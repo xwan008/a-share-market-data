@@ -29,7 +29,7 @@ def main() -> int:
         old.unlink()
 
     common = {
-        "schema_version": 4,
+        "schema_version": 5,
         "generated_at": latest.get("generated_at"),
         "trade_date": latest.get("trade_date"),
         "market_status": latest.get("market_status"),
@@ -56,7 +56,8 @@ def main() -> int:
     for key, stocks in groups.items():
         payload = {**common, "shard": key, "stocks": stocks}
         (SHARDS / f"{key}.json").write_text(
-            json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
+            json.dumps(payload, ensure_ascii=False, indent=2),
+            encoding="utf-8",
         )
 
     health = {
@@ -67,15 +68,27 @@ def main() -> int:
         "history": {
             "storage": trends.get("history_storage"),
             "window_days": trends.get("history_window_days"),
+            "structure_window_days": trends.get("structure_window_days"),
             "history_shard_key_length": trends.get("history_shard_key_length"),
             "coverage": coverage,
         },
-        "sample_quotes": {code: latest_stocks.get(code) for code in SAMPLES},
+        "sample_quotes": {
+            code: {
+                **(latest_stocks.get(code) or {}),
+                "trend": trend_stocks.get(code),
+            }
+            for code in SAMPLES
+        },
     }
-    (DATA / "health.json").write_text(json.dumps(health, ensure_ascii=False, indent=2), encoding="utf-8")
+    (DATA / "health.json").write_text(
+        json.dumps(health, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
     print(
         f"wrote {len(groups)} {SHARD_KEY_LENGTH}-digit quote shards; "
-        f"history >=5d: {coverage.get('points_ge_5', 0)}, >=20d: {coverage.get('points_ge_20', 0)}"
+        f"history >=5d: {coverage.get('points_ge_5', 0)}, "
+        f">=20d: {coverage.get('points_ge_20', 0)}, "
+        f">=60d: {coverage.get('points_ge_60', 0)}"
     )
     return 0
 
