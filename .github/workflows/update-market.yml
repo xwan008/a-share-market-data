@@ -6,6 +6,9 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/update-market.yml'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'requirements.txt'
   schedule:
     # Beijing time. Two attempts around each target window reduce transient failures.
     - cron: '37 11 * * 1-5'
