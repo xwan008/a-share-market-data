@@ -1,0 +1,56 @@
+name: Backfill A-share rolling history
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/backfill-history.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: a-share-market-data-write
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Backfill latest 25 sessions from Tencent K-line
+        run: python scripts/backfill_history.py
+
+      - name: Build 5d/20d trend summary
+        run: python scripts/build_history.py
+
+      - name: Rebuild compact ChatGPT bridge files
+        run: python scripts/build_bridge.py
+
+      - name: Commit rolling history
+        shell: bash
+        run: |
+          if git status --porcelain -- data | grep -q .; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -A data
+            git commit -m "data: backfill rolling A-share history"
+            git push
+          else
+            echo "No backfill changes to commit."
+          fi
+
+# Creating/updating this workflow triggers one validation backfill; later runs are manual.
