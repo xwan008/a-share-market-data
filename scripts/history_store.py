@@ -4,13 +4,14 @@ import json
 from collections import defaultdict
 from datetime import date
 from pathlib import Path
+from typing import Iterable
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data"
 HISTORY_SHARDS_DIR = DATA_DIR / "history_shards"
 LATEST_PATH = DATA_DIR / "latest.json"
 
-ROLLING_DAYS = 25
+ROLLING_DAYS = 65
 HISTORY_SHARD_KEY_LENGTH = 4
 USABLE_CONFIDENCE = {"high", "medium"}
 
@@ -34,11 +35,18 @@ def compact_row(trade_date: str, quote: dict) -> dict:
         "low": quote.get("low"),
         "close": quote.get("price"),
         "volume": quote.get("volume"),
+        "prev_close": quote.get("prev_close"),
         "confidence": quote.get("confidence"),
+        "basis": "live_close",
+        "source": quote.get("primary_source"),
     }
 
 
-def merge_rows(existing: list[dict], incoming: list[dict], limit: int = ROLLING_DAYS) -> list[dict]:
+def merge_rows(
+    existing: list[dict],
+    incoming: list[dict],
+    limit: int = ROLLING_DAYS,
+) -> list[dict]:
     by_date: dict[str, dict] = {}
     for row in [*existing, *incoming]:
         d = row.get("date")
@@ -48,39 +56,79 @@ def merge_rows(existing: list[dict], incoming: list[dict], limit: int = ROLLING_
     return [by_date[d] for d in sorted(by_date)[-limit:]]
 
 
-def write_history_shards(series: dict[str, dict], generated_at: str | None = None) -> int:
+def _basis_after_merge(old_basis: str | None, item: dict, replace: bool) -> str:
+    incoming_basis = item.get("history_basis")
+    if replace and incoming_basis:
+        return str(incoming_basis)
+    if incoming_basis:
+        return str(incoming_basis)
+    if old_basis in {"tencent_qfq", "tencent_qfq_plus_live_tail"}:
+        return "tencent_qfq_plus_live_tail"
+    return old_basis or "live_close_only"
+
+
+def write_history_shards(
+    series: dict[str, dict],
+    generated_at: str | None = None,
+    *,
+    replace: bool = False,
+    prune_to_codes: Iterable[str] | None = None,
+) -> int:
     HISTORY_SHARDS_DIR.mkdir(parents=True, exist_ok=True)
     groups: dict[str, dict] = defaultdict(dict)
+    valid_codes = {str(c).zfill(6) for c in prune_to_codes} if prune_to_codes is not None else None
 
     for code, item in series.items():
         code = str(code).zfill(6)
         key = code[:HISTORY_SHARD_KEY_LENGTH]
         groups[key][code] = item
 
-    for key, stocks in groups.items():
+    keys = set(groups)
+    if valid_codes is not None:
+        keys.update(path.stem for path in HISTORY_SHARDS_DIR.glob("*.json"))
+
+    written = 0
+    for key in sorted(keys):
         path = HISTORY_SHARDS_DIR / f"{key}.json"
         current = read_json(path, {"stocks": {}})
         current_stocks = current.get("stocks", {})
 
-        for code, item in stocks.items():
+        if valid_codes is not None:
+            current_stocks = {c: v for c, v in current_stocks.items() if c in valid_codes}
+
+        for code, item in groups.get(key, {}).items():
             old = current_stocks.get(code, {})
-            rows = merge_rows(old.get("history", []), item.get("history", []))
+            rows = merge_rows(
+                [] if replace else old.get("history", []),
+                item.get("history", []),
+            )
             current_stocks[code] = {
                 "name": item.get("name") or old.get("name"),
+                "history_basis": _basis_after_merge(old.get("history_basis"), item, replace),
+                "last_full_refresh": item.get("last_full_refresh") or old.get("last_full_refresh"),
                 "history": rows,
             }
 
+        if not current_stocks:
+            if path.exists():
+                path.unlink()
+            continue
+
         payload = {
-            "schema_version": 1,
+            "schema_version": 2,
             "generated_at": generated_at,
             "rolling_days": ROLLING_DAYS,
             "history_shard_key_length": HISTORY_SHARD_KEY_LENGTH,
             "shard": key,
             "stocks": current_stocks,
         }
-        path.write_text(json.dumps(payload, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+        path.write_text(
+            json.dumps(payload, ensure_ascii=False, separators=(",", ":")),
+            encoding="utf-8",
+        )
+        written += 1
 
-    return len(groups)
+    return written
 
 
 def append_latest_snapshot() -> tuple[int, int]:
@@ -123,7 +171,11 @@ def append_latest_snapshot() -> tuple[int, int]:
             "history": [compact_row(trade_date, quote)],
         }
 
-    shard_count = write_history_shards(updates, latest.get("generated_at"))
+    shard_count = write_history_shards(
+        updates,
+        latest.get("generated_at"),
+        prune_to_codes=stocks.keys(),
+    )
     print(
         json.dumps(
             {
