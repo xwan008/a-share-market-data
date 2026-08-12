@@ -49,10 +49,13 @@ jobs:
       - name: Fetch and validate quotes
         run: python scripts/fetch_market.py
 
+      - name: Detect and repair corporate-action qfq drift
+        run: python scripts/repair_corporate_actions.py
+
       - name: Append closed session to bounded rolling history
         run: python scripts/history_store.py
 
-      - name: Build 5d/20d/60d trend, density and structure summary
+      - name: Build 5d/20d/60d trend, density, volume and structure summary
         run: python scripts/build_history.py
 
       - name: Build compact ChatGPT bridge files
@@ -83,4 +86,6 @@ jobs:
           fi
 
 # Intraday/morning snapshots update current quote files only.
+# Corporate-action repair may refresh affected completed qfq history intraday,
+# but the current unfinished candle is explicitly excluded.
 # Rolling history accepts only market_status=closed and remains capped at 65 sessions per stock.
