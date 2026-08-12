@@ -25,31 +25,35 @@ def _num(value: Any) -> float | None:
     return number if isfinite(number) else None
 
 
-def validate_price(
-    *,
-    primary_price: Any,
-    secondary_price: Any | None,
-    max_diff_pct: float = 0.2,
-) -> ValidationResult:
+def normalize_quote_date(value: Any) -> str | None:
+    """Accept only unambiguous modern dates. Two-digit years are intentionally rejected."""
+    if value is None:
+        return None
+    text = str(value).strip().replace("/", "-")
+    for fmt in ("%Y-%m-%d", "%Y%m%d"):
+        try:
+            dt = datetime.strptime(text, fmt)
+        except ValueError:
+            continue
+        if 2000 <= dt.year <= 2100:
+            return dt.date().isoformat()
+    return None
+
+
+def validate_price(*, primary_price: Any, secondary_price: Any | None, max_diff_pct: float = 0.2) -> ValidationResult:
     warnings: list[str] = []
     primary = _num(primary_price)
     secondary = _num(secondary_price)
-
     if primary is None or primary <= 0:
         return ValidationResult("invalid", False, ["primary_price_invalid"], {})
-
     source_prices = {"primary": primary}
     if secondary is None or secondary <= 0:
-        warnings.append("secondary_source_unavailable")
-        return ValidationResult("medium", True, warnings, source_prices)
-
+        return ValidationResult("medium", True, ["secondary_source_unavailable"], source_prices)
     source_prices["secondary"] = secondary
     diff_pct = abs(primary - secondary) / primary * 100
     if diff_pct <= max_diff_pct:
         return ValidationResult("high", True, warnings, source_prices)
-
-    warnings.append(f"source_price_diff_pct={diff_pct:.3f}")
-    return ValidationResult("invalid", False, warnings, source_prices)
+    return ValidationResult("invalid", False, [f"source_price_diff_pct={diff_pct:.3f}"], source_prices)
 
 
 def validate_quote_fields(quote: dict[str, Any]) -> list[str]:
@@ -58,7 +62,6 @@ def validate_quote_fields(quote: dict[str, Any]) -> list[str]:
         value = _num(quote.get(key))
         if value is None or value <= 0:
             warnings.append(f"{key}_invalid")
-
     price = _num(quote.get("price"))
     prev_close = _num(quote.get("prev_close"))
     pct = _num(quote.get("change_pct"))
@@ -66,14 +69,13 @@ def validate_quote_fields(quote: dict[str, Any]) -> list[str]:
         derived = (price / prev_close - 1) * 100
         if abs(derived - pct) > 0.5:
             warnings.append("change_pct_inconsistent")
-
     return warnings
 
 
 def parse_quote_time(date_value: Any, time_value: Any, tz_suffix: str = "+08:00") -> str | None:
-    if not date_value:
+    date_text = normalize_quote_date(date_value)
+    if not date_text:
         return None
-    date_text = str(date_value).replace("/", "-").strip()
     time_text = str(time_value or "15:00:00").strip()
     if len(time_text) == 5:
         time_text += ":00"
