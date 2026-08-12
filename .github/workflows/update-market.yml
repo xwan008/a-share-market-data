@@ -48,6 +48,9 @@ jobs:
       - name: Build rolling trend summary
         run: python scripts/build_history.py
 
+      - name: Build compact ChatGPT bridge files
+        run: python scripts/build_bridge.py
+
       - name: Commit updated data
         shell: bash
         run: |
@@ -57,8 +60,9 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/latest.json data/trend_summary.json data/history/
+          git add data/latest.json data/trend_summary.json data/health.json data/history/ data/shards/
           git commit -m "data: update A-share snapshot"
           git push
 
 # Touch this file only when an immediate validation run is needed.
+# Bridge shards enabled.
