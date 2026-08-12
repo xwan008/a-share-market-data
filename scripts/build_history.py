@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from datetime import date, datetime
 from pathlib import Path
-from statistics import mean
+from statistics import mean, median
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data"
@@ -160,14 +160,8 @@ def structure_zones(rows: list[dict], current_close: float) -> tuple[list[dict],
     lows = _local_extrema(window, "low", "low")
     highs = _local_extrema(window, "high", "high")
 
-    supports = [
-        z for z in _cluster_levels(lows)
-        if z["center"] <= current_close * 1.02
-    ]
-    resistances = [
-        z for z in _cluster_levels(highs)
-        if z["center"] >= current_close * 0.98
-    ]
+    supports = [z for z in _cluster_levels(lows) if z["center"] <= current_close * 1.02]
+    resistances = [z for z in _cluster_levels(highs) if z["center"] >= current_close * 0.98]
 
     support_ranked = sorted(
         supports,
@@ -181,6 +175,60 @@ def structure_zones(rows: list[dict], current_close: float) -> tuple[list[dict],
     for z in [*support_ranked, *resistance_ranked]:
         z.pop("_last_index", None)
     return support_ranked, resistance_ranked
+
+
+def price_density_zones(rows: list[dict], current_close: float) -> list[dict]:
+    """Cluster repeated closing prices into compact 60d trading-density zones."""
+    window = rows[-STRUCTURE_WINDOW:]
+    observations: list[tuple[float, int, str]] = []
+    for i, row in enumerate(window):
+        value = fnum(row.get("close"))
+        if value is not None and value > 0:
+            observations.append((value, i, str(row.get("date"))))
+    if len(observations) < 5:
+        return []
+
+    typical = median(x[0] for x in observations)
+    bin_width = max(typical * 0.025, 0.01)
+    bins: dict[int, list[tuple[float, int, str]]] = {}
+    for obs in observations:
+        bucket = int(obs[0] // bin_width)
+        bins.setdefault(bucket, []).append(obs)
+
+    zones: list[dict] = []
+    for obs in bins.values():
+        if len(obs) < 2:
+            continue
+        prices = [x[0] for x in obs]
+        center = mean(prices)
+        low = min(prices) * 0.995
+        high = max(prices) * 1.005
+        latest = max(obs, key=lambda x: x[1])
+        if high < current_close * 0.99:
+            relation = "below"
+        elif low > current_close * 1.01:
+            relation = "above"
+        else:
+            relation = "current"
+        zones.append(
+            {
+                "low": round(low, 4),
+                "high": round(high, 4),
+                "center": round(center, 4),
+                "closes": len(obs),
+                "relation": relation,
+                "last_date": latest[2],
+                "_last_index": latest[1],
+            }
+        )
+
+    zones = sorted(
+        zones,
+        key=lambda z: (-z["closes"], abs(current_close - z["center"]), -z["_last_index"]),
+    )[:5]
+    for z in zones:
+        z.pop("_last_index", None)
+    return zones
 
 
 def build_stock_summary(
@@ -222,12 +270,8 @@ def build_stock_summary(
         "last_full_refresh": item.get("last_full_refresh"),
         "high_20d": high20,
         "low_20d": low20,
-        "close_change_5d_pct": (
-            pct_change(last5_closes[0], last5_closes[-1]) if points >= 5 else None
-        ),
-        "close_change_20d_pct": (
-            pct_change(last20_closes[0], last20_closes[-1]) if points >= 20 else None
-        ),
+        "close_change_5d_pct": pct_change(last5_closes[0], last5_closes[-1]) if points >= 5 else None,
+        "close_change_20d_pct": pct_change(last20_closes[0], last20_closes[-1]) if points >= 20 else None,
         "last5": [{"date": r.get("date"), "close": r.get("close")} for r in last5],
     }
 
@@ -235,6 +279,7 @@ def build_stock_summary(
         high60 = max(float(r.get("high") or r["close"]) for r in last60)
         low60 = min(float(r.get("low") or r["close"]) for r in last60)
         supports, resistances = structure_zones(last60, current_close)
+        dense_zones = price_density_zones(last60, current_close)
         out["structure_60d"] = {
             "points": len(last60),
             "high": high60,
@@ -242,13 +287,10 @@ def build_stock_summary(
             "close_change_pct": pct_change(last60_closes[0], last60_closes[-1]),
             "ma20": mean(last20_closes),
             "ma60": mean(last60_closes),
-            "position_pct": (
-                (current_close - low60) / (high60 - low60) * 100
-                if high60 > low60
-                else 50.0
-            ),
+            "position_pct": (current_close - low60) / (high60 - low60) * 100 if high60 > low60 else 50.0,
             "support_zones": supports,
             "resistance_zones": resistances,
+            "dense_price_zones": dense_zones,
         }
     else:
         out["structure_60d"] = None
