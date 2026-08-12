@@ -3,7 +3,9 @@ from __future__ import annotations
 import json
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import requests
 
@@ -16,7 +18,7 @@ STATUS_PATH = DATA_DIR / "backfill_status.json"
 
 URL = "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get"
 MAX_WORKERS = 12
-REQUEST_BARS = 35
+REQUEST_BARS = 80
 RETRIES = 2
 
 
@@ -31,7 +33,11 @@ def as_float(value):
         return None
 
 
-def fetch_tencent_history(code: str, name: str | None) -> tuple[str, dict | None, str | None]:
+def fetch_tencent_history(
+    code: str,
+    name: str | None,
+    refreshed_at: str,
+) -> tuple[str, dict | None, str | None]:
     symbol = symbol_for(code)
     params = {"param": f"{symbol},day,,,{REQUEST_BARS},qfq"}
     last_error: str | None = None
@@ -69,11 +75,22 @@ def fetch_tencent_history(code: str, name: str | None) -> tuple[str, dict | None
                         "close": close,
                         "volume": volume,
                         "confidence": "historical_tencent",
+                        "basis": "qfq",
+                        "source": "tencent",
                     }
                 )
             history = sorted(history, key=lambda r: r["date"])[-ROLLING_DAYS:]
             if history:
-                return code, {"name": name, "history": history}, None
+                return (
+                    code,
+                    {
+                        "name": name,
+                        "history_basis": "tencent_qfq",
+                        "last_full_refresh": refreshed_at,
+                        "history": history,
+                    },
+                    None,
+                )
             last_error = "no_history_rows"
         except Exception as exc:
             last_error = f"{type(exc).__name__}:{exc}"
@@ -86,7 +103,8 @@ def fetch_tencent_history(code: str, name: str | None) -> tuple[str, dict | None
 def main() -> int:
     latest = read_json(LATEST_PATH, {})
     stocks = latest.get("stocks", {})
-    generated_at = latest.get("generated_at")
+    latest_generated_at = latest.get("generated_at")
+    refreshed_at = datetime.now(ZoneInfo("Asia/Shanghai")).isoformat()
     if not stocks:
         print("latest.json has no stocks")
         return 2
@@ -97,7 +115,12 @@ def main() -> int:
 
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as pool:
         futures = {
-            pool.submit(fetch_tencent_history, code, stocks[code].get("name")): code
+            pool.submit(
+                fetch_tencent_history,
+                code,
+                stocks[code].get("name"),
+                refreshed_at,
+            ): code
             for code in codes
         }
         for future in as_completed(futures):
@@ -107,25 +130,31 @@ def main() -> int:
             else:
                 failures[code] = error or "unknown"
 
-    shard_count = write_history_shards(results, generated_at)
+    shard_count = write_history_shards(
+        results,
+        refreshed_at,
+        replace=True,
+        prune_to_codes=stocks.keys(),
+    )
     success_ratio = len(results) / len(codes) if codes else 0.0
     status = {
-        "schema_version": 1,
+        "schema_version": 2,
         "source": "tencent_qfq_day",
         "requested_stocks": len(codes),
         "successful_stocks": len(results),
         "failed_stocks": len(failures),
         "success_ratio": success_ratio,
         "rolling_days": ROLLING_DAYS,
+        "request_bars": REQUEST_BARS,
         "history_shards_written": shard_count,
         "latest_trade_date": latest.get("trade_date"),
+        "latest_generated_at": latest_generated_at,
+        "history_refreshed_at": refreshed_at,
         "sample_failures": dict(list(failures.items())[:30]),
     }
     STATUS_PATH.write_text(json.dumps(status, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps(status, ensure_ascii=False))
 
-    # Partial failure is expected for suspended/newly listed securities. Only fail the
-    # workflow if the bulk source itself appears unusable.
     return 0 if success_ratio >= 0.70 else 3
 
 
