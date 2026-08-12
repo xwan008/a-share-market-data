@@ -61,6 +61,7 @@ jobs:
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add -A data
             git commit -m "data: update A-share snapshot and rolling history"
+            git pull --rebase origin main
             git push
           else
             echo "No market-data changes to commit."
