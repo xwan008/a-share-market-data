@@ -25,7 +25,7 @@ permissions:
 
 concurrency:
   group: a-share-market-data-write
-  cancel-in-progress: false
+  cancel-in-progress: ${{ github.event_name == 'push' }}
 
 jobs:
   update:
