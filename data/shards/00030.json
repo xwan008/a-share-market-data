@@ -1,42 +1,11 @@
 {
-  "schema_version": 4,
-  "generated_at": "2026-08-12T17:29:20.280441+08:00",
+  "schema_version": 5,
+  "generated_at": "2026-08-12T18:08:33.606941+08:00",
   "trade_date": "2026-08-12",
   "market_status": "closed",
   "shard_key_length": 5,
   "shard": "00030",
   "stocks": {
-    "000300": {
-      "name": "沪深300",
-      "price": 4690.9165,
-      "prev_close": 4663.7887,
-      "open": 4660.4658,
-      "high": 4700.4347,
-      "low": 4657.6933,
-      "price_time": "2026-08-12T15:35:40+08:00",
-      "confidence": "high",
-      "primary_source": "sina",
-      "source_prices": {
-        "sina": 4690.9165,
-        "tencent": 4690.92,
-        "akshare": null
-      },
-      "trend": {
-        "points": 1,
-        "last_date": "2026-08-12",
-        "last_close": 4690.9165,
-        "high_20d": 4700.4347,
-        "low_20d": 4657.6933,
-        "close_change_5d_pct": null,
-        "close_change_20d_pct": null,
-        "last5": [
-          {
-            "date": "2026-08-12",
-            "close": 4690.9165
-          }
-        ]
-      }
-    },
     "000301": {
       "name": "东方盛虹",
       "price": 12.92,
@@ -53,9 +22,16 @@
         "akshare": null
       },
       "trend": {
-        "points": 20,
+        "points": 25,
         "last_date": "2026-08-12",
         "last_close": 12.92,
+        "history_confidence": "medium",
+        "history_warnings": [
+          "full_refresh_age_unknown",
+          "fewer_than_60_points"
+        ],
+        "history_basis": "live_close_only",
+        "last_full_refresh": null,
         "high_20d": 13.75,
         "low_20d": 11.15,
         "close_change_5d_pct": 0.15503875968991832,
@@ -81,7 +57,8 @@
             "date": "2026-08-12",
             "close": 12.92
           }
-        ]
+        ],
+        "structure_60d": null
       }
     }
   }
