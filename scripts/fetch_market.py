@@ -15,10 +15,22 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data"
 LATEST_PATH = DATA_DIR / "latest.json"
 
+SH_MAIN_PREFIXES = ("600", "601", "603", "605")
+SZ_MAIN_PREFIXES = ("000", "001", "002", "003")
+
 
 def is_main_board(code: str) -> bool:
     code = str(code).zfill(6)
-    return code.startswith(("600", "601", "603", "605", "000", "001", "002", "003"))
+    return code.startswith((*SH_MAIN_PREFIXES, *SZ_MAIN_PREFIXES))
+
+
+def is_main_board_symbol(raw: str) -> bool:
+    raw = str(raw).lower().strip()
+    if raw.startswith("sh"):
+        return raw[2:].zfill(6).startswith(SH_MAIN_PREFIXES)
+    if raw.startswith("sz"):
+        return raw[2:].zfill(6).startswith(SZ_MAIN_PREFIXES)
+    return is_main_board(raw)
 
 
 def normalize_code(raw: str) -> str:
@@ -43,9 +55,9 @@ def fetch_easyquotation_snapshot(provider: str) -> dict[str, dict]:
     raw = q.market_snapshot(prefix=True)
     out: dict[str, dict] = {}
     for symbol, item in raw.items():
-        code = normalize_code(symbol)
-        if not is_main_board(code):
+        if not is_main_board_symbol(symbol):
             continue
+        code = normalize_code(symbol)
         out[code] = {
             "name": item.get("name"),
             "price": item.get("now"),
@@ -116,9 +128,9 @@ def infer_trade_date(sources: list[dict[str, dict]], now: datetime) -> str | Non
     dates: list[str] = []
     for source in sources:
         for item in source.values():
-            date = normalize_quote_date(item.get("date"))
-            if date:
-                dates.append(date)
+            quote_date = normalize_quote_date(item.get("date"))
+            if quote_date:
+                dates.append(quote_date)
     if not dates:
         return None
     return Counter(dates).most_common(1)[0][0]
@@ -127,8 +139,8 @@ def infer_trade_date(sources: list[dict[str, dict]], now: datetime) -> str | Non
 def source_is_fresh(item: dict, trade_date: str | None) -> bool:
     if not item or positive_number(item.get("price")) is None:
         return False
-    date = normalize_quote_date(item.get("date"))
-    return date is not None and trade_date is not None and date == trade_date
+    quote_date = normalize_quote_date(item.get("date"))
+    return quote_date is not None and trade_date is not None and quote_date == trade_date
 
 
 def main() -> int:
@@ -188,11 +200,15 @@ def main() -> int:
                 "change_pct": a.get("change_pct"),
             }
         )
-        quote_time = parse_quote_time(base.get("date"), base.get("time")) if source in {"sina", "tencent"} else None
+        quote_time = (
+            parse_quote_time(base.get("date"), base.get("time"))
+            if source in {"sina", "tencent"}
+            else None
+        )
 
         quote = {
             "name": base.get("name") or s.get("name") or t.get("name") or a.get("name"),
-            "market": "SH" if code.startswith(("600", "601", "603", "605")) else "SZ",
+            "market": "SH" if code.startswith(SH_MAIN_PREFIXES) else "SZ",
             "price": base.get("price"),
             "prev_close": base.get("prev_close"),
             "open": base.get("open"),
@@ -218,7 +234,7 @@ def main() -> int:
         stats[validation.confidence] += 1
 
     payload = {
-        "schema_version": 2,
+        "schema_version": 3,
         "generated_at": now.isoformat(),
         "trade_date": trade_date,
         "timezone": "Asia/Shanghai",
