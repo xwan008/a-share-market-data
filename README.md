@@ -4,11 +4,12 @@ A lightweight, serverless A-share market-data bridge for the downstream ChatGPT 
 
 ## What it does
 
-- Pulls the A-share main-board snapshot with Sina/easyquotation as a primary quote source.
-- Uses additional public sources such as Tencent and AKShare/Eastmoney for verification/fallback when available.
-- Publishes a confidence level for every current price.
-- Saves post-close history and gradually builds 5-day/20-day trend context.
-- Generates small four-digit-code shards so ChatGPT never needs to load the full-market JSON just to verify one candidate.
+- Pulls A-share main-board current quotes with Sina/easyquotation as a primary source.
+- Uses Tencent and AKShare/Eastmoney as verification/fallback sources when available.
+- Publishes a confidence level for every current-price anchor.
+- Keeps a **bounded rolling history of at most 25 sessions per stock**.
+- Precomputes 5-session and 20-session trend context.
+- Generates small quote shards so ChatGPT does not need to load the full-market JSON for a candidate.
 
 ## Main-board universe
 
@@ -19,13 +20,13 @@ Included:
 
 Excluded: ChiNext (`300/301`), STAR (`688/689`) and BSE.
 
-## Confidence rules
+## Current-price confidence
 
 - `high`: current price has strong multi-source agreement/verification.
 - `medium`: one valid fresh source is available; price is usable but should be labelled single-source/medium confidence downstream.
 - `invalid`: price is missing/non-positive, stale, or available sources materially conflict.
 
-The downstream task should accept `high` and `medium`. Only `invalid` or missing records should fall back to public-web quote validation.
+The downstream task accepts `high` and `medium`. Only `invalid` or missing records fall back to public-web quote validation.
 
 ## Files consumed by ChatGPT
 
@@ -37,23 +38,24 @@ Always read this first. It provides:
 - `trade_date`
 - `market_status`
 - source status/errors
-- high/medium/invalid coverage
+- high/medium/invalid price coverage
 - `shard_key_length`
-- sample quotes used as a pipeline smoke test
+- rolling-history configuration and 5d/20d coverage
+- sample quotes used as pipeline smoke tests
 
-If this file is stale or the trade date is wrong for the requested run, do not trust the bridge blindly; use the existing public-web fallback.
+The quote shard length is deliberately discoverable rather than hard-coded. Read `shard_key_length = N`, then use the first `N` digits of a stock code.
 
-### 2. `data/shards/<first-four-digits>.json`
+At the time of writing the bridge uses five-digit quote shards, for example:
 
-Current shard key length is **4**.
+- `002475` → `data/shards/00247.json`
+- `601138` → `data/shards/60113.json`
+- `601899` → `data/shards/60189.json`
 
-Examples:
+If the shard layout changes later, downstream code should continue to work by following `health.json`.
 
-- `002475` (立讯精密) → `data/shards/0024.json`
-- `601138` (工业富联) → `data/shards/6011.json`
-- `601899` (紫金矿业) → `data/shards/6018.json`
+### 2. `data/shards/<dynamic-key>.json`
 
-Each stock record contains the current quote anchor and, as history accumulates, its trend summary:
+Each stock record contains its current quote anchor plus a trend summary:
 
 ```json
 {
@@ -64,65 +66,99 @@ Each stock record contains the current quote anchor and, as history accumulates,
   "low": 55.30,
   "price_time": "2026-08-12T15:35:15+08:00",
   "confidence": "high",
-  "primary_source": "sina",
   "source_prices": {
     "sina": 57.35,
     "tencent": 57.35,
     "akshare": null
   },
   "trend": {
-    "points": 1,
+    "points": 20,
     "last_date": "2026-08-12",
     "last_close": 57.35,
-    "high_20d": 57.58,
-    "low_20d": 55.30,
-    "close_change_5d_pct": null,
-    "close_change_20d_pct": null
+    "high_20d": 64.201,
+    "low_20d": 52.65,
+    "close_change_5d_pct": 2.59,
+    "close_change_20d_pct": -6.66,
+    "last5": [
+      {"date": "2026-08-06", "close": 55.90},
+      {"date": "2026-08-07", "close": 56.99},
+      {"date": "2026-08-10", "close": 55.79},
+      {"date": "2026-08-11", "close": 55.63},
+      {"date": "2026-08-12", "close": 57.35}
+    ]
   }
 }
 ```
 
-Do not interpret `high_20d`, `low_20d`, `close_change_5d_pct`, or `close_change_20d_pct` as genuine 5/20-session statistics until `trend.points` is large enough:
+Use 5-session fields only when `trend.points >= 5`, and 20-session fields only when `trend.points >= 20`.
 
-- `points >= 5`: use 5-session fields.
-- `points >= 20`: use 20-session fields.
-- below those thresholds: supplement technical trend with dated public historical pages/K-line sources.
+### 3. `data/history_shards/<first-four-digits>.json`
 
-### 3. `data/latest.json`
+This is the bounded internal history store. It uses four-digit shards independently of the quote-shard layout.
 
-Full-market source snapshot retained for storage/debugging. It is intentionally **not** the preferred ChatGPT read path because it is large.
+Each stock contains a `history` array with at most 25 dated OHLCV rows. On every update:
 
-### 4. `data/trend_summary.json`
+1. the latest session is merged by trading date;
+2. a duplicate trading date overwrites the previous row rather than being appended twice;
+3. rows are sorted by date;
+4. only the newest 25 are retained.
 
-Full-market accumulated trend file retained for processing/debugging. Per-stock trend data is also embedded in the small shard files for downstream reads.
+Therefore the working history does **not** grow with repository age. Running the project for five years still leaves at most 25 stored sessions per stock.
 
-## GitHub Actions schedule
+### 4. `data/latest.json`
 
-The workflow runs on weekdays at Beijing time:
+Full-market current snapshot retained for processing/debugging. It is intentionally not the preferred ChatGPT read path because it is large.
+
+### 5. `data/trend_summary.json`
+
+Full-market derived trend output. The relevant per-stock trend is embedded in the small quote shard, so normal downstream reads do not need this large file.
+
+### 6. `data/backfill_status.json`
+
+Records the latest manual historical backfill result and source coverage.
+
+## Historical bootstrap
+
+The repository does not need to wait 20 future trading days before 5d/20d analysis becomes useful.
+
+`Backfill A-share rolling history` is a manual GitHub Actions workflow that requests recent Tencent forward-adjusted daily K-lines and fills the rolling 25-session history store. Individual suspended/new stocks may fail without invalidating the batch; a broad source failure causes the workflow to fail.
+
+After the initial bootstrap, normal quote updates maintain the rolling window automatically. The old one-file-per-day `data/history/YYYY-MM-DD.json` model is no longer used.
+
+## GitHub Actions
+
+### Normal update
+
+Runs on weekdays at Beijing time:
 
 - 11:37
 - 11:52
 - 15:12
 - 15:27
 
-Duplicate runs provide a retry path for temporary upstream/GitHub delays. The workflow can also be run manually.
+Each run:
+
+1. fetches and validates current quotes;
+2. merges the current trading session into bounded history;
+3. rebuilds 5d/20d trend summaries;
+4. rebuilds compact quote shards and health status;
+5. commits the data.
+
+Duplicate runs provide a retry path for transient upstream/GitHub failures. Same-day history is deduplicated, so repeated runs do not create duplicate sessions.
+
+### Historical backfill
+
+The backfill workflow is manual (`workflow_dispatch`) and should normally only be needed for initial bootstrap or history repair.
 
 ## Downstream lookup flow
 
 1. Read `data/health.json` and validate freshness/trade date.
-2. Take the first four digits of the candidate stock code.
-3. Read only that shard file.
-4. Use `high` or `medium` current price directly according to its confidence label.
-5. For missing/invalid records, use the existing Tencent → Eastmoney → dual dated-page fallback.
-6. Use embedded trend only when enough sessions have accumulated; otherwise keep using dated historical pages for 5d/20d structure.
-
-## Local checks
-
-```bash
-python -m py_compile scripts/*.py tests/*.py
-python -m pytest -q
-```
+2. Read `health.shard_key_length = N`.
+3. Take the first `N` digits of the candidate stock code and read only that quote shard.
+4. Use `high` or `medium` current price according to its confidence label.
+5. Use embedded 5d/20d trend when `points` is sufficient.
+6. For missing/invalid current price or insufficient history, use the existing dated public-web fallback.
 
 ## Reliability notes
 
-The upstream quote sources are public, unofficial market endpoints and can be throttled or changed. The bridge therefore uses multiple sources, publishes confidence instead of hiding failures, keeps local history, and retains a downstream web fallback.
+The upstream market-data endpoints are public and unofficial, so they may be throttled or changed. The bridge therefore uses multiple current-price sources, bounded local history, explicit confidence/coverage fields, and a downstream web fallback rather than assuming any one provider is permanently reliable.
