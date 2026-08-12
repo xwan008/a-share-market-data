@@ -57,7 +57,7 @@ Each stock contains current quote fields plus a compact trend object. When histo
   - repeated-close `dense_price_zones`
   - approximate volume-at-price `volume_profile_zones`
 
-`volume_profile_zones` is derived from daily typical price and daily volume (`daily_typical_price_approx`). It is deliberately approximate rather than tick-level volume profile, so downstream logic should use it as corroborating structural evidence, not as a precise cost-distribution claim.
+`volume_profile_zones` is derived from daily typical price and daily volume (`daily_typical_price_approx`). Tencent historical K-line volume is normalized from board lots to **shares**, matching live quote volume, before volume shares are compared. It is deliberately approximate rather than tick-level volume profile, so downstream logic should use it as corroborating structural evidence, not as a precise cost-distribution claim.
 
 The 60d fields are a structural summary, not an instruction to mechanically buy at the nearest support.
 
