@@ -23,6 +23,7 @@ URL = "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get"
 MAX_WORKERS = 12
 REQUEST_BARS = 80
 RETRIES = 2
+TENCENT_VOLUME_LOT_SIZE = 100
 
 
 def symbol_for(code: str) -> str:
@@ -45,6 +46,8 @@ def fetch_tencent_history(
 ) -> tuple[str, dict | None, str | None]:
     """Fetch a bounded Tencent qfq daily series.
 
+    Tencent daily K-line volume is expressed in board lots (手) for A shares;
+    normalize it to shares so it is comparable with live quote volume.
     exclude_date is used by intraday corporate-action repair so the current
     unfinished session can never enter completed daily history.
     """
@@ -75,7 +78,8 @@ def fetch_tencent_history(
                 close = as_float(row[2])
                 high = as_float(row[3])
                 low = as_float(row[4])
-                volume = as_float(row[5])
+                volume_lots = as_float(row[5])
+                volume_shares = volume_lots * TENCENT_VOLUME_LOT_SIZE if volume_lots is not None else None
                 if close is None or close <= 0:
                     continue
                 history.append(
@@ -85,7 +89,8 @@ def fetch_tencent_history(
                         "high": high,
                         "low": low,
                         "close": close,
-                        "volume": volume,
+                        "volume": volume_shares,
+                        "volume_unit": "shares",
                         "confidence": "historical_tencent",
                         "basis": "qfq",
                         "source": "tencent",
@@ -150,7 +155,7 @@ def main() -> int:
     )
     success_ratio = len(results) / len(codes) if codes else 0.0
     status = {
-        "schema_version": 2,
+        "schema_version": 3,
         "source": "tencent_qfq_day",
         "requested_stocks": len(codes),
         "successful_stocks": len(results),
@@ -158,6 +163,8 @@ def main() -> int:
         "success_ratio": success_ratio,
         "rolling_days": ROLLING_DAYS,
         "request_bars": REQUEST_BARS,
+        "volume_unit": "shares",
+        "tencent_source_volume_unit": "lots_100_shares",
         "history_shards_written": shard_count,
         "latest_trade_date": latest.get("trade_date"),
         "latest_generated_at": latest_generated_at,
