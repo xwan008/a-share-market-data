@@ -20,6 +20,7 @@ def read_json(path: Path, default: dict) -> dict:
 def main() -> int:
     latest = read_json(DATA / "latest.json", {})
     trends = read_json(DATA / "trend_summary.json", {"stocks": {}})
+    repair = read_json(DATA / "repair_status.json", {})
     latest_stocks = latest.get("stocks", {})
     trend_stocks = trends.get("stocks", {})
     coverage = trends.get("coverage", {})
@@ -29,7 +30,7 @@ def main() -> int:
         old.unlink()
 
     common = {
-        "schema_version": 5,
+        "schema_version": 6,
         "generated_at": latest.get("generated_at"),
         "trade_date": latest.get("trade_date"),
         "market_status": latest.get("market_status"),
@@ -71,6 +72,7 @@ def main() -> int:
             "structure_window_days": trends.get("structure_window_days"),
             "history_shard_key_length": trends.get("history_shard_key_length"),
             "coverage": coverage,
+            "corporate_action_repair": repair,
         },
         "sample_quotes": {
             code: {
@@ -88,7 +90,8 @@ def main() -> int:
         f"wrote {len(groups)} {SHARD_KEY_LENGTH}-digit quote shards; "
         f"history >=5d: {coverage.get('points_ge_5', 0)}, "
         f">=20d: {coverage.get('points_ge_20', 0)}, "
-        f">=60d: {coverage.get('points_ge_60', 0)}"
+        f">=60d: {coverage.get('points_ge_60', 0)}, "
+        f"repairs: {repair.get('repaired', 0)}"
     )
     return 0
 
