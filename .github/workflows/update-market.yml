@@ -52,7 +52,7 @@ jobs:
       - name: Append closed session to bounded rolling history
         run: python scripts/history_store.py
 
-      - name: Build 5d/20d/60d trend and structure summary
+      - name: Build 5d/20d/60d trend, density and structure summary
         run: python scripts/build_history.py
 
       - name: Build compact ChatGPT bridge files
