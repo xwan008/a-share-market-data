@@ -2,6 +2,10 @@ name: Update A-share market data
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/update-market.yml'
   schedule:
     # Beijing time. GitHub supports IANA timezones for scheduled workflows.
     # Two morning-close attempts and two post-close attempts reduce transient failures.
