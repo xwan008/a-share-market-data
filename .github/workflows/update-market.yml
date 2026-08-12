@@ -1,0 +1,58 @@
+name: Update A-share market data
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Beijing time. GitHub supports IANA timezones for scheduled workflows.
+    # Two morning-close attempts and two post-close attempts reduce transient failures.
+    - cron: '37 11 * * 1-5'
+      timezone: 'Asia/Shanghai'
+    - cron: '52 11 * * 1-5'
+      timezone: 'Asia/Shanghai'
+    - cron: '12 15 * * 1-5'
+      timezone: 'Asia/Shanghai'
+    - cron: '27 15 * * 1-5'
+      timezone: 'Asia/Shanghai'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-a-share-market-data
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Fetch and validate quotes
+        run: python scripts/fetch_market.py
+
+      - name: Build rolling trend summary
+        run: python scripts/build_history.py
+
+      - name: Commit updated data
+        shell: bash
+        run: |
+          if git diff --quiet -- data; then
+            echo "No market-data changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/latest.json data/trend_summary.json data/history/
+          git commit -m "data: update A-share snapshot"
+          git push
