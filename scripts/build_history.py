@@ -1,12 +1,18 @@
 from __future__ import annotations
 
 import json
+from datetime import date, datetime
 from pathlib import Path
+from statistics import mean
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data"
 HISTORY_SHARDS_DIR = DATA_DIR / "history_shards"
 OUTPUT = DATA_DIR / "trend_summary.json"
+LATEST = DATA_DIR / "latest.json"
+
+HISTORY_WINDOW = 65
+STRUCTURE_WINDOW = 60
 
 
 def read_json(path: Path, default: dict) -> dict:
@@ -15,61 +21,281 @@ def read_json(path: Path, default: dict) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def main() -> int:
+def fnum(value) -> float | None:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def pct_change(first: float, last: float) -> float | None:
+    if first == 0:
+        return None
+    return (last / first - 1) * 100
+
+
+def _refresh_age_days(last_full_refresh: str | None, expected_trade_date: str | None) -> int | None:
+    if not last_full_refresh or not expected_trade_date:
+        return None
+    try:
+        refresh_date = datetime.fromisoformat(last_full_refresh).date()
+        expected = date.fromisoformat(expected_trade_date)
+    except ValueError:
+        return None
+    return (expected - refresh_date).days
+
+
+def history_quality(
+    rows: list[dict],
+    *,
+    expected_trade_date: str | None,
+    last_full_refresh: str | None,
+) -> tuple[str, list[str]]:
+    warnings: list[str] = []
+    if not rows:
+        return "invalid", ["no_history"]
+
+    dates = [str(r.get("date") or "") for r in rows]
+    if any(not d for d in dates) or len(set(dates)) != len(dates):
+        return "invalid", ["invalid_or_duplicate_dates"]
+
+    for row in rows:
+        o, h, l, c = map(fnum, (row.get("open"), row.get("high"), row.get("low"), row.get("close")))
+        if c is None or c <= 0:
+            return "invalid", ["invalid_close"]
+        values = [x for x in (o, c, l) if x is not None]
+        if h is not None and values and h + 1e-9 < max(values):
+            return "invalid", ["ohlc_inconsistent"]
+        values = [x for x in (o, c, h) if x is not None]
+        if l is not None and values and l - 1e-9 > min(values):
+            return "invalid", ["ohlc_inconsistent"]
+
+    last_date = dates[-1]
+    if expected_trade_date and last_date != expected_trade_date:
+        warnings.append("last_date_not_latest_trade_date")
+
+    parsed = []
+    for d in dates:
+        try:
+            parsed.append(date.fromisoformat(d))
+        except ValueError:
+            return "invalid", ["invalid_date_format"]
+    if any((b - a).days > 14 for a, b in zip(parsed, parsed[1:])):
+        warnings.append("large_calendar_gap")
+
+    refresh_age = _refresh_age_days(last_full_refresh, expected_trade_date)
+    if refresh_age is None:
+        warnings.append("full_refresh_age_unknown")
+    elif refresh_age > 10:
+        warnings.append("full_refresh_older_than_10d")
+
+    if len(rows) < 20:
+        warnings.append("fewer_than_20_points")
+        return "invalid", warnings
+    if len(rows) < 60:
+        warnings.append("fewer_than_60_points")
+        return "medium", warnings
+    if warnings:
+        return "medium", warnings
+    return "high", []
+
+
+def _local_extrema(rows: list[dict], key: str, mode: str, window: int = 2) -> list[tuple[float, int, str]]:
+    values = [fnum(r.get(key)) for r in rows]
+    out: list[tuple[float, int, str]] = []
+    for i in range(window, len(rows) - window):
+        value = values[i]
+        if value is None:
+            continue
+        neighbors = [v for v in values[i - window : i + window + 1] if v is not None]
+        if not neighbors:
+            continue
+        if mode == "low" and value <= min(neighbors):
+            out.append((value, i, str(rows[i].get("date"))))
+        elif mode == "high" and value >= max(neighbors):
+            out.append((value, i, str(rows[i].get("date"))))
+    return out
+
+
+def _cluster_levels(
+    levels: list[tuple[float, int, str]],
+    *,
+    tolerance_pct: float = 0.025,
+) -> list[dict]:
+    clusters: list[list[tuple[float, int, str]]] = []
+    for level in sorted(levels, key=lambda x: x[0]):
+        if not clusters:
+            clusters.append([level])
+            continue
+        center = mean(x[0] for x in clusters[-1])
+        if center > 0 and abs(level[0] - center) / center <= tolerance_pct:
+            clusters[-1].append(level)
+        else:
+            clusters.append([level])
+
+    out = []
+    for cluster in clusters:
+        prices = [x[0] for x in cluster]
+        center = mean(prices)
+        if len(prices) == 1:
+            zone_low, zone_high = center * 0.99, center * 1.01
+        else:
+            zone_low, zone_high = min(prices) * 0.995, max(prices) * 1.005
+        latest = max(cluster, key=lambda x: x[1])
+        out.append(
+            {
+                "low": round(zone_low, 4),
+                "high": round(zone_high, 4),
+                "center": round(center, 4),
+                "touches": len(cluster),
+                "last_touch_date": latest[2],
+                "_last_index": latest[1],
+            }
+        )
+    return out
+
+
+def structure_zones(rows: list[dict], current_close: float) -> tuple[list[dict], list[dict]]:
+    window = rows[-STRUCTURE_WINDOW:]
+    lows = _local_extrema(window, "low", "low")
+    highs = _local_extrema(window, "high", "high")
+
+    supports = [
+        z for z in _cluster_levels(lows)
+        if z["center"] <= current_close * 1.02
+    ]
+    resistances = [
+        z for z in _cluster_levels(highs)
+        if z["center"] >= current_close * 0.98
+    ]
+
+    support_ranked = sorted(
+        supports,
+        key=lambda z: (-z["touches"], abs(current_close - z["center"]), -z["_last_index"]),
+    )[:3]
+    resistance_ranked = sorted(
+        resistances,
+        key=lambda z: (-z["touches"], abs(current_close - z["center"]), -z["_last_index"]),
+    )[:3]
+
+    for z in [*support_ranked, *resistance_ranked]:
+        z.pop("_last_index", None)
+    return support_ranked, resistance_ranked
+
+
+def build_stock_summary(
+    item: dict,
+    *,
+    expected_trade_date: str | None,
+) -> dict | None:
+    rows = [r for r in item.get("history", []) if fnum(r.get("close")) not in (None, 0)]
+    rows = sorted(rows, key=lambda r: str(r.get("date") or ""))[-HISTORY_WINDOW:]
+    if not rows:
+        return None
+
+    closes = [float(r["close"]) for r in rows]
+    points = len(rows)
+    last5 = rows[-5:]
+    last20 = rows[-20:]
+    last60 = rows[-60:]
+    last5_closes = [float(r["close"]) for r in last5]
+    last20_closes = [float(r["close"]) for r in last20]
+    last60_closes = [float(r["close"]) for r in last60]
+    current_close = closes[-1]
+
+    quality, quality_warnings = history_quality(
+        rows,
+        expected_trade_date=expected_trade_date,
+        last_full_refresh=item.get("last_full_refresh"),
+    )
+
+    high20 = max(float(r.get("high") or r["close"]) for r in last20)
+    low20 = min(float(r.get("low") or r["close"]) for r in last20)
+
     out = {
-        "schema_version": 2,
+        "points": points,
+        "last_date": rows[-1].get("date"),
+        "last_close": current_close,
+        "history_confidence": quality,
+        "history_warnings": quality_warnings,
+        "history_basis": item.get("history_basis"),
+        "last_full_refresh": item.get("last_full_refresh"),
+        "high_20d": high20,
+        "low_20d": low20,
+        "close_change_5d_pct": (
+            pct_change(last5_closes[0], last5_closes[-1]) if points >= 5 else None
+        ),
+        "close_change_20d_pct": (
+            pct_change(last20_closes[0], last20_closes[-1]) if points >= 20 else None
+        ),
+        "last5": [{"date": r.get("date"), "close": r.get("close")} for r in last5],
+    }
+
+    if points >= 60:
+        high60 = max(float(r.get("high") or r["close"]) for r in last60)
+        low60 = min(float(r.get("low") or r["close"]) for r in last60)
+        supports, resistances = structure_zones(last60, current_close)
+        out["structure_60d"] = {
+            "points": len(last60),
+            "high": high60,
+            "low": low60,
+            "close_change_pct": pct_change(last60_closes[0], last60_closes[-1]),
+            "ma20": mean(last20_closes),
+            "ma60": mean(last60_closes),
+            "position_pct": (
+                (current_close - low60) / (high60 - low60) * 100
+                if high60 > low60
+                else 50.0
+            ),
+            "support_zones": supports,
+            "resistance_zones": resistances,
+        }
+    else:
+        out["structure_60d"] = None
+
+    return out
+
+
+def main() -> int:
+    latest = read_json(LATEST, {})
+    expected_trade_date = latest.get("trade_date")
+    out = {
+        "schema_version": 3,
         "history_storage": "rolling_shards",
-        "history_window_days": 25,
+        "history_window_days": HISTORY_WINDOW,
         "history_shard_key_length": 4,
+        "structure_window_days": STRUCTURE_WINDOW,
         "stocks": {},
     }
     shard_files = sorted(HISTORY_SHARDS_DIR.glob("*.json"))
-    coverage_5d = 0
-    coverage_20d = 0
+    coverage_5d = coverage_20d = coverage_60d = 0
+    quality_counts = {"high": 0, "medium": 0, "invalid": 0}
     max_points = 0
 
     for path in shard_files:
         payload = read_json(path, {"stocks": {}})
         for code, item in payload.get("stocks", {}).items():
-            rows = [r for r in item.get("history", []) if r.get("close") not in (None, 0)]
-            rows = sorted(rows, key=lambda r: r.get("date", ""))[-20:]
-            if not rows:
+            summary = build_stock_summary(item, expected_trade_date=expected_trade_date)
+            if summary is None:
                 continue
-
-            closes = [float(r["close"]) for r in rows]
-            last5 = rows[-5:]
-            last5_closes = [float(r["close"]) for r in last5]
-            points = len(rows)
+            points = summary["points"]
             max_points = max(max_points, points)
             if points >= 5:
                 coverage_5d += 1
             if points >= 20:
                 coverage_20d += 1
-
-            out["stocks"][code] = {
-                "points": points,
-                "last_date": rows[-1].get("date"),
-                "last_close": closes[-1],
-                "high_20d": max(float(r.get("high") or r["close"]) for r in rows),
-                "low_20d": min(float(r.get("low") or r["close"]) for r in rows),
-                "close_change_5d_pct": (
-                    (last5_closes[-1] / last5_closes[0] - 1) * 100
-                    if points >= 5 and len(last5_closes) == 5
-                    else None
-                ),
-                "close_change_20d_pct": (
-                    (closes[-1] / closes[0] - 1) * 100 if points >= 20 else None
-                ),
-                "last5": [
-                    {"date": r.get("date"), "close": r.get("close")} for r in last5
-                ],
-            }
+            if points >= 60:
+                coverage_60d += 1
+            quality_counts[summary["history_confidence"]] += 1
+            out["stocks"][code] = summary
 
     total = len(out["stocks"])
     out["coverage"] = {
         "stocks": total,
         "points_ge_5": coverage_5d,
         "points_ge_20": coverage_20d,
+        "points_ge_60": coverage_60d,
+        "history_confidence": quality_counts,
         "max_points": max_points,
         "shard_files": len(shard_files),
     }
