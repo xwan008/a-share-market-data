@@ -7,7 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 SHARDS = DATA / "shards"
-SHARD_KEY_LENGTH = 4
+SHARD_KEY_LENGTH = 5
 SAMPLES = ("002475", "601138", "601899")
 
 
@@ -24,12 +24,11 @@ def main() -> int:
     trend_stocks = trends.get("stocks", {})
     SHARDS.mkdir(parents=True, exist_ok=True)
 
-    # Remove old shard layout before writing the new one; git will track deletions.
     for old in SHARDS.glob("*.json"):
         old.unlink()
 
     common = {
-        "schema_version": 2,
+        "schema_version": 3,
         "generated_at": latest.get("generated_at"),
         "trade_date": latest.get("trade_date"),
         "market_status": latest.get("market_status"),
@@ -68,7 +67,7 @@ def main() -> int:
         "sample_quotes": {code: latest_stocks.get(code) for code in SAMPLES},
     }
     (DATA / "health.json").write_text(json.dumps(health, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"wrote {len(groups)} four-digit quote shards and health.json")
+    print(f"wrote {len(groups)} five-digit quote shards and health.json")
     return 0
 
 
