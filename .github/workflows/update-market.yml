@@ -39,12 +39,17 @@ jobs:
           cache: 'pip'
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Run tests
+        run: python -m pytest -q
 
       - name: Fetch and validate quotes
         run: python scripts/fetch_market.py
 
-      - name: Append current session to bounded rolling history
+      - name: Append closed session to bounded rolling history
         run: python scripts/history_store.py
 
       - name: Build 5d/20d trend summary
@@ -67,4 +72,5 @@ jobs:
             echo "No market-data changes to commit."
           fi
 
-# Rolling history is bounded to 25 sessions per stock.
+# Intraday/morning snapshots update current quote files only.
+# Rolling history accepts only market_status=closed and remains capped at 25 sessions per stock.
