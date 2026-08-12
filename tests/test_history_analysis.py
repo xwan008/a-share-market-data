@@ -1,6 +1,7 @@
 from scripts.build_history import (
     build_stock_summary,
     history_quality,
+    normalized_volume,
     price_density_zones,
     structure_zones,
     volume_profile_zones,
@@ -82,6 +83,7 @@ def test_build_summary_contains_60d_structure():
     assert summary["structure_60d"]["points"] == 60
     assert summary["structure_60d"]["ma20"] > 0
     assert "volume_profile_zones" in summary["structure_60d"]
+    assert summary["structure_60d"]["volume_profile_unit"] == "shares"
     assert summary["history_confidence"] == "high"
 
 
@@ -97,6 +99,20 @@ def test_density_zones_capture_repeated_closes():
     zones = price_density_zones(rows, rows[-1]["close"])
     assert len(zones) <= 5
     assert all(zone["closes"] >= 2 for zone in zones)
+
+
+def test_volume_unit_normalization_handles_legacy_and_new_rows():
+    legacy_qfq = {"volume": 1234, "basis": "qfq", "source": "tencent"}
+    normalized_qfq = {
+        "volume": 123400,
+        "volume_unit": "shares",
+        "basis": "qfq",
+        "source": "tencent",
+    }
+    live = {"volume": 123400, "volume_unit": "shares", "basis": "live_close", "source": "sina"}
+    assert normalized_volume(legacy_qfq) == 123400
+    assert normalized_volume(normalized_qfq) == 123400
+    assert normalized_volume(live) == 123400
 
 
 def test_volume_profile_zones_are_bounded_and_weighted():
