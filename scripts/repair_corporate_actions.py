@@ -53,10 +53,13 @@ def is_corporate_action_suspect(history_close: float, prev_close: float) -> bool
     )
 
 
-def load_history_item(code: str) -> dict:
-    path = HISTORY_SHARDS_DIR / f"{code[:4]}.json"
-    payload = read_json(path, {"stocks": {}})
-    return payload.get("stocks", {}).get(code, {})
+def load_all_history_items() -> dict[str, dict]:
+    """Read each history shard once instead of reparsing it per stock."""
+    items: dict[str, dict] = {}
+    for path in HISTORY_SHARDS_DIR.glob("*.json"):
+        payload = read_json(path, {"stocks": {}})
+        items.update(payload.get("stocks", {}))
+    return items
 
 
 def main() -> int:
@@ -81,6 +84,7 @@ def main() -> int:
         print(json.dumps(status, ensure_ascii=False))
         return 0
 
+    history_items = load_all_history_items()
     suspects: dict[str, dict] = {}
     for code, quote in stocks.items():
         if quote.get("confidence") not in USABLE_CONFIDENCE:
@@ -88,7 +92,7 @@ def main() -> int:
         prev_close = as_float(quote.get("prev_close"))
         if prev_close is None or prev_close <= 0:
             continue
-        item = load_history_item(code)
+        item = history_items.get(code, {})
         previous = previous_completed_row(item.get("history", []), trade_date)
         if not previous:
             continue
@@ -128,6 +132,8 @@ def main() -> int:
         "market_status": market_status,
         "threshold_pct": MISMATCH_PCT * 100,
         "threshold_abs": MISMATCH_ABS,
+        "history_shards_scanned": len(list(HISTORY_SHARDS_DIR.glob("*.json"))),
+        "stocks_checked": len(stocks),
         "detected": len(suspects),
         "repaired": len(repaired),
         "failed": len(failures),
