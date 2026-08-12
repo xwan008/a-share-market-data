@@ -9,6 +9,7 @@ A lightweight GitHub Actions data bridge for the downstream ChatGPT A-share stoc
 - Publishes per-stock current-price confidence.
 - Keeps a **bounded rolling history of at most 65 completed sessions per stock**.
 - Uses Tencent forward-adjusted (`qfq`) daily K-lines as the periodic historical baseline.
+- Detects likely corporate-action adjustment drift from `historical previous close` vs the current session's `prev_close` and repairs only affected stocks immediately.
 - Precomputes compact **5d / 20d / 60d** context so ChatGPT does not need to load 60 raw candles.
 - Publishes history-quality labels and warnings.
 - Generates small quote shards for candidate-only reads.
@@ -34,6 +35,7 @@ Always read this first. Key fields:
 - `shard_key_length`
 - rolling-history window and 5d/20d/60d coverage
 - history-confidence coverage
+- latest `corporate_action_repair` status
 - sample quotes and trend structures
 
 ### `data/shards/<dynamic-key>.json`
@@ -53,6 +55,9 @@ Each stock contains current quote fields plus a compact trend object. When histo
   - swing `support_zones`
   - swing `resistance_zones`
   - repeated-close `dense_price_zones`
+  - approximate volume-at-price `volume_profile_zones`
+
+`volume_profile_zones` is derived from daily typical price and daily volume (`daily_typical_price_approx`). It is deliberately approximate rather than tick-level volume profile, so downstream logic should use it as corroborating structural evidence, not as a precise cost-distribution claim.
 
 The 60d fields are a structural summary, not an instruction to mechanically buy at the nearest support.
 
@@ -64,21 +69,35 @@ Morning/intraday snapshots never enter this daily history. Post-close snapshots 
 
 The store therefore has a fixed upper bound and does not grow with repository age.
 
+### `data/repair_status.json`
+
+Records the latest targeted corporate-action check and repair result: detected mismatches, repaired stocks, failures and sample mismatch details.
+
 ## History quality
 
 History is labelled:
 
-- `high`: at least 60 valid points, latest date matches the current completed trade date, OHLC is structurally consistent, no large calendar gap, and the full qfq refresh is recent.
+- `high`: at least 60 valid points, OHLC is structurally consistent, no material date/freshness warning, and the qfq baseline is recent.
 - `medium`: still usable but has fewer than 60 points or a freshness/gap warning.
 - `invalid`: too little usable history or structural/date errors.
 
-The periodic qfq refresh repairs adjustment drift caused by dividends/splits/corporate actions. Daily post-close bars maintain the live tail between full refreshes.
+During intraday runs, completed history is expected to end **before** the current trading date. This prevents the current morning/afternoon partial candle from being mistaken for a completed daily bar while still allowing the 12:00 screener to retain high history confidence when the previous completed session is fresh.
+
+## Corporate-action repair
+
+After each fresh quote pull, `repair_corporate_actions.py` compares the stored previous completed qfq close with the current session's exchange reference `prev_close`.
+
+A material mismatch (with both percentage and absolute thresholds to ignore normal rounding noise) is treated as a likely dividend/split/rights/adjustment event. Only affected stocks are re-fetched from Tencent qfq history.
+
+During intraday repair the current trading date is explicitly excluded, so an unfinished current-day K-line can never enter completed history. After the close, the normal history append writes the final daily bar.
+
+The weekly full qfq refresh remains as a second safety net even when no targeted repair fires.
 
 ## Why 5d / 20d / 60d have different jobs
 
 - **5d**: short-term emotion and acceleration — chase/not chase, pullback or momentum.
 - **20d**: recent position — roughly high/mid/low in the last month and whether a pullback has occurred.
-- **60d**: medium-term structure — MA20/MA60, repeated price zones, swing support/resistance and broader platform context.
+- **60d**: medium-term structure — MA20/MA60, repeated price zones, approximate high-volume price zones, swing support/resistance and broader platform context.
 
 Core buy zones should combine 60d structure with earnings, valuation and industry conditions. A rising current price alone must not move the core buy zone upward.
 
@@ -93,7 +112,9 @@ Weekdays, Beijing time:
 - 15:12
 - 15:27
 
-Morning runs update current quotes only. Post-close runs also merge the completed session into the 65-session history and rebuild 5d/20d/60d summaries.
+Each run pulls/validates current quotes, runs the targeted corporate-action repair check, rebuilds trend/structure summaries and republishes compact bridge files.
+
+Morning runs do not append the current intraday candle. Post-close runs merge the completed session into the 65-session history.
 
 ### Full qfq history refresh
 
@@ -103,15 +124,16 @@ It refreshes the latest 65 sessions from Tencent qfq K-lines, prunes records out
 
 ## Downstream lookup flow
 
-1. Read `data/health.json` and validate freshness/trade date/coverage.
+1. Read `data/health.json` and validate freshness/trade date/coverage/repair status.
 2. Build the fundamental/industry candidate list first.
 3. Read only each candidate's small quote shard.
 4. Use `confidence=high/medium` current price directly; web price fallback only for invalid/missing records.
 5. Use 5d/20d/60d fields only when the relevant points and `history_confidence` are adequate.
 6. Use web research primarily for earnings, catalysts, valuation and market regime rather than repeated price scraping.
+7. Define a **value anchor** independently from earnings/valuation, define a **structure anchor** independently from 60d structure, and only treat their overlap as the preferred core-buy region. If there is no credible overlap, wait rather than forcing a buy zone.
 
 At 12:00, combine the latest morning price with completed-session history; never treat the morning snapshot as a completed daily candle.
 
 ## Reliability notes
 
-The upstream quote/K-line endpoints are public and unofficial and can be throttled or changed. The bridge therefore uses multi-source current-price validation, explicit history-quality labels, a bounded local history, weekly qfq refresh and downstream fallback rather than assuming any single provider is permanently reliable.
+The upstream quote/K-line endpoints are public and unofficial and can be throttled or changed. The bridge therefore uses multi-source current-price validation, explicit history-quality labels, targeted corporate-action repair, a bounded local history, weekly qfq refresh and downstream fallback rather than assuming any single provider is permanently reliable.
