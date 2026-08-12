@@ -7,8 +7,7 @@ on:
     paths:
       - '.github/workflows/update-market.yml'
   schedule:
-    # Beijing time. GitHub supports IANA timezones for scheduled workflows.
-    # Two morning-close attempts and two post-close attempts reduce transient failures.
+    # Beijing time. Two attempts around each target window reduce transient failures.
     - cron: '37 11 * * 1-5'
       timezone: 'Asia/Shanghai'
     - cron: '52 11 * * 1-5'
@@ -22,13 +21,13 @@ permissions:
   contents: write
 
 concurrency:
-  group: update-a-share-market-data
+  group: a-share-market-data-write
   cancel-in-progress: false
 
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -45,7 +44,10 @@ jobs:
       - name: Fetch and validate quotes
         run: python scripts/fetch_market.py
 
-      - name: Build rolling trend summary
+      - name: Append current session to bounded rolling history
+        run: python scripts/history_store.py
+
+      - name: Build 5d/20d trend summary
         run: python scripts/build_history.py
 
       - name: Build compact ChatGPT bridge files
@@ -54,15 +56,14 @@ jobs:
       - name: Commit updated data
         shell: bash
         run: |
-          if git diff --quiet -- data; then
+          if git status --porcelain -- data | grep -q .; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -A data
+            git commit -m "data: update A-share snapshot and rolling history"
+            git push
+          else
             echo "No market-data changes to commit."
-            exit 0
           fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/latest.json data/trend_summary.json data/health.json data/history/ data/shards/
-          git commit -m "data: update A-share snapshot"
-          git push
 
-# Touch this file only when an immediate validation run is needed.
-# Five-digit bridge shards enabled.
+# Rolling history is bounded to 25 sessions per stock.
