@@ -13,6 +13,7 @@ LATEST = DATA_DIR / "latest.json"
 
 HISTORY_WINDOW = 65
 STRUCTURE_WINDOW = 60
+INTRADAY_STATUSES = {"morning_session", "morning_closed", "afternoon_session"}
 
 
 def read_json(path: Path, default: dict) -> dict:
@@ -50,6 +51,7 @@ def history_quality(
     *,
     expected_trade_date: str | None,
     last_full_refresh: str | None,
+    history_may_end_before_trade_date: bool = False,
 ) -> tuple[str, list[str]]:
     warnings: list[str] = []
     if not rows:
@@ -70,16 +72,28 @@ def history_quality(
         if l is not None and values and l - 1e-9 > min(values):
             return "invalid", ["ohlc_inconsistent"]
 
-    last_date = dates[-1]
-    if expected_trade_date and last_date != expected_trade_date:
-        warnings.append("last_date_not_latest_trade_date")
-
     parsed = []
     for d in dates:
         try:
             parsed.append(date.fromisoformat(d))
         except ValueError:
             return "invalid", ["invalid_date_format"]
+
+    last_date = dates[-1]
+    if expected_trade_date:
+        try:
+            expected = date.fromisoformat(expected_trade_date)
+            last_parsed = parsed[-1]
+        except ValueError:
+            return "invalid", ["invalid_expected_trade_date"]
+        if history_may_end_before_trade_date:
+            if last_parsed >= expected:
+                return "invalid", ["intraday_or_future_date_in_completed_history"]
+            if (expected - last_parsed).days > 10:
+                warnings.append("completed_history_tail_too_old")
+        elif last_date != expected_trade_date:
+            warnings.append("last_date_not_latest_trade_date")
+
     if any((b - a).days > 14 for a, b in zip(parsed, parsed[1:])):
         warnings.append("large_calendar_gap")
 
@@ -231,10 +245,77 @@ def price_density_zones(rows: list[dict], current_close: float) -> list[dict]:
     return zones
 
 
+def volume_profile_zones(rows: list[dict], current_close: float) -> list[dict]:
+    """Approximate 60d volume-at-price zones from daily typical price and volume.
+
+    Daily bars cannot provide tick-level volume profile, so this is deliberately
+    labelled approximate and should be used as corroborating structure evidence.
+    """
+    window = rows[-STRUCTURE_WINDOW:]
+    observations: list[tuple[float, float, int, str]] = []
+    for i, row in enumerate(window):
+        close = fnum(row.get("close"))
+        high = fnum(row.get("high"))
+        low = fnum(row.get("low"))
+        volume = fnum(row.get("volume"))
+        if close is None or close <= 0 or volume is None or volume <= 0:
+            continue
+        typical_price = mean([x for x in (high, low, close) if x is not None])
+        observations.append((typical_price, volume, i, str(row.get("date"))))
+    if len(observations) < 5:
+        return []
+
+    typical = median(x[0] for x in observations)
+    bin_width = max(typical * 0.025, 0.01)
+    bins: dict[int, list[tuple[float, float, int, str]]] = {}
+    total_volume = sum(x[1] for x in observations)
+    for obs in observations:
+        bucket = int(obs[0] // bin_width)
+        bins.setdefault(bucket, []).append(obs)
+
+    zones: list[dict] = []
+    for obs in bins.values():
+        bin_volume = sum(x[1] for x in obs)
+        if bin_volume <= 0:
+            continue
+        prices = [x[0] for x in obs]
+        center = sum(x[0] * x[1] for x in obs) / bin_volume
+        low = min(prices) * 0.995
+        high = max(prices) * 1.005
+        latest = max(obs, key=lambda x: x[2])
+        if high < current_close * 0.99:
+            relation = "below"
+        elif low > current_close * 1.01:
+            relation = "above"
+        else:
+            relation = "current"
+        zones.append(
+            {
+                "low": round(low, 4),
+                "high": round(high, 4),
+                "center": round(center, 4),
+                "volume_share_pct": round(bin_volume / total_volume * 100, 2) if total_volume else 0.0,
+                "days": len(obs),
+                "relation": relation,
+                "last_date": latest[3],
+                "_last_index": latest[2],
+            }
+        )
+
+    zones = sorted(
+        zones,
+        key=lambda z: (-z["volume_share_pct"], abs(current_close - z["center"]), -z["_last_index"]),
+    )[:5]
+    for z in zones:
+        z.pop("_last_index", None)
+    return zones
+
+
 def build_stock_summary(
     item: dict,
     *,
     expected_trade_date: str | None,
+    history_may_end_before_trade_date: bool = False,
 ) -> dict | None:
     rows = [r for r in item.get("history", []) if fnum(r.get("close")) not in (None, 0)]
     rows = sorted(rows, key=lambda r: str(r.get("date") or ""))[-HISTORY_WINDOW:]
@@ -255,6 +336,7 @@ def build_stock_summary(
         rows,
         expected_trade_date=expected_trade_date,
         last_full_refresh=item.get("last_full_refresh"),
+        history_may_end_before_trade_date=history_may_end_before_trade_date,
     )
 
     high20 = max(float(r.get("high") or r["close"]) for r in last20)
@@ -280,6 +362,7 @@ def build_stock_summary(
         low60 = min(float(r.get("low") or r["close"]) for r in last60)
         supports, resistances = structure_zones(last60, current_close)
         dense_zones = price_density_zones(last60, current_close)
+        volume_zones = volume_profile_zones(last60, current_close)
         out["structure_60d"] = {
             "points": len(last60),
             "high": high60,
@@ -291,6 +374,8 @@ def build_stock_summary(
             "support_zones": supports,
             "resistance_zones": resistances,
             "dense_price_zones": dense_zones,
+            "volume_profile_method": "daily_typical_price_approx",
+            "volume_profile_zones": volume_zones,
         }
     else:
         out["structure_60d"] = None
@@ -301,8 +386,9 @@ def build_stock_summary(
 def main() -> int:
     latest = read_json(LATEST, {})
     expected_trade_date = latest.get("trade_date")
+    history_may_end_before_trade_date = latest.get("market_status") in INTRADAY_STATUSES
     out = {
-        "schema_version": 3,
+        "schema_version": 4,
         "history_storage": "rolling_shards",
         "history_window_days": HISTORY_WINDOW,
         "history_shard_key_length": 4,
@@ -317,7 +403,11 @@ def main() -> int:
     for path in shard_files:
         payload = read_json(path, {"stocks": {}})
         for code, item in payload.get("stocks", {}).items():
-            summary = build_stock_summary(item, expected_trade_date=expected_trade_date)
+            summary = build_stock_summary(
+                item,
+                expected_trade_date=expected_trade_date,
+                history_may_end_before_trade_date=history_may_end_before_trade_date,
+            )
             if summary is None:
                 continue
             points = summary["points"]
