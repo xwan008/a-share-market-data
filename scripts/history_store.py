@@ -35,6 +35,7 @@ def compact_row(trade_date: str, quote: dict) -> dict:
         "low": quote.get("low"),
         "close": quote.get("price"),
         "volume": quote.get("volume"),
+        "volume_unit": "shares",
         "prev_close": quote.get("prev_close"),
         "confidence": quote.get("confidence"),
         "basis": "live_close",
@@ -115,10 +116,11 @@ def write_history_shards(
             continue
 
         payload = {
-            "schema_version": 2,
+            "schema_version": 3,
             "generated_at": generated_at,
             "rolling_days": ROLLING_DAYS,
             "history_shard_key_length": HISTORY_SHARD_KEY_LENGTH,
+            "volume_unit": "shares",
             "shard": key,
             "stocks": current_stocks,
         }
