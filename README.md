@@ -7,8 +7,8 @@ A lightweight, serverless A-share market-data bridge for the downstream ChatGPT 
 - Pulls A-share main-board current quotes with Sina/easyquotation as a primary source.
 - Uses Tencent and AKShare/Eastmoney as verification/fallback sources when available.
 - Publishes a confidence level for every current-price anchor.
-- Keeps a **bounded rolling history of at most 25 sessions per stock**.
-- Precomputes 5-session and 20-session trend context.
+- Keeps a **bounded rolling history of at most 25 completed sessions per stock**.
+- Precomputes 5-session and 20-session trend context from completed daily bars only.
 - Generates small quote shards so ChatGPT does not need to load the full-market JSON for a candidate.
 
 ## Main-board universe
@@ -96,14 +96,16 @@ Use 5-session fields only when `trend.points >= 5`, and 20-session fields only w
 
 This is the bounded internal history store. It uses four-digit shards independently of the quote-shard layout.
 
-Each stock contains a `history` array with at most 25 dated OHLCV rows. On every update:
+Each stock contains a `history` array with at most 25 dated OHLCV rows. Only snapshots with `market_status = closed` are allowed into this store. On every closed-session update:
 
-1. the latest session is merged by trading date;
+1. the final daily session is merged by trading date;
 2. a duplicate trading date overwrites the previous row rather than being appended twice;
 3. rows are sorted by date;
 4. only the newest 25 are retained.
 
-Therefore the working history does **not** grow with repository age. Running the project for five years still leaves at most 25 stored sessions per stock.
+Therefore the working history does **not** grow with repository age. Running the project for five years still leaves at most 25 stored completed sessions per stock.
+
+Morning/intraday snapshots never enter rolling daily history. They update current quote files only.
 
 ### 4. `data/latest.json`
 
@@ -123,7 +125,7 @@ The repository does not need to wait 20 future trading days before 5d/20d analys
 
 `Backfill A-share rolling history` is a manual GitHub Actions workflow that requests recent Tencent forward-adjusted daily K-lines and fills the rolling 25-session history store. Individual suspended/new stocks may fail without invalidating the batch; a broad source failure causes the workflow to fail.
 
-After the initial bootstrap, normal quote updates maintain the rolling window automatically. The old one-file-per-day `data/history/YYYY-MM-DD.json` model is no longer used.
+After the initial bootstrap, normal post-close updates maintain the rolling window automatically. The old one-file-per-day `data/history/YYYY-MM-DD.json` model is no longer used.
 
 ## GitHub Actions
 
@@ -136,15 +138,17 @@ Runs on weekdays at Beijing time:
 - 15:12
 - 15:27
 
-Each run:
+Every run refreshes and validates current quotes and rebuilds compact ChatGPT quote shards.
 
-1. fetches and validates current quotes;
-2. merges the current trading session into bounded history;
-3. rebuilds 5d/20d trend summaries;
-4. rebuilds compact quote shards and health status;
-5. commits the data.
+The two morning runs are **current-price snapshots only**: rolling daily history is not changed.
 
-Duplicate runs provide a retry path for transient upstream/GitHub failures. Same-day history is deduplicated, so repeated runs do not create duplicate sessions.
+The two post-close runs additionally:
+
+1. merge the completed daily bar into bounded history;
+2. rebuild 5d/20d trend summaries;
+3. publish updated history coverage in `health.json`.
+
+Duplicate post-close runs are safe because same-day history is deduplicated by trading date. The workflow runs tests before market-data processing.
 
 ### Historical backfill
 
@@ -157,7 +161,9 @@ The backfill workflow is manual (`workflow_dispatch`) and should normally only b
 3. Take the first `N` digits of the candidate stock code and read only that quote shard.
 4. Use `high` or `medium` current price according to its confidence label.
 5. Use embedded 5d/20d trend when `points` is sufficient.
-6. For missing/invalid current price or insufficient history, use the existing dated public-web fallback.
+6. For missing/invalid current price or insufficient history, use dated public-web fallback only for the missing field.
+
+At 12:00, combine the latest morning price snapshot with trend data calculated from completed sessions. Intraday prices are never mistaken for a completed daily K-line.
 
 ## Reliability notes
 
