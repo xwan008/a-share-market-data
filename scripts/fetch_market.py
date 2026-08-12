@@ -143,7 +143,12 @@ def main() -> int:
         if fresh:
             source, base = fresh[0]
             primary = positive_number(base.get("price"))
-            secondary = positive_number(fresh[1][1].get("price")) if len(fresh) > 1 else a_price
+            # The dated primary source proves the trading day. A second realtime provider
+            # queried in the same run may cross-check price even if its wrapper omits date.
+            other_realtime = t if source == "sina" else s
+            secondary = positive_number(other_realtime.get("price")) if other_realtime else None
+            if secondary is None:
+                secondary = a_price
         elif a_price is not None:
             source, base, primary, secondary = "akshare", a, a_price, None
         else:
@@ -155,7 +160,7 @@ def main() -> int:
             warnings.append("quote_date_not_explicit")
         for name, item in (("sina", s), ("tencent", t)):
             if item and positive_number(item.get("price")) is not None and not source_is_fresh(item, trade_date):
-                warnings.append(f"{name}_date_invalid_or_stale")
+                warnings.append(f"{name}_date_unverified")
         warnings += validate_quote_fields({
             "price": base.get("price"), "prev_close": base.get("prev_close"), "change_pct": a.get("change_pct")
         })
