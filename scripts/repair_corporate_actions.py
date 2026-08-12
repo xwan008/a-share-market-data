@@ -5,8 +5,12 @@ from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-from backfill_history import fetch_tencent_history
-from history_store import HISTORY_SHARDS_DIR, read_json, write_history_shards
+try:
+    from .backfill_history import fetch_tencent_history
+    from .history_store import HISTORY_SHARDS_DIR, read_json, write_history_shards
+except ImportError:  # direct script execution
+    from backfill_history import fetch_tencent_history
+    from history_store import HISTORY_SHARDS_DIR, read_json, write_history_shards
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data"
