@@ -37,7 +37,14 @@ def fetch_tencent_history(
     code: str,
     name: str | None,
     refreshed_at: str,
+    *,
+    exclude_date: str | None = None,
 ) -> tuple[str, dict | None, str | None]:
+    """Fetch a bounded Tencent qfq daily series.
+
+    exclude_date is used by intraday corporate-action repair so the current
+    unfinished session can never enter completed daily history.
+    """
     symbol = symbol_for(code)
     params = {"param": f"{symbol},day,,,{REQUEST_BARS},qfq"}
     last_error: str | None = None
@@ -59,6 +66,8 @@ def fetch_tencent_history(
                 if not isinstance(row, list) or len(row) < 6:
                     continue
                 d = str(row[0])
+                if exclude_date and d == exclude_date:
+                    continue
                 open_ = as_float(row[1])
                 close = as_float(row[2])
                 high = as_float(row[3])
