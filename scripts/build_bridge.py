@@ -22,13 +22,14 @@ def main() -> int:
     trends = read_json(DATA / "trend_summary.json", {"stocks": {}})
     latest_stocks = latest.get("stocks", {})
     trend_stocks = trends.get("stocks", {})
+    coverage = trends.get("coverage", {})
     SHARDS.mkdir(parents=True, exist_ok=True)
 
     for old in SHARDS.glob("*.json"):
         old.unlink()
 
     common = {
-        "schema_version": 3,
+        "schema_version": 4,
         "generated_at": latest.get("generated_at"),
         "trade_date": latest.get("trade_date"),
         "market_status": latest.get("market_status"),
@@ -62,12 +63,20 @@ def main() -> int:
         **common,
         "source_status": latest.get("source_status"),
         "validation_stats": latest.get("validation_stats"),
-        "trend_days": trends.get("generated_from_days", 0),
         "shard_count": len(groups),
+        "history": {
+            "storage": trends.get("history_storage"),
+            "window_days": trends.get("history_window_days"),
+            "history_shard_key_length": trends.get("history_shard_key_length"),
+            "coverage": coverage,
+        },
         "sample_quotes": {code: latest_stocks.get(code) for code in SAMPLES},
     }
     (DATA / "health.json").write_text(json.dumps(health, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"wrote {len(groups)} five-digit quote shards and health.json")
+    print(
+        f"wrote {len(groups)} {SHARD_KEY_LENGTH}-digit quote shards; "
+        f"history >=5d: {coverage.get('points_ge_5', 0)}, >=20d: {coverage.get('points_ge_20', 0)}"
+    )
     return 0
 
 
