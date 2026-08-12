@@ -9,7 +9,10 @@ from zoneinfo import ZoneInfo
 
 import requests
 
-from history_store import ROLLING_DAYS, read_json, write_history_shards
+try:
+    from .history_store import ROLLING_DAYS, read_json, write_history_shards
+except ImportError:  # direct script execution
+    from history_store import ROLLING_DAYS, read_json, write_history_shards
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data"
