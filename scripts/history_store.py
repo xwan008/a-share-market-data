@@ -21,6 +21,11 @@ def read_json(path: Path, default: dict) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def should_append_history(latest: dict) -> bool:
+    """Only completed trading sessions belong in daily rolling history."""
+    return latest.get("market_status") == "closed"
+
+
 def compact_row(trade_date: str, quote: dict) -> dict:
     return {
         "date": trade_date,
@@ -80,6 +85,21 @@ def write_history_shards(series: dict[str, dict], generated_at: str | None = Non
 
 def append_latest_snapshot() -> tuple[int, int]:
     latest = read_json(LATEST_PATH, {})
+
+    if not should_append_history(latest):
+        print(
+            json.dumps(
+                {
+                    "market_status": latest.get("market_status"),
+                    "trade_date": latest.get("trade_date"),
+                    "updated_stocks": 0,
+                    "reason": "history_only_accepts_closed_sessions",
+                },
+                ensure_ascii=False,
+            )
+        )
+        return 0, 0
+
     trade_date = latest.get("trade_date")
     stocks = latest.get("stocks", {})
     if not trade_date or not stocks:
@@ -108,6 +128,7 @@ def append_latest_snapshot() -> tuple[int, int]:
         json.dumps(
             {
                 "trade_date": trade_date,
+                "market_status": latest.get("market_status"),
                 "updated_stocks": len(updates),
                 "history_shards": shard_count,
                 "rolling_days": ROLLING_DAYS,
