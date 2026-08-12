@@ -1,4 +1,9 @@
-from scripts.build_history import build_stock_summary, history_quality, structure_zones
+from scripts.build_history import (
+    build_stock_summary,
+    history_quality,
+    price_density_zones,
+    structure_zones,
+)
 
 
 def make_rows(n=65):
@@ -68,3 +73,10 @@ def test_structure_zones_return_bounded_lists():
     supports, resistances = structure_zones(rows, rows[-1]["close"])
     assert len(supports) <= 3
     assert len(resistances) <= 3
+
+
+def test_density_zones_capture_repeated_closes():
+    rows = make_rows(65)[-60:]
+    zones = price_density_zones(rows, rows[-1]["close"])
+    assert len(zones) <= 5
+    assert all(zone["closes"] >= 2 for zone in zones)
