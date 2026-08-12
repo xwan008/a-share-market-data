@@ -3,6 +3,7 @@ from scripts.build_history import (
     history_quality,
     price_density_zones,
     structure_zones,
+    volume_profile_zones,
 )
 
 
@@ -53,6 +54,21 @@ def test_history_quality_requires_60_points_for_high():
     assert "fewer_than_60_points" in warnings2
 
 
+def test_intraday_history_may_end_on_prior_completed_session():
+    rows = make_rows(65)
+    from datetime import date, timedelta
+
+    current_trade_date = (date.fromisoformat(rows[-1]["date"]) + timedelta(days=1)).isoformat()
+    confidence, warnings = history_quality(
+        rows,
+        expected_trade_date=current_trade_date,
+        last_full_refresh=f"{current_trade_date}T11:50:00+08:00",
+        history_may_end_before_trade_date=True,
+    )
+    assert confidence == "high"
+    assert warnings == []
+
+
 def test_build_summary_contains_60d_structure():
     rows = make_rows(65)
     item = {
@@ -65,6 +81,7 @@ def test_build_summary_contains_60d_structure():
     assert summary["points"] == 65
     assert summary["structure_60d"]["points"] == 60
     assert summary["structure_60d"]["ma20"] > 0
+    assert "volume_profile_zones" in summary["structure_60d"]
     assert summary["history_confidence"] == "high"
 
 
@@ -80,3 +97,12 @@ def test_density_zones_capture_repeated_closes():
     zones = price_density_zones(rows, rows[-1]["close"])
     assert len(zones) <= 5
     assert all(zone["closes"] >= 2 for zone in zones)
+
+
+def test_volume_profile_zones_are_bounded_and_weighted():
+    rows = make_rows(65)[-60:]
+    zones = volume_profile_zones(rows, rows[-1]["close"])
+    assert len(zones) <= 5
+    assert zones
+    assert all(zone["volume_share_pct"] > 0 for zone in zones)
+    assert all(zone["days"] >= 1 for zone in zones)
