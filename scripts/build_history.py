@@ -14,6 +14,7 @@ LATEST = DATA_DIR / "latest.json"
 HISTORY_WINDOW = 65
 STRUCTURE_WINDOW = 60
 INTRADAY_STATUSES = {"morning_session", "morning_closed", "afternoon_session"}
+TENCENT_VOLUME_LOT_SIZE = 100
 
 
 def read_json(path: Path, default: dict) -> dict:
@@ -27,6 +28,18 @@ def fnum(value) -> float | None:
         return float(value)
     except (TypeError, ValueError):
         return None
+
+
+def normalized_volume(row: dict) -> float | None:
+    """Return volume in shares across legacy qfq rows and live rows."""
+    volume = fnum(row.get("volume"))
+    if volume is None:
+        return None
+    if row.get("volume_unit") == "shares":
+        return volume
+    if row.get("basis") == "qfq" and row.get("source") == "tencent":
+        return volume * TENCENT_VOLUME_LOT_SIZE
+    return volume
 
 
 def pct_change(first: float, last: float) -> float | None:
@@ -246,18 +259,14 @@ def price_density_zones(rows: list[dict], current_close: float) -> list[dict]:
 
 
 def volume_profile_zones(rows: list[dict], current_close: float) -> list[dict]:
-    """Approximate 60d volume-at-price zones from daily typical price and volume.
-
-    Daily bars cannot provide tick-level volume profile, so this is deliberately
-    labelled approximate and should be used as corroborating structure evidence.
-    """
+    """Approximate 60d volume-at-price zones using normalized share volume."""
     window = rows[-STRUCTURE_WINDOW:]
     observations: list[tuple[float, float, int, str]] = []
     for i, row in enumerate(window):
         close = fnum(row.get("close"))
         high = fnum(row.get("high"))
         low = fnum(row.get("low"))
-        volume = fnum(row.get("volume"))
+        volume = normalized_volume(row)
         if close is None or close <= 0 or volume is None or volume <= 0:
             continue
         typical_price = mean([x for x in (high, low, close) if x is not None])
@@ -375,6 +384,7 @@ def build_stock_summary(
             "resistance_zones": resistances,
             "dense_price_zones": dense_zones,
             "volume_profile_method": "daily_typical_price_approx",
+            "volume_profile_unit": "shares",
             "volume_profile_zones": volume_zones,
         }
     else:
@@ -388,11 +398,12 @@ def main() -> int:
     expected_trade_date = latest.get("trade_date")
     history_may_end_before_trade_date = latest.get("market_status") in INTRADAY_STATUSES
     out = {
-        "schema_version": 4,
+        "schema_version": 5,
         "history_storage": "rolling_shards",
         "history_window_days": HISTORY_WINDOW,
         "history_shard_key_length": 4,
         "structure_window_days": STRUCTURE_WINDOW,
+        "volume_unit": "shares",
         "stocks": {},
     }
     shard_files = sorted(HISTORY_SHARDS_DIR.glob("*.json"))
