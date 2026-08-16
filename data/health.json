@@ -1,8 +1,8 @@
 {
   "schema_version": 6,
-  "generated_at": "2026-08-14T16:42:11.566119+08:00",
+  "generated_at": "2026-08-16T10:50:04.025173+08:00",
   "trade_date": "2026-08-14",
-  "market_status": "closed",
+  "market_status": "closed_or_no_trade",
   "shard_key_length": 5,
   "source_status": {
     "sina": "ok",
@@ -38,18 +38,13 @@
     },
     "corporate_action_repair": {
       "schema_version": 1,
-      "generated_at": "2026-08-14T16:42:22.249477+08:00",
+      "generated_at": "2026-08-16T10:50:15.488479+08:00",
       "trade_date": "2026-08-14",
-      "market_status": "closed",
-      "threshold_pct": 0.4,
-      "threshold_abs": 0.02,
-      "history_shards_scanned": 62,
-      "stocks_checked": 3177,
+      "market_status": "closed_or_no_trade",
       "detected": 0,
       "repaired": 0,
       "failed": 0,
-      "sample_suspects": {},
-      "sample_failures": {}
+      "reason": "no_current_trading_session_to_check"
     }
   },
   "sample_quotes": {
@@ -166,6 +161,75 @@
               "last_touch_date": "2026-08-07"
             }
           ],
+          "structure_evolution": {
+            "pivot_window": 2,
+            "confirmation_lag_sessions": 2,
+            "trend_state": "transition",
+            "break_state": "transition",
+            "invalidation": null,
+            "latest_high": {
+              "date": "2026-08-07",
+              "type": "high",
+              "price": 58.0,
+              "label": "LH"
+            },
+            "latest_low": {
+              "date": "2026-08-11",
+              "type": "low",
+              "price": 54.52,
+              "label": "HL"
+            },
+            "pivots": [
+              {
+                "date": "2026-07-10",
+                "type": "high",
+                "price": 65.521,
+                "label": "LH"
+              },
+              {
+                "date": "2026-07-14",
+                "type": "low",
+                "price": 57.271,
+                "label": "LL"
+              },
+              {
+                "date": "2026-07-16",
+                "type": "high",
+                "price": 64.201,
+                "label": "LH"
+              },
+              {
+                "date": "2026-07-20",
+                "type": "low",
+                "price": 55.03,
+                "label": "LL"
+              },
+              {
+                "date": "2026-07-27",
+                "type": "high",
+                "price": 63.02,
+                "label": "LH"
+              },
+              {
+                "date": "2026-08-05",
+                "type": "low",
+                "price": 52.65,
+                "label": "LL"
+              },
+              {
+                "date": "2026-08-07",
+                "type": "high",
+                "price": 58.0,
+                "label": "LH"
+              },
+              {
+                "date": "2026-08-11",
+                "type": "low",
+                "price": 54.52,
+                "label": "HL"
+              }
+            ]
+          },
           "dense_price_zones": [
             {
               "low": 55.2026,
@@ -373,6 +437,78 @@
               "last_touch_date": "2026-06-18"
             }
           ],
+          "structure_evolution": {
+            "pivot_window": 2,
+            "confirmation_lag_sessions": 2,
+            "trend_state": "bullish",
+            "break_state": "intact",
+            "invalidation": {
+              "direction": "below",
+              "price": 64.51
+            },
+            "latest_high": {
+              "date": "2026-08-10",
+              "type": "high",
+              "price": 70.97,
+              "label": "HH"
+            },
+            "latest_low": {
+              "date": "2026-08-12",
+              "type": "low",
+              "price": 64.51,
+              "label": "HL"
+            },
+            "pivots": [
+              {
+                "date": "2026-07-01",
+                "type": "high",
+                "price": 73.23,
+                "label": "LH"
+              },
+              {
+                "date": "2026-07-06",
+                "type": "low",
+                "price": 60.85,
+                "label": "LL"
+              },
+              {
+                "date": "2026-07-10",
+                "type": "high",
+                "price": 70.35,
+                "label": "LH"
+              },
+              {
+                "date": "2026-07-20",
+                "type": "low",
+                "price": 54.39,
+                "label": "LL"
+              },
+              {
+                "date": "2026-07-23",
+                "type": "high",
+                "price": 63.5,
+                "label": "LH"
+              },
+              {
+                "date": "2026-07-30",
+                "type": "low",
+                "price": 52.57,
+                "label": "LL"
+              },
+              {
+                "date": "2026-08-10",
+                "type": "high",
+                "price": 70.97,
+                "label": "HH"
+              },
+              {
+                "date": "2026-08-12",
+                "type": "low",
+                "price": 64.51,
+                "label": "HL"
+              }
+            ]
+          },
           "dense_price_zones": [
             {
               "low": 67.9286,
@@ -580,6 +716,78 @@
               "last_touch_date": "2026-05-26"
             }
           ],
+          "structure_evolution": {
+            "pivot_window": 2,
+            "confirmation_lag_sessions": 2,
+            "trend_state": "bullish",
+            "break_state": "intact",
+            "invalidation": {
+              "direction": "below",
+              "price": 31.69
+            },
+            "latest_high": {
+              "date": "2026-08-06",
+              "type": "high",
+              "price": 35.8,
+              "label": "HH"
+            },
+            "latest_low": {
+              "date": "2026-08-03",
+              "type": "low",
+              "price": 31.69,
+              "label": "HL"
+            },
+            "pivots": [
+              {
+                "date": "2026-07-01",
+                "type": "low",
+                "price": 24.42,
+                "label": "LL"
+              },
+              {
+                "date": "2026-07-06",
+                "type": "high",
+                "price": 29.19,
+                "label": "LH"
+              },
+              {
+                "date": "2026-07-09",
+                "type": "low",
+                "price": 26.55,
+                "label": "HL"
+              },
+              {
+                "date": "2026-07-16",
+                "type": "high",
+                "price": 29.59,
+                "label": "HH"
+              },
+              {
+                "date": "2026-07-17",
+                "type": "low",
+                "price": 27.92,
+                "label": "HL"
+              },
+              {
+                "date": "2026-07-23",
+                "type": "high",
+                "price": 33.68,
+                "label": "HH"
+              },
+              {
+                "date": "2026-08-03",
+                "type": "low",
+                "price": 31.69,
+                "label": "HL"
+              },
+              {
+                "date": "2026-08-06",
+                "type": "high",
+                "price": 35.8,
+                "label": "HH"
+              }
+            ]
+          },
           "dense_price_zones": [
             {
               "low": 27.1336,
