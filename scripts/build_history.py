@@ -13,6 +13,9 @@ LATEST = DATA_DIR / "latest.json"
 
 HISTORY_WINDOW = 65
 STRUCTURE_WINDOW = 60
+SWING_CONFIRMATION_WINDOW = 2
+MAX_STRUCTURE_PIVOTS = 8
+SWING_EQUAL_TOLERANCE_PCT = 0.001
 INTRADAY_STATUSES = {"morning_session", "morning_closed", "afternoon_session"}
 TENCENT_VOLUME_LOT_SIZE = 100
 
@@ -204,6 +207,152 @@ def structure_zones(rows: list[dict], current_close: float) -> tuple[list[dict],
     return support_ranked, resistance_ranked
 
 
+def _swing_pivots(rows: list[dict], *, window: int = SWING_CONFIRMATION_WINDOW) -> list[dict]:
+    """Return an alternating sequence of confirmed swing highs/lows.
+
+    A pivot needs `window` completed sessions on both sides. A daily candle that is
+    simultaneously a local high and low is skipped because daily OHLC does not reveal
+    the intraday ordering needed to decide which pivot happened first.
+    """
+    lows = _local_extrema(rows, "low", "low", window=window)
+    highs = _local_extrema(rows, "high", "high", window=window)
+    by_index: dict[int, list[dict]] = {}
+    for price, index, pivot_date in lows:
+        by_index.setdefault(index, []).append(
+            {"type": "low", "price": price, "date": pivot_date, "_index": index}
+        )
+    for price, index, pivot_date in highs:
+        by_index.setdefault(index, []).append(
+            {"type": "high", "price": price, "date": pivot_date, "_index": index}
+        )
+
+    candidates = [items[0] for _, items in sorted(by_index.items()) if len(items) == 1]
+    pivots: list[dict] = []
+    for pivot in candidates:
+        if not pivots:
+            pivots.append(pivot)
+            continue
+        previous = pivots[-1]
+        if pivot["type"] != previous["type"]:
+            pivots.append(pivot)
+            continue
+
+        more_extreme = (
+            pivot["price"] <= previous["price"]
+            if pivot["type"] == "low"
+            else pivot["price"] >= previous["price"]
+        )
+        if more_extreme:
+            pivots[-1] = pivot
+    return pivots
+
+
+def _label_swing_pivots(
+    pivots: list[dict], *, tolerance_pct: float = SWING_EQUAL_TOLERANCE_PCT
+) -> list[dict]:
+    """Label confirmed highs/lows as HH/HL/LH/LL (or EH/EL when nearly equal)."""
+    previous_price: dict[str, float] = {}
+    labelled: list[dict] = []
+    for pivot in pivots:
+        item = dict(pivot)
+        pivot_type = item["type"]
+        price = float(item["price"])
+        previous = previous_price.get(pivot_type)
+        label = None
+        if previous is not None:
+            upper = previous * (1 + tolerance_pct)
+            lower = previous * (1 - tolerance_pct)
+            if pivot_type == "high":
+                label = "HH" if price > upper else "LH" if price < lower else "EH"
+            else:
+                label = "HL" if price > upper else "LL" if price < lower else "EL"
+        item["label"] = label
+        labelled.append(item)
+        previous_price[pivot_type] = price
+    return labelled
+
+
+def _structure_trend_state(pivots: list[dict]) -> str:
+    latest_high = next((p for p in reversed(pivots) if p["type"] == "high" and p.get("label")), None)
+    latest_low = next((p for p in reversed(pivots) if p["type"] == "low" and p.get("label")), None)
+    if latest_high is None or latest_low is None:
+        return "insufficient"
+    if latest_high["label"] == "HH" and latest_low["label"] == "HL":
+        return "bullish"
+    if latest_high["label"] == "LH" and latest_low["label"] == "LL":
+        return "bearish"
+    return "transition"
+
+
+def structure_evolution(
+    rows: list[dict],
+    current_close: float,
+    *,
+    pivot_window: int = SWING_CONFIRMATION_WINDOW,
+    max_pivots: int = MAX_STRUCTURE_PIVOTS,
+) -> dict:
+    """Describe 60d swing evolution without treating unconfirmed bars as pivots."""
+    window_rows = rows[-STRUCTURE_WINDOW:]
+    pivots = _label_swing_pivots(_swing_pivots(window_rows, window=pivot_window))
+    trend_state = _structure_trend_state(pivots)
+    previous_state = _structure_trend_state(pivots[:-1]) if pivots else "insufficient"
+    latest_high = next((p for p in reversed(pivots) if p["type"] == "high"), None)
+    latest_low = next((p for p in reversed(pivots) if p["type"] == "low"), None)
+    latest_pivot = pivots[-1] if pivots else None
+
+    break_state = "insufficient" if trend_state == "insufficient" else "transition"
+    invalidation = None
+    if trend_state == "bullish" and latest_low is not None:
+        invalidation = {"direction": "below", "price": round(float(latest_low["price"]), 4)}
+        break_state = (
+            "bullish_structure_under_threat"
+            if current_close < float(latest_low["price"])
+            else "intact"
+        )
+    elif trend_state == "bearish" and latest_high is not None:
+        invalidation = {"direction": "above", "price": round(float(latest_high["price"]), 4)}
+        break_state = (
+            "bearish_structure_under_threat"
+            if current_close > float(latest_high["price"])
+            else "intact"
+        )
+    elif (
+        previous_state == "bullish"
+        and latest_pivot is not None
+        and latest_pivot["type"] == "low"
+        and latest_pivot.get("label") == "LL"
+    ):
+        break_state = "bullish_structure_break_confirmed"
+    elif (
+        previous_state == "bearish"
+        and latest_pivot is not None
+        and latest_pivot["type"] == "high"
+        and latest_pivot.get("label") == "HH"
+    ):
+        break_state = "bearish_structure_break_confirmed"
+
+    def public_pivot(pivot: dict | None) -> dict | None:
+        if pivot is None:
+            return None
+        return {
+            "date": pivot["date"],
+            "type": pivot["type"],
+            "price": round(float(pivot["price"]), 4),
+            "label": pivot.get("label"),
+        }
+
+    return {
+        "pivot_window": pivot_window,
+        "confirmation_lag_sessions": pivot_window,
+        "trend_state": trend_state,
+        "break_state": break_state,
+        "invalidation": invalidation,
+        "latest_high": public_pivot(latest_high),
+        "latest_low": public_pivot(latest_low),
+        "pivots": [public_pivot(p) for p in pivots[-max_pivots:]],
+    }
+
+
 def price_density_zones(rows: list[dict], current_close: float) -> list[dict]:
     """Cluster repeated closing prices into compact 60d trading-density zones."""
     window = rows[-STRUCTURE_WINDOW:]
@@ -370,6 +519,7 @@ def build_stock_summary(
         high60 = max(float(r.get("high") or r["close"]) for r in last60)
         low60 = min(float(r.get("low") or r["close"]) for r in last60)
         supports, resistances = structure_zones(last60, current_close)
+        evolution = structure_evolution(last60, current_close)
         dense_zones = price_density_zones(last60, current_close)
         volume_zones = volume_profile_zones(last60, current_close)
         out["structure_60d"] = {
@@ -382,6 +532,7 @@ def build_stock_summary(
             "position_pct": (current_close - low60) / (high60 - low60) * 100 if high60 > low60 else 50.0,
             "support_zones": supports,
             "resistance_zones": resistances,
+            "structure_evolution": evolution,
             "dense_price_zones": dense_zones,
             "volume_profile_method": "daily_typical_price_approx",
             "volume_profile_unit": "shares",
@@ -398,7 +549,7 @@ def main() -> int:
     expected_trade_date = latest.get("trade_date")
     history_may_end_before_trade_date = latest.get("market_status") in INTRADAY_STATUSES
     out = {
-        "schema_version": 5,
+        "schema_version": 6,
         "history_storage": "rolling_shards",
         "history_window_days": HISTORY_WINDOW,
         "history_shard_key_length": 4,
