@@ -54,8 +54,20 @@ Each stock contains current quote fields plus a compact trend object. When histo
   - current 60d range position
   - swing `support_zones`
   - swing `resistance_zones`
+  - `structure_evolution` with confirmed pivot sequence and HH/HL/LH/LL structure state
   - repeated-close `dense_price_zones`
   - approximate volume-at-price `volume_profile_zones`
+
+`structure_evolution` uses the same completed-session 60d OHLC history, but preserves the time ordering of confirmed swing pivots instead of clustering them only into price zones. Its main fields are:
+
+- `trend_state`: `bullish`, `bearish`, `transition`, or `insufficient`
+- `break_state`: whether the current structure is intact, under threat, or has a confirmed structural break
+- `latest_high`, `latest_low`: latest confirmed swing pivots and their HH/LH or HL/LL labels
+- `invalidation`: the latest confirmed structural level whose breach threatens the active trend
+- `pivots`: the latest confirmed alternating high/low sequence
+- `confirmation_lag_sessions`: currently `2`; a pivot needs two completed sessions on each side before it becomes confirmed
+
+The most recent unconfirmed bars may therefore threaten an existing structure without being promoted immediately to a confirmed reversal. Daily candles that are simultaneously a local high and low are omitted from pivot sequencing because daily OHLC does not reveal their intraday ordering.
 
 `volume_profile_zones` is derived from daily typical price and daily volume (`daily_typical_price_approx`). Tencent historical K-line volume is normalized from board lots to **shares**, matching live quote volume, before volume shares are compared. It is deliberately approximate rather than tick-level volume profile, so downstream logic should use it as corroborating structural evidence, not as a precise cost-distribution claim.
 
@@ -97,7 +109,7 @@ The weekly full qfq refresh remains as a second safety net even when no targeted
 
 - **5d**: short-term emotion and acceleration — chase/not chase, pullback or momentum.
 - **20d**: recent position — roughly high/mid/low in the last month and whether a pullback has occurred.
-- **60d**: medium-term structure — MA20/MA60, repeated price zones, approximate high-volume price zones, swing support/resistance and broader platform context.
+- **60d**: medium-term structure — MA20/MA60, repeated price zones, approximate high-volume price zones, swing support/resistance, confirmed HH/HL/LH/LL evolution and broader platform context.
 
 Core buy zones should combine 60d structure with earnings, valuation and industry conditions. A rising current price alone must not move the core buy zone upward.
 
