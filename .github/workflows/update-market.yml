@@ -10,14 +10,15 @@ on:
       - 'tests/**'
       - 'requirements.txt'
   schedule:
-    # Beijing time. Two attempts around each target window reduce transient failures.
-    - cron: '37 11 * * 1-5'
+    # Beijing time. Fetch 10 minutes before the 06:20/12:20 analysis windows.
+    # Use a second post-close attempt to reduce transient source failures.
+    - cron: '10 6 * * 1-5'
       timezone: 'Asia/Shanghai'
-    - cron: '52 11 * * 1-5'
+    - cron: '10 12 * * 1-5'
       timezone: 'Asia/Shanghai'
-    - cron: '12 15 * * 1-5'
+    - cron: '10 16 * * 1-5'
       timezone: 'Asia/Shanghai'
-    - cron: '27 15 * * 1-5'
+    - cron: '30 16 * * 1-5'
       timezone: 'Asia/Shanghai'
 
 permissions:
