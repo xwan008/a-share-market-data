@@ -2,15 +2,6 @@ name: Update A-share market data
 
 on:
   workflow_dispatch:
-    inputs:
-      mode:
-        description: 'Update mode: intraday or full'
-        required: false
-        default: 'full'
-        type: choice
-        options:
-          - full
-          - intraday
   push:
     branches: [main]
     paths:
@@ -19,11 +10,8 @@ on:
       - 'tests/**'
       - 'requirements.txt'
   schedule:
-    # Beijing time.
-    # 12:10: lightweight quote/bridge refresh for the 12:20 analysis window.
-    # 16:10: full post-close build; 16:30: retry/fallback full build.
-    - cron: '10 12 * * 1-5'
-      timezone: 'Asia/Shanghai'
+    # Beijing time. Build complete closed-session data after the market close.
+    # 16:10 is the primary run; 16:30 is a retry/fallback run.
     - cron: '10 16 * * 1-5'
       timezone: 'Asia/Shanghai'
     - cron: '30 16 * * 1-5'
@@ -50,42 +38,24 @@ jobs:
           python-version: '3.12'
           cache: 'pip'
 
-      - name: Resolve update mode
-        id: mode
-        shell: bash
-        run: |
-          if [[ "${{ github.event_name }}" == "schedule" && "${{ github.event.schedule }}" == "10 12 * * 1-5" ]]; then
-            echo "mode=intraday" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.mode }}" == "intraday" ]]; then
-            echo "mode=intraday" >> "$GITHUB_OUTPUT"
-          else
-            echo "mode=full" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Install dependencies
-        run: pip install -r requirements.txt
-
-      - name: Install test dependency
-        if: steps.mode.outputs.mode == 'full'
-        run: pip install pytest
+        run: |
+          pip install -r requirements.txt
+          pip install pytest
 
       - name: Run tests
-        if: steps.mode.outputs.mode == 'full'
         run: python -m pytest -q
 
-      - name: Fetch and validate quotes
+      - name: Fetch and validate closed-session quotes
         run: python scripts/fetch_market.py
 
       - name: Detect and repair corporate-action qfq drift
-        if: steps.mode.outputs.mode == 'full'
         run: python scripts/repair_corporate_actions.py
 
       - name: Append closed session to bounded rolling history
-        if: steps.mode.outputs.mode == 'full'
         run: python scripts/history_store.py
 
       - name: Build 5d/20d/60d trend, density, volume and structure summary
-        if: steps.mode.outputs.mode == 'full'
         run: python scripts/build_history.py
 
       - name: Build compact ChatGPT bridge files
@@ -115,9 +85,6 @@ jobs:
             echo "No market-data changes to commit."
           fi
 
-# Intraday mode updates current quote/bridge files only; it does not append the
-# unfinished candle or recompute confirmed daily pivots/HH/HL/LH/LL.
-# Full mode runs after the close and owns tests, corporate-action repair,
-# rolling-history append, and 5d/20d/60d structure recomputation.
-# The 06:20 analysis consumes the previous post-close full build, so no 06:10
-# market-data workflow is required.
+# Only completed daily sessions are persisted into rolling history and structure.
+# The 06:20 analysis consumes the latest completed post-close build from the
+# previous trading day. No intraday or morning market-data workflow is required.
