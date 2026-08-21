@@ -160,11 +160,7 @@ def main() -> int:
             source, base = fresh[0]
             primary = positive_number(base.get("price"))
             other_realtime = t if source == "sina" else s
-            secondary = (
-                positive_number(other_realtime.get("price"))
-                if source_is_fresh(other_realtime, trade_date)
-                else None
-            )
+            secondary = positive_number(other_realtime.get("price")) if other_realtime else None
         else:
             source, base, primary, secondary = "none", s or t, None, None
 
