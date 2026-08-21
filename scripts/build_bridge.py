@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from collections import defaultdict
 from pathlib import Path
+from statistics import median
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
@@ -15,6 +16,108 @@ def read_json(path: Path, default: dict) -> dict:
     if not path.exists():
         return default
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def fnum(value) -> float | None:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def pct(part: int, total: int) -> float | None:
+    if total <= 0:
+        return None
+    return round(part / total * 100, 2)
+
+
+def build_market_breadth(latest_stocks: dict, trend_stocks: dict) -> dict:
+    """Build objective main-board breadth inputs for the downstream market regime check.
+
+    This deliberately does not produce a mechanical risk-on/risk-off score. It only
+    summarizes broad participation and structure so the analysis layer does not infer
+    the whole market from a small candidate list.
+    """
+    advancers = decliners = flat = 0
+    quote_usable = 0
+
+    above_ma20 = above_ma60 = 0
+    bullish_intact = bearish_intact = 0
+    transition_or_other = 0
+    structure_usable = 0
+    change_5d: list[float] = []
+    change_20d: list[float] = []
+
+    for code, quote in latest_stocks.items():
+        if quote.get("confidence") not in {"high", "medium"}:
+            continue
+        price = fnum(quote.get("price"))
+        prev_close = fnum(quote.get("prev_close"))
+        if price is not None and price > 0 and prev_close is not None and prev_close > 0:
+            quote_usable += 1
+            if price > prev_close:
+                advancers += 1
+            elif price < prev_close:
+                decliners += 1
+            else:
+                flat += 1
+
+        trend = trend_stocks.get(code) or {}
+        if trend.get("history_confidence") not in {"high", "medium"}:
+            continue
+        structure = trend.get("structure_60d") or {}
+        ma20 = fnum(structure.get("ma20"))
+        ma60 = fnum(structure.get("ma60"))
+        last_close = fnum(trend.get("last_close"))
+        evolution = structure.get("structure_evolution") or {}
+        if last_close is None or last_close <= 0 or ma20 is None or ma60 is None:
+            continue
+
+        structure_usable += 1
+        if last_close >= ma20:
+            above_ma20 += 1
+        if last_close >= ma60:
+            above_ma60 += 1
+
+        trend_state = evolution.get("trend_state")
+        break_state = evolution.get("break_state")
+        if trend_state == "bullish" and break_state == "intact":
+            bullish_intact += 1
+        elif trend_state == "bearish" and break_state == "intact":
+            bearish_intact += 1
+        else:
+            transition_or_other += 1
+
+        c5 = fnum(trend.get("close_change_5d_pct"))
+        c20 = fnum(trend.get("close_change_20d_pct"))
+        if c5 is not None:
+            change_5d.append(c5)
+        if c20 is not None:
+            change_20d.append(c20)
+
+    return {
+        "scope": "sh_sz_main_board",
+        "quote_usable": quote_usable,
+        "advancers": advancers,
+        "decliners": decliners,
+        "flat": flat,
+        "advancers_pct": pct(advancers, quote_usable),
+        "decliners_pct": pct(decliners, quote_usable),
+        "structure_usable": structure_usable,
+        "above_ma20": above_ma20,
+        "above_ma20_pct": pct(above_ma20, structure_usable),
+        "above_ma60": above_ma60,
+        "above_ma60_pct": pct(above_ma60, structure_usable),
+        "bullish_intact": bullish_intact,
+        "bullish_intact_pct": pct(bullish_intact, structure_usable),
+        "bearish_intact": bearish_intact,
+        "bearish_intact_pct": pct(bearish_intact, structure_usable),
+        "transition_or_other": transition_or_other,
+        "transition_or_other_pct": pct(transition_or_other, structure_usable),
+        "median_5d_change_pct": round(median(change_5d), 2) if change_5d else None,
+        "median_20d_change_pct": round(median(change_20d), 2) if change_20d else None,
+        "interpretation": "objective_inputs_only_no_mechanical_market_score",
+    }
 
 
 def main() -> int:
@@ -66,6 +169,7 @@ def main() -> int:
         "source_status": latest.get("source_status"),
         "validation_stats": latest.get("validation_stats"),
         "shard_count": len(groups),
+        "market_breadth": build_market_breadth(latest_stocks, trend_stocks),
         "history": {
             "storage": trends.get("history_storage"),
             "window_days": trends.get("history_window_days"),
