@@ -6,8 +6,6 @@ from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-import pandas as pd
-
 from validate import normalize_quote_date, parse_quote_time, validate_price, validate_quote_fields
 
 TZ = ZoneInfo("Asia/Shanghai")
@@ -48,6 +46,14 @@ def positive_number(value) -> float | None:
     return number if number > 0 else None
 
 
+def calculate_change_pct(price, prev_close) -> float | None:
+    current = positive_number(price)
+    previous = positive_number(prev_close)
+    if current is None or previous is None:
+        return None
+    return (current / previous - 1) * 100
+
+
 def fetch_easyquotation_snapshot(provider: str) -> dict[str, dict]:
     import easyquotation
 
@@ -78,28 +84,6 @@ def fetch_sina_snapshot() -> dict[str, dict]:
 
 def fetch_tencent_snapshot() -> dict[str, dict]:
     return fetch_easyquotation_snapshot("tencent")
-
-
-def fetch_akshare_snapshot() -> dict[str, dict]:
-    import akshare as ak
-
-    df: pd.DataFrame = ak.stock_zh_a_spot_em()
-    out: dict[str, dict] = {}
-    for _, row in df.iterrows():
-        code = normalize_code(row.get("代码"))
-        if not is_main_board(code):
-            continue
-        out[code] = {
-            "name": row.get("名称"),
-            "price": row.get("最新价"),
-            "prev_close": row.get("昨收"),
-            "open": row.get("今开"),
-            "high": row.get("最高"),
-            "low": row.get("最低"),
-            "volume": row.get("成交量"),
-            "change_pct": row.get("涨跌幅"),
-        }
-    return out
 
 
 def safe_fetch(fn, label: str) -> tuple[dict[str, dict], str | None]:
@@ -147,11 +131,10 @@ def main() -> int:
     now = datetime.now(TZ)
     sina, sina_error = safe_fetch(fetch_sina_snapshot, "sina")
     tencent, tencent_error = safe_fetch(fetch_tencent_snapshot, "tencent")
-    ak, ak_error = safe_fetch(fetch_akshare_snapshot, "akshare")
-    if not sina and not tencent and not ak:
+    if not sina and not tencent:
         print(
             json.dumps(
-                {"error": "all_sources_failed", "details": [sina_error, tencent_error, ak_error]},
+                {"error": "all_sources_failed", "details": [sina_error, tencent_error]},
                 ensure_ascii=False,
             )
         )
@@ -164,32 +147,30 @@ def main() -> int:
     elif trade_date != now.date().isoformat():
         status = "closed_or_no_trade"
 
-    codes = sorted(set(sina) | set(tencent) | set(ak))
+    codes = sorted(set(sina) | set(tencent))
     stocks: dict[str, dict] = {}
     stats = {"high": 0, "medium": 0, "invalid": 0}
 
     for code in codes:
-        s, t, a = sina.get(code, {}), tencent.get(code, {}), ak.get(code, {})
+        s, t = sina.get(code, {}), tencent.get(code, {})
         fresh = [("sina", s), ("tencent", t)]
         fresh = [(name, item) for name, item in fresh if source_is_fresh(item, trade_date)]
-        a_price = positive_number(a.get("price")) if a else None
 
         if fresh:
             source, base = fresh[0]
             primary = positive_number(base.get("price"))
             other_realtime = t if source == "sina" else s
-            secondary = positive_number(other_realtime.get("price")) if other_realtime else None
-            if secondary is None:
-                secondary = a_price
-        elif a_price is not None:
-            source, base, primary, secondary = "akshare", a, a_price, None
+            secondary = (
+                positive_number(other_realtime.get("price"))
+                if source_is_fresh(other_realtime, trade_date)
+                else None
+            )
         else:
-            source, base, primary, secondary = "none", s or t or a, None, None
+            source, base, primary, secondary = "none", s or t, None, None
 
+        change_pct = calculate_change_pct(base.get("price"), base.get("prev_close"))
         validation = validate_price(primary_price=primary, secondary_price=secondary)
         warnings = list(validation.warnings)
-        if source == "akshare":
-            warnings.append("quote_date_not_explicit")
         for name, item in (("sina", s), ("tencent", t)):
             if item and positive_number(item.get("price")) is not None and not source_is_fresh(item, trade_date):
                 warnings.append(f"{name}_date_unverified")
@@ -197,7 +178,7 @@ def main() -> int:
             {
                 "price": base.get("price"),
                 "prev_close": base.get("prev_close"),
-                "change_pct": a.get("change_pct"),
+                "change_pct": change_pct,
             }
         )
         quote_time = (
@@ -207,7 +188,7 @@ def main() -> int:
         )
 
         quote = {
-            "name": base.get("name") or s.get("name") or t.get("name") or a.get("name"),
+            "name": base.get("name") or s.get("name") or t.get("name"),
             "market": "SH" if code.startswith(SH_MAIN_PREFIXES) else "SZ",
             "price": base.get("price"),
             "prev_close": base.get("prev_close"),
@@ -215,13 +196,12 @@ def main() -> int:
             "high": base.get("high"),
             "low": base.get("low"),
             "volume": base.get("volume"),
-            "change_pct": a.get("change_pct"),
+            "change_pct": change_pct,
             "price_time": quote_time,
             "primary_source": source,
             "source_prices": {
                 "sina": s.get("price") if s else None,
                 "tencent": t.get("price") if t else None,
-                "akshare": a.get("price") if a else None,
             },
             "source_dates": {
                 "sina": normalize_quote_date(s.get("date")) if s else None,
@@ -242,8 +222,7 @@ def main() -> int:
         "source_status": {
             "sina": "ok" if sina else "failed",
             "tencent": "ok" if tencent else "failed",
-            "akshare": "ok" if ak else "failed",
-            "errors": [x for x in (sina_error, tencent_error, ak_error) if x],
+            "errors": [x for x in (sina_error, tencent_error) if x],
         },
         "validation_stats": stats,
         "stocks": stocks,
