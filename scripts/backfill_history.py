@@ -20,9 +20,12 @@ LATEST_PATH = DATA_DIR / "latest.json"
 STATUS_PATH = DATA_DIR / "backfill_status.json"
 
 URL = "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get"
-MAX_WORKERS = 12
+PRIMARY_WORKERS = 6
+RECOVERY_WORKERS = 2
 REQUEST_BARS = 80
-RETRIES = 2
+RETRIES = 4
+RECOVERY_PAUSE_SECONDS = 5
+MIN_COMMIT_SUCCESS_RATIO = 0.20
 TENCENT_VOLUME_LOT_SIZE = 100
 
 
@@ -44,13 +47,7 @@ def fetch_tencent_history(
     *,
     exclude_date: str | None = None,
 ) -> tuple[str, dict | None, str | None]:
-    """Fetch a bounded Tencent qfq daily series.
-
-    Tencent daily K-line volume is expressed in board lots (手) for A shares;
-    normalize it to shares so it is comparable with live quote volume.
-    exclude_date is used by intraday corporate-action repair so the current
-    unfinished session can never enter completed daily history.
-    """
+    """Fetch a bounded Tencent qfq daily series with conservative retrying."""
     symbol = symbol_for(code)
     params = {"param": f"{symbol},day,,,{REQUEST_BARS},qfq"}
     last_error: str | None = None
@@ -60,7 +57,7 @@ def fetch_tencent_history(
             response = requests.get(
                 URL,
                 params=params,
-                timeout=10,
+                timeout=12,
                 headers={"User-Agent": "Mozilla/5.0 a-share-market-data/1.0"},
             )
             response.raise_for_status()
@@ -111,26 +108,27 @@ def fetch_tencent_history(
             last_error = "no_history_rows"
         except Exception as exc:
             last_error = f"{type(exc).__name__}:{exc}"
+
         if attempt < RETRIES:
-            time.sleep(0.35 * (attempt + 1))
+            # Back off aggressively on Tencent 5xx/rate pressure instead of
+            # hammering the endpoint with the old short fixed delay.
+            time.sleep(min(8.0, 0.75 * (2**attempt)))
 
     return code, None, last_error
 
 
-def main() -> int:
-    latest = read_json(LATEST_PATH, {})
-    stocks = latest.get("stocks", {})
-    latest_generated_at = latest.get("generated_at")
-    refreshed_at = datetime.now(ZoneInfo("Asia/Shanghai")).isoformat()
-    if not stocks:
-        print("latest.json has no stocks")
-        return 2
-
+def fetch_codes(
+    codes: list[str],
+    stocks: dict[str, dict],
+    refreshed_at: str,
+    workers: int,
+) -> tuple[dict[str, dict], dict[str, str]]:
     results: dict[str, dict] = {}
     failures: dict[str, str] = {}
-    codes = sorted(stocks)
+    if not codes:
+        return results, failures
 
-    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as pool:
+    with ThreadPoolExecutor(max_workers=workers) as pool:
         futures = {
             pool.submit(
                 fetch_tencent_history,
@@ -146,23 +144,67 @@ def main() -> int:
                 results[code] = item
             else:
                 failures[code] = error or "unknown"
+    return results, failures
 
+
+def main() -> int:
+    latest = read_json(LATEST_PATH, {})
+    stocks = latest.get("stocks", {})
+    latest_generated_at = latest.get("generated_at")
+    refreshed_at = datetime.now(ZoneInfo("Asia/Shanghai")).isoformat()
+    if not stocks:
+        print("latest.json has no stocks")
+        return 2
+
+    codes = sorted(stocks)
+    results, failures = fetch_codes(codes, stocks, refreshed_at, PRIMARY_WORKERS)
+    first_pass_success = len(results)
+
+    # A second, much slower pass is deliberately limited to the failures. This
+    # addresses transient Tencent 501/5xx bursts without turning a partial
+    # upstream outage into a total-history outage for every stock.
+    recovered = 0
+    if failures:
+        time.sleep(RECOVERY_PAUSE_SECONDS)
+        retry_codes = sorted(failures)
+        retry_results, retry_failures = fetch_codes(
+            retry_codes,
+            stocks,
+            refreshed_at,
+            RECOVERY_WORKERS,
+        )
+        recovered = len(retry_results)
+        results.update(retry_results)
+        failures = retry_failures
+
+    success_ratio = len(results) / len(codes) if codes else 0.0
+
+    # Important: write_history_shards(replace=True) only replaces the stocks
+    # that were successfully fetched. Existing histories for failed codes stay
+    # in place, so a degraded refresh never deletes the last good K-line set.
     shard_count = write_history_shards(
         results,
         refreshed_at,
         replace=True,
         prune_to_codes=stocks.keys(),
     )
-    success_ratio = len(results) / len(codes) if codes else 0.0
+
     status = {
-        "schema_version": 3,
+        "schema_version": 4,
         "source": "tencent_qfq_day",
         "requested_stocks": len(codes),
         "successful_stocks": len(results),
         "failed_stocks": len(failures),
         "success_ratio": success_ratio,
+        "first_pass_successful_stocks": first_pass_success,
+        "second_pass_recovered_stocks": recovered,
+        "degraded": bool(failures),
+        "stale_histories_retained": len(failures),
         "rolling_days": ROLLING_DAYS,
         "request_bars": REQUEST_BARS,
+        "primary_workers": PRIMARY_WORKERS,
+        "recovery_workers": RECOVERY_WORKERS,
+        "retries_per_pass": RETRIES,
         "volume_unit": "shares",
         "tencent_source_volume_unit": "lots_100_shares",
         "history_shards_written": shard_count,
@@ -174,7 +216,11 @@ def main() -> int:
     STATUS_PATH.write_text(json.dumps(status, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps(status, ensure_ascii=False))
 
-    return 0 if success_ratio >= 0.70 else 3
+    # Commit useful partial progress. Only fail closed when the upstream source
+    # is so broken that less than 20% of the universe refreshed; otherwise the
+    # downstream build records per-stock freshness and can reject stale names
+    # individually instead of discarding thousands of fresh histories.
+    return 0 if success_ratio >= MIN_COMMIT_SUCCESS_RATIO else 3
 
 
 if __name__ == "__main__":
