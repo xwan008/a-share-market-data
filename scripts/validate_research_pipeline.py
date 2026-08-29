@@ -8,7 +8,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_UNIVERSE = ROOT / "config" / "industry_scan_universe.json"
+DEFAULT_COMPANY_REGISTRY = ROOT / "data" / "research" / "company_industry_registry.json"
 ALLOWED_STATUS = {"T0", "T1", "T2", "unconfirmed", "not_applicable"}
+MAIN_BOARD_PREFIXES = ("600", "601", "603", "605", "000", "001", "002", "003")
 
 
 class ValidationError(Exception):
@@ -39,6 +41,14 @@ def parse_iso(value: str | None) -> datetime | None:
         return None
 
 
+def normalize_code(value: object) -> str:
+    return str(value or "").zfill(6)
+
+
+def is_main_board_code(code: str) -> bool:
+    return len(code) == 6 and code.isdigit() and code.startswith(MAIN_BOARD_PREFIXES)
+
+
 def validate_industry_scan(scan: dict, universe: dict) -> list[str]:
     errors: list[str] = []
     require(scan.get("weekly_pool_read") is False, "industry_scan_weekly_pool_must_be_false", errors)
@@ -54,7 +64,6 @@ def validate_industry_scan(scan: dict, universe: dict) -> list[str]:
     missing_industries = sorted(set(expected) - set(actual))
     extra_industries = sorted(set(actual) - set(expected))
     require(not missing_industries, f"missing_broad_industries:{missing_industries}", errors)
-    # Extra broad industries are allowed only if explicitly dynamic.
     for industry_id in extra_industries:
         require(
             actual[industry_id].get("registry_source") == "dynamic",
@@ -67,7 +76,7 @@ def validate_industry_scan(scan: dict, universe: dict) -> list[str]:
         if not item:
             continue
         subchains = item.get("subchains", [])
-        by_name = {}
+        by_name: dict[str, dict] = {}
         duplicate_names: list[str] = []
         for row in subchains:
             name = row.get("name")
@@ -114,7 +123,63 @@ def t2_keys_from_scan(scan: dict) -> set[tuple[str, str]]:
     return out
 
 
-def validate_t2_recall(recall: dict, scan: dict) -> list[str]:
+def validate_company_registry(registry: dict) -> list[str]:
+    errors: list[str] = []
+    companies = registry.get("companies", {})
+    require(isinstance(companies, dict), "company_registry_companies_must_be_object", errors)
+    if not isinstance(companies, dict):
+        return errors
+
+    for raw_code, company in companies.items():
+        code = normalize_code(raw_code)
+        require(is_main_board_code(code), f"registry_invalid_main_board_code:{raw_code}", errors)
+        require(bool(company.get("name")), f"registry_company_missing_name:{code}", errors)
+        mappings = company.get("mappings", [])
+        require(isinstance(mappings, list) and bool(mappings), f"registry_company_missing_mappings:{code}", errors)
+        seen: set[tuple[str, str, str]] = set()
+        for mapping in mappings if isinstance(mappings, list) else []:
+            key = (
+                mapping.get("broad_industry_id"),
+                mapping.get("subchain"),
+                mapping.get("value_chain_link"),
+            )
+            require(all(key), f"registry_mapping_missing_key_fields:{code}:{key}", errors)
+            require(key not in seen, f"registry_duplicate_mapping:{code}:{key}", errors)
+            seen.add(key)
+            status = mapping.get("status")
+            require(status in {"active", "inactive"}, f"registry_invalid_mapping_status:{code}:{key}:{status}", errors)
+            require(bool(mapping.get("exposure_summary")), f"registry_mapping_missing_exposure:{code}:{key}", errors)
+            require(bool(mapping.get("evidence_sources")), f"registry_mapping_missing_evidence:{code}:{key}", errors)
+            if status == "inactive":
+                require(bool(mapping.get("invalidation_reason")), f"registry_inactive_without_reason:{code}:{key}", errors)
+    return errors
+
+
+def active_registry_mappings_for_t2(registry: dict, scan: dict) -> set[tuple[str, str, str, str]]:
+    t2 = t2_keys_from_scan(scan)
+    out: set[tuple[str, str, str, str]] = set()
+    for raw_code, company in registry.get("companies", {}).items():
+        code = normalize_code(raw_code)
+        for mapping in company.get("mappings", []):
+            pair = (mapping.get("broad_industry_id"), mapping.get("subchain"))
+            if mapping.get("status") == "active" and pair in t2:
+                out.add((code, pair[0], pair[1], mapping.get("value_chain_link")))
+    return out
+
+
+def recalled_mappings(recall: dict) -> set[tuple[str, str, str, str]]:
+    out: set[tuple[str, str, str, str]] = set()
+    for row in recall.get("t2_subchains", []):
+        industry_id = row.get("broad_industry_id")
+        subchain = row.get("subchain")
+        for link in row.get("value_chain_links", []):
+            link_name = link.get("name")
+            for company in link.get("companies", []):
+                out.add((normalize_code(company.get("code")), industry_id, subchain, link_name))
+    return out
+
+
+def validate_t2_recall(recall: dict, scan: dict, registry: dict | None = None) -> list[str]:
     errors: list[str] = []
     require(recall.get("weekly_pool_read") is False, "t2_recall_weekly_pool_must_be_false", errors)
     scan_frozen = parse_iso(scan.get("industry_frozen_at"))
@@ -159,6 +224,10 @@ def validate_t2_recall(recall: dict, scan: dict) -> list[str]:
             count = link.get("company_count")
             require(isinstance(companies, list), f"companies_not_list:{key}:{name}", errors)
             require(count == len(companies), f"company_count_mismatch:{key}:{name}:{count}!={len(companies) if isinstance(companies, list) else 'NA'}", errors)
+            if "registry_count" in link:
+                require(isinstance(link.get("registry_count"), int) and link.get("registry_count") >= 0, f"invalid_registry_count:{key}:{name}", errors)
+            if "new_discovery_count" in link:
+                require(isinstance(link.get("new_discovery_count"), int) and link.get("new_discovery_count") >= 0, f"invalid_new_discovery_count:{key}:{name}", errors)
             gap = link.get("coverage_gap", [])
             require(isinstance(gap, list), f"link_coverage_gap_not_list:{key}:{name}", errors)
             if not companies and not gap:
@@ -168,8 +237,8 @@ def validate_t2_recall(recall: dict, scan: dict) -> list[str]:
 
             codes: set[str] = set()
             for company in companies if isinstance(companies, list) else []:
-                code = str(company.get("code", "")).zfill(6)
-                require(len(code) == 6 and code.isdigit(), f"invalid_company_code:{key}:{name}:{code}", errors)
+                code = normalize_code(company.get("code"))
+                require(is_main_board_code(code), f"invalid_company_code:{key}:{name}:{code}", errors)
                 require(code not in codes, f"duplicate_company_in_link:{key}:{name}:{code}", errors)
                 codes.add(code)
                 require(bool(company.get("name")), f"company_missing_name:{key}:{name}:{code}", errors)
@@ -178,6 +247,15 @@ def validate_t2_recall(recall: dict, scan: dict) -> list[str]:
 
         expected_status = "incomplete" if unresolved or chain_gap else "complete"
         require(row.get("recall_status") == expected_status, f"recall_status_mismatch:{key}:expected_{expected_status}", errors)
+
+    if registry is not None:
+        errors.extend(validate_company_registry(registry))
+        missing_registry_mappings = sorted(active_registry_mappings_for_t2(registry, scan) - recalled_mappings(recall))
+        require(
+            not missing_registry_mappings,
+            f"active_registry_mappings_missing_from_recall:{missing_registry_mappings}",
+            errors,
+        )
 
     return errors
 
@@ -214,6 +292,10 @@ def main() -> int:
     p_recall = sub.add_parser("t2-recall")
     p_recall.add_argument("recall")
     p_recall.add_argument("--industry-scan", required=True)
+    p_recall.add_argument("--company-registry", default=str(DEFAULT_COMPANY_REGISTRY))
+
+    p_registry = sub.add_parser("company-registry")
+    p_registry.add_argument("registry", nargs="?", default=str(DEFAULT_COMPANY_REGISTRY))
 
     p_order = sub.add_parser("stage-order")
     p_order.add_argument("run_state")
@@ -224,10 +306,15 @@ def main() -> int:
             errors = validate_industry_scan(load_json(args.scan), load_json(args.universe))
             return print_result("industry-scan", errors)
         if args.command == "t2-recall":
-            errors = validate_t2_recall(load_json(args.recall), load_json(args.industry_scan))
+            errors = validate_t2_recall(
+                load_json(args.recall),
+                load_json(args.industry_scan),
+                load_json(args.company_registry),
+            )
             return print_result("t2-recall", errors)
-        errors = validate_stage_order(load_json(args.run_state))
-        return print_result("stage-order", errors)
+        if args.command == "company-registry":
+            return print_result("company-registry", validate_company_registry(load_json(args.registry)))
+        return print_result("stage-order", validate_stage_order(load_json(args.run_state)))
     except ValidationError as exc:
         return print_result(args.command, [str(exc)])
 
