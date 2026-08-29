@@ -6,6 +6,11 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/backfill-history.yml'
+      - 'scripts/backfill_history.py'
+      - 'scripts/history_store.py'
+      - 'scripts/build_history.py'
+      - 'scripts/build_bridge.py'
+      - 'tests/**'
   schedule:
     # Weekly qfq refresh repairs corporate-action/adjustment drift in the rolling history.
     - cron: '20 10 * * 6'
@@ -21,7 +26,7 @@ concurrency:
 jobs:
   backfill:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
         with:
@@ -74,3 +79,6 @@ jobs:
           fi
 
 # Manual/weekly maintenance workflow. History remains bounded to 65 completed sessions.
+# Partial upstream Tencent failures are committed as degraded refreshes; failed
+# symbols retain their previous good history and remain individually stale until
+# a later refresh succeeds.
