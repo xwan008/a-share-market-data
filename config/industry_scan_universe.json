@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "purpose": "A股低风险买点榜产业景气主流程的固定覆盖骨架。它只定义扫描范围，不包含任何当前景气结论，也不得读取周度个股补漏池来修改本文件。",
+  "coverage_rules": {
+    "all_broad_industries_must_be_scanned": true,
+    "minimum_subchains_are_floor_not_ceiling": true,
+    "dynamic_new_subchains_must_be_added_when_public_evidence_requires": true,
+    "broad_industry_cannot_be_final_t2_unit": true,
+    "every_minimum_subchain_requires_status_or_explicit_not_applicable_reason": true,
+    "scan_complete_only_if_every_broad_industry_has_coverage_result": true,
+    "weekly_stock_pool_must_not_influence_industry_scan": true
+  },
+  "broad_industries": [
+    {"id":"agriculture","name":"农林牧渔","minimum_subchains":["生猪养殖","肉禽/禽苗","饲料","种业","水产养殖","农产品种植","动物保健"]},
+    {"id":"chemicals","name":"基础化工","minimum_subchains":["聚氨酯/MDI/TDI","C2/C3轻烃","煤化工","磷化工","氟化工","氯碱/PVC","纯碱/玻璃原料","农药/农化","化肥","染料","轮胎材料/炭黑","化纤","钛白粉","有机硅"]},
+    {"id":"steel","name":"钢铁","minimum_subchains":["普钢","特钢","不锈钢","钢管/板材"]},
+    {"id":"nonferrous","name":"有色金属","minimum_subchains":["铜矿/冶炼","电解铝/氧化铝","黄金","白银","铅锌","锂资源/锂盐","镍钴","稀土","钼钨锡","金属新材料"]},
+    {"id":"electronics","name":"电子","minimum_subchains":["半导体设计","晶圆制造","封装测试","半导体设备","半导体材料","PCB/CCL","消费电子组装","高速连接器/铜互连","被动元件","显示面板","LED/光电器件"]},
+    {"id":"home_appliances","name":"家用电器","minimum_subchains":["白电","黑电","厨电","小家电","家电零部件"]},
+    {"id":"food_beverage","name":"食品饮料","minimum_subchains":["白酒","啤酒","乳制品","调味品","休闲食品","饮料","食品加工"]},
+    {"id":"textile_apparel","name":"纺织服饰","minimum_subchains":["品牌服饰","纺织制造","鞋服代工","功能材料"]},
+    {"id":"light_manufacturing","name":"轻工制造","minimum_subchains":["造纸","包装印刷","家居","文娱用品","日用轻工"]},
+    {"id":"pharma","name":"医药生物","minimum_subchains":["创新药","仿制药","CXO/CDMO/CRDMO","医疗器械","IVD","中药","疫苗","血制品","医药商业","医疗服务"]},
+    {"id":"utilities","name":"公用事业","minimum_subchains":["火电","水电","核电","燃气","垃圾焚烧/固废","供热"]},
+    {"id":"transportation","name":"交通运输","minimum_subchains":["航运","港口","航空","机场","快递","物流","铁路","公路"]},
+    {"id":"real_estate","name":"房地产","minimum_subchains":["住宅开发","商业地产","物业管理","产业园区"]},
+    {"id":"retail","name":"商贸零售","minimum_subchains":["百货","超市","专业连锁","电商服务","免税"]},
+    {"id":"social_services","name":"社会服务","minimum_subchains":["酒店","旅游景区","餐饮","教育","人力服务"]},
+    {"id":"conglomerates","name":"综合","minimum_subchains":["多元综合平台"]},
+    {"id":"building_materials","name":"建筑材料","minimum_subchains":["水泥","玻璃","玻纤","防水材料","管材","耐火材料"]},
+    {"id":"construction","name":"建筑装饰","minimum_subchains":["基建施工","专业工程","装饰装修","工程咨询/设计"]},
+    {"id":"power_equipment","name":"电力设备","minimum_subchains":["电网一次设备/变压器/高压开关","电网二次设备/继保自动化","特高压","风电整机/零部件","光伏硅料/硅片","光伏电池组件","逆变器","储能系统","锂电池","负极/正极/隔膜/电解液","充电桩"]},
+    {"id":"defense","name":"国防军工","minimum_subchains":["航空主机","航空发动机","导弹/弹药","军工电子","军船","卫星/航天"]},
+    {"id":"computer","name":"计算机","minimum_subchains":["AI服务器/算力整机","数据中心基础设施","云计算","工业软件","网络安全","金融IT","信创基础软硬件","AI应用软件"]},
+    {"id":"media","name":"传媒","minimum_subchains":["游戏","影视","广告营销","出版","互联网内容"]},
+    {"id":"communication","name":"通信","minimum_subchains":["高速光模块/光器件","光纤光缆","高速铜互连/连接器","通信主设备","运营商","卫星通信"]},
+    {"id":"banking","name":"银行","minimum_subchains":["国有大行","股份行","城商行","农商行"]},
+    {"id":"nonbank_finance","name":"非银金融","minimum_subchains":["证券","保险","多元金融"]},
+    {"id":"automotive","name":"汽车","minimum_subchains":["乘用车","重卡","客车","商用车动力系统","汽车电子","智能驾驶","热管理","轮胎","底盘/传动","汽车连接器"]},
+    {"id":"machinery","name":"机械设备","minimum_subchains":["工程机械","工业机器人","机床","通用自动化","专用设备","仪器仪表","船舶制造","船机动力","轨交设备"]},
+    {"id":"coal","name":"煤炭","minimum_subchains":["动力煤","焦煤","煤化工一体化"]},
+    {"id":"oil_gas","name":"石油石化","minimum_subchains":["油气开采","油服","炼化","成品油/销售","石化材料"]},
+    {"id":"environmental","name":"环保","minimum_subchains":["水务","固废","大气治理","环境监测","资源回收"]},
+    {"id":"beauty_care","name":"美容护理","minimum_subchains":["化妆品","医美","个护用品"]}
+  ],
+  "completion_contract": {
+    "required_output_per_broad_industry":["broad_industry","subchains_scanned","t2_subchains","t1_subchains","t0_subchains","unconfirmed_subchains","coverage_gap"],
+    "required_output_per_t2_subchain":["subchain","direct_profit_driver","leading_variables","evidence","main_value_chain_links","eligible_main_board_companies_recalled","coverage_gap"],
+    "forbidden_shortcuts":["先列熟悉公司再倒推产业链","用几个龙头财报代表整个大行业","未扫描完整大行业覆盖骨架就宣布全市场扫描完成","只扫描热门行业","因为周度补漏池出现某公司而新增或升级T2"]
+  }
+}
