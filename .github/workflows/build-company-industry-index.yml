@@ -2,6 +2,13 @@ name: Build company industry index
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/build-company-industry-index.yml'
+      - 'scripts/build_company_industry_index.py'
+      - 'requirements-research.txt'
+      - 'config/industry_scan_universe.json'
   schedule:
     # Beijing Sunday 09:20. Slow-changing taxonomy is refreshed separately from market data.
     - cron: '20 9 * * 0'
