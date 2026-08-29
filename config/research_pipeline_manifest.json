@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "pipeline": "a_share_low_risk",
+  "authoritative_files": {
+    "orchestrator_skill": "skills/a-share-low-risk/orchestrator/SKILL.md",
+    "industry_registry": "config/industry_scan_universe.json",
+    "company_registry": "data/research/company_industry_registry.json",
+    "weekly_pool": "data/research/weekly_fundamental_opportunity_pool.json",
+    "market_health": "data/health.json",
+    "backfill_status": "data/backfill_status.json"
+  },
+  "stages": [
+    {
+      "id": "industry_scan",
+      "skill": "skills/a-share-low-risk/industry-scan/SKILL.md",
+      "output": "data/research/pipeline/industry_scan.json",
+      "validator": "python scripts/validate_research_pipeline.py industry-scan data/research/pipeline/industry_scan.json"
+    },
+    {
+      "id": "t2_company_recall",
+      "skill": "skills/a-share-low-risk/t2-company-recall/SKILL.md",
+      "output": "data/research/pipeline/t2_company_recall.json",
+      "validator": "python scripts/validate_research_pipeline.py t2-recall data/research/pipeline/t2_company_recall.json --industry-scan data/research/pipeline/industry_scan.json"
+    },
+    {
+      "id": "weekly_merge",
+      "requires": ["industry_scan", "t2_company_recall"],
+      "run_state": "data/research/pipeline/run_state.json",
+      "validator": "python scripts/validate_research_pipeline.py stage-order data/research/pipeline/run_state.json"
+    },
+    {
+      "id": "earnings_validation",
+      "skill": "skills/a-share-low-risk/earnings-validation/SKILL.md"
+    },
+    {
+      "id": "left_value_cycle",
+      "skill": "skills/a-share-low-risk/cycle-valuation/SKILL.md"
+    },
+    {
+      "id": "right_structure",
+      "skill": "skills/a-share-low-risk/technical-structure/SKILL.md"
+    }
+  ],
+  "hard_stop_on_validator_failure": true,
+  "weekly_pool_forbidden_before_stage": "weekly_merge"
+}
