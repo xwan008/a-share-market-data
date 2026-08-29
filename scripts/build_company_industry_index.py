@@ -206,6 +206,10 @@ def main() -> int:
     indexed_count = len(updated)
     mapped_count = sum(1 for item in updated.values() if item.get("registry_broad_industry_id"))
     missing_codes = sorted(set(stocks) - set(updated))
+    unmapped_codes = sorted(
+        code for code, item in updated.items()
+        if not item.get("registry_broad_industry_id")
+    )
     coverage_pct = indexed_count / len(stocks) * 100 if stocks else 0.0
     mapped_pct = mapped_count / indexed_count * 100 if indexed_count else 0.0
 
@@ -223,15 +227,17 @@ def main() -> int:
         "mapped_to_registry_broad_count": mapped_count,
         "coverage_pct": round(coverage_pct, 2),
         "mapped_pct": round(mapped_pct, 2),
-        "status": "healthy" if coverage_pct >= 98 else ("degraded" if coverage_pct >= 80 else "building"),
-        "missing_codes_sample": missing_codes[:50],
+        "status": "healthy" if not missing_codes and not unmapped_codes else ("degraded" if coverage_pct >= 80 else "building"),
+        "missing_codes": missing_codes,
+        "unmapped_codes": unmapped_codes,
         "failure_sample": dict(list(failures.items())[:50]),
         "companies": updated,
     }
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT_PATH.write_text(json.dumps(payload, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
     print(json.dumps({k: v for k, v in payload.items() if k != "companies"}, ensure_ascii=False))
-    # Partial data is persisted deliberately; validator decides whether a T2 recall has sufficient coverage.
+    # Partial data is persisted deliberately. Downstream T2 recall must explicitly
+    # classify missing/unmapped codes before it can claim complete coverage.
     return 0
 
 
