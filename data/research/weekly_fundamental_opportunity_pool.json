@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "pool_name": "A股周度全市场盈利机会池",
+  "purpose": "作为A股低风险买点榜的补漏召回层。周度扫描全市场主板公司，识别未来1-2季度盈利趋势向上或拐点明确、但不一定处于T2正式景气行业的公司。行情与技术结构不在本文件重复存储，统一读取本仓库data/health.json与data/shards。",
+  "universe": {
+    "included_prefixes": ["600", "601", "603", "605", "000", "001", "002", "003"],
+    "excluded": ["创业板", "科创板", "北交所"]
+  },
+  "market_data_source": {
+    "repository": "xwan008/a-share-market-data",
+    "health": "data/health.json",
+    "quote_shards": "data/shards/<dynamic-key>.json",
+    "rule": "本池不复制价格、K线、支撑压力、HH/HL等行情字段；需要时按health.shard_key_length读取对应shard。"
+  },
+  "selection_principle": "核心只判断公司未来1-2季度盈利趋势是否向上或拐点是否明确。T2行业景气是增强置信度的标签，不再是本补漏池的必要准入条件。",
+  "required_fields_per_candidate": [
+    "code",
+    "name",
+    "first_added_date",
+    "last_review_date",
+    "status",
+    "earnings_direction",
+    "earnings_driver",
+    "evidence",
+    "key_validation_metric",
+    "invalidation_condition",
+    "industry_t2_tag",
+    "source_summary"
+  ],
+  "allowed_status": ["新发现", "继续保留", "盈利强化", "盈利转弱", "移除"],
+  "generated_at": "2026-08-29T21:00:00+08:00",
+  "scan_as_of": null,
+  "candidates": [],
+  "removed_since_previous_scan": [],
+  "notes": "初始化文件。首次周度扫描后写入正式候选；后续周六重扫时做状态迁移，不机械覆盖历史判断。"
+}
