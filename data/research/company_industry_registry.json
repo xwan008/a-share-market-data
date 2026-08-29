@@ -2,6 +2,23 @@
   "schema_version": 1,
   "purpose": "持久化已验证的主板公司与细分产业链/价值链环节映射。它不是当前景气状态表；产业是否T2由industry-scan独立决定。",
   "updated_at": null,
+  "mapping_schema": {
+    "company_key": "6位股票代码",
+    "company_fields": ["name", "mappings"],
+    "mapping_fields": [
+      "broad_industry_id",
+      "subchain",
+      "value_chain_link",
+      "exposure_summary",
+      "exposure_materiality",
+      "status",
+      "first_verified_at",
+      "last_verified_at",
+      "evidence_sources",
+      "invalidation_reason"
+    ],
+    "status_values": ["active", "inactive"]
+  },
   "companies": {},
   "rules": {
     "never_use_registry_to_upgrade_industry_status": true,
