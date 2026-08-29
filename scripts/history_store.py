@@ -14,6 +14,7 @@ LATEST_PATH = DATA_DIR / "latest.json"
 ROLLING_DAYS = 65
 HISTORY_SHARD_KEY_LENGTH = 4
 USABLE_CONFIDENCE = {"high", "medium"}
+COMPLETED_SESSION_STATUSES = {"closed", "closed_or_no_trade"}
 
 
 def read_json(path: Path, default: dict) -> dict:
@@ -23,8 +24,14 @@ def read_json(path: Path, default: dict) -> dict:
 
 
 def should_append_history(latest: dict) -> bool:
-    """Only completed trading sessions belong in daily rolling history."""
-    return latest.get("market_status") == "closed"
+    """Accept any snapshot that represents an already-completed trading session.
+
+    Scheduled GitHub jobs can run after midnight or on a weekend/holiday. In that
+    case fetch_market marks the snapshot as ``closed_or_no_trade`` while its
+    trade_date still points at the latest completed A-share session. That row is
+    safe to persist because merge_rows de-duplicates by trade date.
+    """
+    return latest.get("market_status") in COMPLETED_SESSION_STATUSES
 
 
 def compact_row(trade_date: str, quote: dict) -> dict:
@@ -143,7 +150,7 @@ def append_latest_snapshot() -> tuple[int, int]:
                     "market_status": latest.get("market_status"),
                     "trade_date": latest.get("trade_date"),
                     "updated_stocks": 0,
-                    "reason": "history_only_accepts_closed_sessions",
+                    "reason": "history_only_accepts_completed_sessions",
                 },
                 ensure_ascii=False,
             )
