@@ -1,8 +1,9 @@
 from scripts.history_store import ROLLING_DAYS, merge_rows, should_append_history
 
 
-def test_history_only_accepts_closed_market():
+def test_history_accepts_completed_market_snapshots():
     assert should_append_history({"market_status": "closed"}) is True
+    assert should_append_history({"market_status": "closed_or_no_trade"}) is True
     assert should_append_history({"market_status": "morning_closed"}) is False
     assert should_append_history({"market_status": "trading"}) is False
     assert should_append_history({}) is False
