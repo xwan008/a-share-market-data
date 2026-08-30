@@ -12,7 +12,8 @@ on:
       - 'scripts/build_bridge.py'
       - 'tests/**'
   schedule:
-    # Weekly qfq refresh repairs corporate-action/adjustment drift in the rolling history.
+    # Weekly qfq refresh repairs corporate-action/adjustment drift and refreshes
+    # the compact 52-week summary while full OHLCV storage stays bounded to 180 sessions.
     - cron: '20 10 * * 6'
       timezone: 'Asia/Shanghai'
 
@@ -45,10 +46,10 @@ jobs:
       - name: Run tests
         run: python -m pytest -q
 
-      - name: Refresh latest 65 sessions from Tencent qfq K-line
+      - name: Refresh bounded 180-session qfq history and compact 52-week summary
         run: python scripts/backfill_history.py
 
-      - name: Build 5d/20d/60d trend and structure summary
+      - name: Build 5d/20d/60d market breadth and structure summary
         run: python scripts/build_history.py
 
       - name: Rebuild compact ChatGPT bridge files
@@ -61,7 +62,7 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add -A data
-            git commit -m "data: refresh 65-session qfq history"
+            git commit -m "data: refresh bounded 180-session qfq history"
 
             for attempt in 1 2 3; do
               git pull --rebase origin main
@@ -78,7 +79,7 @@ jobs:
             echo "No backfill changes to commit."
           fi
 
-# Manual/weekly maintenance workflow. History remains bounded to 65 completed sessions.
-# Partial upstream Tencent failures are committed as degraded refreshes; failed
-# symbols retain their previous good history and remain individually stale until
-# a later refresh succeeds.
+# Manual/weekly maintenance workflow. Full OHLCV history remains bounded to 180
+# completed sessions. A weekly fetch reads ~one trading year only to rebuild a
+# compact 52-week high/low + weekly-pivot summary; those extra rows are not stored.
+# Partial Tencent failures retain the last good local history and summary.
