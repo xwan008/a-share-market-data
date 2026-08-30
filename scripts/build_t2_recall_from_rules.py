@@ -16,25 +16,14 @@ OUTPUT = ROOT / "data" / "research" / "pipeline" / "t2_company_recall.json"
 TZ = ZoneInfo("Asia/Shanghai")
 
 
-DIRECT_RECALL_STATUSES = {"T2"}
-CONDITIONAL_RECALL_STATUSES = {"T1"}
-
-
-def recall_keys(scan: dict) -> dict[tuple[str, str], str]:
-    """Return subchains that are eligible for company-level recall.
-
-    T2 chains are direct recall. T1 chains are conditional recall and must pass a
-    stricter company-level earnings gate downstream. unconfirmed chains are not
-    promoted automatically; they remain candidates for reverse-trigger review
-    when strong company-level signals are detected by a dedicated audit/review.
-    """
+def scan_status_map(scan: dict) -> dict[tuple[str, str], str]:
     out: dict[tuple[str, str], str] = {}
     for industry in scan.get("broad_industries", []):
         bid = industry.get("id")
         for row in industry.get("subchains", []):
-            status = row.get("status")
-            if status in DIRECT_RECALL_STATUSES | CONDITIONAL_RECALL_STATUSES:
-                out[(bid, row.get("name"))] = status
+            name = row.get("name")
+            if bid and name:
+                out[(bid, name)] = str(row.get("status") or "unconfirmed")
     return out
 
 
@@ -51,14 +40,23 @@ def main() -> int:
     latest = json.loads(LATEST.read_text(encoding="utf-8"))
     rule_data = json.loads(RULES.read_text(encoding="utf-8"))
     previous = json.loads(OUTPUT.read_text(encoding="utf-8")) if OUTPUT.exists() else {}
+
+    statuses = scan_status_map(scan)
     rule_map = {(r["broad_industry_id"], r["subchain"]): r for r in rule_data.get("chains", [])}
-    required = recall_keys(scan)
-    missing_rules = sorted(set(required) - set(rule_map))
-    extra_rules = sorted(set(rule_map) - set(required))
-    if missing_rules:
-        raise SystemExit(f"missing recall exposure rules: {missing_rules}")
-    if extra_rules:
-        print(json.dumps({"warning":"rules_for_non_recall_chain_ignored","rules":extra_rules}, ensure_ascii=False))
+    t2_required = {key for key, status in statuses.items() if status == "T2"}
+    t1_available = {key for key, status in statuses.items() if status == "T1" and key in rule_map}
+    t1_missing_rules = sorted(key for key, status in statuses.items() if status == "T1" and key not in rule_map)
+    required = t2_required | t1_available
+
+    missing_t2_rules = sorted(t2_required - set(rule_map))
+    if missing_t2_rules:
+        raise SystemExit(f"missing mandatory T2 exposure rules: {missing_t2_rules}")
+
+    inactive_rules = sorted(key for key in rule_map if statuses.get(key) not in {"T1", "T2"})
+    if inactive_rules:
+        print(json.dumps({"warning": "rules_for_non_active_recall_chain_ignored", "rules": inactive_rules}, ensure_ascii=False))
+    if t1_missing_rules:
+        print(json.dumps({"warning": "t1_recall_rule_coverage_gap", "subchains": t1_missing_rules}, ensure_ascii=False))
 
     companies = index.get("companies", {})
     quotes = latest.get("stocks", {})
@@ -68,8 +66,8 @@ def main() -> int:
     rows = []
 
     for broad, subchain in sorted(required):
-        industry_status = required[(broad, subchain)]
-        recall_mode = "direct" if industry_status == "T2" else "conditional"
+        industry_status = statuses[(broad, subchain)]
+        recall_mode = "direct_t2" if industry_status == "T2" else "conditional_t1"
         rule = rule_map[(broad, subchain)]
         explicit = set(str(c).zfill(6) for c in rule.get("explicit_exposed", []))
         broad_codes = {
@@ -161,6 +159,7 @@ def main() -> int:
     semantic_unchanged = (
         previous.get("industry_scan_frozen_at") == scan.get("industry_frozen_at")
         and previous.get("t2_subchains") == rows
+        and previous.get("t1_rule_coverage_gaps") == [list(x) for x in t1_missing_rules]
         and bool(previous.get("t2_recall_frozen_at"))
     )
     frozen_at = previous.get("t2_recall_frozen_at") if semantic_unchanged else now
@@ -172,27 +171,29 @@ def main() -> int:
         "company_index_fingerprint": company_index_fingerprint(index),
         "weekly_pool_read": False,
         "recall_policy": {
-            "T2": "direct company recall; normal company earnings gate downstream",
-            "T1": "conditional company recall; stricter company earnings confirmation required downstream",
-            "unconfirmed": "no automatic recall; strong company earnings anomalies should trigger subchain re-review rather than automatic promotion"
+            "T2": "mandatory direct company recall; normal company earnings gate downstream",
+            "T1": "conditional company recall only when an explicit exposure rule exists; stricter company earnings confirmation and tighter representative cap downstream",
+            "unconfirmed": "not automatically promoted; strong company earnings anomalies are audited as reverse triggers for subchain re-review"
         },
+        "t1_rule_coverage_gaps": [list(x) for x in t1_missing_rules],
         "t2_recall_frozen_at": frozen_at,
         "t2_subchains": rows,
     }
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps({
-        "status":"ok",
+        "status": "ok",
         "schema_version": payload["schema_version"],
         "semantic_unchanged": semantic_unchanged,
         "company_index_fingerprint": payload["company_index_fingerprint"],
         "t2_recall_frozen_at": payload["t2_recall_frozen_at"],
-        "recalled_subchains":len(rows),
-        "direct_t2_subchains":sum(1 for r in rows if r["industry_status"] == "T2"),
-        "conditional_t1_subchains":sum(1 for r in rows if r["industry_status"] == "T1"),
-        "candidate_classifications":sum(r["candidate_universe_count"] for r in rows),
-        "exposed_company_rows":sum(r["classification_counts"]["exposed"] for r in rows),
-        "cross_industry_discoveries":sum(len(r["cross_industry_discoveries"]) for r in rows),
+        "recalled_subchains": len(rows),
+        "direct_t2_subchains": sum(1 for r in rows if r["industry_status"] == "T2"),
+        "conditional_t1_subchains": sum(1 for r in rows if r["industry_status"] == "T1"),
+        "t1_rule_coverage_gap_count": len(t1_missing_rules),
+        "candidate_classifications": sum(r["candidate_universe_count"] for r in rows),
+        "exposed_company_rows": sum(r["classification_counts"]["exposed"] for r in rows),
+        "cross_industry_discoveries": sum(len(r["cross_industry_discoveries"]) for r in rows),
     }, ensure_ascii=False))
     return 0
 
