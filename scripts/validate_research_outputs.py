@@ -9,6 +9,7 @@ from pathlib import Path
 MAIN_BOARD_PREFIXES = ("600", "601", "603", "605", "000", "001", "002", "003")
 WEEKLY_STATUS = {"pass", "reject", "uncertain"}
 FINAL_STATUS = {"core", "watch", "reject"}
+RESOURCE_CYCLE_TAGS = {"nonferrous::铜矿资源", "nonferrous::电解铝"}
 
 
 class ValidationError(Exception):
@@ -45,6 +46,10 @@ def parse_iso(value: object) -> datetime | None:
         return datetime.fromisoformat(str(value).replace("Z", "+00:00"))
     except ValueError:
         return None
+
+
+def _valid_range(value: object) -> bool:
+    return isinstance(value, list) and len(value) == 2 and all(isinstance(x, (int, float)) for x in value) and value[0] <= value[1]
 
 
 def validate_weekly_scan(scan: dict) -> list[str]:
@@ -87,33 +92,90 @@ def validate_weekly_scan(scan: dict) -> list[str]:
     return errors
 
 
-def _valid_range(value: object) -> bool:
-    return isinstance(value, list) and len(value) == 2 and all(isinstance(x, (int, float)) for x in value) and value[0] <= value[1]
+def _validate_valuation_rows(rows: object, errors: list[str], prefix: str) -> set[str]:
+    require(isinstance(rows, list), f"{prefix}_companies_must_be_list", errors)
+    if not isinstance(rows, list):
+        return set()
+    seen: set[str] = set()
+    for row in rows:
+        code = normalize_code(row.get("code"))
+        require(is_main_board(code), f"{prefix}_invalid_code:{code}", errors)
+        require(code not in seen, f"{prefix}_duplicate_code:{code}", errors)
+        seen.add(code)
+        status = row.get("valuation_status")
+        require(status in {"valid", "unavailable"}, f"{prefix}_invalid_status:{code}:{status}", errors)
+        require(bool(row.get("valuation_model")), f"{prefix}_missing_model:{code}", errors)
+        require(bool(row.get("forward_earnings_basis")), f"{prefix}_missing_forward_basis:{code}", errors)
+        require(bool(row.get("invalidation_condition")), f"{prefix}_missing_invalidation:{code}", errors)
+        if status == "valid":
+            require(_valid_range(row.get("reasonable_multiple_range")), f"{prefix}_bad_multiple_range:{code}", errors)
+            require(_valid_range(row.get("value_anchor_range")), f"{prefix}_bad_anchor_range:{code}", errors)
+            require(_valid_range(row.get("reasonable_buy_range")), f"{prefix}_bad_reasonable_buy_range:{code}", errors)
+            require(_valid_range(row.get("safe_buy_range")), f"{prefix}_bad_safe_buy_range:{code}", errors)
+            require(bool(row.get("key_sensitivities")), f"{prefix}_missing_sensitivities:{code}", errors)
+    return seen
 
 
 def validate_fundamental_valuation(output: dict) -> list[str]:
     errors: list[str] = []
-    rows = output.get("companies", [])
-    require(isinstance(rows, list), "valuation_companies_must_be_list", errors)
-    if not isinstance(rows, list):
-        return errors
-    seen: set[str] = set()
-    for row in rows:
+    seen = _validate_valuation_rows(output.get("companies", []), errors, "valuation")
+    deferred = {normalize_code(x) for x in output.get("deferred_cycle_codes", [])}
+    common_count = output.get("common_pool_count")
+    require(isinstance(common_count, int), "valuation_missing_common_pool_count", errors)
+    if isinstance(common_count, int):
+        require(len(seen | deferred) == common_count, f"valuation_fundamental_plus_cycle_count_mismatch:{len(seen | deferred)}!={common_count}", errors)
+        require(not (seen & deferred), f"valuation_cycle_codes_leaked_into_fundamental:{sorted(seen & deferred)}", errors)
+    for row in output.get("companies", []) if isinstance(output.get("companies"), list) else []:
+        if row.get("valuation_status") == "valid":
+            source = str(row.get("forecast_source") or "")
+            basis = str(row.get("forward_earnings_basis") or "")
+            require("profit_forecast" in source or "consensus" in source.lower(), f"valuation_formal_without_consensus_source:{row.get('code')}:{source}", errors)
+            require("H1 EPS×2" not in basis and "H1 EPS*2" not in basis, f"valuation_formal_uses_h1_times_two:{row.get('code')}", errors)
+            require(bool(row.get("multiple_rationale")), f"valuation_missing_multiple_rationale:{row.get('code')}", errors)
+    return errors
+
+
+def validate_cycle_valuation(output: dict) -> list[str]:
+    errors: list[str] = []
+    seen = _validate_valuation_rows(output.get("companies", []), errors, "cycle")
+    declared = {normalize_code(x) for x in output.get("cycle_codes", [])}
+    require(seen == declared, f"cycle_declared_codes_mismatch:seen={sorted(seen)}:declared={sorted(declared)}", errors)
+    anchor_errors = output.get("anchor_errors", {}) if isinstance(output.get("anchor_errors"), dict) else {}
+    for row in output.get("companies", []) if isinstance(output.get("companies"), list) else []:
         code = normalize_code(row.get("code"))
-        require(is_main_board(code), f"valuation_invalid_code:{code}", errors)
-        require(code not in seen, f"valuation_duplicate_code:{code}", errors)
-        seen.add(code)
-        status = row.get("valuation_status")
-        require(status in {"valid", "unavailable"}, f"valuation_invalid_status:{code}:{status}", errors)
-        require(bool(row.get("valuation_model")), f"valuation_missing_model:{code}", errors)
-        require(bool(row.get("forward_earnings_basis")), f"valuation_missing_forward_basis:{code}", errors)
-        require(bool(row.get("invalidation_condition")), f"valuation_missing_invalidation:{code}", errors)
-        if status == "valid":
-            require(_valid_range(row.get("reasonable_multiple_range")), f"valuation_bad_multiple_range:{code}", errors)
-            require(_valid_range(row.get("value_anchor_range")), f"valuation_bad_anchor_range:{code}", errors)
-            require(_valid_range(row.get("reasonable_buy_range")), f"valuation_bad_reasonable_buy_range:{code}", errors)
-            require(_valid_range(row.get("safe_buy_range")), f"valuation_bad_safe_buy_range:{code}", errors)
-            require(bool(row.get("key_sensitivities")), f"valuation_missing_sensitivities:{code}", errors)
+        tag = row.get("cycle_tag")
+        if row.get("valuation_status") == "valid":
+            require(bool(row.get("commodity_anchors")), f"cycle_valid_without_anchors:{code}", errors)
+            factors = row.get("bear_base_bull_anchor_factor")
+            earnings = row.get("bear_base_bull_forward_eps")
+            require(isinstance(factors, list) and len(factors) == 3, f"cycle_missing_scenarios:{code}", errors)
+            require(isinstance(earnings, list) and len(earnings) == 3, f"cycle_missing_forward_earnings_scenarios:{code}", errors)
+            require(bool(row.get("profit_sensitivity")), f"cycle_missing_profit_sensitivity:{code}", errors)
+        elif tag in RESOURCE_CYCLE_TAGS:
+            reason = str(row.get("reason") or "")
+            allowed = "commodity_anchor_fetch_failed" in reason or "forward_consensus_insufficient" in reason or "current_price_missing" in reason
+            require(allowed, f"resource_cycle_silently_unavailable:{code}:{reason}", errors)
+            if "commodity_anchor_fetch_failed" in reason:
+                require(bool(anchor_errors), f"resource_cycle_claims_anchor_failure_without_error_map:{code}", errors)
+    return errors
+
+
+def validate_left_valuation(output: dict) -> list[str]:
+    errors: list[str] = []
+    seen = _validate_valuation_rows(output.get("companies", []), errors, "left")
+    common_count = output.get("common_pool_count")
+    require(isinstance(common_count, int), "left_missing_common_pool_count", errors)
+    if isinstance(common_count, int):
+        require(len(seen) == common_count, f"left_common_pool_coverage_mismatch:{len(seen)}!={common_count}", errors)
+    left = {normalize_code(x) for x in output.get("left_set_codes", [])}
+    require(left <= seen, f"left_set_contains_unknown_codes:{sorted(left-seen)}", errors)
+    by = {normalize_code(r.get('code')): r for r in output.get('companies', []) if isinstance(r, dict)}
+    for code in left:
+        require(by[code].get('valuation_status') == 'valid', f"left_set_contains_unavailable:{code}", errors)
+        require(by[code].get('left_conclusion') in {'safe_buy_zone','reasonable_buy_zone'}, f"left_set_bad_conclusion:{code}:{by[code].get('left_conclusion')}", errors)
+    upstream = output.get('upstream', {})
+    require(upstream.get('fundamental_valuation') == 'PASS', 'left_fundamental_upstream_not_pass', errors)
+    require(upstream.get('cycle_valuation') == 'PASS', 'left_cycle_upstream_not_pass', errors)
     return errors
 
 
@@ -167,7 +229,7 @@ def print_result(stage: str, errors: list[str]) -> int:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate modular A-share research stage outputs")
     sub = parser.add_subparsers(dest="command", required=True)
-    for name in ("weekly-scan", "fundamental-valuation", "final-selection"):
+    for name in ("weekly-scan", "fundamental-valuation", "cycle-valuation", "left-valuation", "final-selection"):
         p = sub.add_parser(name)
         p.add_argument("path")
     args = parser.parse_args()
@@ -177,6 +239,10 @@ def main() -> int:
             return print_result(args.command, validate_weekly_scan(payload))
         if args.command == "fundamental-valuation":
             return print_result(args.command, validate_fundamental_valuation(payload))
+        if args.command == "cycle-valuation":
+            return print_result(args.command, validate_cycle_valuation(payload))
+        if args.command == "left-valuation":
+            return print_result(args.command, validate_left_valuation(payload))
         return print_result(args.command, validate_final_selection(payload))
     except ValidationError as exc:
         return print_result(args.command, [str(exc)])
