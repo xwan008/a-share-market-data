@@ -1,6 +1,6 @@
 {
   "schema_version": 6,
-  "generated_at": "2026-08-30T19:05:27.797224+08:00",
+  "generated_at": "2026-08-30T20:25:10.252393+08:00",
   "trade_date": "2026-08-28",
   "market_status": "closed_or_no_trade",
   "shard_key_length": 5,
@@ -26,7 +26,7 @@
         "last_close": 3.6,
         "history_confidence": "high",
         "history_warnings": [],
-        "history_basis": "tencent_qfq",
+        "history_basis": "tencent_qfq_plus_live_tail",
         "last_full_refresh": "2026-08-30T20:13:00.161834+08:00",
         "high_20d": 4.11,
         "low_20d": 3.09,
@@ -291,7 +291,7 @@
         "last_close": 23.97,
         "history_confidence": "high",
         "history_warnings": [],
-        "history_basis": "tencent_qfq",
+        "history_basis": "tencent_qfq_plus_live_tail",
         "last_full_refresh": "2026-08-30T20:13:00.161834+08:00",
         "high_20d": 24.55,
         "low_20d": 20.51,
@@ -542,7 +542,7 @@
         "last_close": 4.81,
         "history_confidence": "high",
         "history_warnings": [],
-        "history_basis": "tencent_qfq",
+        "history_basis": "tencent_qfq_plus_live_tail",
         "last_full_refresh": "2026-08-30T20:13:00.161834+08:00",
         "high_20d": 4.83,
         "low_20d": 4.2,
@@ -796,7 +796,7 @@
         "last_close": 18.02,
         "history_confidence": "high",
         "history_warnings": [],
-        "history_basis": "tencent_qfq",
+        "history_basis": "tencent_qfq_plus_live_tail",
         "last_full_refresh": "2026-08-30T20:13:00.161834+08:00",
         "high_20d": 18.4,
         "low_20d": 17.08,
@@ -1053,24 +1053,19 @@
       },
       "trend": {
         "points": 65,
-        "last_date": "2025-06-30",
+        "last_date": "2026-08-28",
         "last_close": 0.14,
-        "history_confidence": "medium",
+        "history_confidence": "invalid",
         "history_warnings": [
-          "last_date_not_latest_trade_date",
-          "large_calendar_gap"
+          "ohlc_inconsistent"
         ],
-        "history_basis": "tencent_qfq",
+        "history_basis": "tencent_qfq_plus_live_tail",
         "last_full_refresh": "2026-08-30T20:13:00.161834+08:00",
-        "high_20d": 0.76,
+        "high_20d": 0.72,
         "low_20d": 0.14,
-        "close_change_5d_pct": -17.647058823529406,
-        "close_change_20d_pct": -81.57894736842105,
+        "close_change_5d_pct": -6.666666666666654,
+        "close_change_20d_pct": -80.55555555555556,
         "last5": [
-          {
-            "date": "2025-06-24",
-            "close": 0.17
-          },
           {
             "date": "2025-06-25",
             "close": 0.15
@@ -1086,15 +1081,19 @@
           {
             "date": "2025-06-30",
             "close": 0.14
+          },
+          {
+            "date": "2026-08-28",
+            "close": 0.14
           }
         ],
         "structure_60d": {
           "points": 60,
-          "high": 1.86,
+          "high": 1.83,
           "low": 0.14,
-          "close_change_pct": -92.34972677595628,
-          "ma20": 0.3075,
-          "ma60": 1.0621666666666667,
+          "close_change_pct": -92.13483146067416,
+          "ma20": 0.2765,
+          "ma60": 1.034,
           "position_pct": 0.0,
           "support_zones": [
             {
@@ -1202,28 +1201,20 @@
           },
           "dense_price_zones": [
             {
-              "low": 0.1492,
-              "high": 0.1709,
-              "center": 0.16,
+              "low": 0.1692,
+              "high": 0.1809,
+              "center": 0.175,
               "closes": 6,
               "relation": "above",
-              "last_date": "2025-06-27"
+              "last_date": "2025-06-24"
             },
             {
-              "low": 0.1791,
-              "high": 0.201,
-              "center": 0.188,
+              "low": 0.1393,
+              "high": 0.1507,
+              "center": 0.146,
               "closes": 5,
-              "relation": "above",
-              "last_date": "2025-06-23"
-            },
-            {
-              "low": 1.592,
-              "high": 1.6281,
-              "center": 1.612,
-              "closes": 5,
-              "relation": "above",
-              "last_date": "2025-03-28"
+              "relation": "current",
+              "last_date": "2026-08-28"
             },
             {
               "low": 1.5323,
@@ -1232,6 +1223,14 @@
               "closes": 4,
               "relation": "above",
               "last_date": "2025-03-31"
+            },
+            {
+              "low": 1.5821,
+              "high": 1.608,
+              "center": 1.595,
+              "closes": 4,
+              "relation": "above",
+              "last_date": "2025-03-25"
             },
             {
               "low": 1.7611,
@@ -1246,49 +1245,49 @@
           "volume_profile_unit": "shares",
           "volume_profile_zones": [
             {
-              "low": 0.1459,
-              "high": 0.1742,
-              "center": 0.1569,
-              "volume_share_pct": 14.53,
+              "low": 0.2288,
+              "high": 0.2546,
+              "center": 0.2468,
+              "volume_share_pct": 14.58,
+              "days": 2,
+              "relation": "above",
+              "last_date": "2025-06-11"
+            },
+            {
+              "low": 0.1692,
+              "high": 0.1976,
+              "center": 0.1809,
+              "volume_share_pct": 13.5,
               "days": 7,
+              "relation": "above",
+              "last_date": "2025-06-24"
+            },
+            {
+              "low": 0.1459,
+              "high": 0.1575,
+              "center": 0.1502,
+              "volume_share_pct": 9.94,
+              "days": 4,
               "relation": "above",
               "last_date": "2025-06-30"
             },
             {
-              "low": 0.2056,
-              "high": 0.2311,
-              "center": 0.2195,
-              "volume_share_pct": 12.11,
-              "days": 3,
-              "relation": "above",
-              "last_date": "2025-06-13"
-            },
-            {
-              "low": 1.6749,
-              "high": 1.7152,
-              "center": 1.6908,
-              "volume_share_pct": 10.5,
+              "low": 1.6716,
+              "high": 1.6984,
+              "center": 1.6884,
+              "volume_share_pct": 9.63,
               "days": 5,
               "relation": "above",
               "last_date": "2025-03-27"
             },
             {
-              "low": 0.2521,
-              "high": 0.2546,
-              "center": 0.2533,
-              "volume_share_pct": 10.39,
-              "days": 1,
+              "low": 0.2056,
+              "high": 0.2244,
+              "center": 0.2143,
+              "volume_share_pct": 8.2,
+              "days": 2,
               "relation": "above",
-              "last_date": "2025-06-10"
-            },
-            {
-              "low": 0.1758,
-              "high": 0.1976,
-              "center": 0.1864,
-              "volume_share_pct": 8.61,
-              "days": 4,
-              "relation": "above",
-              "last_date": "2025-06-19"
+              "last_date": "2025-06-13"
             }
           ]
         }
@@ -1314,7 +1313,7 @@
         "last_close": 4.65,
         "history_confidence": "high",
         "history_warnings": [],
-        "history_basis": "tencent_qfq",
+        "history_basis": "tencent_qfq_plus_live_tail",
         "last_full_refresh": "2026-08-30T20:13:00.161834+08:00",
         "high_20d": 4.73,
         "low_20d": 4.28,
@@ -1568,7 +1567,7 @@
         "last_close": 2.69,
         "history_confidence": "high",
         "history_warnings": [],
-        "history_basis": "tencent_qfq",
+        "history_basis": "tencent_qfq_plus_live_tail",
         "last_full_refresh": "2026-08-30T20:13:00.161834+08:00",
         "high_20d": 2.7,
         "low_20d": 2.42,
@@ -1822,7 +1821,7 @@
         "last_close": 2.65,
         "history_confidence": "high",
         "history_warnings": [],
-        "history_basis": "tencent_qfq",
+        "history_basis": "tencent_qfq_plus_live_tail",
         "last_full_refresh": "2026-08-30T20:13:00.161834+08:00",
         "high_20d": 2.71,
         "low_20d": 2.44,
@@ -2080,7 +2079,7 @@
         "last_close": 119.03,
         "history_confidence": "high",
         "history_warnings": [],
-        "history_basis": "tencent_qfq",
+        "history_basis": "tencent_qfq_plus_live_tail",
         "last_full_refresh": "2026-08-30T20:13:00.161834+08:00",
         "high_20d": 128.63,
         "low_20d": 115.15,
