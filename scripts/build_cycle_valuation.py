@@ -3,18 +3,20 @@ from __future__ import annotations
 import json
 import math
 import re
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[1]
 COMMON = ROOT / 'data/research/pipeline/common_qualification_pool.json'
 LATEST = ROOT / 'data/latest.json'
+HEALTH = ROOT / 'data/health.json'
 POLICY = ROOT / 'config/cycle_valuation_policy.json'
 OUT = ROOT / 'data/research/pipeline/cycle_valuation.json'
 TZ = ZoneInfo('Asia/Shanghai')
 CYCLE_TAGS = ('nonferrous::铜矿资源', 'nonferrous::电解铝', 'coal::动力煤', 'chemicals::氟化工', 'chemicals::氨纶')
 RESOURCE_TAGS = ('nonferrous::铜矿资源', 'nonferrous::电解铝')
+MAX_ANCHOR_AGE_DAYS = 7
 
 
 def num(v):
@@ -27,6 +29,10 @@ def num(v):
 
 def load(path: Path) -> dict:
     return json.loads(path.read_text(encoding='utf-8'))
+
+
+def parse_day(v: object) -> date:
+    return date.fromisoformat(str(v)[:10])
 
 
 def load_consensus(ak) -> dict[str, dict]:
@@ -53,25 +59,30 @@ def load_consensus(ak) -> dict[str, dict]:
     return out
 
 
-def fetch_anchor(ak, symbol: str) -> dict:
+def fetch_anchor(ak, symbol: str, reference_trade_date: str) -> dict:
     df = ak.futures_zh_daily_sina(symbol=symbol)
     if df is None or df.empty:
         raise RuntimeError(f'empty futures series:{symbol}')
     close_col = next((c for c in df.columns if str(c).lower() == 'close'), None)
     date_col = next((c for c in df.columns if str(c).lower() == 'date'), None)
-    if close_col is None:
-        raise RuntimeError(f'close column missing:{symbol}:{list(df.columns)}')
+    if close_col is None or date_col is None:
+        raise RuntimeError(f'required column missing:{symbol}:{list(df.columns)}')
     vals = [num(x) for x in df[close_col].tolist()]
     vals = [x for x in vals if x is not None and x > 0]
     if len(vals) < 60:
         raise RuntimeError(f'insufficient futures history:{symbol}:{len(vals)}')
+    last_date = str(df.iloc[-1][date_col])[:10]
+    age_days = (parse_day(reference_trade_date) - parse_day(last_date)).days
+    if age_days < -1 or age_days > MAX_ANCHOR_AGE_DAYS:
+        raise RuntimeError(f'stale_anchor:{symbol}:last_date={last_date}:reference={reference_trade_date}:age_days={age_days}')
     current = vals[-1]
     ma20 = sum(vals[-20:]) / 20
     ma60 = sum(vals[-60:]) / 60
     high60 = max(vals[-60:])
     return {
         'symbol': symbol,
-        'last_date': str(df.iloc[-1][date_col]) if date_col is not None else None,
+        'last_date': last_date,
+        'age_days': age_days,
         'current': current,
         'ma20': ma20,
         'ma60': ma60,
@@ -98,6 +109,10 @@ def main() -> int:
 
     common = load(COMMON)
     latest = load(LATEST)
+    health = load(HEALTH)
+    reference_trade_date = str(health.get('trade_date') or '')[:10]
+    if not reference_trade_date:
+        raise RuntimeError('missing health trade_date for commodity freshness validation')
     cfg = load(POLICY)
     stocks = latest.get('stocks', {})
     consensus = load_consensus(ak)
@@ -142,7 +157,7 @@ def main() -> int:
             symbol = a['symbol']
             if symbol not in anchor_cache and symbol not in anchor_errors:
                 try:
-                    anchor_cache[symbol] = fetch_anchor(ak, symbol)
+                    anchor_cache[symbol] = fetch_anchor(ak, symbol, reference_trade_date)
                 except Exception as exc:
                     anchor_errors[symbol] = f'{type(exc).__name__}:{exc}'
             if symbol in anchor_errors:
@@ -227,8 +242,10 @@ def main() -> int:
         companies.append(row)
 
     payload = {
-        'schema_version': 1,
+        'schema_version': 2,
         'generated_at': datetime.now(TZ).isoformat(),
+        'reference_trade_date': reference_trade_date,
+        'max_anchor_age_days': MAX_ANCHOR_AGE_DAYS,
         'common_pool_count': len(common.get('common_pool_codes', [])),
         'cycle_company_count': len(companies),
         'cycle_codes': sorted(cycle_codes),
@@ -236,10 +253,10 @@ def main() -> int:
         'anchor_errors': anchor_errors,
         'companies': companies,
         'left_set_codes': sorted(left),
-        'method_note': 'Resource cycle valuation cannot terminate at commodity_anchor_required when machine-readable anchors are available; commodity trend is an explicit upstream earnings input.',
+        'method_note': 'Resource cycle valuation requires fresh commodity anchors near the market trade date; stale continuous contracts become explicit unavailable inputs instead of silently entering valuation.',
     }
     OUT.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding='utf-8')
-    print(json.dumps({'status': 'ok', 'cycle': len(companies), 'left': len(left), 'anchor_errors': anchor_errors}, ensure_ascii=False))
+    print(json.dumps({'status': 'ok', 'cycle': len(companies), 'left': len(left), 'reference_trade_date': reference_trade_date, 'anchor_errors': anchor_errors}, ensure_ascii=False))
     return 0
 
 
