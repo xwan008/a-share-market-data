@@ -156,7 +156,7 @@ def main() -> int:
                 'valuation_status': 'unavailable', 'valuation_model': model or 'unsupported_business_model',
                 'forecast_source': 'analyst_consensus' if eps_now else 'none',
                 'forecast_report_count': reports,
-                'forward_earnings_basis': f'{year}机构一致预期EPS优先；一致预期不足时禁止用H1×2直接形成正式价值锚。',
+                'forward_earnings_basis': f'{year}机构一致预期EPS优先；一致预期不足时半年报简单年化仅作诊断，不形成正式价值锚。',
                 'reasonable_multiple_range': None, 'value_anchor_range': None,
                 'reasonable_buy_range': None, 'safe_buy_range': None,
                 'key_sensitivities': ['未来1-2季度盈利兑现', '一致预期修正', '业务估值政策'],
@@ -187,7 +187,7 @@ def main() -> int:
             'consensus_eps_current_year': round(eps_now, 4),
             'consensus_eps_next_year': round(eps_next, 4) if eps_next else None,
             'next_year_eps_growth_pct': round(growth_next, 2) if growth_next is not None else None,
-            'forward_earnings_basis': f'{year}机构一致预期EPS={eps_now:.4f}; 不再用2026H1 EPS×2替代明显季节性/成长公司的Forward E。',
+            'forward_earnings_basis': f'{year}机构一致预期EPS={eps_now:.4f}; 正式Forward E直接采用外部一致预期而非半年报简单年化。',
             'reasonable_multiple_range': [pe_lo, pe_hi],
             'multiple_rationale': policy.get('rationale') or '版本化业务估值政策；结合增长持续性、业务质量与周期属性复核。',
             'value_anchor_range': [round(fair_lo, 2), round(fair_hi, 2)],
@@ -209,7 +209,7 @@ def main() -> int:
         'deferred_cycle_codes': sorted(cycle_codes),
         'companies': companies,
         'left_set_codes': sorted(left),
-        'method_note': 'Formal non-cycle valuation prioritizes analyst consensus forward EPS; H1 annualization is non-formal fallback only. Cycle candidates are physically deferred to cycle_valuation.',
+        'method_note': 'Formal non-cycle valuation prioritizes analyst consensus forward EPS; simple half-year annualization is diagnostic only. Cycle candidates are physically deferred to cycle_valuation.',
     }
     OUT.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding='utf-8')
     print(json.dumps({'status': 'ok', 'fundamental': len(companies), 'cycle_deferred': len(cycle_codes), 'left': len(left)}, ensure_ascii=False))
