@@ -3,7 +3,7 @@ name: Build low-risk V2 shadow
 on:
   workflow_dispatch:
   push:
-    branches: [refactor/low-risk-v2-blueprint]
+    branches: [main]
     paths:
       - 'skills/a-share-low-risk/**'
       - 'config/research_pipeline_manifest.json'
@@ -12,6 +12,12 @@ on:
       - 'scripts/build_v2_full_market_price_structure.py'
       - 'scripts/validate_v2_blueprint.py'
       - '.github/workflows/build-low-risk-v2-shadow.yml'
+  schedule:
+    # update-market runs at 16:10 and 16:30 Beijing time. Run V2 mechanical
+    # shadow scans after those closed-session refreshes; bot data commits do
+    # not reliably trigger downstream GitHub Actions workflows.
+    - cron: '50 16 * * 1-5'
+      timezone: 'Asia/Shanghai'
 
 permissions:
   contents: write
@@ -28,6 +34,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Refresh scheduled run to latest main
+        if: github.ref_name == 'main'
+        shell: bash
+        run: |
+          git fetch origin main
+          git merge --ff-only origin/main
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -62,5 +74,9 @@ jobs:
           git add data/research/v2/earnings_anomaly_recall.json data/research/v2/full_market_price_structure.json
           if git diff --cached --quiet; then exit 0; fi
           git commit -m "research-v2: refresh shadow mechanical scans"
-          git pull --rebase origin "${GITHUB_REF_NAME}"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
+          for attempt in 1 2 3; do
+            git pull --rebase origin main
+            if git push origin HEAD:main; then exit 0; fi
+            sleep $((attempt * 2))
+          done
+          exit 1
