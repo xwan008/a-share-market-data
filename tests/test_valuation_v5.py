@@ -28,6 +28,75 @@ def test_calendar_forward_eps_uses_next_year_at_late_august():
     assert round(value, 4) == round(3.0 * 4 / 12 + 4.0 * 8 / 12, 4)
 
 
+def test_resource_consensus_is_normalized_when_commodity_windfall_is_positive():
+    normalized, factor = cycle_mod.normalize_forward_eps(
+        4.0,
+        weighted_neutral_delta=0.25,
+        sensitivity=0.8,
+        neutral_policy={'min_normalization_factor': 0.70},
+    )
+    assert factor < 1.0
+    assert normalized < 4.0
+
+
+def test_weak_commodity_does_not_mechanically_raise_normalized_eps():
+    normalized, factor = cycle_mod.normalize_forward_eps(
+        4.0,
+        weighted_neutral_delta=-0.20,
+        sensitivity=0.8,
+        neutral_policy={'min_normalization_factor': 0.70},
+    )
+    assert factor == 1.0
+    assert normalized == 4.0
+
+
+def test_180d_market_anchor_caps_low_risk_buy_zone_even_when_theoretical_fair_is_high():
+    market_anchor = {
+        'safe_percentile_band': [24.0, 28.0],
+        'reasonable_percentile_band': [28.0, 34.0],
+        'ma60': 30.0,
+    }
+    policy = {
+        'safe_to_fair_floor': [0.76, 0.88],
+        'reasonable_to_fair_floor': [0.88, 1.0],
+    }
+    market_policy = {
+        'macro_uncertainty_haircut': 0.95,
+        'max_reasonable_to_ma60': 1.06,
+    }
+    safe, reasonable, value_anchor, method = cycle_mod.calibrate_low_risk_buy_bands(
+        fair_floor=44.0,
+        market_anchor=market_anchor,
+        policy=policy,
+        market_policy=market_policy,
+    )
+    assert safe == [24.0, 28.0]
+    assert reasonable == [28.0, 31.8]
+    assert value_anchor == [24.0, 31.8]
+    assert method == 'normalized_fundamental_plus_180d_market_calibration'
+
+
+def test_aluminum_regime_requires_medium_term_normalization():
+    regime = json.loads((ROOT / 'config/cycle_regime_registry.json').read_text(encoding='utf-8'))
+    aluminum = regime['subchains']['nonferrous::电解铝']
+    assert aluminum['regime'] == 'near_term_tight_medium_term_normalizing'
+    assert aluminum['bear_base_bull_earnings_factor'][1] < 1.0
+    assert aluminum['multiple_range_by_regime'][1] <= 11.0
+    assert len(aluminum['evidence']) >= 2
+
+
+def test_cycle_policy_requires_neutral_and_180d_low_risk_calibration():
+    policy = json.loads((ROOT / 'config/cycle_valuation_policy.json').read_text(encoding='utf-8'))
+    neutral = policy['neutral_commodity_policy']
+    market = policy['low_risk_price_calibration']
+    assert neutral['window_sessions'] >= 180
+    assert neutral['minimum_sessions'] >= 120
+    assert policy['short_term_anchor_policy']['positive_strength_can_raise_low_risk_buy_zone'] is False
+    assert market['window_sessions'] == 180
+    assert market['safe_percentiles'][1] <= market['reasonable_percentiles'][0]
+    assert market['max_reasonable_to_ma60'] <= 1.10
+
+
 def test_financial_pb_band_is_forward_roe_driven():
     policy = {
         'roe_pb_bands': [
@@ -39,15 +108,6 @@ def test_financial_pb_band_is_forward_roe_driven():
     assert fund_mod.choose_pb_band(policy, 0.07) == [0.8, 1.0]
     assert fund_mod.choose_pb_band(policy, 0.10) == [1.0, 1.3]
     assert fund_mod.choose_pb_band(policy, 0.18) == [1.2, 1.6]
-
-
-def test_aluminum_regime_requires_medium_term_normalization():
-    regime = json.loads((ROOT / 'config/cycle_regime_registry.json').read_text(encoding='utf-8'))
-    aluminum = regime['subchains']['nonferrous::电解铝']
-    assert aluminum['regime'] == 'near_term_tight_medium_term_normalizing'
-    assert aluminum['bear_base_bull_earnings_factor'][1] < 1.0
-    assert aluminum['multiple_range_by_regime'][1] <= 11.0
-    assert len(aluminum['evidence']) >= 2
 
 
 def test_policy_audit_rejects_unsupported_policy():
