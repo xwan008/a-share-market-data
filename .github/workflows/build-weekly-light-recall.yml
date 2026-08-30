@@ -1,6 +1,6 @@
 name: Build weekly light recall
 
-# trigger-version: 2 (validated T2 baseline exists)
+# trigger-version: 3 (migration guard)
 on:
   workflow_dispatch:
   push:
@@ -8,6 +8,7 @@ on:
     paths:
       - 'data/research/pipeline/t2_company_recall.json'
       - 'scripts/build_weekly_light_recall.py'
+      - 'scripts/apply_weekly_migration_guard.py'
       - '.github/workflows/build-weekly-light-recall.yml'
 
 permissions:
@@ -35,6 +36,8 @@ jobs:
         run: python scripts/validate_t2_recall_v2.py data/research/pipeline/t2_company_recall.json --industry-scan data/research/pipeline/industry_scan.json
       - name: Mechanically screen full main-board universe
         run: python scripts/build_weekly_light_recall.py
+      - name: Force legacy active names into explicit migration review
+        run: python scripts/apply_weekly_migration_guard.py
       - name: Commit light recall for deep verification
         shell: bash
         run: |
