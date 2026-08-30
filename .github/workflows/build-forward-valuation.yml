@@ -3,7 +3,7 @@ name: Build forward valuation scan
 on:
   workflow_dispatch:
   push:
-    branches: [main, fix/valuation-v5-forward-cycle-coverage]
+    branches: [main]
     paths:
       - 'scripts/build_forward_valuation.py'
       - 'scripts/build_forward_valuation_v5.py'
@@ -20,6 +20,10 @@ on:
       - 'tests/test_valuation_v4.py'
       - 'tests/test_valuation_v5.py'
       - '.github/workflows/build-forward-valuation.yml'
+
+concurrency:
+  group: valuation-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: write
