@@ -1,9 +1,9 @@
 # 非周期公司左侧估值 Skill
 
 ## 目的
-把非周期公司的左侧价值判断固定为“前瞻盈利来源 → 估值模型归属 → 理论业务估值 → 低风险PE/ PB锚 → 安全/合理买入区”，禁止因行业景气、一次半年报年化、当前股价或临时拍PE直接抬高买入区。
+把非周期公司的左侧价值判断固定为“前瞻盈利来源 → 估值模型归属 → 理论业务估值 → 低风险PE/PB锚 → 安全/合理买入区”，禁止因行业景气、一次半年报年化、下一年度乐观预测、当前股价或临时拍PE直接抬高买入区。
 
-核心原则：**行业理论PE不是低风险买点PE。** 左侧榜的目标不是回答牛市里公司最高可以给多少倍，而是回答在当前年度可验证盈利基础上，什么价格才具有足够安全边际。
+核心原则：**理论行业估值不是低风险买点估值。** 左侧榜的目标不是回答牛市里公司最高可以给多少倍，而是回答在当前年度可验证盈利基础上，什么价格才具有足够安全边际。
 
 ## 输入
 - 已通过 `earnings-validation` 的共同资格池非周期公司。
@@ -74,11 +74,15 @@ PE公司：
 6. **任何进入非周期估值阶段的公司都必须拥有版本化估值政策；`unsupported_policy`数量必须为0，否则Validator硬失败。**
 
 ## 金融PB模型
-金融公司继续执行Forward ROE-PB，不受上述PE增长护栏机械替代：
+金融公司执行Forward ROE-PB，但同样遵守“当前年度主锚、下一年度不能提前抬价”：
 1. 从报告BVPS/市场PB构造可审计BVPS桥；
-2. 用当前年/下一年EPS形成Forward ROE；
-3. 按Registry的ROE-PB区间形成价值锚；
-4. PE仅作交叉检查。
+2. 用2026 EPS计算2026 Forward ROE，作为低风险PB档位的主锚；
+3. 计算2027 Forward ROE，只作为持续性/下行检查：
+   - 若2027 ROE高于2026，不得因此提高2026低风险PB档位；
+   - 若2027 ROE低于2026，则使用更低ROE约束PB档位；
+4. 实际用于选档的是`low_risk_forward_roe = min(2026 ROE, 2027 ROE)`（下一年缺失时使用2026 ROE）；
+5. 输出`low_risk_forward_roe / low_risk_roe_method`，保证可审计；
+6. PE仅作交叉检查。
 
 ## 输出
 至少包含：
@@ -89,16 +93,18 @@ PE公司：
 - `forward_earnings_basis`
 - PE模型：`theoretical_business_multiple_range / growth_pe_floor_cap / low_risk_pe_method / reasonable_multiple_range`
 - PE模型：`business_fair_value_range / value_anchor_range`
+- PB模型：`forward_roe_current_year / forward_roe_next_year / low_risk_forward_roe / low_risk_roe_method`
 - `safe_buy_range / reasonable_buy_range`
-- PE模型的市场Forward PE；PB模型的BVPS代理/市场PB/Forward ROE
+- PE模型的市场Forward PE；PB模型的BVPS代理/市场PB
 - `valuation_status / invalidation_condition`
 - 顶层`policy_coverage`
 
 ## 硬规则
 - 正式`valuation_status=valid`时，前瞻盈利不能仅来自`H1×2`。
-- 在当前年度内，下一年度正增长不得直接抬高低风险买点盈利锚或PE；下一年度恶化可以压低PE。
+- 在当前年度内，下一年度正增长不得直接抬高低风险买点盈利锚、PE或PB档位；下一年度恶化可以压低估值。
 - 行业/业务理论PE不得直接作为低风险买入PE，除非公司级政策明确审计后确认二者相同。
+- 金融股不得直接用下一年度更高ROE提高当前年度PB档位。
 - 当前价、技术突破、HH/HL、市场热度不能进入合理估值倍数因果输入。
 - 公司/业务估值政策必须版本化；若盈利预期或增长结构达到`review_trigger`，先重审倍数，再生成价值锚。
-- 所有正式价值锚必须可从当前年度Forward E或BVPS/Forward ROE与低风险倍数重新计算。
+- 所有正式价值锚必须可从当前年度Forward E或BVPS/低风险Forward ROE与低风险倍数重新计算。
 - `unsupported_policy > 0`时，本阶段不得PASS。
