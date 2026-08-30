@@ -1,6 +1,6 @@
 {
-  "schema_version": 3,
-  "generated_at": "2026-08-30T11:41:51.118630+08:00",
+  "schema_version": 4,
+  "generated_at": "2026-08-30T15:16:50.496847+08:00",
   "reference_trade_date": "2026-08-28",
   "max_anchor_age_days": 7,
   "cycle_regime_registry_reviewed_at": "2026-08-30",
@@ -68,9 +68,9 @@
       "cycle_tag": "coal::动力煤",
       "current_price": 2.73,
       "valuation_status": "unavailable",
-      "valuation_model": "forward_cycle_scenario",
+      "valuation_model": "normalized_forward_cycle_low_risk",
       "execution_state": "input_data_insufficient",
-      "forward_earnings_basis": "2026/2027 consensus plus commodity and 6-18m regime are mandatory for resource valuation.",
+      "forward_earnings_basis": "2026/2027 consensus plus neutral commodity anchor, 6-18m regime and price-history calibration are mandatory for resource valuation.",
       "commodity_anchors": [],
       "reasonable_multiple_range": null,
       "value_anchor_range": null,
@@ -87,9 +87,9 @@
       "cycle_tag": "nonferrous::电解铝",
       "current_price": 11.46,
       "valuation_status": "unavailable",
-      "valuation_model": "forward_cycle_scenario",
+      "valuation_model": "normalized_forward_cycle_low_risk",
       "execution_state": "input_data_insufficient",
-      "forward_earnings_basis": "2026/2027 consensus plus commodity and 6-18m regime are mandatory for resource valuation.",
+      "forward_earnings_basis": "2026/2027 consensus plus neutral commodity anchor, 6-18m regime and price-history calibration are mandatory for resource valuation.",
       "commodity_anchors": [
         {
           "symbol": "AL0",
@@ -102,6 +102,11 @@
           "current_to_ma60": 1.0160671997621247,
           "drawdown_from_60d_high_pct": -1.56378600823045,
           "trend_20_vs_60_pct": 1.4686673675491368,
+          "neutral_window_sessions": 252,
+          "neutral_price_median": 23575.0,
+          "neutral_price_p40": 22967.0,
+          "neutral_price_p60": 23841.0,
+          "current_to_neutral": 1.0146341463414634,
           "weight": 0.7,
           "direction": 1.0
         },
@@ -116,6 +121,11 @@
           "current_to_ma60": 0.9673353831166855,
           "drawdown_from_60d_high_pct": -9.40814231953473,
           "trend_20_vs_60_pct": -2.252732198849272,
+          "neutral_window_sessions": 252,
+          "neutral_price_median": 2798.0,
+          "neutral_price_p40": 2770.0,
+          "neutral_price_p60": 2822.0,
+          "current_to_neutral": 0.9463902787705504,
           "weight": 0.3,
           "direction": -1.0
         }
@@ -136,7 +146,7 @@
       "current_price": 6.76,
       "valuation_status": "valid",
       "execution_state": "valid",
-      "valuation_model": "forward_cycle_scenario",
+      "valuation_model": "normalized_forward_cycle_low_risk",
       "valuation_basis_unit": "PE",
       "forecast_source": "akshare.stock_profit_forecast_em",
       "forecast_report_count": 3,
@@ -148,6 +158,9 @@
         "current_year": 0.3333,
         "next_year": 0.6667
       },
+      "normalized_forward_eps": 0.5979,
+      "neutralization_factor": 0.9458,
+      "weighted_neutral_commodity_delta": 0.0765,
       "market_forward_pe_current_year": 14.8,
       "market_forward_pe_next_year": 9.39,
       "market_forward_pe_12m_proxy": 10.69,
@@ -164,11 +177,17 @@
           "current_to_ma60": 1.0344958613832542,
           "drawdown_from_60d_high_pct": -0.584261457002011,
           "trend_20_vs_60_pct": 2.4051157989398497,
+          "neutral_window_sessions": 252,
+          "neutral_price_median": 101165.0,
+          "neutral_price_p40": 96748.0,
+          "neutral_price_p60": 102330.0,
+          "current_to_neutral": 1.076459249740523,
           "weight": 1.0,
           "direction": 1.0
         }
       ],
       "short_term_anchor_effect_on_eps": 0.0259,
+      "low_risk_short_term_effect_on_eps": 0.0,
       "profit_sensitivity": 0.75,
       "cycle_regime": "tight_spot_medium_term_balancing",
       "cycle_regime_reviewed_at": "2026-08-30",
@@ -194,37 +213,68 @@
         1.08
       ],
       "bear_base_bull_forward_eps": [
-        0.5837,
-        0.6356,
-        0.7005
+        0.5381,
+        0.586,
+        0.6458
       ],
-      "forward_earnings_basis": "2026/2027 consensus -> calendar-weighted forward-12m EPS 0.6322 -> structured 6-18m regime -> capped short-term commodity modifier +2.59%.",
+      "forward_earnings_basis": "2026/2027 consensus -> forward-12m EPS 0.6322 -> neutral commodity normalization factor 0.9458 -> structured 6-18m regime -> positive short-term commodity strength does not raise low-risk buy zones.",
       "reasonable_multiple_range": [
         11.0,
         15.0
       ],
       "multiple_rationale": "现货/区域流动性偏紧与矿端扰动支撑价格，但2026全球统计口径仍可能呈现供应过剩，估值不能把短期高铜价永久化。",
-      "value_anchor_range": [
-        6.42,
-        10.51
+      "scenario_fair_value_range": [
+        5.92,
+        9.69
       ],
-      "base_fair_value_floor": 6.99,
+      "normalized_base_fair_value_floor": 6.45,
+      "base_fair_value_floor": 6.45,
+      "market_price_anchor_180d": {
+        "history_points": 180,
+        "history_basis": "tencent_qfq_plus_live_tail",
+        "last_history_date": "2026-08-28",
+        "low_180d": 5.19,
+        "high_180d": 9.14,
+        "median_180d": 6.295,
+        "ma60": 6.480666666666666,
+        "safe_percentile_band": [
+          5.77,
+          6.08
+        ],
+        "reasonable_percentile_band": [
+          6.08,
+          6.458
+        ],
+        "percentiles": {
+          "p15": 5.77,
+          "p25": 5.93,
+          "p35": 6.08,
+          "p50": 6.295,
+          "p60": 6.458
+        }
+      },
+      "price_calibration_method": "normalized_fundamental_plus_180d_market_calibration",
+      "value_anchor_range": [
+        5.77,
+        6.12
+      ],
       "safe_buy_range": [
-        5.24,
-        6.15
+        5.77,
+        6.08
       ],
       "reasonable_buy_range": [
-        6.15,
-        6.99
+        6.08,
+        6.12
       ],
       "key_sensitivities": [
+        "neutral commodity price",
         "6-18m supply-demand regime",
         "next-year consensus EPS",
-        "commodity/cost anchor",
+        "180d market price distribution",
         "production/sales"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "reasonable_buy_zone"
+      "left_conclusion": "above_buy_zone"
     },
     {
       "code": "000737",
@@ -232,9 +282,9 @@
       "cycle_tag": "nonferrous::铜矿资源",
       "current_price": 15.37,
       "valuation_status": "unavailable",
-      "valuation_model": "forward_cycle_scenario",
+      "valuation_model": "normalized_forward_cycle_low_risk",
       "execution_state": "input_data_insufficient",
-      "forward_earnings_basis": "2026/2027 consensus plus commodity and 6-18m regime are mandatory for resource valuation.",
+      "forward_earnings_basis": "2026/2027 consensus plus neutral commodity anchor, 6-18m regime and price-history calibration are mandatory for resource valuation.",
       "commodity_anchors": [
         {
           "symbol": "CU0",
@@ -247,6 +297,11 @@
           "current_to_ma60": 1.0344958613832542,
           "drawdown_from_60d_high_pct": -0.584261457002011,
           "trend_20_vs_60_pct": 2.4051157989398497,
+          "neutral_window_sessions": 252,
+          "neutral_price_median": 101165.0,
+          "neutral_price_p40": 96748.0,
+          "neutral_price_p60": 102330.0,
+          "current_to_neutral": 1.076459249740523,
           "weight": 1.0,
           "direction": 1.0
         }
@@ -267,7 +322,7 @@
       "current_price": 27.23,
       "valuation_status": "valid",
       "execution_state": "valid",
-      "valuation_model": "forward_cycle_scenario",
+      "valuation_model": "normalized_forward_cycle_low_risk",
       "valuation_basis_unit": "PE",
       "forecast_source": "akshare.stock_profit_forecast_em",
       "forecast_report_count": 19,
@@ -279,6 +334,9 @@
         "current_year": 0.3333,
         "next_year": 0.6667
       },
+      "normalized_forward_eps": 3.9564,
+      "neutralization_factor": 0.9756,
+      "weighted_neutral_commodity_delta": 0.0263,
       "market_forward_pe_current_year": 7.18,
       "market_forward_pe_next_year": 6.5,
       "market_forward_pe_12m_proxy": 6.71,
@@ -295,6 +353,11 @@
           "current_to_ma60": 1.0160671997621247,
           "drawdown_from_60d_high_pct": -1.56378600823045,
           "trend_20_vs_60_pct": 1.4686673675491368,
+          "neutral_window_sessions": 252,
+          "neutral_price_median": 23575.0,
+          "neutral_price_p40": 22967.0,
+          "neutral_price_p60": 23841.0,
+          "current_to_neutral": 1.0146341463414634,
           "weight": 0.7,
           "direction": 1.0
         },
@@ -309,11 +372,17 @@
           "current_to_ma60": 0.9673353831166855,
           "drawdown_from_60d_high_pct": -9.40814231953473,
           "trend_20_vs_60_pct": -2.252732198849272,
+          "neutral_window_sessions": 252,
+          "neutral_price_median": 2798.0,
+          "neutral_price_p40": 2770.0,
+          "neutral_price_p60": 2822.0,
+          "current_to_neutral": 0.9463902787705504,
           "weight": 0.3,
           "direction": -1.0
         }
       ],
       "short_term_anchor_effect_on_eps": 0.02,
+      "low_risk_short_term_effect_on_eps": 0.0,
       "profit_sensitivity": 0.95,
       "cycle_regime": "near_term_tight_medium_term_normalizing",
       "cycle_regime_reviewed_at": "2026-08-30",
@@ -353,33 +422,64 @@
         1.02
       ],
       "bear_base_bull_forward_eps": [
-        3.2264,
-        3.7228,
-        4.2192
+        3.086,
+        3.5608,
+        4.0355
       ],
-      "forward_earnings_basis": "2026/2027 consensus -> calendar-weighted forward-12m EPS 4.0554 -> structured 6-18m regime -> capped short-term commodity modifier +2.00%.",
+      "forward_earnings_basis": "2026/2027 consensus -> forward-12m EPS 4.0554 -> neutral commodity normalization factor 0.9756 -> structured 6-18m regime -> positive short-term commodity strength does not raise low-risk buy zones.",
       "reasonable_multiple_range": [
         8.0,
         11.0
       ],
       "multiple_rationale": "近端库存与地缘扰动仍支撑铝价，但中东复产快于此前预期、2027库存重建/供给过剩风险意味着当前高利润不应直接按高倍PE资本化。",
-      "value_anchor_range": [
-        25.81,
-        46.41
+      "scenario_fair_value_range": [
+        24.69,
+        44.39
       ],
-      "base_fair_value_floor": 29.78,
+      "normalized_base_fair_value_floor": 28.49,
+      "base_fair_value_floor": 28.49,
+      "market_price_anchor_180d": {
+        "history_points": 180,
+        "history_basis": "tencent_qfq_plus_live_tail",
+        "last_history_date": "2026-08-28",
+        "low_180d": 21.77,
+        "high_180d": 36.621,
+        "median_180d": 29.311,
+        "ma60": 25.364216666666668,
+        "safe_percentile_band": [
+          25.671,
+          27.12335
+        ],
+        "reasonable_percentile_band": [
+          27.12335,
+          30.877
+        ],
+        "percentiles": {
+          "p15": 25.671,
+          "p25": 26.480249999999998,
+          "p35": 27.12335,
+          "p50": 29.311,
+          "p60": 30.877
+        }
+      },
+      "price_calibration_method": "valuation_dominant_below_market_p35",
+      "value_anchor_range": [
+        21.36,
+        28.49
+      ],
       "safe_buy_range": [
-        22.34,
-        26.21
+        21.36,
+        25.07
       ],
       "reasonable_buy_range": [
-        26.21,
-        29.78
+        25.07,
+        28.49
       ],
       "key_sensitivities": [
+        "neutral commodity price",
         "6-18m supply-demand regime",
         "next-year consensus EPS",
-        "commodity/cost anchor",
+        "180d market price distribution",
         "production/sales"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
@@ -392,7 +492,7 @@
       "current_price": 17.85,
       "valuation_status": "valid",
       "execution_state": "valid",
-      "valuation_model": "forward_cycle_scenario",
+      "valuation_model": "normalized_forward_cycle_low_risk",
       "valuation_basis_unit": "PE",
       "forecast_source": "akshare.stock_profit_forecast_em",
       "forecast_report_count": 3,
@@ -404,6 +504,9 @@
         "current_year": 0.3333,
         "next_year": 0.6667
       },
+      "normalized_forward_eps": 1.2043,
+      "neutralization_factor": 0.9458,
+      "weighted_neutral_commodity_delta": 0.0765,
       "market_forward_pe_current_year": 15.04,
       "market_forward_pe_next_year": 13.56,
       "market_forward_pe_12m_proxy": 14.02,
@@ -420,11 +523,17 @@
           "current_to_ma60": 1.0344958613832542,
           "drawdown_from_60d_high_pct": -0.584261457002011,
           "trend_20_vs_60_pct": 2.4051157989398497,
+          "neutral_window_sessions": 252,
+          "neutral_price_median": 101165.0,
+          "neutral_price_p40": 96748.0,
+          "neutral_price_p60": 102330.0,
+          "current_to_neutral": 1.076459249740523,
           "weight": 1.0,
           "direction": 1.0
         }
       ],
       "short_term_anchor_effect_on_eps": 0.0259,
+      "low_risk_short_term_effect_on_eps": 0.0,
       "profit_sensitivity": 0.75,
       "cycle_regime": "tight_spot_medium_term_balancing",
       "cycle_regime_reviewed_at": "2026-08-30",
@@ -450,33 +559,64 @@
         1.08
       ],
       "bear_base_bull_forward_eps": [
-        1.1756,
-        1.2802,
-        1.4108
+        1.0838,
+        1.1802,
+        1.3006
       ],
-      "forward_earnings_basis": "2026/2027 consensus -> calendar-weighted forward-12m EPS 1.2733 -> structured 6-18m regime -> capped short-term commodity modifier +2.59%.",
+      "forward_earnings_basis": "2026/2027 consensus -> forward-12m EPS 1.2733 -> neutral commodity normalization factor 0.9458 -> structured 6-18m regime -> positive short-term commodity strength does not raise low-risk buy zones.",
       "reasonable_multiple_range": [
         11.0,
         15.0
       ],
       "multiple_rationale": "现货/区域流动性偏紧与矿端扰动支撑价格，但2026全球统计口径仍可能呈现供应过剩，估值不能把短期高铜价永久化。",
-      "value_anchor_range": [
-        12.93,
-        21.16
+      "scenario_fair_value_range": [
+        11.92,
+        19.51
       ],
-      "base_fair_value_floor": 14.08,
+      "normalized_base_fair_value_floor": 12.98,
+      "base_fair_value_floor": 12.98,
+      "market_price_anchor_180d": {
+        "history_points": 180,
+        "history_basis": "tencent_qfq_plus_live_tail",
+        "last_history_date": "2026-08-28",
+        "low_180d": 14.27,
+        "high_180d": 29.24,
+        "median_180d": 18.16,
+        "ma60": 16.25766666666667,
+        "safe_percentile_band": [
+          15.997,
+          17.54
+        ],
+        "reasonable_percentile_band": [
+          17.54,
+          18.852
+        ],
+        "percentiles": {
+          "p15": 15.997,
+          "p25": 16.7925,
+          "p35": 17.54,
+          "p50": 18.16,
+          "p60": 18.852
+        }
+      },
+      "price_calibration_method": "valuation_dominant_below_market_p35",
+      "value_anchor_range": [
+        9.74,
+        12.98
+      ],
       "safe_buy_range": [
-        10.56,
-        12.39
+        9.74,
+        11.42
       ],
       "reasonable_buy_range": [
-        12.39,
-        14.08
+        11.42,
+        12.98
       ],
       "key_sensitivities": [
+        "neutral commodity price",
         "6-18m supply-demand regime",
         "next-year consensus EPS",
-        "commodity/cost anchor",
+        "180d market price distribution",
         "production/sales"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
@@ -489,7 +629,7 @@
       "current_price": 27.59,
       "valuation_status": "valid",
       "execution_state": "valid",
-      "valuation_model": "forward_cycle_scenario",
+      "valuation_model": "normalized_forward_cycle_low_risk",
       "valuation_basis_unit": "PE",
       "forecast_source": "akshare.stock_profit_forecast_em",
       "forecast_report_count": 20,
@@ -501,6 +641,9 @@
         "current_year": 0.3333,
         "next_year": 0.6667
       },
+      "normalized_forward_eps": 3.8835,
+      "neutralization_factor": 0.9769,
+      "weighted_neutral_commodity_delta": 0.0263,
       "market_forward_pe_current_year": 7.02,
       "market_forward_pe_next_year": 6.9,
       "market_forward_pe_12m_proxy": 6.94,
@@ -517,6 +660,11 @@
           "current_to_ma60": 1.0160671997621247,
           "drawdown_from_60d_high_pct": -1.56378600823045,
           "trend_20_vs_60_pct": 1.4686673675491368,
+          "neutral_window_sessions": 252,
+          "neutral_price_median": 23575.0,
+          "neutral_price_p40": 22967.0,
+          "neutral_price_p60": 23841.0,
+          "current_to_neutral": 1.0146341463414634,
           "weight": 0.7,
           "direction": 1.0
         },
@@ -531,11 +679,17 @@
           "current_to_ma60": 0.9673353831166855,
           "drawdown_from_60d_high_pct": -9.40814231953473,
           "trend_20_vs_60_pct": -2.252732198849272,
+          "neutral_window_sessions": 252,
+          "neutral_price_median": 2798.0,
+          "neutral_price_p40": 2770.0,
+          "neutral_price_p60": 2822.0,
+          "current_to_neutral": 0.9463902787705504,
           "weight": 0.3,
           "direction": -1.0
         }
       ],
       "short_term_anchor_effect_on_eps": 0.0189,
+      "low_risk_short_term_effect_on_eps": 0.0,
       "profit_sensitivity": 0.9,
       "cycle_regime": "near_term_tight_medium_term_normalizing",
       "cycle_regime_reviewed_at": "2026-08-30",
@@ -575,37 +729,68 @@
         1.02
       ],
       "bear_base_bull_forward_eps": [
-        3.1597,
-        3.6458,
-        4.1319
+        3.0291,
+        3.4952,
+        3.9612
       ],
-      "forward_earnings_basis": "2026/2027 consensus -> calendar-weighted forward-12m EPS 3.9755 -> structured 6-18m regime -> capped short-term commodity modifier +1.89%.",
+      "forward_earnings_basis": "2026/2027 consensus -> forward-12m EPS 3.9755 -> neutral commodity normalization factor 0.9769 -> structured 6-18m regime -> positive short-term commodity strength does not raise low-risk buy zones.",
       "reasonable_multiple_range": [
         8.0,
         11.0
       ],
       "multiple_rationale": "近端库存与地缘扰动仍支撑铝价，但中东复产快于此前预期、2027库存重建/供给过剩风险意味着当前高利润不应直接按高倍PE资本化。",
-      "value_anchor_range": [
-        25.28,
-        45.45
+      "scenario_fair_value_range": [
+        24.23,
+        43.57
       ],
-      "base_fair_value_floor": 29.17,
+      "normalized_base_fair_value_floor": 27.96,
+      "base_fair_value_floor": 27.96,
+      "market_price_anchor_180d": {
+        "history_points": 180,
+        "history_basis": "tencent_qfq_plus_live_tail",
+        "last_history_date": "2026-08-28",
+        "low_180d": 21.11,
+        "high_180d": 37.246,
+        "median_180d": 28.956,
+        "ma60": 24.956666666666667,
+        "safe_percentile_band": [
+          24.9851,
+          26.383899999999997
+        ],
+        "reasonable_percentile_band": [
+          26.383899999999997,
+          30.0
+        ],
+        "percentiles": {
+          "p15": 24.9851,
+          "p25": 25.7725,
+          "p35": 26.383899999999997,
+          "p50": 28.956,
+          "p60": 30.0
+        }
+      },
+      "price_calibration_method": "normalized_fundamental_plus_180d_market_calibration",
+      "value_anchor_range": [
+        24.99,
+        26.45
+      ],
       "safe_buy_range": [
-        21.87,
-        25.67
+        24.99,
+        26.38
       ],
       "reasonable_buy_range": [
-        25.67,
-        29.17
+        26.38,
+        26.45
       ],
       "key_sensitivities": [
+        "neutral commodity price",
         "6-18m supply-demand regime",
         "next-year consensus EPS",
-        "commodity/cost anchor",
+        "180d market price distribution",
         "production/sales"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "reasonable_buy_zone"
+      "left_conclusion": "above_buy_zone"
     },
     {
       "code": "000949",
@@ -649,9 +834,9 @@
       "cycle_tag": "coal::动力煤",
       "current_price": 29.11,
       "valuation_status": "unavailable",
-      "valuation_model": "forward_cycle_scenario",
+      "valuation_model": "normalized_forward_cycle_low_risk",
       "execution_state": "input_data_insufficient",
-      "forward_earnings_basis": "2026/2027 consensus plus commodity and 6-18m regime are mandatory for resource valuation.",
+      "forward_earnings_basis": "2026/2027 consensus plus neutral commodity anchor, 6-18m regime and price-history calibration are mandatory for resource valuation.",
       "commodity_anchors": [],
       "reasonable_multiple_range": null,
       "value_anchor_range": null,
@@ -705,7 +890,7 @@
       "current_price": 13.17,
       "valuation_status": "valid",
       "execution_state": "valid",
-      "valuation_model": "forward_cycle_scenario",
+      "valuation_model": "normalized_forward_cycle_low_risk",
       "valuation_basis_unit": "PE",
       "forecast_source": "akshare.stock_profit_forecast_em",
       "forecast_report_count": 18,
@@ -717,6 +902,9 @@
         "current_year": 0.3333,
         "next_year": 0.6667
       },
+      "normalized_forward_eps": 1.9802,
+      "neutralization_factor": 0.9769,
+      "weighted_neutral_commodity_delta": 0.0263,
       "market_forward_pe_current_year": 6.81,
       "market_forward_pe_next_year": 6.35,
       "market_forward_pe_12m_proxy": 6.5,
@@ -733,6 +921,11 @@
           "current_to_ma60": 1.0160671997621247,
           "drawdown_from_60d_high_pct": -1.56378600823045,
           "trend_20_vs_60_pct": 1.4686673675491368,
+          "neutral_window_sessions": 252,
+          "neutral_price_median": 23575.0,
+          "neutral_price_p40": 22967.0,
+          "neutral_price_p60": 23841.0,
+          "current_to_neutral": 1.0146341463414634,
           "weight": 0.7,
           "direction": 1.0
         },
@@ -747,11 +940,17 @@
           "current_to_ma60": 0.9673353831166855,
           "drawdown_from_60d_high_pct": -9.40814231953473,
           "trend_20_vs_60_pct": -2.252732198849272,
+          "neutral_window_sessions": 252,
+          "neutral_price_median": 2798.0,
+          "neutral_price_p40": 2770.0,
+          "neutral_price_p60": 2822.0,
+          "current_to_neutral": 0.9463902787705504,
           "weight": 0.3,
           "direction": -1.0
         }
       ],
       "short_term_anchor_effect_on_eps": 0.0189,
+      "low_risk_short_term_effect_on_eps": 0.0,
       "profit_sensitivity": 0.9,
       "cycle_regime": "near_term_tight_medium_term_normalizing",
       "cycle_regime_reviewed_at": "2026-08-30",
@@ -791,33 +990,64 @@
         1.02
       ],
       "bear_base_bull_forward_eps": [
-        1.6111,
-        1.8589,
-        2.1068
+        1.5445,
+        1.7821,
+        2.0198
       ],
-      "forward_earnings_basis": "2026/2027 consensus -> calendar-weighted forward-12m EPS 2.0271 -> structured 6-18m regime -> capped short-term commodity modifier +1.89%.",
+      "forward_earnings_basis": "2026/2027 consensus -> forward-12m EPS 2.0271 -> neutral commodity normalization factor 0.9769 -> structured 6-18m regime -> positive short-term commodity strength does not raise low-risk buy zones.",
       "reasonable_multiple_range": [
         8.0,
         11.0
       ],
       "multiple_rationale": "近端库存与地缘扰动仍支撑铝价，但中东复产快于此前预期、2027库存重建/供给过剩风险意味着当前高利润不应直接按高倍PE资本化。",
-      "value_anchor_range": [
-        12.89,
-        23.17
+      "scenario_fair_value_range": [
+        12.36,
+        22.22
       ],
-      "base_fair_value_floor": 14.87,
+      "normalized_base_fair_value_floor": 14.26,
+      "base_fair_value_floor": 14.26,
+      "market_price_anchor_180d": {
+        "history_points": 180,
+        "history_basis": "tencent_qfq_plus_live_tail",
+        "last_history_date": "2026-08-28",
+        "low_180d": 10.374,
+        "high_180d": 20.077,
+        "median_180d": 15.094,
+        "ma60": 12.3013,
+        "safe_percentile_band": [
+          12.448,
+          13.2051
+        ],
+        "reasonable_percentile_band": [
+          13.2051,
+          16.2028
+        ],
+        "percentiles": {
+          "p15": 12.448,
+          "p25": 12.864,
+          "p35": 13.2051,
+          "p50": 15.094,
+          "p60": 16.2028
+        }
+      },
+      "price_calibration_method": "valuation_dominant_below_market_p35",
+      "value_anchor_range": [
+        10.69,
+        14.26
+      ],
       "safe_buy_range": [
-        11.15,
-        13.09
+        10.69,
+        12.55
       ],
       "reasonable_buy_range": [
-        13.09,
-        14.87
+        12.55,
+        14.26
       ],
       "key_sensitivities": [
+        "neutral commodity price",
         "6-18m supply-demand regime",
         "next-year consensus EPS",
-        "commodity/cost anchor",
+        "180d market price distribution",
         "production/sales"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
@@ -865,9 +1095,9 @@
       "cycle_tag": "coal::动力煤",
       "current_price": 23.02,
       "valuation_status": "unavailable",
-      "valuation_model": "forward_cycle_scenario",
+      "valuation_model": "normalized_forward_cycle_low_risk",
       "execution_state": "input_data_insufficient",
-      "forward_earnings_basis": "2026/2027 consensus plus commodity and 6-18m regime are mandatory for resource valuation.",
+      "forward_earnings_basis": "2026/2027 consensus plus neutral commodity anchor, 6-18m regime and price-history calibration are mandatory for resource valuation.",
       "commodity_anchors": [],
       "reasonable_multiple_range": null,
       "value_anchor_range": null,
@@ -884,9 +1114,9 @@
       "cycle_tag": "nonferrous::铜矿资源",
       "current_price": 49.01,
       "valuation_status": "unavailable",
-      "valuation_model": "forward_cycle_scenario",
+      "valuation_model": "normalized_forward_cycle_low_risk",
       "execution_state": "input_data_insufficient",
-      "forward_earnings_basis": "2026/2027 consensus plus commodity and 6-18m regime are mandatory for resource valuation.",
+      "forward_earnings_basis": "2026/2027 consensus plus neutral commodity anchor, 6-18m regime and price-history calibration are mandatory for resource valuation.",
       "commodity_anchors": [
         {
           "symbol": "CU0",
@@ -899,6 +1129,11 @@
           "current_to_ma60": 1.0344958613832542,
           "drawdown_from_60d_high_pct": -0.584261457002011,
           "trend_20_vs_60_pct": 2.4051157989398497,
+          "neutral_window_sessions": 252,
+          "neutral_price_median": 101165.0,
+          "neutral_price_p40": 96748.0,
+          "neutral_price_p60": 102330.0,
+          "current_to_neutral": 1.076459249740523,
           "weight": 1.0,
           "direction": 1.0
         }
@@ -936,9 +1171,9 @@
       "cycle_tag": "coal::动力煤",
       "current_price": 13.99,
       "valuation_status": "unavailable",
-      "valuation_model": "forward_cycle_scenario",
+      "valuation_model": "normalized_forward_cycle_low_risk",
       "execution_state": "input_data_insufficient",
-      "forward_earnings_basis": "2026/2027 consensus plus commodity and 6-18m regime are mandatory for resource valuation.",
+      "forward_earnings_basis": "2026/2027 consensus plus neutral commodity anchor, 6-18m regime and price-history calibration are mandatory for resource valuation.",
       "commodity_anchors": [],
       "reasonable_multiple_range": null,
       "value_anchor_range": null,
@@ -956,7 +1191,7 @@
       "current_price": 6.34,
       "valuation_status": "valid",
       "execution_state": "valid",
-      "valuation_model": "forward_cycle_scenario",
+      "valuation_model": "normalized_forward_cycle_low_risk",
       "valuation_basis_unit": "PE",
       "forecast_source": "akshare.stock_profit_forecast_em",
       "forecast_report_count": 6,
@@ -968,6 +1203,9 @@
         "current_year": 0.3333,
         "next_year": 0.6667
       },
+      "normalized_forward_eps": 0.9503,
+      "neutralization_factor": 0.9769,
+      "weighted_neutral_commodity_delta": 0.0263,
       "market_forward_pe_current_year": 6.69,
       "market_forward_pe_next_year": 6.44,
       "market_forward_pe_12m_proxy": 6.52,
@@ -984,6 +1222,11 @@
           "current_to_ma60": 1.0160671997621247,
           "drawdown_from_60d_high_pct": -1.56378600823045,
           "trend_20_vs_60_pct": 1.4686673675491368,
+          "neutral_window_sessions": 252,
+          "neutral_price_median": 23575.0,
+          "neutral_price_p40": 22967.0,
+          "neutral_price_p60": 23841.0,
+          "current_to_neutral": 1.0146341463414634,
           "weight": 0.7,
           "direction": 1.0
         },
@@ -998,11 +1241,17 @@
           "current_to_ma60": 0.9673353831166855,
           "drawdown_from_60d_high_pct": -9.40814231953473,
           "trend_20_vs_60_pct": -2.252732198849272,
+          "neutral_window_sessions": 252,
+          "neutral_price_median": 2798.0,
+          "neutral_price_p40": 2770.0,
+          "neutral_price_p60": 2822.0,
+          "current_to_neutral": 0.9463902787705504,
           "weight": 0.3,
           "direction": -1.0
         }
       ],
       "short_term_anchor_effect_on_eps": 0.0189,
+      "low_risk_short_term_effect_on_eps": 0.0,
       "profit_sensitivity": 0.9,
       "cycle_regime": "near_term_tight_medium_term_normalizing",
       "cycle_regime_reviewed_at": "2026-08-30",
@@ -1042,33 +1291,64 @@
         1.02
       ],
       "bear_base_bull_forward_eps": [
-        0.7731,
-        0.8921,
-        1.011
+        0.7412,
+        0.8552,
+        0.9693
       ],
-      "forward_earnings_basis": "2026/2027 consensus -> calendar-weighted forward-12m EPS 0.9728 -> structured 6-18m regime -> capped short-term commodity modifier +1.89%.",
+      "forward_earnings_basis": "2026/2027 consensus -> forward-12m EPS 0.9728 -> neutral commodity normalization factor 0.9769 -> structured 6-18m regime -> positive short-term commodity strength does not raise low-risk buy zones.",
       "reasonable_multiple_range": [
         8.0,
         11.0
       ],
       "multiple_rationale": "近端库存与地缘扰动仍支撑铝价，但中东复产快于此前预期、2027库存重建/供给过剩风险意味着当前高利润不应直接按高倍PE资本化。",
-      "value_anchor_range": [
-        6.19,
-        11.12
+      "scenario_fair_value_range": [
+        5.93,
+        10.66
       ],
-      "base_fair_value_floor": 7.14,
+      "normalized_base_fair_value_floor": 6.84,
+      "base_fair_value_floor": 6.84,
+      "market_price_anchor_180d": {
+        "history_points": 180,
+        "history_basis": "tencent_qfq_plus_live_tail",
+        "last_history_date": "2026-08-28",
+        "low_180d": 5.54,
+        "high_180d": 10.275,
+        "median_180d": 7.38,
+        "ma60": 6.262166666666667,
+        "safe_percentile_band": [
+          6.24,
+          6.915
+        ],
+        "reasonable_percentile_band": [
+          6.915,
+          7.686999999999999
+        ],
+        "percentiles": {
+          "p15": 6.24,
+          "p25": 6.5874999999999995,
+          "p35": 6.915,
+          "p50": 7.38,
+          "p60": 7.686999999999999
+        }
+      },
+      "price_calibration_method": "valuation_dominant_below_market_p35",
+      "value_anchor_range": [
+        5.13,
+        6.84
+      ],
       "safe_buy_range": [
-        5.35,
-        6.28
+        5.13,
+        6.02
       ],
       "reasonable_buy_range": [
-        6.28,
-        7.14
+        6.02,
+        6.84
       ],
       "key_sensitivities": [
+        "neutral commodity price",
         "6-18m supply-demand regime",
         "next-year consensus EPS",
-        "commodity/cost anchor",
+        "180d market price distribution",
         "production/sales"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
@@ -1099,7 +1379,7 @@
       "current_price": 12.0,
       "valuation_status": "valid",
       "execution_state": "valid",
-      "valuation_model": "forward_cycle_scenario",
+      "valuation_model": "normalized_forward_cycle_low_risk",
       "valuation_basis_unit": "PE",
       "forecast_source": "akshare.stock_profit_forecast_em",
       "forecast_report_count": 4,
@@ -1111,6 +1391,9 @@
         "current_year": 0.3333,
         "next_year": 0.6667
       },
+      "normalized_forward_eps": 1.2862,
+      "neutralization_factor": 0.9458,
+      "weighted_neutral_commodity_delta": 0.0765,
       "market_forward_pe_current_year": 10.62,
       "market_forward_pe_next_year": 8.14,
       "market_forward_pe_12m_proxy": 8.82,
@@ -1127,11 +1410,17 @@
           "current_to_ma60": 1.0344958613832542,
           "drawdown_from_60d_high_pct": -0.584261457002011,
           "trend_20_vs_60_pct": 2.4051157989398497,
+          "neutral_window_sessions": 252,
+          "neutral_price_median": 101165.0,
+          "neutral_price_p40": 96748.0,
+          "neutral_price_p60": 102330.0,
+          "current_to_neutral": 1.076459249740523,
           "weight": 1.0,
           "direction": 1.0
         }
       ],
       "short_term_anchor_effect_on_eps": 0.0259,
+      "low_risk_short_term_effect_on_eps": 0.0,
       "profit_sensitivity": 0.75,
       "cycle_regime": "tight_spot_medium_term_balancing",
       "cycle_regime_reviewed_at": "2026-08-30",
@@ -1157,33 +1446,64 @@
         1.08
       ],
       "bear_base_bull_forward_eps": [
-        1.2557,
-        1.3673,
-        1.5068
+        1.1576,
+        1.2605,
+        1.3891
       ],
-      "forward_earnings_basis": "2026/2027 consensus -> calendar-weighted forward-12m EPS 1.3600 -> structured 6-18m regime -> capped short-term commodity modifier +2.59%.",
+      "forward_earnings_basis": "2026/2027 consensus -> forward-12m EPS 1.3600 -> neutral commodity normalization factor 0.9458 -> structured 6-18m regime -> positive short-term commodity strength does not raise low-risk buy zones.",
       "reasonable_multiple_range": [
         11.0,
         15.0
       ],
       "multiple_rationale": "现货/区域流动性偏紧与矿端扰动支撑价格，但2026全球统计口径仍可能呈现供应过剩，估值不能把短期高铜价永久化。",
-      "value_anchor_range": [
-        13.81,
-        22.6
+      "scenario_fair_value_range": [
+        12.73,
+        20.84
       ],
-      "base_fair_value_floor": 15.04,
+      "normalized_base_fair_value_floor": 13.87,
+      "base_fair_value_floor": 13.87,
+      "market_price_anchor_180d": {
+        "history_points": 180,
+        "history_basis": "tencent_qfq_plus_live_tail",
+        "last_history_date": "2026-08-28",
+        "low_180d": 9.1,
+        "high_180d": 18.211,
+        "median_180d": 13.215499999999999,
+        "ma60": 11.369,
+        "safe_percentile_band": [
+          11.239,
+          12.34365
+        ],
+        "reasonable_percentile_band": [
+          12.34365,
+          13.881
+        ],
+        "percentiles": {
+          "p15": 11.239,
+          "p25": 11.86525,
+          "p35": 12.34365,
+          "p50": 13.215499999999999,
+          "p60": 13.881
+        }
+      },
+      "price_calibration_method": "valuation_dominant_below_market_p35",
+      "value_anchor_range": [
+        10.4,
+        13.87
+      ],
       "safe_buy_range": [
-        11.28,
-        13.24
+        10.4,
+        12.2
       ],
       "reasonable_buy_range": [
-        13.24,
-        15.04
+        12.2,
+        13.87
       ],
       "key_sensitivities": [
+        "neutral commodity price",
         "6-18m supply-demand regime",
         "next-year consensus EPS",
-        "commodity/cost anchor",
+        "180d market price distribution",
         "production/sales"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
@@ -1195,9 +1515,9 @@
       "cycle_tag": "coal::动力煤",
       "current_price": 9.02,
       "valuation_status": "unavailable",
-      "valuation_model": "forward_cycle_scenario",
+      "valuation_model": "normalized_forward_cycle_low_risk",
       "execution_state": "input_data_insufficient",
-      "forward_earnings_basis": "2026/2027 consensus plus commodity and 6-18m regime are mandatory for resource valuation.",
+      "forward_earnings_basis": "2026/2027 consensus plus neutral commodity anchor, 6-18m regime and price-history calibration are mandatory for resource valuation.",
       "commodity_anchors": [],
       "reasonable_multiple_range": null,
       "value_anchor_range": null,
@@ -1214,9 +1534,9 @@
       "cycle_tag": "coal::动力煤",
       "current_price": 47.63,
       "valuation_status": "unavailable",
-      "valuation_model": "forward_cycle_scenario",
+      "valuation_model": "normalized_forward_cycle_low_risk",
       "execution_state": "input_data_insufficient",
-      "forward_earnings_basis": "2026/2027 consensus plus commodity and 6-18m regime are mandatory for resource valuation.",
+      "forward_earnings_basis": "2026/2027 consensus plus neutral commodity anchor, 6-18m regime and price-history calibration are mandatory for resource valuation.",
       "commodity_anchors": [],
       "reasonable_multiple_range": null,
       "value_anchor_range": null,
@@ -1233,9 +1553,9 @@
       "cycle_tag": "coal::动力煤",
       "current_price": 14.81,
       "valuation_status": "unavailable",
-      "valuation_model": "forward_cycle_scenario",
+      "valuation_model": "normalized_forward_cycle_low_risk",
       "execution_state": "input_data_insufficient",
-      "forward_earnings_basis": "2026/2027 consensus plus commodity and 6-18m regime are mandatory for resource valuation.",
+      "forward_earnings_basis": "2026/2027 consensus plus neutral commodity anchor, 6-18m regime and price-history calibration are mandatory for resource valuation.",
       "commodity_anchors": [],
       "reasonable_multiple_range": null,
       "value_anchor_range": null,
@@ -1253,7 +1573,7 @@
       "current_price": 39.12,
       "valuation_status": "valid",
       "execution_state": "valid",
-      "valuation_model": "forward_cycle_scenario",
+      "valuation_model": "normalized_forward_cycle_low_risk",
       "valuation_basis_unit": "PE",
       "forecast_source": "akshare.stock_profit_forecast_em",
       "forecast_report_count": 19,
@@ -1265,6 +1585,9 @@
         "current_year": 0.3333,
         "next_year": 0.6667
       },
+      "normalized_forward_eps": 2.9974,
+      "neutralization_factor": 0.9458,
+      "weighted_neutral_commodity_delta": 0.0765,
       "market_forward_pe_current_year": 13.55,
       "market_forward_pe_next_year": 11.82,
       "market_forward_pe_12m_proxy": 12.34,
@@ -1281,11 +1604,17 @@
           "current_to_ma60": 1.0344958613832542,
           "drawdown_from_60d_high_pct": -0.584261457002011,
           "trend_20_vs_60_pct": 2.4051157989398497,
+          "neutral_window_sessions": 252,
+          "neutral_price_median": 101165.0,
+          "neutral_price_p40": 96748.0,
+          "neutral_price_p60": 102330.0,
+          "current_to_neutral": 1.076459249740523,
           "weight": 1.0,
           "direction": 1.0
         }
       ],
       "short_term_anchor_effect_on_eps": 0.0259,
+      "low_risk_short_term_effect_on_eps": 0.0,
       "profit_sensitivity": 0.75,
       "cycle_regime": "tight_spot_medium_term_balancing",
       "cycle_regime_reviewed_at": "2026-08-30",
@@ -1311,33 +1640,64 @@
         1.08
       ],
       "bear_base_bull_forward_eps": [
-        2.9262,
-        3.1863,
-        3.5114
+        2.6977,
+        2.9375,
+        3.2372
       ],
-      "forward_earnings_basis": "2026/2027 consensus -> calendar-weighted forward-12m EPS 3.1693 -> structured 6-18m regime -> capped short-term commodity modifier +2.59%.",
+      "forward_earnings_basis": "2026/2027 consensus -> forward-12m EPS 3.1693 -> neutral commodity normalization factor 0.9458 -> structured 6-18m regime -> positive short-term commodity strength does not raise low-risk buy zones.",
       "reasonable_multiple_range": [
         11.0,
         15.0
       ],
       "multiple_rationale": "现货/区域流动性偏紧与矿端扰动支撑价格，但2026全球统计口径仍可能呈现供应过剩，估值不能把短期高铜价永久化。",
-      "value_anchor_range": [
-        32.19,
-        52.67
+      "scenario_fair_value_range": [
+        29.67,
+        48.56
       ],
-      "base_fair_value_floor": 35.05,
+      "normalized_base_fair_value_floor": 32.31,
+      "base_fair_value_floor": 32.31,
+      "market_price_anchor_180d": {
+        "history_points": 180,
+        "history_basis": "tencent_qfq_plus_live_tail",
+        "last_history_date": "2026-08-28",
+        "low_180d": 24.0,
+        "high_180d": 43.07,
+        "median_180d": 30.455,
+        "ma60": 33.894666666666666,
+        "safe_percentile_band": [
+          26.127,
+          28.86
+        ],
+        "reasonable_percentile_band": [
+          28.86,
+          31.552
+        ],
+        "percentiles": {
+          "p15": 26.127,
+          "p25": 27.8125,
+          "p35": 28.86,
+          "p50": 30.455,
+          "p60": 31.552
+        }
+      },
+      "price_calibration_method": "normalized_fundamental_plus_180d_market_calibration",
+      "value_anchor_range": [
+        26.13,
+        30.7
+      ],
       "safe_buy_range": [
-        26.29,
-        30.84
+        26.13,
+        28.86
       ],
       "reasonable_buy_range": [
-        30.84,
-        35.05
+        28.86,
+        30.7
       ],
       "key_sensitivities": [
+        "neutral commodity price",
         "6-18m supply-demand regime",
         "next-year consensus EPS",
-        "commodity/cost anchor",
+        "180d market price distribution",
         "production/sales"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
@@ -1349,9 +1709,9 @@
       "cycle_tag": "coal::动力煤",
       "current_price": 27.07,
       "valuation_status": "unavailable",
-      "valuation_model": "forward_cycle_scenario",
+      "valuation_model": "normalized_forward_cycle_low_risk",
       "execution_state": "input_data_insufficient",
-      "forward_earnings_basis": "2026/2027 consensus plus commodity and 6-18m regime are mandatory for resource valuation.",
+      "forward_earnings_basis": "2026/2027 consensus plus neutral commodity anchor, 6-18m regime and price-history calibration are mandatory for resource valuation.",
       "commodity_anchors": [],
       "reasonable_multiple_range": null,
       "value_anchor_range": null,
@@ -1369,7 +1729,7 @@
       "current_price": 9.82,
       "valuation_status": "valid",
       "execution_state": "valid",
-      "valuation_model": "forward_cycle_scenario",
+      "valuation_model": "normalized_forward_cycle_low_risk",
       "valuation_basis_unit": "PE",
       "forecast_source": "akshare.stock_profit_forecast_em",
       "forecast_report_count": 10,
@@ -1381,6 +1741,9 @@
         "current_year": 0.3333,
         "next_year": 0.6667
       },
+      "normalized_forward_eps": 1.3096,
+      "neutralization_factor": 0.9769,
+      "weighted_neutral_commodity_delta": 0.0263,
       "market_forward_pe_current_year": 7.57,
       "market_forward_pe_next_year": 7.21,
       "market_forward_pe_12m_proxy": 7.32,
@@ -1397,6 +1760,11 @@
           "current_to_ma60": 1.0160671997621247,
           "drawdown_from_60d_high_pct": -1.56378600823045,
           "trend_20_vs_60_pct": 1.4686673675491368,
+          "neutral_window_sessions": 252,
+          "neutral_price_median": 23575.0,
+          "neutral_price_p40": 22967.0,
+          "neutral_price_p60": 23841.0,
+          "current_to_neutral": 1.0146341463414634,
           "weight": 0.7,
           "direction": 1.0
         },
@@ -1411,11 +1779,17 @@
           "current_to_ma60": 0.9673353831166855,
           "drawdown_from_60d_high_pct": -9.40814231953473,
           "trend_20_vs_60_pct": -2.252732198849272,
+          "neutral_window_sessions": 252,
+          "neutral_price_median": 2798.0,
+          "neutral_price_p40": 2770.0,
+          "neutral_price_p60": 2822.0,
+          "current_to_neutral": 0.9463902787705504,
           "weight": 0.3,
           "direction": -1.0
         }
       ],
       "short_term_anchor_effect_on_eps": 0.0189,
+      "low_risk_short_term_effect_on_eps": 0.0,
       "profit_sensitivity": 0.9,
       "cycle_regime": "near_term_tight_medium_term_normalizing",
       "cycle_regime_reviewed_at": "2026-08-30",
@@ -1455,37 +1829,68 @@
         1.02
       ],
       "bear_base_bull_forward_eps": [
-        1.0655,
-        1.2295,
-        1.3934
+        1.0215,
+        1.1787,
+        1.3358
       ],
-      "forward_earnings_basis": "2026/2027 consensus -> calendar-weighted forward-12m EPS 1.3407 -> structured 6-18m regime -> capped short-term commodity modifier +1.89%.",
+      "forward_earnings_basis": "2026/2027 consensus -> forward-12m EPS 1.3407 -> neutral commodity normalization factor 0.9769 -> structured 6-18m regime -> positive short-term commodity strength does not raise low-risk buy zones.",
       "reasonable_multiple_range": [
         8.0,
         11.0
       ],
       "multiple_rationale": "近端库存与地缘扰动仍支撑铝价，但中东复产快于此前预期、2027库存重建/供给过剩风险意味着当前高利润不应直接按高倍PE资本化。",
-      "value_anchor_range": [
-        8.52,
-        15.33
+      "scenario_fair_value_range": [
+        8.17,
+        14.69
       ],
-      "base_fair_value_floor": 9.84,
+      "normalized_base_fair_value_floor": 9.43,
+      "base_fair_value_floor": 9.43,
+      "market_price_anchor_180d": {
+        "history_points": 180,
+        "history_basis": "tencent_qfq_plus_live_tail",
+        "last_history_date": "2026-08-28",
+        "low_180d": 7.953,
+        "high_180d": 15.553,
+        "median_180d": 11.203,
+        "ma60": 9.201116666666667,
+        "safe_percentile_band": [
+          9.27955,
+          10.443
+        ],
+        "reasonable_percentile_band": [
+          10.443,
+          11.693
+        ],
+        "percentiles": {
+          "p15": 9.27955,
+          "p25": 9.66725,
+          "p35": 10.443,
+          "p50": 11.203,
+          "p60": 11.693
+        }
+      },
+      "price_calibration_method": "valuation_dominant_below_market_p35",
+      "value_anchor_range": [
+        7.07,
+        9.43
+      ],
       "safe_buy_range": [
-        7.38,
-        8.66
+        7.07,
+        8.3
       ],
       "reasonable_buy_range": [
-        8.66,
-        9.84
+        8.3,
+        9.43
       ],
       "key_sensitivities": [
+        "neutral commodity price",
         "6-18m supply-demand regime",
         "next-year consensus EPS",
-        "commodity/cost anchor",
+        "180d market price distribution",
         "production/sales"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "reasonable_buy_zone"
+      "left_conclusion": "above_buy_zone"
     },
     {
       "code": "601899",
@@ -1494,7 +1899,7 @@
       "current_price": 34.65,
       "valuation_status": "valid",
       "execution_state": "valid",
-      "valuation_model": "forward_cycle_scenario",
+      "valuation_model": "normalized_forward_cycle_low_risk",
       "valuation_basis_unit": "PE",
       "forecast_source": "akshare.stock_profit_forecast_em",
       "forecast_report_count": 21,
@@ -1506,6 +1911,9 @@
         "current_year": 0.3333,
         "next_year": 0.6667
       },
+      "normalized_forward_eps": 3.3425,
+      "neutralization_factor": 0.9621,
+      "weighted_neutral_commodity_delta": 0.0562,
       "market_forward_pe_current_year": 11.11,
       "market_forward_pe_next_year": 9.49,
       "market_forward_pe_12m_proxy": 9.97,
@@ -1522,6 +1930,11 @@
           "current_to_ma60": 1.0863825299785828,
           "drawdown_from_60d_high_pct": -0.7488925527899815,
           "trend_20_vs_60_pct": 3.969204231247292,
+          "neutral_window_sessions": 252,
+          "neutral_price_median": 961.1099999999999,
+          "neutral_price_p40": 944.1199999999999,
+          "neutral_price_p60": 994.624,
+          "current_to_neutral": 1.0397144967797651,
           "weight": 0.55,
           "direction": 1.0
         },
@@ -1536,11 +1949,17 @@
           "current_to_ma60": 1.0344958613832542,
           "drawdown_from_60d_high_pct": -0.584261457002011,
           "trend_20_vs_60_pct": 2.4051157989398497,
+          "neutral_window_sessions": 252,
+          "neutral_price_median": 101165.0,
+          "neutral_price_p40": 96748.0,
+          "neutral_price_p60": 102330.0,
+          "current_to_neutral": 1.076459249740523,
           "weight": 0.45,
           "direction": 1.0
         }
       ],
       "short_term_anchor_effect_on_eps": 0.0441,
+      "low_risk_short_term_effect_on_eps": 0.0,
       "profit_sensitivity": 0.7,
       "cycle_regime": "gold_copper_diversified_constructive",
       "cycle_regime_reviewed_at": "2026-08-30",
@@ -1566,37 +1985,68 @@
         1.1
       ],
       "bear_base_bull_forward_eps": [
-        3.4098,
-        3.7,
-        3.9902
+        3.142,
+        3.4094,
+        3.6768
       ],
-      "forward_earnings_basis": "2026/2027 consensus -> calendar-weighted forward-12m EPS 3.4741 -> structured 6-18m regime -> capped short-term commodity modifier +4.41%.",
+      "forward_earnings_basis": "2026/2027 consensus -> forward-12m EPS 3.4741 -> neutral commodity normalization factor 0.9621 -> structured 6-18m regime -> positive short-term commodity strength does not raise low-risk buy zones.",
       "reasonable_multiple_range": [
         12.0,
         16.0
       ],
       "multiple_rationale": "黄金与铜双主业降低单一铜周期误判；仍需用2027盈利中枢而不是当前高商品价格直接外推。",
-      "value_anchor_range": [
-        40.92,
-        63.84
+      "scenario_fair_value_range": [
+        37.7,
+        58.83
       ],
-      "base_fair_value_floor": 44.4,
+      "normalized_base_fair_value_floor": 40.91,
+      "base_fair_value_floor": 40.91,
+      "market_price_anchor_180d": {
+        "history_points": 180,
+        "history_basis": "tencent_qfq_plus_live_tail",
+        "last_history_date": "2026-08-28",
+        "low_180d": 24.68,
+        "high_180d": 42.65,
+        "median_180d": 32.515,
+        "ma60": 30.100166666666667,
+        "safe_percentile_band": [
+          29.134,
+          31.256
+        ],
+        "reasonable_percentile_band": [
+          31.256,
+          33.546
+        ],
+        "percentiles": {
+          "p15": 29.134,
+          "p25": 30.16,
+          "p35": 31.256,
+          "p50": 32.515,
+          "p60": 33.546
+        }
+      },
+      "price_calibration_method": "normalized_fundamental_plus_180d_market_calibration",
+      "value_anchor_range": [
+        29.13,
+        31.91
+      ],
       "safe_buy_range": [
-        33.74,
-        39.07
+        29.13,
+        31.26
       ],
       "reasonable_buy_range": [
-        39.07,
-        44.4
+        31.26,
+        31.91
       ],
       "key_sensitivities": [
+        "neutral commodity price",
         "6-18m supply-demand regime",
         "next-year consensus EPS",
-        "commodity/cost anchor",
+        "180d market price distribution",
         "production/sales"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "safe_buy_zone"
+      "left_conclusion": "above_buy_zone"
     },
     {
       "code": "601918",
@@ -1604,9 +2054,9 @@
       "cycle_tag": "coal::动力煤",
       "current_price": 10.88,
       "valuation_status": "unavailable",
-      "valuation_model": "forward_cycle_scenario",
+      "valuation_model": "normalized_forward_cycle_low_risk",
       "execution_state": "input_data_insufficient",
-      "forward_earnings_basis": "2026/2027 consensus plus commodity and 6-18m regime are mandatory for resource valuation.",
+      "forward_earnings_basis": "2026/2027 consensus plus neutral commodity anchor, 6-18m regime and price-history calibration are mandatory for resource valuation.",
       "commodity_anchors": [],
       "reasonable_multiple_range": null,
       "value_anchor_range": null,
@@ -1624,7 +2074,7 @@
       "current_price": 19.51,
       "valuation_status": "valid",
       "execution_state": "valid",
-      "valuation_model": "forward_cycle_scenario",
+      "valuation_model": "normalized_forward_cycle_low_risk",
       "valuation_basis_unit": "PE",
       "forecast_source": "akshare.stock_profit_forecast_em",
       "forecast_report_count": 20,
@@ -1636,6 +2086,9 @@
         "current_year": 0.3333,
         "next_year": 0.6667
       },
+      "normalized_forward_eps": 1.6026,
+      "neutralization_factor": 0.9458,
+      "weighted_neutral_commodity_delta": 0.0765,
       "market_forward_pe_current_year": 12.52,
       "market_forward_pe_next_year": 11.07,
       "market_forward_pe_12m_proxy": 11.51,
@@ -1652,11 +2105,17 @@
           "current_to_ma60": 1.0344958613832542,
           "drawdown_from_60d_high_pct": -0.584261457002011,
           "trend_20_vs_60_pct": 2.4051157989398497,
+          "neutral_window_sessions": 252,
+          "neutral_price_median": 101165.0,
+          "neutral_price_p40": 96748.0,
+          "neutral_price_p60": 102330.0,
+          "current_to_neutral": 1.076459249740523,
           "weight": 1.0,
           "direction": 1.0
         }
       ],
       "short_term_anchor_effect_on_eps": 0.0259,
+      "low_risk_short_term_effect_on_eps": 0.0,
       "profit_sensitivity": 0.75,
       "cycle_regime": "tight_spot_medium_term_balancing",
       "cycle_regime_reviewed_at": "2026-08-30",
@@ -1682,33 +2141,64 @@
         1.08
       ],
       "bear_base_bull_forward_eps": [
-        1.5645,
-        1.7036,
-        1.8774
+        1.4423,
+        1.5705,
+        1.7308
       ],
-      "forward_earnings_basis": "2026/2027 consensus -> calendar-weighted forward-12m EPS 1.6945 -> structured 6-18m regime -> capped short-term commodity modifier +2.59%.",
+      "forward_earnings_basis": "2026/2027 consensus -> forward-12m EPS 1.6945 -> neutral commodity normalization factor 0.9458 -> structured 6-18m regime -> positive short-term commodity strength does not raise low-risk buy zones.",
       "reasonable_multiple_range": [
         11.0,
         15.0
       ],
       "multiple_rationale": "现货/区域流动性偏紧与矿端扰动支撑价格，但2026全球统计口径仍可能呈现供应过剩，估值不能把短期高铜价永久化。",
-      "value_anchor_range": [
-        17.21,
-        28.16
+      "scenario_fair_value_range": [
+        15.87,
+        25.96
       ],
-      "base_fair_value_floor": 18.74,
+      "normalized_base_fair_value_floor": 17.28,
+      "base_fair_value_floor": 17.28,
+      "market_price_anchor_180d": {
+        "history_points": 180,
+        "history_basis": "tencent_qfq_plus_live_tail",
+        "last_history_date": "2026-08-28",
+        "low_180d": 16.204,
+        "high_180d": 26.744,
+        "median_180d": 19.082,
+        "ma60": 18.7465,
+        "safe_percentile_band": [
+          17.547,
+          18.42
+        ],
+        "reasonable_percentile_band": [
+          18.42,
+          19.514
+        ],
+        "percentiles": {
+          "p15": 17.547,
+          "p25": 18.073,
+          "p35": 18.42,
+          "p50": 19.082,
+          "p60": 19.514
+        }
+      },
+      "price_calibration_method": "valuation_dominant_below_market_p35",
+      "value_anchor_range": [
+        12.96,
+        17.28
+      ],
       "safe_buy_range": [
-        14.05,
-        16.49
+        12.96,
+        15.2
       ],
       "reasonable_buy_range": [
-        16.49,
-        18.74
+        15.2,
+        17.28
       ],
       "key_sensitivities": [
+        "neutral commodity price",
         "6-18m supply-demand regime",
         "next-year consensus EPS",
-        "commodity/cost anchor",
+        "180d market price distribution",
         "production/sales"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
@@ -1734,14 +2224,10 @@
     }
   ],
   "left_set_codes": [
-    "000630",
     "000807",
-    "000933",
     "002532",
     "600595",
-    "600711",
-    "601600",
-    "601899"
+    "600711"
   ],
-  "method_note": "Resource cycle valuation uses current+next-year consensus to build a forward-12m earnings proxy, then applies a reviewed 6-18m supply-demand regime. Current/MA60 futures strength is capped as a near-term modifier and cannot override medium-term normalization risk."
+  "method_note": "Resource low-risk valuation first normalizes current+next-year consensus against a long-window neutral commodity/cost anchor, then applies the reviewed 6-18m regime. Positive short-term commodity strength cannot lift a low-risk buy zone. Final value/safe/reasonable bands are calibrated against the stock own bounded 180-session price distribution and MA60 ceiling; theoretical bear/base/bull values are retained separately as scenario_fair_value_range."
 }
