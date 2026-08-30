@@ -6,6 +6,7 @@ on:
     branches: [main, fix/valuation-v5-forward-cycle-coverage]
     paths:
       - 'scripts/build_forward_valuation.py'
+      - 'scripts/build_forward_valuation_v5.py'
       - 'scripts/build_cycle_valuation.py'
       - 'scripts/build_valuation_policy_audit.py'
       - 'scripts/merge_left_valuation.py'
@@ -39,7 +40,7 @@ jobs:
       - name: Run valuation regression tests
         run: pytest -q tests/test_valuation_v4.py tests/test_valuation_v5.py
       - name: Build non-cycle forward valuation
-        run: python scripts/build_forward_valuation.py
+        run: python scripts/build_forward_valuation_v5.py
       - name: Validate non-cycle valuation contract
         run: python scripts/validate_research_outputs.py fundamental-valuation data/research/pipeline/fundamental_valuation.json
       - name: Build resource and cycle valuation
