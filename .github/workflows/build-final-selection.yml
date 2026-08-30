@@ -11,8 +11,8 @@ on:
       - 'data/research/pipeline/right_structure_scan.json'
 
 concurrency:
-  group: final-selection-${{ github.ref }}
-  cancel-in-progress: true
+  group: a-share-research-artifact-writers-${{ github.ref }}
+  cancel-in-progress: false
 
 permissions:
   contents: write
