@@ -53,4 +53,4 @@ Top3优先从`PRIORITY_INFLECTION`中产生，其次才考虑`RIGHT_PARTICIPATE`
 ## 输出
 V2 shadow期写入：`data/research/v2/opportunity_ranking.json`。
 
-在黄金测试集与历史回放未通过前，所有结果必须标记 `mode=shadow`，不得覆盖V1正式榜单。
+在通用经济/结构不变量、历史回放和连续影子运行未完成验证前，所有结果必须标记 `mode=shadow`，不得覆盖V1正式榜单。测试与Validator必须case-free，不得使用固定股票、固定价格区间或历史人工结论作为PASS/FAIL条件。
