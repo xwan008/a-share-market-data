@@ -24,8 +24,8 @@ jobs:
           python-version: '3.12'
       - name: Revalidate weekly scan
         run: python scripts/validate_research_outputs.py weekly-scan data/research/pipeline/weekly_opportunity_scan.json
-      - name: Revalidate left valuation
-        run: python scripts/validate_research_outputs.py fundamental-valuation data/research/pipeline/left_valuation_scan.json
+      - name: Revalidate merged left valuation
+        run: python scripts/validate_research_outputs.py left-valuation data/research/pipeline/left_valuation_scan.json
       - name: Build final intersection and hard-gate selection
         run: python scripts/build_final_selection.py
       - name: Validate final selection
