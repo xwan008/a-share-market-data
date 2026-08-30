@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-30T15:21:41.105977+08:00",
+  "generated_at": "2026-08-30T15:40:51.763701+08:00",
   "common_pool_count": 138,
   "fundamental_count": 106,
   "cycle_count": 32,
@@ -22,28 +22,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 21.82,
       "market_forward_pe_next_year": 16.9,
-      "forward_earnings_basis": "2026 consensus EPS=1.1033; 2027 EPS=1.4250",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=1.1033 is the low-risk earnings anchor; 2027 EPS=1.4250 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         20.0,
         28.0
       ],
+      "growth_pe_floor_cap": 20.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        20.0,
+        24.0
+      ],
       "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "business_fair_value_range": [
         22.07,
         30.89
       ],
+      "value_anchor_range": [
+        22.07,
+        26.48
+      ],
       "safe_buy_range": [
-        16.55,
-        19.42
+        17.21,
+        19.86
       ],
       "reasonable_buy_range": [
-        19.42,
+        19.86,
         22.07
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
@@ -66,28 +77,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 311.94,
       "market_forward_pe_next_year": 142.6,
-      "forward_earnings_basis": "2026 consensus EPS=0.0457; 2027 EPS=0.1000",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=0.0457 is the low-risk earnings anchor; 2027 EPS=0.1000 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         20.0,
         28.0
       ],
+      "growth_pe_floor_cap": 24.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        20.0,
+        24.0
+      ],
       "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "business_fair_value_range": [
         0.91,
         1.28
       ],
+      "value_anchor_range": [
+        0.91,
+        1.1
+      ],
       "safe_buy_range": [
-        0.69,
-        0.8
+        0.71,
+        0.82
       ],
       "reasonable_buy_range": [
-        0.8,
+        0.82,
         0.91
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
@@ -141,12 +163,22 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 16.57,
       "market_forward_pe_next_year": 13.6,
-      "forward_earnings_basis": "2026 consensus EPS=1.6680; 2027 EPS=2.0330",
+      "forward_earnings_basis": "2026 consensus EPS=1.6680 is the low-risk earnings anchor; 2027 EPS=2.0330 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
+        16.0,
+        20.0
+      ],
+      "growth_pe_floor_cap": 20.0,
+      "low_risk_pe_method": "theoretical_pe_unchanged",
       "reasonable_multiple_range": [
         16.0,
         20.0
       ],
       "multiple_rationale": "2026盈利增长由高端大缸径发动机、数据中心发电与新能源动力共同驱动；周期属性仍要求折价，但不应按传统重卡纯周期12-16倍机械定价。",
+      "business_fair_value_range": [
+        26.69,
+        33.36
+      ],
       "value_anchor_range": [
         26.69,
         33.36
@@ -160,9 +192,10 @@
         26.69
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "数据中心发电产品与大缸径发动机订单连续转弱，或重卡/发动机需求显著下行。",
       "left_conclusion": "above_buy_zone",
@@ -567,10 +600,12 @@
       "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
       "forward_roe_current_year": 0.0956,
       "forward_roe_next_year": 0.1062,
+      "low_risk_forward_roe": 0.0956,
+      "low_risk_roe_method": "current_year_primary_no_positive_next_year_uplift",
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 9.93,
       "market_forward_pe_next_year": 8.93,
-      "forward_earnings_basis": "BVPS proxy=22.5931 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "forward_earnings_basis": "BVPS proxy=22.5931; 2026 Forward ROE is the primary PB-band anchor and 2027 ROE can only lower, not raise, the low-risk PB band.",
       "reasonable_multiple_range": [
         0.95,
         1.3
@@ -589,7 +624,8 @@
         21.46
       ],
       "key_sensitivities": [
-        "forward ROE",
+        "current-year forward ROE",
+        "next-year downside durability",
         "book value quality",
         "market activity/investment return"
       ],
@@ -615,10 +651,12 @@
       "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
       "forward_roe_current_year": 0.116,
       "forward_roe_next_year": 0.1147,
+      "low_risk_forward_roe": 0.1147,
+      "low_risk_roe_method": "next_year_downside_guard",
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 10.23,
       "market_forward_pe_next_year": 10.35,
-      "forward_earnings_basis": "BVPS proxy=7.7583 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "forward_earnings_basis": "BVPS proxy=7.7583; 2026 Forward ROE is the primary PB-band anchor and 2027 ROE can only lower, not raise, the low-risk PB band.",
       "reasonable_multiple_range": [
         0.95,
         1.3
@@ -637,7 +675,8 @@
         7.37
       ],
       "key_sensitivities": [
-        "forward ROE",
+        "current-year forward ROE",
+        "next-year downside durability",
         "book value quality",
         "market activity/investment return"
       ],
@@ -1204,28 +1243,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 35.08,
       "market_forward_pe_next_year": 26.78,
-      "forward_earnings_basis": "2026 consensus EPS=1.0231; 2027 EPS=1.3401",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=1.0231 is the low-risk earnings anchor; 2027 EPS=1.3401 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         20.0,
         28.0
       ],
+      "growth_pe_floor_cap": 20.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        20.0,
+        24.0
+      ],
       "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "business_fair_value_range": [
         20.46,
         28.65
       ],
+      "value_anchor_range": [
+        20.46,
+        24.55
+      ],
       "safe_buy_range": [
-        15.35,
-        18.01
+        15.96,
+        18.42
       ],
       "reasonable_buy_range": [
-        18.01,
+        18.42,
         20.46
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
@@ -1267,28 +1317,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 12.71,
       "market_forward_pe_next_year": 10.64,
-      "forward_earnings_basis": "2026 consensus EPS=1.7214; 2027 EPS=2.0564",
+      "forward_earnings_basis": "2026 consensus EPS=1.7214 is the low-risk earnings anchor; 2027 EPS=2.0564 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
+        13.0,
+        17.0
+      ],
+      "growth_pe_floor_cap": 18.0,
+      "low_risk_pe_method": "theoretical_pe_unchanged",
       "reasonable_multiple_range": [
         13.0,
         17.0
       ],
       "multiple_rationale": "Versioned business valuation policy.",
+      "business_fair_value_range": [
+        22.38,
+        29.26
+      ],
       "value_anchor_range": [
         22.38,
         29.26
       ],
       "safe_buy_range": [
-        16.78,
-        19.69
+        17.46,
+        20.14
       ],
       "reasonable_buy_range": [
-        19.69,
+        20.14,
         22.38
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "reasonable_buy_zone",
@@ -1311,28 +1372,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 28.24,
       "market_forward_pe_next_year": 20.82,
-      "forward_earnings_basis": "2026 consensus EPS=2.7421; 2027 EPS=3.7189",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=2.7421 is the low-risk earnings anchor; 2027 EPS=3.7189 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         20.0,
         28.0
       ],
+      "growth_pe_floor_cap": 22.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        20.0,
+        24.0
+      ],
       "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "business_fair_value_range": [
         54.84,
         76.78
       ],
+      "value_anchor_range": [
+        54.84,
+        65.81
+      ],
       "safe_buy_range": [
-        41.13,
-        48.26
+        42.78,
+        49.36
       ],
       "reasonable_buy_range": [
-        48.26,
+        49.36,
         54.84
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
@@ -1386,28 +1458,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 35.1,
       "market_forward_pe_next_year": 20.31,
-      "forward_earnings_basis": "2026 consensus EPS=4.4417; 2027 EPS=7.6750",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=4.4417 is the low-risk earnings anchor; 2027 EPS=7.6750 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         20.0,
         28.0
       ],
+      "growth_pe_floor_cap": 24.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        20.0,
+        24.0
+      ],
       "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "business_fair_value_range": [
         88.83,
         124.37
       ],
+      "value_anchor_range": [
+        88.83,
+        106.6
+      ],
       "safe_buy_range": [
-        66.63,
-        78.17
+        69.29,
+        79.95
       ],
       "reasonable_buy_range": [
-        78.17,
+        79.95,
         88.83
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
@@ -1430,28 +1513,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 26.55,
       "market_forward_pe_next_year": 19.35,
-      "forward_earnings_basis": "2026 consensus EPS=5.3931; 2027 EPS=7.3984",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=5.3931 is the low-risk earnings anchor; 2027 EPS=7.3984 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         18.0,
         25.0
       ],
+      "growth_pe_floor_cap": 22.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        18.0,
+        22.0
+      ],
       "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "business_fair_value_range": [
         97.08,
         134.83
       ],
+      "value_anchor_range": [
+        97.08,
+        118.65
+      ],
       "safe_buy_range": [
-        72.81,
-        85.43
+        75.72,
+        87.37
       ],
       "reasonable_buy_range": [
-        85.43,
+        87.37,
         97.08
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
@@ -1575,28 +1669,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 20.01,
       "market_forward_pe_next_year": 16.44,
-      "forward_earnings_basis": "2026 consensus EPS=0.9500; 2027 EPS=1.1562",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=0.9500 is the low-risk earnings anchor; 2027 EPS=1.1562 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         18.0,
         25.0
       ],
+      "growth_pe_floor_cap": 20.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        18.0,
+        22.0
+      ],
       "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "business_fair_value_range": [
         17.1,
         23.75
       ],
+      "value_anchor_range": [
+        17.1,
+        20.9
+      ],
       "safe_buy_range": [
-        12.82,
-        15.05
+        13.34,
+        15.39
       ],
       "reasonable_buy_range": [
-        15.05,
+        15.39,
         17.1
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
@@ -1619,28 +1724,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 86.27,
       "market_forward_pe_next_year": 46.31,
-      "forward_earnings_basis": "2026 consensus EPS=2.0125; 2027 EPS=3.7487",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=2.0125 is the low-risk earnings anchor; 2027 EPS=3.7487 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         22.0,
         30.0
       ],
+      "growth_pe_floor_cap": 24.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        22.0,
+        26.0
+      ],
       "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "business_fair_value_range": [
         44.28,
         60.38
       ],
+      "value_anchor_range": [
+        44.28,
+        52.33
+      ],
       "safe_buy_range": [
-        33.21,
-        38.96
+        34.53,
+        39.85
       ],
       "reasonable_buy_range": [
-        38.96,
+        39.85,
         44.28
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
@@ -1682,28 +1798,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 48.91,
       "market_forward_pe_next_year": 23.3,
-      "forward_earnings_basis": "2026 consensus EPS=4.0000; 2027 EPS=8.3962",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=4.0000 is the low-risk earnings anchor; 2027 EPS=8.3962 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         20.0,
         28.0
       ],
+      "growth_pe_floor_cap": 24.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        20.0,
+        24.0
+      ],
       "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "business_fair_value_range": [
         80.0,
         112.0
       ],
+      "value_anchor_range": [
+        80.0,
+        96.0
+      ],
       "safe_buy_range": [
-        60.0,
-        70.4
+        62.4,
+        72.0
       ],
       "reasonable_buy_range": [
-        70.4,
+        72.0,
         80.0
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
@@ -1745,28 +1872,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 144.27,
       "market_forward_pe_next_year": 75.64,
-      "forward_earnings_basis": "2026 consensus EPS=0.2480; 2027 EPS=0.4730",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=0.2480 is the low-risk earnings anchor; 2027 EPS=0.4730 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         20.0,
         28.0
       ],
+      "growth_pe_floor_cap": 24.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        20.0,
+        24.0
+      ],
       "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "business_fair_value_range": [
         4.96,
         6.94
       ],
+      "value_anchor_range": [
+        4.96,
+        5.95
+      ],
       "safe_buy_range": [
-        3.72,
-        4.36
+        3.87,
+        4.46
       ],
       "reasonable_buy_range": [
-        4.36,
+        4.46,
         4.96
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
@@ -1779,7 +1917,7 @@
       "valuation_status": "valid",
       "execution_state": "valid",
       "policy_status": "supported",
-      "valuation_model": "grid_equipment_forward_pe",
+      "valuation_model": "grid_equipment_company_low_risk_forward_pe",
       "valuation_basis_unit": "PE",
       "forecast_source": "akshare.stock_profit_forecast_em",
       "forecast_report_count": 4,
@@ -1789,31 +1927,42 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 12.81,
       "market_forward_pe_next_year": 14.69,
-      "forward_earnings_basis": "2026 consensus EPS=0.8975; 2027 EPS=0.7830",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=0.8975 is the low-risk earnings anchor; 2027 EPS=0.7830 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         18.0,
         25.0
       ],
-      "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "growth_pe_floor_cap": 13.0,
+      "low_risk_pe_method": "company_explicit_low_risk_pe",
+      "reasonable_multiple_range": [
+        13.0,
+        16.0
+      ],
+      "multiple_rationale": "行业景气可支持理论估值，但2027一致预期EPS低于2026，且2026利润含显著非经常性收益风险；低风险买点必须以2026 EPS为主锚并压低PE，不能直接套用18-25倍行业模板。",
+      "business_fair_value_range": [
         16.16,
         22.44
       ],
+      "value_anchor_range": [
+        11.67,
+        14.36
+      ],
       "safe_buy_range": [
-        12.12,
-        14.22
+        9.1,
+        10.5
       ],
       "reasonable_buy_range": [
-        14.22,
-        16.16
+        10.5,
+        11.67
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "safe_buy_zone",
+      "left_conclusion": "reasonable_buy_zone",
       "left_engine": "fundamental"
     },
     {
@@ -1833,28 +1982,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 39.22,
       "market_forward_pe_next_year": 25.36,
-      "forward_earnings_basis": "2026 consensus EPS=3.1030; 2027 EPS=4.7996",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=3.1030 is the low-risk earnings anchor; 2027 EPS=4.7996 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         20.0,
         28.0
       ],
+      "growth_pe_floor_cap": 24.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        20.0,
+        24.0
+      ],
       "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "business_fair_value_range": [
         62.06,
         86.89
       ],
+      "value_anchor_range": [
+        62.06,
+        74.47
+      ],
       "safe_buy_range": [
-        46.55,
-        54.61
+        48.41,
+        55.85
       ],
       "reasonable_buy_range": [
-        54.61,
+        55.85,
         62.06
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
@@ -1877,12 +2037,22 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 19.64,
       "market_forward_pe_next_year": 14.97,
-      "forward_earnings_basis": "2026 consensus EPS=2.8814; 2027 EPS=3.7814",
+      "forward_earnings_basis": "2026 consensus EPS=2.8814 is the low-risk earnings anchor; 2027 EPS=3.7814 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
+        20.0,
+        24.0
+      ],
+      "growth_pe_floor_cap": 20.0,
+      "low_risk_pe_method": "company_explicit_low_risk_pe",
       "reasonable_multiple_range": [
         20.0,
         24.0
       ],
       "multiple_rationale": "消费电子基本盘叠加AI数据中心互连/热管理/电源与汽车电子，多业务增长结构和明确前三季度指引支持高于传统消费电子代工的估值；同时保留整合与利润率风险折价。",
+      "business_fair_value_range": [
+        57.63,
+        69.15
+      ],
       "value_anchor_range": [
         57.63,
         69.15
@@ -1896,9 +2066,10 @@
         54.17
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "Q3实际业绩低于预告下沿，或数据中心/汽车电子增长显著弱于公司表述。",
       "left_conclusion": "above_buy_zone",
@@ -2247,31 +2418,42 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 11.57,
       "market_forward_pe_next_year": 10.07,
-      "forward_earnings_basis": "2026 consensus EPS=3.2101; 2027 EPS=3.6891",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=3.2101 is the low-risk earnings anchor; 2027 EPS=3.6891 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         20.0,
         28.0
       ],
-      "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "growth_pe_floor_cap": 18.0,
+      "low_risk_pe_method": "company_explicit_low_risk_pe",
+      "reasonable_multiple_range": [
+        12.0,
+        16.0
+      ],
+      "multiple_rationale": "2026电解液/六氟景气和盈利显著修复，但利润仍高度受产品价格、原料成本、供需与产能利用率影响；理论成长估值不能直接作为低风险买点，按2026 EPS约12-16倍PE形成低风险价值锚。",
+      "business_fair_value_range": [
         64.2,
         89.88
       ],
+      "value_anchor_range": [
+        38.52,
+        51.36
+      ],
       "safe_buy_range": [
-        48.15,
-        56.5
+        30.05,
+        34.67
       ],
       "reasonable_buy_range": [
-        56.5,
-        64.2
+        34.67,
+        38.52
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "原材料上涨快于产品提价导致单吨利润持续下滑，或Q3/Q4订单/排产低于公司反馈。",
-      "left_conclusion": "safe_buy_zone",
+      "left_conclusion": "reasonable_buy_zone",
       "left_engine": "fundamental"
     },
     {
@@ -2292,10 +2474,12 @@
       "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
       "forward_roe_current_year": 0.0919,
       "forward_roe_next_year": 0.1004,
+      "low_risk_forward_roe": 0.0919,
+      "low_risk_roe_method": "current_year_primary_no_positive_next_year_uplift",
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 9.0,
       "market_forward_pe_next_year": 8.24,
-      "forward_earnings_basis": "BVPS proxy=12.4263 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "forward_earnings_basis": "BVPS proxy=12.4263; 2026 Forward ROE is the primary PB-band anchor and 2027 ROE can only lower, not raise, the low-risk PB band.",
       "reasonable_multiple_range": [
         0.95,
         1.3
@@ -2314,7 +2498,8 @@
         11.8
       ],
       "key_sensitivities": [
-        "forward ROE",
+        "current-year forward ROE",
+        "next-year downside durability",
         "book value quality",
         "market activity/investment return"
       ],
@@ -2340,10 +2525,12 @@
       "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
       "forward_roe_current_year": 0.058,
       "forward_roe_next_year": 0.0632,
+      "low_risk_forward_roe": 0.058,
+      "low_risk_roe_method": "current_year_primary_no_positive_next_year_uplift",
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 27.39,
       "market_forward_pe_next_year": 25.15,
-      "forward_earnings_basis": "BVPS proxy=4.1140 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "forward_earnings_basis": "BVPS proxy=4.1140; 2026 Forward ROE is the primary PB-band anchor and 2027 ROE can only lower, not raise, the low-risk PB band.",
       "reasonable_multiple_range": [
         0.85,
         1.1
@@ -2362,7 +2549,8 @@
         3.5
       ],
       "key_sensitivities": [
-        "forward ROE",
+        "current-year forward ROE",
+        "next-year downside durability",
         "book value quality",
         "market activity/investment return"
       ],
@@ -2387,28 +2575,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 23.6,
       "market_forward_pe_next_year": 13.48,
-      "forward_earnings_basis": "2026 consensus EPS=2.3083; 2027 EPS=4.0422",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=2.3083 is the low-risk earnings anchor; 2027 EPS=4.0422 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         18.0,
         25.0
       ],
+      "growth_pe_floor_cap": 24.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        18.0,
+        22.0
+      ],
       "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "business_fair_value_range": [
         41.55,
         57.71
       ],
+      "value_anchor_range": [
+        41.55,
+        50.78
+      ],
       "safe_buy_range": [
-        31.16,
-        36.56
+        32.41,
+        37.39
       ],
       "reasonable_buy_range": [
-        36.56,
+        37.39,
         41.55
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "隔膜供需转松导致价格/单平利润快速回落，或排产显著下降。",
       "left_conclusion": "above_buy_zone",
@@ -2512,28 +2711,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 43.68,
       "market_forward_pe_next_year": 30.2,
-      "forward_earnings_basis": "2026 consensus EPS=8.2968; 2027 EPS=11.9995",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=8.2968 is the low-risk earnings anchor; 2027 EPS=11.9995 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         20.0,
         28.0
       ],
+      "growth_pe_floor_cap": 22.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        20.0,
+        24.0
+      ],
       "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "business_fair_value_range": [
         165.94,
         232.31
       ],
+      "value_anchor_range": [
+        165.94,
+        199.12
+      ],
       "safe_buy_range": [
-        124.45,
-        146.02
+        129.43,
+        149.34
       ],
       "reasonable_buy_range": [
-        146.02,
+        149.34,
         165.94
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
@@ -2557,10 +2767,12 @@
       "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
       "forward_roe_current_year": 0.0694,
       "forward_roe_next_year": 0.0762,
+      "low_risk_forward_roe": 0.0694,
+      "low_risk_roe_method": "current_year_primary_no_positive_next_year_uplift",
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 12.85,
       "market_forward_pe_next_year": 11.71,
-      "forward_earnings_basis": "BVPS proxy=9.6503 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "forward_earnings_basis": "BVPS proxy=9.6503; 2026 Forward ROE is the primary PB-band anchor and 2027 ROE can only lower, not raise, the low-risk PB band.",
       "reasonable_multiple_range": [
         0.85,
         1.1
@@ -2579,7 +2791,8 @@
         8.2
       ],
       "key_sensitivities": [
-        "forward ROE",
+        "current-year forward ROE",
+        "next-year downside durability",
         "book value quality",
         "market activity/investment return"
       ],
@@ -2604,28 +2817,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 38.97,
       "market_forward_pe_next_year": 26.29,
-      "forward_earnings_basis": "2026 consensus EPS=2.2886; 2027 EPS=3.3922",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=2.2886 is the low-risk earnings anchor; 2027 EPS=3.3922 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         20.0,
         28.0
       ],
+      "growth_pe_floor_cap": 22.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        20.0,
+        24.0
+      ],
       "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "business_fair_value_range": [
         45.77,
         64.08
       ],
+      "value_anchor_range": [
+        45.77,
+        54.93
+      ],
       "safe_buy_range": [
-        34.33,
-        40.28
+        35.7,
+        41.19
       ],
       "reasonable_buy_range": [
-        40.28,
+        41.19,
         45.77
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
@@ -2711,10 +2935,12 @@
       "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
       "forward_roe_current_year": 0.1082,
       "forward_roe_next_year": 0.1175,
+      "low_risk_forward_roe": 0.1082,
+      "low_risk_roe_method": "current_year_primary_no_positive_next_year_uplift",
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 10.9,
       "market_forward_pe_next_year": 10.04,
-      "forward_earnings_basis": "BVPS proxy=23.6858 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "forward_earnings_basis": "BVPS proxy=23.6858; 2026 Forward ROE is the primary PB-band anchor and 2027 ROE can only lower, not raise, the low-risk PB band.",
       "reasonable_multiple_range": [
         0.95,
         1.3
@@ -2733,7 +2959,8 @@
         22.5
       ],
       "key_sensitivities": [
-        "forward ROE",
+        "current-year forward ROE",
+        "next-year downside durability",
         "book value quality",
         "market activity/investment return"
       ],
@@ -2758,28 +2985,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 10.94,
       "market_forward_pe_next_year": 9.74,
-      "forward_earnings_basis": "2026 consensus EPS=2.7486; 2027 EPS=3.0864",
+      "forward_earnings_basis": "2026 consensus EPS=2.7486 is the low-risk earnings anchor; 2027 EPS=3.0864 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
+        13.0,
+        17.0
+      ],
+      "growth_pe_floor_cap": 18.0,
+      "low_risk_pe_method": "theoretical_pe_unchanged",
       "reasonable_multiple_range": [
         13.0,
         17.0
       ],
       "multiple_rationale": "Versioned business valuation policy.",
+      "business_fair_value_range": [
+        35.73,
+        46.73
+      ],
       "value_anchor_range": [
         35.73,
         46.73
       ],
       "safe_buy_range": [
-        26.8,
-        31.44
+        27.87,
+        32.16
       ],
       "reasonable_buy_range": [
-        31.44,
+        32.16,
         35.73
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "出口/新能源出口连续转弱或产品结构改善无法继续转化为扣非利润增长。",
       "left_conclusion": "safe_buy_zone",
@@ -2803,10 +3041,12 @@
       "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
       "forward_roe_current_year": 0.0535,
       "forward_roe_next_year": 0.058,
+      "low_risk_forward_roe": 0.0535,
+      "low_risk_roe_method": "current_year_primary_no_positive_next_year_uplift",
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 39.79,
       "market_forward_pe_next_year": 36.73,
-      "forward_earnings_basis": "BVPS proxy=4.4844 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "forward_earnings_basis": "BVPS proxy=4.4844; 2026 Forward ROE is the primary PB-band anchor and 2027 ROE can only lower, not raise, the low-risk PB band.",
       "reasonable_multiple_range": [
         0.85,
         1.1
@@ -2825,7 +3065,8 @@
         3.81
       ],
       "key_sensitivities": [
-        "forward ROE",
+        "current-year forward ROE",
+        "next-year downside durability",
         "book value quality",
         "market activity/investment return"
       ],
@@ -2851,10 +3092,12 @@
       "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
       "forward_roe_current_year": 0.07,
       "forward_roe_next_year": 0.0774,
+      "low_risk_forward_roe": 0.07,
+      "low_risk_roe_method": "current_year_primary_no_positive_next_year_uplift",
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 12.76,
       "market_forward_pe_next_year": 11.54,
-      "forward_earnings_basis": "BVPS proxy=9.7935 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "forward_earnings_basis": "BVPS proxy=9.7935; 2026 Forward ROE is the primary PB-band anchor and 2027 ROE can only lower, not raise, the low-risk PB band.",
       "reasonable_multiple_range": [
         0.85,
         1.1
@@ -2873,7 +3116,8 @@
         8.32
       ],
       "key_sensitivities": [
-        "forward ROE",
+        "current-year forward ROE",
+        "next-year downside durability",
         "book value quality",
         "market activity/investment return"
       ],
@@ -2917,31 +3161,42 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 11.45,
       "market_forward_pe_next_year": 9.08,
-      "forward_earnings_basis": "2026 consensus EPS=0.2629; 2027 EPS=0.3314",
+      "forward_earnings_basis": "2026 consensus EPS=0.2629 is the low-risk earnings anchor; 2027 EPS=0.3314 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
+        13.0,
+        17.0
+      ],
+      "growth_pe_floor_cap": 20.0,
+      "low_risk_pe_method": "theoretical_pe_unchanged",
       "reasonable_multiple_range": [
         13.0,
         17.0
       ],
       "multiple_rationale": "Versioned business valuation policy.",
+      "business_fair_value_range": [
+        3.42,
+        4.47
+      ],
       "value_anchor_range": [
         3.42,
         4.47
       ],
       "safe_buy_range": [
-        2.56,
-        3.01
+        2.67,
+        3.08
       ],
       "reasonable_buy_range": [
-        3.01,
+        3.08,
         3.42
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "reasonable_buy_zone",
+      "left_conclusion": "safe_buy_zone",
       "left_engine": "fundamental"
     },
     {
@@ -2961,28 +3216,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 52.5,
       "market_forward_pe_next_year": 33.76,
-      "forward_earnings_basis": "2026 consensus EPS=2.7743; 2027 EPS=4.3143",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=2.7743 is the low-risk earnings anchor; 2027 EPS=4.3143 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         20.0,
         28.0
       ],
+      "growth_pe_floor_cap": 24.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        20.0,
+        24.0
+      ],
       "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "business_fair_value_range": [
         55.49,
         77.68
       ],
+      "value_anchor_range": [
+        55.49,
+        66.58
+      ],
       "safe_buy_range": [
-        41.61,
-        48.83
+        43.28,
+        49.94
       ],
       "reasonable_buy_range": [
-        48.83,
+        49.94,
         55.49
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
@@ -3177,28 +3443,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 20.17,
       "market_forward_pe_next_year": 18.0,
-      "forward_earnings_basis": "2026 consensus EPS=1.1409; 2027 EPS=1.2782",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=1.1409 is the low-risk earnings anchor; 2027 EPS=1.2782 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         18.0,
         25.0
       ],
+      "growth_pe_floor_cap": 18.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        18.0,
+        22.0
+      ],
       "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "business_fair_value_range": [
         20.54,
         28.52
       ],
+      "value_anchor_range": [
+        20.54,
+        25.1
+      ],
       "safe_buy_range": [
-        15.4,
-        18.07
+        16.02,
+        18.48
       ],
       "reasonable_buy_range": [
-        18.07,
+        18.48,
         20.54
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
@@ -3221,28 +3498,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 17.03,
       "market_forward_pe_next_year": 13.63,
-      "forward_earnings_basis": "2026 consensus EPS=0.6916; 2027 EPS=0.8644",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=0.6916 is the low-risk earnings anchor; 2027 EPS=0.8644 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         16.0,
         22.0
       ],
+      "growth_pe_floor_cap": 20.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        16.0,
+        20.0
+      ],
       "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "business_fair_value_range": [
         11.07,
         15.22
       ],
+      "value_anchor_range": [
+        11.07,
+        13.83
+      ],
       "safe_buy_range": [
-        8.3,
-        9.74
+        8.63,
+        9.96
       ],
       "reasonable_buy_range": [
-        9.74,
+        9.96,
         11.07
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "主要订单延期/取消，或交付毛利率明显恶化。",
       "left_conclusion": "above_buy_zone",
@@ -3265,28 +3553,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 23.84,
       "market_forward_pe_next_year": 16.52,
-      "forward_earnings_basis": "2026 consensus EPS=1.3343; 2027 EPS=1.9261",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=1.3343 is the low-risk earnings anchor; 2027 EPS=1.9261 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         18.0,
         24.0
       ],
+      "growth_pe_floor_cap": 22.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        18.0,
+        22.0
+      ],
       "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "business_fair_value_range": [
         24.02,
         32.02
       ],
+      "value_anchor_range": [
+        24.02,
+        29.35
+      ],
       "safe_buy_range": [
-        18.01,
-        21.13
+        18.73,
+        21.62
       ],
       "reasonable_buy_range": [
-        21.13,
+        21.62,
         24.02
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "造船新增订单显著转弱、低速机排产下降或交付毛利率恶化。",
       "left_conclusion": "above_buy_zone",
@@ -3309,28 +3608,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 23.06,
       "market_forward_pe_next_year": 19.36,
-      "forward_earnings_basis": "2026 consensus EPS=2.9792; 2027 EPS=3.5492",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=2.9792 is the low-risk earnings anchor; 2027 EPS=3.5492 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         22.0,
         30.0
       ],
+      "growth_pe_floor_cap": 18.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        18.0,
+        22.0
+      ],
       "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "business_fair_value_range": [
         65.54,
         89.38
       ],
-      "safe_buy_range": [
-        49.16,
-        57.68
-      ],
-      "reasonable_buy_range": [
-        57.68,
+      "value_anchor_range": [
+        53.63,
         65.54
       ],
+      "safe_buy_range": [
+        41.83,
+        48.26
+      ],
+      "reasonable_buy_range": [
+        48.26,
+        53.63
+      ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
@@ -3687,28 +3997,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 9.55,
       "market_forward_pe_next_year": 8.67,
-      "forward_earnings_basis": "2026 consensus EPS=1.1222; 2027 EPS=1.2367",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=1.1222 is the low-risk earnings anchor; 2027 EPS=1.2367 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         10.0,
         14.0
       ],
-      "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "growth_pe_floor_cap": 18.0,
+      "low_risk_pe_method": "company_explicit_low_risk_pe",
+      "reasonable_multiple_range": [
+        10.0,
+        12.0
+      ],
+      "multiple_rationale": "船舶订单和供应链业务提供盈利支撑，但低风险买点按2026 EPS约10-12倍PE定价，不把2030年前订单能见度直接资本化成更高买入倍数。",
+      "business_fair_value_range": [
         11.22,
         15.71
       ],
+      "value_anchor_range": [
+        11.22,
+        13.47
+      ],
       "safe_buy_range": [
-        8.42,
-        9.88
+        8.75,
+        10.1
       ],
       "reasonable_buy_range": [
-        9.88,
+        10.1,
         11.22
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "船舶订单取消/延期、船价或交付毛利明显下降、出口订单转负。",
       "left_conclusion": "reasonable_buy_zone",
@@ -3932,10 +4253,12 @@
       "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
       "forward_roe_current_year": 0.1453,
       "forward_roe_next_year": 0.1208,
+      "low_risk_forward_roe": 0.1208,
+      "low_risk_roe_method": "next_year_downside_guard",
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 10.54,
       "market_forward_pe_next_year": 12.69,
-      "forward_earnings_basis": "BVPS proxy=5.4368 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "forward_earnings_basis": "BVPS proxy=5.4368; 2026 Forward ROE is the primary PB-band anchor and 2027 ROE can only lower, not raise, the low-risk PB band.",
       "reasonable_multiple_range": [
         1.1,
         1.5
@@ -3954,7 +4277,8 @@
         5.98
       ],
       "key_sensitivities": [
-        "forward ROE",
+        "current-year forward ROE",
+        "next-year downside durability",
         "book value quality",
         "market activity/investment return"
       ],
@@ -3980,10 +4304,12 @@
       "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
       "forward_roe_current_year": 0.042,
       "forward_roe_next_year": 0.0443,
+      "low_risk_forward_roe": 0.042,
+      "low_risk_roe_method": "current_year_primary_no_positive_next_year_uplift",
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 21.66,
       "market_forward_pe_next_year": 20.5,
-      "forward_earnings_basis": "BVPS proxy=6.3142 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "forward_earnings_basis": "BVPS proxy=6.3142; 2026 Forward ROE is the primary PB-band anchor and 2027 ROE can only lower, not raise, the low-risk PB band.",
       "reasonable_multiple_range": [
         0.75,
         0.95
@@ -4002,7 +4328,8 @@
         4.74
       ],
       "key_sensitivities": [
-        "forward ROE",
+        "current-year forward ROE",
+        "next-year downside durability",
         "book value quality",
         "market activity/investment return"
       ],
@@ -4028,34 +4355,37 @@
       "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
       "forward_roe_current_year": 0.0765,
       "forward_roe_next_year": 0.0832,
+      "low_risk_forward_roe": 0.0765,
+      "low_risk_roe_method": "current_year_primary_no_positive_next_year_uplift",
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 12.07,
       "market_forward_pe_next_year": 11.09,
-      "forward_earnings_basis": "BVPS proxy=9.9593 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "forward_earnings_basis": "BVPS proxy=9.9593; 2026 Forward ROE is the primary PB-band anchor and 2027 ROE can only lower, not raise, the low-risk PB band.",
       "reasonable_multiple_range": [
-        0.95,
-        1.3
+        0.85,
+        1.1
       ],
       "multiple_rationale": "券商利润高度受市场成交、投行与自营周期影响，正式估值采用Forward ROE对应的PB区间；PE只作交叉检查。",
       "value_anchor_range": [
-        9.46,
-        12.95
+        8.47,
+        10.96
       ],
       "safe_buy_range": [
-        7.38,
-        8.52
+        6.6,
+        7.62
       ],
       "reasonable_buy_range": [
-        8.52,
-        9.46
+        7.62,
+        8.47
       ],
       "key_sensitivities": [
-        "forward ROE",
+        "current-year forward ROE",
+        "next-year downside durability",
         "book value quality",
         "market activity/investment return"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "reasonable_buy_zone",
+      "left_conclusion": "above_buy_zone",
       "left_engine": "fundamental"
     },
     {
@@ -4096,10 +4426,12 @@
       "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
       "forward_roe_current_year": 0.1322,
       "forward_roe_next_year": 0.1218,
+      "low_risk_forward_roe": 0.1218,
+      "low_risk_roe_method": "next_year_downside_guard",
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 8.5,
       "market_forward_pe_next_year": 9.23,
-      "forward_earnings_basis": "BVPS proxy=16.6486 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "forward_earnings_basis": "BVPS proxy=16.6486; 2026 Forward ROE is the primary PB-band anchor and 2027 ROE can only lower, not raise, the low-risk PB band.",
       "reasonable_multiple_range": [
         1.1,
         1.5
@@ -4118,7 +4450,8 @@
         18.31
       ],
       "key_sensitivities": [
-        "forward ROE",
+        "current-year forward ROE",
+        "next-year downside durability",
         "book value quality",
         "market activity/investment return"
       ],
@@ -4175,10 +4508,12 @@
       "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
       "forward_roe_current_year": 0.0992,
       "forward_roe_next_year": 0.1027,
+      "low_risk_forward_roe": 0.0992,
+      "low_risk_roe_method": "current_year_primary_no_positive_next_year_uplift",
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 15.91,
       "market_forward_pe_next_year": 15.37,
-      "forward_earnings_basis": "BVPS proxy=16.2100 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "forward_earnings_basis": "BVPS proxy=16.2100; 2026 Forward ROE is the primary PB-band anchor and 2027 ROE can only lower, not raise, the low-risk PB band.",
       "reasonable_multiple_range": [
         0.95,
         1.3
@@ -4197,7 +4532,8 @@
         15.4
       ],
       "key_sensitivities": [
-        "forward ROE",
+        "current-year forward ROE",
+        "next-year downside durability",
         "book value quality",
         "market activity/investment return"
       ],
@@ -4294,29 +4630,32 @@
       "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
       "forward_roe_current_year": 0.077,
       "forward_roe_next_year": 0.0841,
+      "low_risk_forward_roe": 0.077,
+      "low_risk_roe_method": "current_year_primary_no_positive_next_year_uplift",
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 13.41,
       "market_forward_pe_next_year": 12.29,
-      "forward_earnings_basis": "BVPS proxy=8.4968 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "forward_earnings_basis": "BVPS proxy=8.4968; 2026 Forward ROE is the primary PB-band anchor and 2027 ROE can only lower, not raise, the low-risk PB band.",
       "reasonable_multiple_range": [
-        0.95,
-        1.3
+        0.85,
+        1.1
       ],
       "multiple_rationale": "券商利润高度受市场成交、投行与自营周期影响，正式估值采用Forward ROE对应的PB区间；PE只作交叉检查。",
       "value_anchor_range": [
-        8.07,
-        11.05
+        7.22,
+        9.35
       ],
       "safe_buy_range": [
-        6.3,
-        7.26
+        5.63,
+        6.5
       ],
       "reasonable_buy_range": [
-        7.26,
-        8.07
+        6.5,
+        7.22
       ],
       "key_sensitivities": [
-        "forward ROE",
+        "current-year forward ROE",
+        "next-year downside durability",
         "book value quality",
         "market activity/investment return"
       ],
@@ -4372,28 +4711,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 20.69,
       "market_forward_pe_next_year": 15.21,
-      "forward_earnings_basis": "2026 consensus EPS=3.0947; 2027 EPS=4.2099",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=3.0947 is the low-risk earnings anchor; 2027 EPS=4.2099 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         20.0,
         28.0
       ],
+      "growth_pe_floor_cap": 22.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        20.0,
+        24.0
+      ],
       "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "business_fair_value_range": [
         61.89,
         86.65
       ],
+      "value_anchor_range": [
+        61.89,
+        74.27
+      ],
       "safe_buy_range": [
-        46.42,
-        54.47
+        48.28,
+        55.7
       ],
       "reasonable_buy_range": [
-        54.47,
+        55.7,
         61.89
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
@@ -4554,28 +4904,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 42.09,
       "market_forward_pe_next_year": 34.03,
-      "forward_earnings_basis": "2026 consensus EPS=0.3027; 2027 EPS=0.3744",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=0.3027 is the low-risk earnings anchor; 2027 EPS=0.3744 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         18.0,
         25.0
       ],
+      "growth_pe_floor_cap": 20.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        18.0,
+        22.0
+      ],
       "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "business_fair_value_range": [
         5.45,
         7.57
       ],
+      "value_anchor_range": [
+        5.45,
+        6.66
+      ],
       "safe_buy_range": [
-        4.09,
-        4.79
+        4.25,
+        4.9
       ],
       "reasonable_buy_range": [
-        4.79,
+        4.9,
         5.45
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
@@ -4630,10 +4991,12 @@
       "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
       "forward_roe_current_year": 0.0995,
       "forward_roe_next_year": 0.1058,
+      "low_risk_forward_roe": 0.0995,
+      "low_risk_roe_method": "current_year_primary_no_positive_next_year_uplift",
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 9.53,
       "market_forward_pe_next_year": 8.96,
-      "forward_earnings_basis": "BVPS proxy=18.9000 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "forward_earnings_basis": "BVPS proxy=18.9000; 2026 Forward ROE is the primary PB-band anchor and 2027 ROE can only lower, not raise, the low-risk PB band.",
       "reasonable_multiple_range": [
         0.95,
         1.3
@@ -4652,7 +5015,8 @@
         17.95
       ],
       "key_sensitivities": [
-        "forward ROE",
+        "current-year forward ROE",
+        "next-year downside durability",
         "book value quality",
         "market activity/investment return"
       ],
@@ -4698,10 +5062,12 @@
       "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
       "forward_roe_current_year": 0.146,
       "forward_roe_next_year": 0.1591,
+      "low_risk_forward_roe": 0.146,
+      "low_risk_roe_method": "current_year_primary_no_positive_next_year_uplift",
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 6.74,
       "market_forward_pe_next_year": 6.18,
-      "forward_earnings_basis": "BVPS proxy=56.7800 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "forward_earnings_basis": "BVPS proxy=56.7800; 2026 Forward ROE is the primary PB-band anchor and 2027 ROE can only lower, not raise, the low-risk PB band.",
       "reasonable_multiple_range": [
         0.9,
         1.25
@@ -4720,7 +5086,8 @@
         51.1
       ],
       "key_sensitivities": [
-        "forward ROE",
+        "current-year forward ROE",
+        "next-year downside durability",
         "book value quality",
         "market activity/investment return"
       ],
@@ -4746,34 +5113,37 @@
       "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
       "forward_roe_current_year": 0.1493,
       "forward_roe_next_year": 0.1659,
+      "low_risk_forward_roe": 0.1493,
+      "low_risk_roe_method": "current_year_primary_no_positive_next_year_uplift",
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 6.22,
       "market_forward_pe_next_year": 5.59,
-      "forward_earnings_basis": "BVPS proxy=7.6900 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "forward_earnings_basis": "BVPS proxy=7.6900; 2026 Forward ROE is the primary PB-band anchor and 2027 ROE can only lower, not raise, the low-risk PB band.",
       "reasonable_multiple_range": [
-        1.0,
-        1.4
+        0.9,
+        1.25
       ],
       "multiple_rationale": "保险公司更完整模型应包含P/EV，但在缺少统一可机器读取EV时，使用Forward ROE-PB桥作为保守代理并显式标记proxy；PE不作为主锚。",
       "value_anchor_range": [
-        7.69,
-        10.77
+        6.92,
+        9.61
       ],
       "safe_buy_range": [
-        6.0,
-        6.92
+        5.4,
+        6.23
       ],
       "reasonable_buy_range": [
-        6.92,
-        7.69
+        6.23,
+        6.92
       ],
       "key_sensitivities": [
-        "forward ROE",
+        "current-year forward ROE",
+        "next-year downside durability",
         "book value quality",
         "market activity/investment return"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "reasonable_buy_zone",
+      "left_conclusion": "above_buy_zone",
       "left_engine": "fundamental"
     },
     {
@@ -4794,10 +5164,12 @@
       "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
       "forward_roe_current_year": 0.3034,
       "forward_roe_next_year": 0.3235,
+      "low_risk_forward_roe": 0.3034,
+      "low_risk_roe_method": "current_year_primary_no_positive_next_year_uplift",
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 4.98,
       "market_forward_pe_next_year": 4.67,
-      "forward_earnings_basis": "BVPS proxy=39.6100 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "forward_earnings_basis": "BVPS proxy=39.6100; 2026 Forward ROE is the primary PB-band anchor and 2027 ROE can only lower, not raise, the low-risk PB band.",
       "reasonable_multiple_range": [
         1.1,
         1.55
@@ -4816,7 +5188,8 @@
         43.57
       ],
       "key_sensitivities": [
-        "forward ROE",
+        "current-year forward ROE",
+        "next-year downside durability",
         "book value quality",
         "market activity/investment return"
       ],
@@ -4873,10 +5246,12 @@
       "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
       "forward_roe_current_year": 0.0606,
       "forward_roe_next_year": 0.0676,
+      "low_risk_forward_roe": 0.0606,
+      "low_risk_roe_method": "current_year_primary_no_positive_next_year_uplift",
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 13.65,
       "market_forward_pe_next_year": 12.24,
-      "forward_earnings_basis": "BVPS proxy=7.1715 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "forward_earnings_basis": "BVPS proxy=7.1715; 2026 Forward ROE is the primary PB-band anchor and 2027 ROE can only lower, not raise, the low-risk PB band.",
       "reasonable_multiple_range": [
         0.85,
         1.1
@@ -4895,7 +5270,8 @@
         6.1
       ],
       "key_sensitivities": [
-        "forward ROE",
+        "current-year forward ROE",
+        "next-year downside durability",
         "book value quality",
         "market activity/investment return"
       ],
@@ -4921,10 +5297,12 @@
       "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
       "forward_roe_current_year": 0.0434,
       "forward_roe_next_year": 0.049,
+      "low_risk_forward_roe": 0.0434,
+      "low_risk_roe_method": "current_year_primary_no_positive_next_year_uplift",
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 22.22,
       "market_forward_pe_next_year": 19.68,
-      "forward_earnings_basis": "BVPS proxy=9.2378 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "forward_earnings_basis": "BVPS proxy=9.2378; 2026 Forward ROE is the primary PB-band anchor and 2027 ROE can only lower, not raise, the low-risk PB band.",
       "reasonable_multiple_range": [
         0.75,
         0.95
@@ -4943,7 +5321,8 @@
         6.93
       ],
       "key_sensitivities": [
-        "forward ROE",
+        "current-year forward ROE",
+        "next-year downside durability",
         "book value quality",
         "market activity/investment return"
       ],
@@ -5140,10 +5519,12 @@
       "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
       "forward_roe_current_year": 0.1783,
       "forward_roe_next_year": 0.1938,
+      "low_risk_forward_roe": 0.1783,
+      "low_risk_roe_method": "current_year_primary_no_positive_next_year_uplift",
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 5.37,
       "market_forward_pe_next_year": 4.94,
-      "forward_earnings_basis": "BVPS proxy=33.1800 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "forward_earnings_basis": "BVPS proxy=33.1800; 2026 Forward ROE is the primary PB-band anchor and 2027 ROE can only lower, not raise, the low-risk PB band.",
       "reasonable_multiple_range": [
         1.0,
         1.4
@@ -5162,7 +5543,8 @@
         33.18
       ],
       "key_sensitivities": [
-        "forward ROE",
+        "current-year forward ROE",
+        "next-year downside durability",
         "book value quality",
         "market activity/investment return"
       ],
@@ -5188,10 +5570,12 @@
       "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
       "forward_roe_current_year": 0.2367,
       "forward_roe_next_year": 0.2457,
+      "low_risk_forward_roe": 0.2367,
+      "low_risk_roe_method": "current_year_primary_no_positive_next_year_uplift",
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 6.88,
       "market_forward_pe_next_year": 6.63,
-      "forward_earnings_basis": "BVPS proxy=23.5000 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "forward_earnings_basis": "BVPS proxy=23.5000; 2026 Forward ROE is the primary PB-band anchor and 2027 ROE can only lower, not raise, the low-risk PB band.",
       "reasonable_multiple_range": [
         1.1,
         1.55
@@ -5210,7 +5594,8 @@
         25.85
       ],
       "key_sensitivities": [
-        "forward ROE",
+        "current-year forward ROE",
+        "next-year downside durability",
         "book value quality",
         "market activity/investment return"
       ],
@@ -5236,10 +5621,12 @@
       "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
       "forward_roe_current_year": 0.0887,
       "forward_roe_next_year": 0.0981,
+      "low_risk_forward_roe": 0.0887,
+      "low_risk_roe_method": "current_year_primary_no_positive_next_year_uplift",
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 9.14,
       "market_forward_pe_next_year": 8.27,
-      "forward_earnings_basis": "BVPS proxy=23.9446 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "forward_earnings_basis": "BVPS proxy=23.9446; 2026 Forward ROE is the primary PB-band anchor and 2027 ROE can only lower, not raise, the low-risk PB band.",
       "reasonable_multiple_range": [
         0.95,
         1.3
@@ -5258,7 +5645,8 @@
         22.75
       ],
       "key_sensitivities": [
-        "forward ROE",
+        "current-year forward ROE",
+        "next-year downside durability",
         "book value quality",
         "market activity/investment return"
       ],
@@ -5315,10 +5703,12 @@
       "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
       "forward_roe_current_year": 0.0599,
       "forward_roe_next_year": 0.0627,
+      "low_risk_forward_roe": 0.0599,
+      "low_risk_roe_method": "current_year_primary_no_positive_next_year_uplift",
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 15.27,
       "market_forward_pe_next_year": 14.57,
-      "forward_earnings_basis": "BVPS proxy=16.1514 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "forward_earnings_basis": "BVPS proxy=16.1514; 2026 Forward ROE is the primary PB-band anchor and 2027 ROE can only lower, not raise, the low-risk PB band.",
       "reasonable_multiple_range": [
         0.85,
         1.1
@@ -5337,7 +5727,8 @@
         13.73
       ],
       "key_sensitivities": [
-        "forward ROE",
+        "current-year forward ROE",
+        "next-year downside durability",
         "book value quality",
         "market activity/investment return"
       ],
@@ -5362,28 +5753,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 47.67,
       "market_forward_pe_next_year": 33.82,
-      "forward_earnings_basis": "2026 consensus EPS=8.8594; 2027 EPS=12.4869",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=8.8594 is the low-risk earnings anchor; 2027 EPS=12.4869 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         22.0,
         30.0
       ],
+      "growth_pe_floor_cap": 22.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        22.0,
+        26.0
+      ],
       "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "business_fair_value_range": [
         194.91,
         265.78
       ],
+      "value_anchor_range": [
+        194.91,
+        230.34
+      ],
       "safe_buy_range": [
-        146.18,
-        171.52
+        152.03,
+        175.42
       ],
       "reasonable_buy_range": [
-        171.52,
+        175.42,
         194.91
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "数据中心光纤需求显著降速、产品价格/毛利快速回落或客户拓展不及预期。",
       "left_conclusion": "above_buy_zone",
@@ -5407,10 +5809,12 @@
       "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
       "forward_roe_current_year": 0.0819,
       "forward_roe_next_year": 0.0875,
+      "low_risk_forward_roe": 0.0819,
+      "low_risk_roe_method": "current_year_primary_no_positive_next_year_uplift",
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 13.94,
       "market_forward_pe_next_year": 13.05,
-      "forward_earnings_basis": "BVPS proxy=8.2098 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "forward_earnings_basis": "BVPS proxy=8.2098; 2026 Forward ROE is the primary PB-band anchor and 2027 ROE can only lower, not raise, the low-risk PB band.",
       "reasonable_multiple_range": [
         0.95,
         1.3
@@ -5429,7 +5833,8 @@
         7.8
       ],
       "key_sensitivities": [
-        "forward ROE",
+        "current-year forward ROE",
+        "next-year downside durability",
         "book value quality",
         "market activity/investment return"
       ],
@@ -5455,10 +5860,12 @@
       "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
       "forward_roe_current_year": 0.0867,
       "forward_roe_next_year": 0.0956,
+      "low_risk_forward_roe": 0.0867,
+      "low_risk_roe_method": "current_year_primary_no_positive_next_year_uplift",
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 9.97,
       "market_forward_pe_next_year": 9.04,
-      "forward_earnings_basis": "BVPS proxy=14.2397 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "forward_earnings_basis": "BVPS proxy=14.2397; 2026 Forward ROE is the primary PB-band anchor and 2027 ROE can only lower, not raise, the low-risk PB band.",
       "reasonable_multiple_range": [
         0.95,
         1.3
@@ -5477,7 +5884,8 @@
         13.53
       ],
       "key_sensitivities": [
-        "forward ROE",
+        "current-year forward ROE",
+        "next-year downside durability",
         "book value quality",
         "market activity/investment return"
       ],
@@ -5660,10 +6068,12 @@
       "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
       "forward_roe_current_year": 0.0883,
       "forward_roe_next_year": 0.0949,
+      "low_risk_forward_roe": 0.0883,
+      "low_risk_roe_method": "current_year_primary_no_positive_next_year_uplift",
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 12.23,
       "market_forward_pe_next_year": 11.38,
-      "forward_earnings_basis": "BVPS proxy=6.4100 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "forward_earnings_basis": "BVPS proxy=6.4100; 2026 Forward ROE is the primary PB-band anchor and 2027 ROE can only lower, not raise, the low-risk PB band.",
       "reasonable_multiple_range": [
         0.95,
         1.3
@@ -5682,7 +6092,8 @@
         6.09
       ],
       "key_sensitivities": [
-        "forward ROE",
+        "current-year forward ROE",
+        "next-year downside durability",
         "book value quality",
         "market activity/investment return"
       ],
@@ -5759,10 +6170,12 @@
       "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
       "forward_roe_current_year": 0.0925,
       "forward_roe_next_year": 0.1025,
+      "low_risk_forward_roe": 0.0925,
+      "low_risk_roe_method": "current_year_primary_no_positive_next_year_uplift",
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 13.51,
       "market_forward_pe_next_year": 12.2,
-      "forward_earnings_basis": "BVPS proxy=27.7715 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "forward_earnings_basis": "BVPS proxy=27.7715; 2026 Forward ROE is the primary PB-band anchor and 2027 ROE can only lower, not raise, the low-risk PB band.",
       "reasonable_multiple_range": [
         0.95,
         1.3
@@ -5781,7 +6194,8 @@
         26.38
       ],
       "key_sensitivities": [
-        "forward ROE",
+        "current-year forward ROE",
+        "next-year downside durability",
         "book value quality",
         "market activity/investment return"
       ],
@@ -5806,28 +6220,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 42.2,
       "market_forward_pe_next_year": 33.33,
-      "forward_earnings_basis": "2026 consensus EPS=2.0338; 2027 EPS=2.5752",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=2.0338 is the low-risk earnings anchor; 2027 EPS=2.5752 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         20.0,
         28.0
       ],
+      "growth_pe_floor_cap": 20.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        20.0,
+        24.0
+      ],
       "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "business_fair_value_range": [
         40.68,
         56.95
       ],
+      "value_anchor_range": [
+        40.68,
+        48.81
+      ],
       "safe_buy_range": [
-        30.51,
-        35.8
+        31.73,
+        36.61
       ],
       "reasonable_buy_range": [
-        35.8,
+        36.61,
         40.68
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
@@ -5881,28 +6306,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 31.35,
       "market_forward_pe_next_year": 24.58,
-      "forward_earnings_basis": "2026 consensus EPS=0.3267; 2027 EPS=0.4167",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=0.3267 is the low-risk earnings anchor; 2027 EPS=0.4167 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         18.0,
         24.0
       ],
+      "growth_pe_floor_cap": 20.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        18.0,
+        22.0
+      ],
       "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "business_fair_value_range": [
         5.88,
         7.84
       ],
+      "value_anchor_range": [
+        5.88,
+        7.19
+      ],
       "safe_buy_range": [
-        4.41,
-        5.17
+        4.59,
+        5.29
       ],
       "reasonable_buy_range": [
-        5.17,
+        5.29,
         5.88
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "海外项目验收持续延迟、订单取消或汇率/费用拖累超过收入增长。",
       "left_conclusion": "above_buy_zone",
@@ -5925,28 +6361,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 69.68,
       "market_forward_pe_next_year": 60.12,
-      "forward_earnings_basis": "2026 consensus EPS=0.6823; 2027 EPS=0.7908",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=0.6823 is the low-risk earnings anchor; 2027 EPS=0.7908 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         20.0,
         28.0
       ],
+      "growth_pe_floor_cap": 18.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        18.0,
+        22.0
+      ],
       "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "business_fair_value_range": [
         13.65,
         19.1
       ],
+      "value_anchor_range": [
+        12.28,
+        15.01
+      ],
       "safe_buy_range": [
-        10.23,
-        12.01
+        9.58,
+        11.05
       ],
       "reasonable_buy_range": [
-        12.01,
-        13.65
+        11.05,
+        12.28
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
@@ -5969,28 +6416,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 42.01,
       "market_forward_pe_next_year": 23.21,
-      "forward_earnings_basis": "2026 consensus EPS=2.2350; 2027 EPS=4.0462",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=2.2350 is the low-risk earnings anchor; 2027 EPS=4.0462 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         20.0,
         28.0
       ],
+      "growth_pe_floor_cap": 24.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        20.0,
+        24.0
+      ],
       "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "business_fair_value_range": [
         44.7,
         62.58
       ],
+      "value_anchor_range": [
+        44.7,
+        53.64
+      ],
       "safe_buy_range": [
-        33.52,
-        39.34
+        34.87,
+        40.23
       ],
       "reasonable_buy_range": [
-        39.34,
+        40.23,
         44.7
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
@@ -6013,28 +6471,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 21.42,
       "market_forward_pe_next_year": 17.58,
-      "forward_earnings_basis": "2026 consensus EPS=7.3472; 2027 EPS=8.9551",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=7.3472 is the low-risk earnings anchor; 2027 EPS=8.9551 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         20.0,
         28.0
       ],
+      "growth_pe_floor_cap": 20.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        20.0,
+        24.0
+      ],
       "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "business_fair_value_range": [
         146.94,
         205.72
       ],
+      "value_anchor_range": [
+        146.94,
+        176.33
+      ],
       "safe_buy_range": [
-        110.21,
-        129.31
+        114.62,
+        132.25
       ],
       "reasonable_buy_range": [
-        129.31,
+        132.25,
         146.94
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "订单增速显著下滑、监管/地缘政策冲击订单或经调整利润率明显低于指引。",
       "left_conclusion": "above_buy_zone",
@@ -6057,28 +6526,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 24.29,
       "market_forward_pe_next_year": 12.89,
-      "forward_earnings_basis": "2026 consensus EPS=7.7100; 2027 EPS=14.5325",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=7.7100 is the low-risk earnings anchor; 2027 EPS=14.5325 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         16.0,
         22.0
       ],
+      "growth_pe_floor_cap": 24.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        16.0,
+        20.0
+      ],
       "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "business_fair_value_range": [
         123.36,
         169.62
       ],
+      "value_anchor_range": [
+        123.36,
+        154.2
+      ],
       "safe_buy_range": [
-        92.52,
-        108.56
+        96.22,
+        111.02
       ],
       "reasonable_buy_range": [
-        108.56,
+        111.02,
         123.36
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
@@ -6132,28 +6612,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 34.47,
       "market_forward_pe_next_year": 25.76,
-      "forward_earnings_basis": "2026 consensus EPS=1.3960; 2027 EPS=1.8680",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=1.3960 is the low-risk earnings anchor; 2027 EPS=1.8680 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         18.0,
         25.0
       ],
+      "growth_pe_floor_cap": 20.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        18.0,
+        22.0
+      ],
       "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "business_fair_value_range": [
         25.13,
         34.9
       ],
+      "value_anchor_range": [
+        25.13,
+        30.71
+      ],
       "safe_buy_range": [
-        18.85,
-        22.11
+        19.6,
+        22.62
       ],
       "reasonable_buy_range": [
-        22.11,
+        22.62,
         25.13
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
@@ -6207,31 +6698,42 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 15.68,
       "market_forward_pe_next_year": 11.97,
-      "forward_earnings_basis": "2026 consensus EPS=1.5192; 2027 EPS=1.9908",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=1.5192 is the low-risk earnings anchor; 2027 EPS=1.9908 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         18.0,
         25.0
       ],
-      "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "growth_pe_floor_cap": 20.0,
+      "low_risk_pe_method": "company_explicit_low_risk_pe",
+      "reasonable_multiple_range": [
+        17.0,
+        21.0
+      ],
+      "multiple_rationale": "设备在手订单和材料放量支持成长，但负极/隔膜/PVDF仍具有材料价格与产能周期属性；低风险买点按2026 EPS约17-21倍PE，理论成长估值与实际买点分离。",
+      "business_fair_value_range": [
         27.35,
         37.98
       ],
+      "value_anchor_range": [
+        25.83,
+        31.9
+      ],
       "safe_buy_range": [
-        20.51,
-        24.06
+        20.15,
+        23.24
       ],
       "reasonable_buy_range": [
-        24.06,
-        27.35
+        23.24,
+        25.83
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "设备验收显著延迟/取消，或材料业务毛利率下降抵消设备增长。",
-      "left_conclusion": "safe_buy_zone",
+      "left_conclusion": "reasonable_buy_zone",
       "left_engine": "fundamental"
     },
     {
@@ -6251,28 +6753,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 26.4,
       "market_forward_pe_next_year": 16.89,
-      "forward_earnings_basis": "2026 consensus EPS=1.4275; 2027 EPS=2.2313",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=1.4275 is the low-risk earnings anchor; 2027 EPS=2.2313 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         20.0,
         28.0
       ],
+      "growth_pe_floor_cap": 24.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        20.0,
+        24.0
+      ],
       "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "business_fair_value_range": [
         28.55,
         39.97
       ],
+      "value_anchor_range": [
+        28.55,
+        34.26
+      ],
       "safe_buy_range": [
-        21.41,
-        25.12
+        22.27,
+        25.7
       ],
       "reasonable_buy_range": [
-        25.12,
+        25.7,
         28.55
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
@@ -6295,28 +6808,39 @@
       "market_pe_dynamic": null,
       "market_forward_pe_current_year": 29.39,
       "market_forward_pe_next_year": 23.57,
-      "forward_earnings_basis": "2026 consensus EPS=13.5015; 2027 EPS=16.8345",
-      "reasonable_multiple_range": [
+      "forward_earnings_basis": "2026 consensus EPS=13.5015 is the low-risk earnings anchor; 2027 EPS=16.8345 is used only as durability/growth guardrail.",
+      "theoretical_business_multiple_range": [
         25.0,
         32.0
       ],
+      "growth_pe_floor_cap": 20.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        20.0,
+        24.0
+      ],
       "multiple_rationale": "Versioned business valuation policy.",
-      "value_anchor_range": [
+      "business_fair_value_range": [
         337.54,
         432.05
       ],
+      "value_anchor_range": [
+        270.03,
+        324.04
+      ],
       "safe_buy_range": [
-        253.15,
-        297.03
+        210.62,
+        243.03
       ],
       "reasonable_buy_range": [
-        297.03,
-        337.54
+        243.03,
+        270.03
       ],
       "key_sensitivities": [
-        "future earnings",
-        "consensus revisions",
-        "reasonable multiple"
+        "2026 earnings",
+        "2027 earnings durability",
+        "company-level low-risk PE",
+        "consensus revisions"
       ],
       "invalidation_condition": "利基存储价格快速回落、下游需求明显被高价抑制或晶圆供给约束出货。",
       "left_conclusion": "above_buy_zone",
@@ -6489,9 +7013,7 @@
     "600066",
     "600166",
     "600710",
-    "600958",
     "601211",
-    "601319",
     "601377",
     "601601",
     "601688",
