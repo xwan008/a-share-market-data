@@ -9,9 +9,9 @@ ROOT=Path(__file__).resolve().parents[1]
 COMMON=ROOT/'data/research/pipeline/common_qualification_pool.json'
 LATEST=ROOT/'data/latest.json'
 POLICY=ROOT/'config/valuation_policy_registry.json'
+CYCLE_POLICY=ROOT/'config/cycle_valuation_policy.json'
 OUT=ROOT/'data/research/pipeline/fundamental_valuation.json'
 TZ=ZoneInfo('Asia/Shanghai')
-CYCLE_KEYS=('铜矿资源','电解铝','动力煤','氟化工','氨纶')
 
 
 def num(v):
@@ -147,15 +147,16 @@ def zone(price,fair_floor,policy,default_band):
 
 def main():
     import akshare as ak
-    common=load(COMMON); latest=load(LATEST); policies=load(POLICY); stocks=latest.get('stocks',{})
+    common=load(COMMON); latest=load(LATEST); policies=load(POLICY); cycle_policy=load(CYCLE_POLICY); stocks=latest.get('stocks',{})
+    cycle_tags=set(cycle_policy.get('subchain_policies',{}))
     consensus=load_consensus(ak); spot,spot_errors=load_spot_indicators(ak)
     year=datetime.now(TZ).year; min_reports=int(policies.get('forecast_policy',{}).get('minimum_report_count',3)); default_band=policies.get('default_buy_band',{})
     companies=[]; left=[]; cycle_codes=[]; unsupported=[]; supported=[]
     execution={'valid':0,'consensus_insufficient':0,'market_data_missing':0,'normalization_required':0,'unsupported_policy':0}; model_counts={}
 
     for code in common.get('common_pool_codes',[]):
-        gate=common['future_earnings_gate'][code]; tags=gate.get('t2_tags') or []; tag_text=' '.join(tags)
-        if any(k in tag_text for k in CYCLE_KEYS): cycle_codes.append(code); continue
+        gate=common['future_earnings_gate'][code]; tags=gate.get('recall_tags') or gate.get('t2_tags') or []
+        if any(tag in cycle_tags for tag in tags): cycle_codes.append(code); continue
         name=gate.get('name') or (stocks.get(code) or {}).get('name') or code; price=num((stocks.get(code) or {}).get('price'))
         override=policies.get('company_overrides',{}).get(code); fin,fin_key=financial_policy(tags,policies); base,key=business_policy(tags,policies)
         policy=override or fin or base; kind='financial_pb_roe' if fin and not override else 'forward_pe'
@@ -198,7 +199,7 @@ def main():
         if row['left_conclusion'] in {'safe_buy_zone','reasonable_buy_zone'}: left.append(code)
         companies.append(row)
 
-    payload={'schema_version':5,'generated_at':datetime.now(TZ).isoformat(),'common_pool_count':len(common.get('common_pool_codes',[])),'fundamental_company_count':len(companies),'deferred_cycle_codes':sorted(cycle_codes),'market_indicator_errors':spot_errors,'policy_coverage':{'noncycle_count':len(companies),'supported_policy_count':len(set(supported)),'unsupported_policy_count':len(set(unsupported)),'supported_policy_codes':sorted(set(supported)),'unsupported_policy_codes':sorted(set(unsupported)),'execution_counts':execution,'model_counts':dict(sorted(model_counts.items()))},'companies':companies,'left_set_codes':sorted(left),'method_note':'Non-cycle PE valuation uses current-year consensus EPS as the low-risk earnings anchor. Industry/business PE ranges are theoretical fair-value references; low-risk entry PE is separately company-explicit or growth-guarded. Financial PB valuation uses current-year Forward ROE as primary; next-year ROE can only lower, never raise, the low-risk PB band.'}
+    payload={'schema_version':5,'generated_at':datetime.now(TZ).isoformat(),'common_pool_count':len(common.get('common_pool_codes',[])),'fundamental_company_count':len(companies),'deferred_cycle_codes':sorted(cycle_codes),'market_indicator_errors':spot_errors,'policy_coverage':{'noncycle_count':len(companies),'supported_policy_count':len(set(supported)),'unsupported_policy_count':len(set(unsupported)),'supported_policy_codes':sorted(set(supported)),'unsupported_policy_codes':sorted(set(unsupported)),'execution_counts':execution,'model_counts':dict(sorted(model_counts.items()))},'companies':companies,'left_set_codes':sorted(left),'method_note':'Non-cycle PE valuation uses current-year consensus EPS as the low-risk earnings anchor. Industry/business PE ranges are theoretical fair-value references; low-risk entry PE is separately company-explicit or growth-guarded. Financial PB valuation uses current-year Forward ROE as primary; next-year ROE can only lower, never raise, the low-risk PB band. Cycle routing is driven by versioned recall tags and cycle policy registry rather than a hard-coded subchain list.'}
     OUT.write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
     print(json.dumps({'status':'ok','fundamental':len(companies),'cycle_deferred':len(cycle_codes),'left':len(left),'unsupported_policy':len(set(unsupported)),'execution':execution,'market_indicator_errors':spot_errors},ensure_ascii=False))
     return 0
