@@ -1,19 +1,20 @@
 {
   "schema_version": 2,
   "mode": "shadow",
-  "generated_at": "2026-08-30T22:15:56.681987+08:00",
+  "generated_at": "2026-08-30T22:28:12.649842+08:00",
   "reference_trade_date": "2026-08-28",
   "valuation_queue_count": 75,
-  "formal_buy_zone_ready_count": 36,
+  "formal_buy_zone_ready_count": 34,
   "expectation_gap_state_counts": {
-    "priced_in_or_overheated": 24,
-    "valuation_review_required": 39,
-    "gap_above_zone_not_started": 7,
+    "valuation_review_required": 41,
+    "priced_in_or_overheated": 21,
+    "gap_above_zone_not_started": 8,
     "fundamental_price_conflict": 2,
-    "reasonable_zone_not_started": 2,
+    "reasonable_zone_not_started": 1,
+    "safe_zone_not_started": 1,
     "trend_confirmed_gap_remaining": 1
   },
-  "production_valuation_ready_count": 36,
+  "production_valuation_ready_count": 34,
   "companies": {
     "000066": {
       "code": "000066",
@@ -22,8 +23,8 @@
       "research_status": "watch",
       "forward_bridge_valid": true,
       "valuation_reference_status": "available",
-      "valuation_anchor_status": "valid",
-      "independent_v2_anchor_count": 3,
+      "valuation_anchor_status": "fundamental_history_divergence",
+      "independent_v2_anchor_count": 2,
       "fundamental_anchor_range": [
         0.91,
         1.28
@@ -51,48 +52,21 @@
         "low": 13.15,
         "high": 25.36
       },
-      "formal_buy_zone": {
-        "safe": [
-          0.82,
-          0.82
-        ],
-        "reasonable": [
-          0.82,
-          0.91
-        ]
-      },
-      "safe_buy_range": [
-        0.82,
-        0.82
-      ],
-      "reasonable_buy_range": [
-        0.82,
-        0.91
-      ],
-      "value_anchor_range": [
-        0.82,
-        0.91
-      ],
-      "formal_buy_zone_status": "ready",
-      "value_gap_state": "priced_in",
-      "gap_to_reference_mid_pct": -92.32,
+      "formal_buy_zone": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "value_anchor_range": null,
+      "formal_buy_zone_status": "fundamental_history_divergence",
+      "value_gap_state": "valuation_review_required",
+      "gap_to_reference_mid_pct": null,
       "structure_type": "transition",
       "structure_action": "observe",
       "chase_risk": "low",
       "relative_strength_20d_vs_market_pct": -1.31,
       "price_discovery": false,
-      "expectation_gap_state": "priced_in_or_overheated",
-      "production_valuation_ready": true,
-      "implied_zone_valuation": {
-        "safe_implied_pe": [
-          17.94,
-          17.94
-        ],
-        "reasonable_implied_pe": [
-          17.94,
-          19.91
-        ]
-      },
+      "expectation_gap_state": "valuation_review_required",
+      "production_valuation_ready": false,
+      "implied_zone_valuation": {},
       "method_note": "Expectation gap uses V2 formal anchors and buy zones only; V1 values are not consumed."
     },
     "000338": {
@@ -103,7 +77,7 @@
       "forward_bridge_valid": true,
       "valuation_reference_status": "available",
       "valuation_anchor_status": "valuation_divergence",
-      "independent_v2_anchor_count": 0,
+      "independent_v2_anchor_count": 1,
       "fundamental_anchor_range": [
         26.69,
         33.36
@@ -216,7 +190,7 @@
       },
       "formal_buy_zone": {
         "safe": [
-          4.72,
+          4.02,
           4.72
         ],
         "reasonable": [
@@ -225,7 +199,7 @@
         ]
       },
       "safe_buy_range": [
-        4.72,
+        4.02,
         4.72
       ],
       "reasonable_buy_range": [
@@ -233,7 +207,7 @@
         5.36
       ],
       "value_anchor_range": [
-        4.72,
+        4.02,
         5.36
       ],
       "formal_buy_zone_status": "ready",
@@ -248,7 +222,7 @@
       "production_valuation_ready": true,
       "implied_zone_valuation": {
         "safe_implied_pe": [
-          10.34,
+          8.8,
           10.34
         ],
         "reasonable_implied_pe": [
@@ -304,11 +278,24 @@
       "current_price": 21.43,
       "research_status": "pass",
       "forward_bridge_valid": true,
-      "valuation_reference_status": "review_required",
-      "valuation_anchor_status": "fundamental_anchor_unavailable",
-      "independent_v2_anchor_count": 0,
-      "fundamental_anchor_range": null,
-      "peer_anchor": null,
+      "valuation_reference_status": "available",
+      "valuation_anchor_status": "valid",
+      "independent_v2_anchor_count": 3,
+      "fundamental_anchor_range": [
+        19.37,
+        26.41
+      ],
+      "peer_anchor": {
+        "source": "eastmoney_peer_valuation",
+        "valuation_column": "市净率-MRQ",
+        "sample_count": 6,
+        "peer_multiple_p25": 1.2363,
+        "peer_multiple_p50": 1.3368,
+        "fair_value_range": [
+          21.77,
+          23.54
+        ]
+      },
       "history_cost_anchor": {
         "history_points": 180,
         "p10": 18.37,
@@ -321,21 +308,48 @@
         "low": 17.25,
         "high": 24.36
       },
-      "formal_buy_zone": null,
-      "safe_buy_range": null,
-      "reasonable_buy_range": null,
-      "value_anchor_range": null,
-      "formal_buy_zone_status": "fundamental_anchor_unavailable",
-      "value_gap_state": "valuation_review_required",
-      "gap_to_reference_mid_pct": null,
+      "formal_buy_zone": {
+        "safe": [
+          15.11,
+          17.43
+        ],
+        "reasonable": [
+          17.43,
+          19.37
+        ]
+      },
+      "safe_buy_range": [
+        15.11,
+        17.43
+      ],
+      "reasonable_buy_range": [
+        17.43,
+        19.37
+      ],
+      "value_anchor_range": [
+        15.11,
+        19.37
+      ],
+      "formal_buy_zone_status": "ready",
+      "value_gap_state": "remaining_gap_above_buy_zone",
+      "gap_to_reference_mid_pct": 6.81,
       "structure_type": "base_not_started",
       "structure_action": "wait_breakout",
       "chase_risk": "low",
       "relative_strength_20d_vs_market_pct": -2.36,
       "price_discovery": false,
-      "expectation_gap_state": "valuation_review_required",
-      "production_valuation_ready": false,
-      "implied_zone_valuation": {},
+      "expectation_gap_state": "gap_above_zone_not_started",
+      "production_valuation_ready": true,
+      "implied_zone_valuation": {
+        "safe_implied_pb": [
+          0.86,
+          0.99
+        ],
+        "reasonable_implied_pb": [
+          0.99,
+          1.1
+        ]
+      },
       "method_note": "Expectation gap uses V2 formal anchors and buy zones only; V1 values are not consumed."
     },
     "000800": {
@@ -406,7 +420,7 @@
       },
       "formal_buy_zone": {
         "safe": [
-          22.83,
+          19.46,
           22.83
         ],
         "reasonable": [
@@ -415,7 +429,7 @@
         ]
       },
       "safe_buy_range": [
-        22.83,
+        19.46,
         22.83
       ],
       "reasonable_buy_range": [
@@ -423,7 +437,7 @@
         25.94
       ],
       "value_anchor_range": [
-        22.83,
+        19.46,
         25.94
       ],
       "formal_buy_zone_status": "ready",
@@ -438,7 +452,7 @@
       "production_valuation_ready": true,
       "implied_zone_valuation": {
         "safe_implied_pe": [
-          6.02,
+          5.13,
           6.02
         ],
         "reasonable_implied_pe": [
@@ -476,7 +490,7 @@
       },
       "formal_buy_zone": {
         "safe": [
-          22.51,
+          19.18,
           22.51
         ],
         "reasonable": [
@@ -485,7 +499,7 @@
         ]
       },
       "safe_buy_range": [
-        22.51,
+        19.18,
         22.51
       ],
       "reasonable_buy_range": [
@@ -493,7 +507,7 @@
         25.58
       ],
       "value_anchor_range": [
-        22.51,
+        19.18,
         25.58
       ],
       "formal_buy_zone_status": "ready",
@@ -508,7 +522,7 @@
       "production_valuation_ready": true,
       "implied_zone_valuation": {
         "safe_implied_pe": [
-          5.72,
+          4.88,
           5.72
         ],
         "reasonable_implied_pe": [
@@ -556,7 +570,7 @@
       },
       "formal_buy_zone": {
         "safe": [
-          18.41,
+          16.78,
           18.41
         ],
         "reasonable": [
@@ -565,7 +579,7 @@
         ]
       },
       "safe_buy_range": [
-        18.41,
+        16.78,
         18.41
       ],
       "reasonable_buy_range": [
@@ -573,7 +587,7 @@
         20.46
       ],
       "value_anchor_range": [
-        18.41,
+        16.78,
         20.46
       ],
       "formal_buy_zone_status": "ready",
@@ -588,7 +602,7 @@
       "production_valuation_ready": true,
       "implied_zone_valuation": {
         "safe_implied_pe": [
-          17.99,
+          16.4,
           17.99
         ],
         "reasonable_implied_pe": [
@@ -605,8 +619,8 @@
       "research_status": "watch",
       "forward_bridge_valid": true,
       "valuation_reference_status": "available",
-      "valuation_anchor_status": "valid",
-      "independent_v2_anchor_count": 2,
+      "valuation_anchor_status": "insufficient_confirming_anchors",
+      "independent_v2_anchor_count": 1,
       "fundamental_anchor_range": [
         3.27,
         4.57
@@ -624,48 +638,21 @@
         "low": 4.55,
         "high": 8.27
       },
-      "formal_buy_zone": {
-        "safe": [
-          2.78,
-          2.78
-        ],
-        "reasonable": [
-          2.78,
-          3.2
-        ]
-      },
-      "safe_buy_range": [
-        2.78,
-        2.78
-      ],
-      "reasonable_buy_range": [
-        2.78,
-        3.2
-      ],
-      "value_anchor_range": [
-        2.78,
-        3.27
-      ],
-      "formal_buy_zone_status": "ready",
-      "value_gap_state": "priced_in",
-      "gap_to_reference_mid_pct": -46.88,
+      "formal_buy_zone": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "value_anchor_range": null,
+      "formal_buy_zone_status": "insufficient_confirming_anchors",
+      "value_gap_state": "valuation_review_required",
+      "gap_to_reference_mid_pct": null,
       "structure_type": "breakout",
       "structure_action": "watch_breakout",
       "chase_risk": "medium",
       "relative_strength_20d_vs_market_pct": 18.74,
       "price_discovery": false,
-      "expectation_gap_state": "priced_in_or_overheated",
-      "production_valuation_ready": true,
-      "implied_zone_valuation": {
-        "safe_implied_pe": [
-          7.23,
-          7.23
-        ],
-        "reasonable_implied_pe": [
-          7.23,
-          8.33
-        ]
-      },
+      "expectation_gap_state": "valuation_review_required",
+      "production_valuation_ready": false,
+      "implied_zone_valuation": {},
       "method_note": "Expectation gap uses V2 formal anchors and buy zones only; V1 values are not consumed."
     },
     "000951": {
@@ -676,7 +663,7 @@
       "forward_bridge_valid": true,
       "valuation_reference_status": "available",
       "valuation_anchor_status": "valuation_divergence",
-      "independent_v2_anchor_count": 0,
+      "independent_v2_anchor_count": 1,
       "fundamental_anchor_range": [
         22.38,
         29.26
@@ -759,7 +746,7 @@
       },
       "formal_buy_zone": {
         "safe": [
-          49.36,
+          44.97,
           49.36
         ],
         "reasonable": [
@@ -768,7 +755,7 @@
         ]
       },
       "safe_buy_range": [
-        49.36,
+        44.97,
         49.36
       ],
       "reasonable_buy_range": [
@@ -776,7 +763,7 @@
         54.84
       ],
       "value_anchor_range": [
-        49.36,
+        44.97,
         54.84
       ],
       "formal_buy_zone_status": "ready",
@@ -791,7 +778,7 @@
       "production_valuation_ready": true,
       "implied_zone_valuation": {
         "safe_implied_pe": [
-          18.0,
+          16.4,
           18.0
         ],
         "reasonable_implied_pe": [
@@ -879,7 +866,7 @@
       },
       "formal_buy_zone": {
         "safe": [
-          62.77,
+          57.19,
           62.77
         ],
         "reasonable": [
@@ -888,7 +875,7 @@
         ]
       },
       "safe_buy_range": [
-        62.77,
+        57.19,
         62.77
       ],
       "reasonable_buy_range": [
@@ -896,7 +883,7 @@
         69.75
       ],
       "value_anchor_range": [
-        62.77,
+        57.19,
         69.75
       ],
       "formal_buy_zone_status": "ready",
@@ -911,7 +898,7 @@
       "production_valuation_ready": true,
       "implied_zone_valuation": {
         "safe_implied_pe": [
-          14.13,
+          12.88,
           14.13
         ],
         "reasonable_implied_pe": [
@@ -929,7 +916,7 @@
       "forward_bridge_valid": true,
       "valuation_reference_status": "available",
       "valuation_anchor_status": "valuation_divergence",
-      "independent_v2_anchor_count": 0,
+      "independent_v2_anchor_count": 1,
       "fundamental_anchor_range": [
         97.08,
         134.83
@@ -1002,7 +989,7 @@
       },
       "formal_buy_zone": {
         "safe": [
-          5.18,
+          4.38,
           5.18
         ],
         "reasonable": [
@@ -1011,7 +998,7 @@
         ]
       },
       "safe_buy_range": [
-        5.18,
+        4.38,
         5.18
       ],
       "reasonable_buy_range": [
@@ -1019,7 +1006,7 @@
         5.97
       ],
       "value_anchor_range": [
-        5.18,
+        4.38,
         6.09
       ],
       "formal_buy_zone_status": "ready",
@@ -1034,7 +1021,7 @@
       "production_valuation_ready": true,
       "implied_zone_valuation": {
         "safe_implied_pe": [
-          7.22,
+          6.11,
           7.22
         ],
         "reasonable_implied_pe": [
@@ -1072,7 +1059,7 @@
       },
       "formal_buy_zone": {
         "safe": [
-          18.13,
+          15.36,
           18.13
         ],
         "reasonable": [
@@ -1081,7 +1068,7 @@
         ]
       },
       "safe_buy_range": [
-        18.13,
+        15.36,
         18.13
       ],
       "reasonable_buy_range": [
@@ -1089,7 +1076,7 @@
         20.9
       ],
       "value_anchor_range": [
-        18.13,
+        15.36,
         21.33
       ],
       "formal_buy_zone_status": "ready",
@@ -1104,7 +1091,7 @@
       "production_valuation_ready": true,
       "implied_zone_valuation": {
         "safe_implied_pe": [
-          5.35,
+          4.54,
           5.35
         ],
         "reasonable_implied_pe": [
@@ -1122,7 +1109,7 @@
       "forward_bridge_valid": true,
       "valuation_reference_status": "available",
       "valuation_anchor_status": "valuation_divergence",
-      "independent_v2_anchor_count": 0,
+      "independent_v2_anchor_count": 1,
       "fundamental_anchor_range": [
         22.44,
         30.6
@@ -1175,7 +1162,7 @@
       "forward_bridge_valid": true,
       "valuation_reference_status": "available",
       "valuation_anchor_status": "valid",
-      "independent_v2_anchor_count": 3,
+      "independent_v2_anchor_count": 2,
       "fundamental_anchor_range": [
         44.28,
         60.38
@@ -1205,7 +1192,7 @@
       },
       "formal_buy_zone": {
         "safe": [
-          33.09,
+          30.15,
           33.09
         ],
         "reasonable": [
@@ -1214,7 +1201,7 @@
         ]
       },
       "safe_buy_range": [
-        33.09,
+        30.15,
         33.09
       ],
       "reasonable_buy_range": [
@@ -1222,7 +1209,7 @@
         36.77
       ],
       "value_anchor_range": [
-        33.09,
+        30.15,
         36.77
       ],
       "formal_buy_zone_status": "ready",
@@ -1237,7 +1224,7 @@
       "production_valuation_ready": true,
       "implied_zone_valuation": {
         "safe_implied_pe": [
-          16.44,
+          14.98,
           16.44
         ],
         "reasonable_implied_pe": [
@@ -1335,7 +1322,7 @@
       "forward_bridge_valid": true,
       "valuation_reference_status": "available",
       "valuation_anchor_status": "valuation_divergence",
-      "independent_v2_anchor_count": 0,
+      "independent_v2_anchor_count": 1,
       "fundamental_anchor_range": [
         16.16,
         22.44
@@ -1418,7 +1405,7 @@
       },
       "formal_buy_zone": {
         "safe": [
-          46.49,
+          42.36,
           46.49
         ],
         "reasonable": [
@@ -1427,7 +1414,7 @@
         ]
       },
       "safe_buy_range": [
-        46.49,
+        42.36,
         46.49
       ],
       "reasonable_buy_range": [
@@ -1435,7 +1422,7 @@
         51.66
       ],
       "value_anchor_range": [
-        46.49,
+        42.36,
         51.66
       ],
       "formal_buy_zone_status": "ready",
@@ -1450,7 +1437,7 @@
       "production_valuation_ready": true,
       "implied_zone_valuation": {
         "safe_implied_pe": [
-          14.98,
+          13.65,
           14.98
         ],
         "reasonable_implied_pe": [
@@ -1498,28 +1485,28 @@
       },
       "formal_buy_zone": {
         "safe": [
-          53.33,
-          53.33
+          57.63,
+          63.97
         ],
         "reasonable": [
-          55.89,
-          59.19
+          63.97,
+          69.15
         ]
       },
       "safe_buy_range": [
-        53.33,
-        53.33
+        57.63,
+        63.97
       ],
       "reasonable_buy_range": [
-        55.89,
-        59.19
+        63.97,
+        69.15
       ],
       "value_anchor_range": [
-        53.33,
-        59.19
+        57.63,
+        69.15
       ],
       "formal_buy_zone_status": "ready",
-      "value_gap_state": "reasonable_buy_zone",
+      "value_gap_state": "safe_buy_zone",
       "gap_to_reference_mid_pct": 12.0,
       "structure_type": "damaged",
       "structure_action": "avoid",
@@ -1530,12 +1517,12 @@
       "production_valuation_ready": true,
       "implied_zone_valuation": {
         "safe_implied_pe": [
-          18.51,
-          18.51
+          20.0,
+          22.2
         ],
         "reasonable_implied_pe": [
-          19.4,
-          20.54
+          22.2,
+          24.0
         ]
       },
       "method_note": "Expectation gap uses V2 formal anchors and buy zones only; V1 values are not consumed."
@@ -1568,7 +1555,7 @@
       },
       "formal_buy_zone": {
         "safe": [
-          11.48,
+          9.78,
           11.48
         ],
         "reasonable": [
@@ -1577,7 +1564,7 @@
         ]
       },
       "safe_buy_range": [
-        11.48,
+        9.78,
         11.48
       ],
       "reasonable_buy_range": [
@@ -1585,7 +1572,7 @@
         13.04
       ],
       "value_anchor_range": [
-        11.48,
+        9.78,
         13.04
       ],
       "formal_buy_zone_status": "ready",
@@ -1600,7 +1587,7 @@
       "production_valuation_ready": true,
       "implied_zone_valuation": {
         "safe_implied_pe": [
-          5.93,
+          5.05,
           5.93
         ],
         "reasonable_implied_pe": [
@@ -1658,7 +1645,7 @@
       "forward_bridge_valid": true,
       "valuation_reference_status": "available",
       "valuation_anchor_status": "valuation_divergence",
-      "independent_v2_anchor_count": 0,
+      "independent_v2_anchor_count": 1,
       "fundamental_anchor_range": [
         64.2,
         89.88
@@ -1711,7 +1698,7 @@
       "forward_bridge_valid": true,
       "valuation_reference_status": "available",
       "valuation_anchor_status": "valuation_divergence",
-      "independent_v2_anchor_count": 0,
+      "independent_v2_anchor_count": 1,
       "fundamental_anchor_range": [
         41.55,
         57.71
@@ -1794,7 +1781,7 @@
       },
       "formal_buy_zone": {
         "safe": [
-          124.32,
+          113.27,
           124.32
         ],
         "reasonable": [
@@ -1803,7 +1790,7 @@
         ]
       },
       "safe_buy_range": [
-        124.32,
+        113.27,
         124.32
       ],
       "reasonable_buy_range": [
@@ -1811,7 +1798,7 @@
         138.13
       ],
       "value_anchor_range": [
-        124.32,
+        113.27,
         138.13
       ],
       "formal_buy_zone_status": "ready",
@@ -1826,7 +1813,7 @@
       "production_valuation_ready": true,
       "implied_zone_valuation": {
         "safe_implied_pe": [
-          14.98,
+          13.65,
           14.98
         ],
         "reasonable_implied_pe": [
@@ -1884,7 +1871,7 @@
       "forward_bridge_valid": true,
       "valuation_reference_status": "available",
       "valuation_anchor_status": "valuation_divergence",
-      "independent_v2_anchor_count": 0,
+      "independent_v2_anchor_count": 1,
       "fundamental_anchor_range": [
         35.73,
         46.73
@@ -1967,7 +1954,7 @@
       },
       "formal_buy_zone": {
         "safe": [
-          32.16,
+          29.3,
           32.16
         ],
         "reasonable": [
@@ -1976,7 +1963,7 @@
         ]
       },
       "safe_buy_range": [
-        32.16,
+        29.3,
         32.16
       ],
       "reasonable_buy_range": [
@@ -1984,7 +1971,7 @@
         34.98
       ],
       "value_anchor_range": [
-        32.16,
+        29.3,
         35.73
       ],
       "formal_buy_zone_status": "ready",
@@ -1999,7 +1986,7 @@
       "production_valuation_ready": true,
       "implied_zone_valuation": {
         "safe_implied_pe": [
-          12.78,
+          11.64,
           12.78
         ],
         "reasonable_implied_pe": [
@@ -2047,7 +2034,7 @@
       },
       "formal_buy_zone": {
         "safe": [
-          41.57,
+          37.88,
           41.57
         ],
         "reasonable": [
@@ -2056,7 +2043,7 @@
         ]
       },
       "safe_buy_range": [
-        41.57,
+        37.88,
         41.57
       ],
       "reasonable_buy_range": [
@@ -2064,7 +2051,7 @@
         46.19
       ],
       "value_anchor_range": [
-        41.57,
+        37.88,
         46.19
       ],
       "formal_buy_zone_status": "ready",
@@ -2079,7 +2066,7 @@
       "production_valuation_ready": true,
       "implied_zone_valuation": {
         "safe_implied_pe": [
-          14.98,
+          13.65,
           14.98
         ],
         "reasonable_implied_pe": [
@@ -2117,7 +2104,7 @@
       },
       "formal_buy_zone": {
         "safe": [
-          9.21,
+          7.8,
           9.21
         ],
         "reasonable": [
@@ -2126,7 +2113,7 @@
         ]
       },
       "safe_buy_range": [
-        9.21,
+        7.8,
         9.21
       ],
       "reasonable_buy_range": [
@@ -2134,7 +2121,7 @@
         10.61
       ],
       "value_anchor_range": [
-        9.21,
+        7.8,
         10.83
       ],
       "formal_buy_zone_status": "ready",
@@ -2149,7 +2136,7 @@
       "production_valuation_ready": true,
       "implied_zone_valuation": {
         "safe_implied_pe": [
-          5.36,
+          4.54,
           5.36
         ],
         "reasonable_implied_pe": [
@@ -2206,8 +2193,8 @@
       "research_status": "watch",
       "forward_bridge_valid": true,
       "valuation_reference_status": "available",
-      "valuation_anchor_status": "valid",
-      "independent_v2_anchor_count": 2,
+      "valuation_anchor_status": "insufficient_confirming_anchors",
+      "independent_v2_anchor_count": 1,
       "fundamental_anchor_range": [
         16.54,
         22.05
@@ -2225,48 +2212,21 @@
         "low": 29.328,
         "high": 82.17
       },
-      "formal_buy_zone": {
-        "safe": [
-          14.06,
-          14.06
-        ],
-        "reasonable": [
-          14.06,
-          16.21
-        ]
-      },
-      "safe_buy_range": [
-        14.06,
-        14.06
-      ],
-      "reasonable_buy_range": [
-        14.06,
-        16.21
-      ],
-      "value_anchor_range": [
-        14.06,
-        16.54
-      ],
-      "formal_buy_zone_status": "ready",
-      "value_gap_state": "priced_in",
-      "gap_to_reference_mid_pct": -63.81,
+      "formal_buy_zone": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "value_anchor_range": null,
+      "formal_buy_zone_status": "insufficient_confirming_anchors",
+      "value_gap_state": "valuation_review_required",
+      "gap_to_reference_mid_pct": null,
       "structure_type": "transition",
       "structure_action": "observe",
       "chase_risk": "high",
       "relative_strength_20d_vs_market_pct": 28.69,
       "price_discovery": false,
-      "expectation_gap_state": "priced_in_or_overheated",
-      "production_valuation_ready": true,
-      "implied_zone_valuation": {
-        "safe_implied_pe": [
-          8.67,
-          8.67
-        ],
-        "reasonable_implied_pe": [
-          8.67,
-          10.0
-        ]
-      },
+      "expectation_gap_state": "valuation_review_required",
+      "production_valuation_ready": false,
+      "implied_zone_valuation": {},
       "method_note": "Expectation gap uses V2 formal anchors and buy zones only; V1 values are not consumed."
     },
     "600379": {
@@ -2317,7 +2277,7 @@
       "forward_bridge_valid": true,
       "valuation_reference_status": "available",
       "valuation_anchor_status": "valuation_divergence",
-      "independent_v2_anchor_count": 0,
+      "independent_v2_anchor_count": 1,
       "fundamental_anchor_range": [
         20.54,
         28.52
@@ -2390,7 +2350,7 @@
       },
       "formal_buy_zone": {
         "safe": [
-          9.96,
+          9.08,
           9.96
         ],
         "reasonable": [
@@ -2399,7 +2359,7 @@
         ]
       },
       "safe_buy_range": [
-        9.96,
+        9.08,
         9.96
       ],
       "reasonable_buy_range": [
@@ -2407,7 +2367,7 @@
         11.07
       ],
       "value_anchor_range": [
-        9.96,
+        9.08,
         11.07
       ],
       "formal_buy_zone_status": "ready",
@@ -2422,7 +2382,7 @@
       "production_valuation_ready": true,
       "implied_zone_valuation": {
         "safe_implied_pe": [
-          14.4,
+          13.13,
           14.4
         ],
         "reasonable_implied_pe": [
@@ -2470,7 +2430,7 @@
       },
       "formal_buy_zone": {
         "safe": [
-          16.84,
+          15.34,
           16.84
         ],
         "reasonable": [
@@ -2479,7 +2439,7 @@
         ]
       },
       "safe_buy_range": [
-        16.84,
+        15.34,
         16.84
       ],
       "reasonable_buy_range": [
@@ -2487,7 +2447,7 @@
         18.71
       ],
       "value_anchor_range": [
-        16.84,
+        15.34,
         18.71
       ],
       "formal_buy_zone_status": "ready",
@@ -2502,7 +2462,7 @@
       "production_valuation_ready": true,
       "implied_zone_valuation": {
         "safe_implied_pe": [
-          12.62,
+          11.5,
           12.62
         ],
         "reasonable_implied_pe": [
@@ -2550,24 +2510,24 @@
       },
       "formal_buy_zone": {
         "safe": [
-          36.92,
-          36.92
+          44.05,
+          48.35
         ],
         "reasonable": [
-          47.22,
+          48.35,
           53.72
         ]
       },
       "safe_buy_range": [
-        36.92,
-        36.92
+        44.05,
+        48.35
       ],
       "reasonable_buy_range": [
-        47.22,
+        48.35,
         53.72
       ],
       "value_anchor_range": [
-        36.92,
+        44.05,
         53.72
       ],
       "formal_buy_zone_status": "ready",
@@ -2582,11 +2542,11 @@
       "production_valuation_ready": true,
       "implied_zone_valuation": {
         "safe_implied_pe": [
-          12.39,
-          12.39
+          14.79,
+          16.23
         ],
         "reasonable_implied_pe": [
-          15.85,
+          16.23,
           18.03
         ]
       },
@@ -2740,7 +2700,7 @@
       },
       "formal_buy_zone": {
         "safe": [
-          5.51,
+          4.7,
           5.51
         ],
         "reasonable": [
@@ -2749,7 +2709,7 @@
         ]
       },
       "safe_buy_range": [
-        5.51,
+        4.7,
         5.51
       ],
       "reasonable_buy_range": [
@@ -2757,7 +2717,7 @@
         6.26
       ],
       "value_anchor_range": [
-        5.51,
+        4.7,
         6.26
       ],
       "formal_buy_zone_status": "ready",
@@ -2772,7 +2732,7 @@
       "production_valuation_ready": true,
       "implied_zone_valuation": {
         "safe_implied_pe": [
-          5.81,
+          4.96,
           5.81
         ],
         "reasonable_implied_pe": [
@@ -2789,8 +2749,8 @@
       "research_status": "watch",
       "forward_bridge_valid": true,
       "valuation_reference_status": "available",
-      "valuation_anchor_status": "valid",
-      "independent_v2_anchor_count": 2,
+      "valuation_anchor_status": "fundamental_history_divergence",
+      "independent_v2_anchor_count": 1,
       "fundamental_anchor_range": [
         5.98,
         7.97
@@ -2808,48 +2768,21 @@
         "low": 19.73,
         "high": 42.83
       },
-      "formal_buy_zone": {
-        "safe": [
-          5.08,
-          5.08
-        ],
-        "reasonable": [
-          5.08,
-          5.86
-        ]
-      },
-      "safe_buy_range": [
-        5.08,
-        5.08
-      ],
-      "reasonable_buy_range": [
-        5.08,
-        5.86
-      ],
-      "value_anchor_range": [
-        5.08,
-        5.98
-      ],
-      "formal_buy_zone_status": "ready",
-      "value_gap_state": "priced_in",
-      "gap_to_reference_mid_pct": -78.12,
+      "formal_buy_zone": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "value_anchor_range": null,
+      "formal_buy_zone_status": "fundamental_history_divergence",
+      "value_gap_state": "valuation_review_required",
+      "gap_to_reference_mid_pct": null,
       "structure_type": "transition",
       "structure_action": "observe",
       "chase_risk": "low",
       "relative_strength_20d_vs_market_pct": 7.32,
       "price_discovery": false,
-      "expectation_gap_state": "priced_in_or_overheated",
-      "production_valuation_ready": true,
-      "implied_zone_valuation": {
-        "safe_implied_pe": [
-          8.67,
-          8.67
-        ],
-        "reasonable_implied_pe": [
-          8.67,
-          10.0
-        ]
-      },
+      "expectation_gap_state": "valuation_review_required",
+      "production_valuation_ready": false,
+      "implied_zone_valuation": {},
       "method_note": "Expectation gap uses V2 formal anchors and buy zones only; V1 values are not consumed."
     },
     "600685": {
@@ -2930,44 +2863,44 @@
       },
       "formal_buy_zone": {
         "safe": [
-          10.42,
-          10.42
+          11.22,
+          12.46
         ],
         "reasonable": [
-          10.56,
-          11.22
+          12.46,
+          13.47
         ]
       },
       "safe_buy_range": [
-        10.42,
-        10.42
+        11.22,
+        12.46
       ],
       "reasonable_buy_range": [
-        10.56,
-        11.22
+        12.46,
+        13.47
       ],
       "value_anchor_range": [
-        10.42,
-        11.22
+        11.22,
+        13.47
       ],
       "formal_buy_zone_status": "ready",
-      "value_gap_state": "reasonable_buy_zone",
+      "value_gap_state": "safe_buy_zone",
       "gap_to_reference_mid_pct": 25.61,
       "structure_type": "base_not_started",
       "structure_action": "wait_breakout",
       "chase_risk": "low",
       "relative_strength_20d_vs_market_pct": -9.2,
       "price_discovery": false,
-      "expectation_gap_state": "reasonable_zone_not_started",
+      "expectation_gap_state": "safe_zone_not_started",
       "production_valuation_ready": true,
       "implied_zone_valuation": {
         "safe_implied_pe": [
-          9.29,
-          9.29
+          10.0,
+          11.1
         ],
         "reasonable_implied_pe": [
-          9.41,
-          10.0
+          11.1,
+          12.0
         ]
       },
       "method_note": "Expectation gap uses V2 formal anchors and buy zones only; V1 values are not consumed."
@@ -3018,11 +2951,24 @@
       "current_price": 8.33,
       "research_status": "pass",
       "forward_bridge_valid": true,
-      "valuation_reference_status": "review_required",
-      "valuation_anchor_status": "fundamental_anchor_unavailable",
-      "independent_v2_anchor_count": 0,
-      "fundamental_anchor_range": null,
-      "peer_anchor": null,
+      "valuation_reference_status": "available",
+      "valuation_anchor_status": "valid",
+      "independent_v2_anchor_count": 3,
+      "fundamental_anchor_range": [
+        5.98,
+        8.16
+      ],
+      "peer_anchor": {
+        "source": "eastmoney_peer_valuation",
+        "valuation_column": "市净率-MRQ",
+        "sample_count": 6,
+        "peer_multiple_p25": 1.2363,
+        "peer_multiple_p50": 1.3368,
+        "fair_value_range": [
+          6.72,
+          7.27
+        ]
+      },
       "history_cost_anchor": {
         "history_points": 180,
         "p10": 5.55,
@@ -3035,21 +2981,48 @@
         "low": 5.32,
         "high": 12.1
       },
-      "formal_buy_zone": null,
-      "safe_buy_range": null,
-      "reasonable_buy_range": null,
-      "value_anchor_range": null,
-      "formal_buy_zone_status": "fundamental_anchor_unavailable",
-      "value_gap_state": "valuation_review_required",
-      "gap_to_reference_mid_pct": null,
+      "formal_buy_zone": {
+        "safe": [
+          4.66,
+          5.38
+        ],
+        "reasonable": [
+          5.38,
+          5.98
+        ]
+      },
+      "safe_buy_range": [
+        4.66,
+        5.38
+      ],
+      "reasonable_buy_range": [
+        5.38,
+        5.98
+      ],
+      "value_anchor_range": [
+        4.66,
+        5.98
+      ],
+      "formal_buy_zone_status": "ready",
+      "value_gap_state": "priced_in",
+      "gap_to_reference_mid_pct": -15.13,
       "structure_type": "transition",
       "structure_action": "observe",
       "chase_risk": "low",
       "relative_strength_20d_vs_market_pct": 3.94,
       "price_discovery": false,
-      "expectation_gap_state": "valuation_review_required",
-      "production_valuation_ready": false,
-      "implied_zone_valuation": {},
+      "expectation_gap_state": "priced_in_or_overheated",
+      "production_valuation_ready": true,
+      "implied_zone_valuation": {
+        "safe_implied_pb": [
+          0.86,
+          0.99
+        ],
+        "reasonable_implied_pb": [
+          0.99,
+          1.1
+        ]
+      },
       "method_note": "Expectation gap uses V2 formal anchors and buy zones only; V1 values are not consumed."
     },
     "600918": {
@@ -3058,11 +3031,24 @@
       "current_price": 5.74,
       "research_status": "pass",
       "forward_bridge_valid": true,
-      "valuation_reference_status": "review_required",
-      "valuation_anchor_status": "fundamental_anchor_unavailable",
-      "independent_v2_anchor_count": 0,
-      "fundamental_anchor_range": null,
-      "peer_anchor": null,
+      "valuation_reference_status": "available",
+      "valuation_anchor_status": "valuation_divergence",
+      "independent_v2_anchor_count": 1,
+      "fundamental_anchor_range": [
+        4.26,
+        5.4
+      ],
+      "peer_anchor": {
+        "source": "eastmoney_peer_valuation",
+        "valuation_column": "市净率-MRQ",
+        "sample_count": 6,
+        "peer_multiple_p25": 1.2363,
+        "peer_multiple_p50": 1.3368,
+        "fair_value_range": [
+          7.03,
+          7.6
+        ]
+      },
       "history_cost_anchor": {
         "history_points": 180,
         "p10": 5.358,
@@ -3079,7 +3065,7 @@
       "safe_buy_range": null,
       "reasonable_buy_range": null,
       "value_anchor_range": null,
-      "formal_buy_zone_status": "fundamental_anchor_unavailable",
+      "formal_buy_zone_status": "valuation_divergence",
       "value_gap_state": "valuation_review_required",
       "gap_to_reference_mid_pct": null,
       "structure_type": "base_not_started",
@@ -3099,8 +3085,8 @@
       "research_status": "watch",
       "forward_bridge_valid": true,
       "valuation_reference_status": "available",
-      "valuation_anchor_status": "valid",
-      "independent_v2_anchor_count": 2,
+      "valuation_anchor_status": "insufficient_confirming_anchors",
+      "independent_v2_anchor_count": 1,
       "fundamental_anchor_range": [
         2.71,
         3.87
@@ -3118,48 +3104,21 @@
         "low": 5.99,
         "high": 9.02
       },
-      "formal_buy_zone": {
-        "safe": [
-          2.3,
-          2.3
-        ],
-        "reasonable": [
-          2.3,
-          2.66
-        ]
-      },
-      "safe_buy_range": [
-        2.3,
-        2.3
-      ],
-      "reasonable_buy_range": [
-        2.3,
-        2.66
-      ],
-      "value_anchor_range": [
-        2.3,
-        2.71
-      ],
-      "formal_buy_zone_status": "ready",
-      "value_gap_state": "priced_in",
-      "gap_to_reference_mid_pct": -63.53,
+      "formal_buy_zone": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "value_anchor_range": null,
+      "formal_buy_zone_status": "insufficient_confirming_anchors",
+      "value_gap_state": "valuation_review_required",
+      "gap_to_reference_mid_pct": null,
       "structure_type": "breakout",
       "structure_action": "participate",
       "chase_risk": "low",
       "relative_strength_20d_vs_market_pct": 9.09,
       "price_discovery": true,
-      "expectation_gap_state": "priced_in_or_overheated",
-      "production_valuation_ready": true,
-      "implied_zone_valuation": {
-        "safe_implied_pe": [
-          5.35,
-          5.35
-        ],
-        "reasonable_implied_pe": [
-          5.35,
-          6.19
-        ]
-      },
+      "expectation_gap_state": "valuation_review_required",
+      "production_valuation_ready": false,
+      "implied_zone_valuation": {},
       "method_note": "Expectation gap uses V2 formal anchors and buy zones only; V1 values are not consumed."
     },
     "600999": {
@@ -3168,11 +3127,24 @@
       "current_price": 18.71,
       "research_status": "pass",
       "forward_bridge_valid": true,
-      "valuation_reference_status": "review_required",
-      "valuation_anchor_status": "fundamental_anchor_unavailable",
-      "independent_v2_anchor_count": 0,
-      "fundamental_anchor_range": null,
-      "peer_anchor": null,
+      "valuation_reference_status": "available",
+      "valuation_anchor_status": "valid",
+      "independent_v2_anchor_count": 3,
+      "fundamental_anchor_range": [
+        15.91,
+        21.7
+      ],
+      "peer_anchor": {
+        "source": "eastmoney_peer_valuation",
+        "valuation_column": "市净率-MRQ",
+        "sample_count": 6,
+        "peer_multiple_p25": 1.2363,
+        "peer_multiple_p50": 1.3368,
+        "fair_value_range": [
+          17.88,
+          19.34
+        ]
+      },
       "history_cost_anchor": {
         "history_points": 180,
         "p10": 15.219,
@@ -3185,21 +3157,48 @@
         "low": 14.601,
         "high": 22.491
       },
-      "formal_buy_zone": null,
-      "safe_buy_range": null,
-      "reasonable_buy_range": null,
-      "value_anchor_range": null,
-      "formal_buy_zone_status": "fundamental_anchor_unavailable",
-      "value_gap_state": "valuation_review_required",
-      "gap_to_reference_mid_pct": null,
+      "formal_buy_zone": {
+        "safe": [
+          12.41,
+          14.32
+        ],
+        "reasonable": [
+          14.32,
+          15.91
+        ]
+      },
+      "safe_buy_range": [
+        12.41,
+        14.32
+      ],
+      "reasonable_buy_range": [
+        14.32,
+        15.91
+      ],
+      "value_anchor_range": [
+        12.41,
+        15.91
+      ],
+      "formal_buy_zone_status": "ready",
+      "value_gap_state": "priced_in",
+      "gap_to_reference_mid_pct": 0.51,
       "structure_type": "transition",
       "structure_action": "observe",
       "chase_risk": "low",
       "relative_strength_20d_vs_market_pct": 1.28,
       "price_discovery": false,
-      "expectation_gap_state": "valuation_review_required",
-      "production_valuation_ready": false,
-      "implied_zone_valuation": {},
+      "expectation_gap_state": "priced_in_or_overheated",
+      "production_valuation_ready": true,
+      "implied_zone_valuation": {
+        "safe_implied_pb": [
+          0.86,
+          0.99
+        ],
+        "reasonable_implied_pb": [
+          0.99,
+          1.1
+        ]
+      },
       "method_note": "Expectation gap uses V2 formal anchors and buy zones only; V1 values are not consumed."
     },
     "601101": {
@@ -3230,7 +3229,7 @@
       },
       "formal_buy_zone": {
         "safe": [
-          5.18,
+          4.38,
           5.18
         ],
         "reasonable": [
@@ -3239,7 +3238,7 @@
         ]
       },
       "safe_buy_range": [
-        5.18,
+        4.38,
         5.18
       ],
       "reasonable_buy_range": [
@@ -3247,7 +3246,7 @@
         5.97
       ],
       "value_anchor_range": [
-        5.18,
+        4.38,
         6.09
       ],
       "formal_buy_zone_status": "ready",
@@ -3262,7 +3261,7 @@
       "production_valuation_ready": true,
       "implied_zone_valuation": {
         "safe_implied_pe": [
-          5.36,
+          4.53,
           5.36
         ],
         "reasonable_implied_pe": [
@@ -3310,7 +3309,7 @@
       },
       "formal_buy_zone": {
         "safe": [
-          45.27,
+          41.25,
           45.27
         ],
         "reasonable": [
@@ -3319,7 +3318,7 @@
         ]
       },
       "safe_buy_range": [
-        45.27,
+        41.25,
         45.27
       ],
       "reasonable_buy_range": [
@@ -3327,7 +3326,7 @@
         50.3
       ],
       "value_anchor_range": [
-        45.27,
+        41.25,
         50.3
       ],
       "formal_buy_zone_status": "ready",
@@ -3342,7 +3341,7 @@
       "production_valuation_ready": true,
       "implied_zone_valuation": {
         "safe_implied_pe": [
-          14.63,
+          13.33,
           14.63
         ],
         "reasonable_implied_pe": [
@@ -3380,7 +3379,7 @@
       },
       "formal_buy_zone": {
         "safe": [
-          23.63,
+          20.14,
           23.63
         ],
         "reasonable": [
@@ -3389,7 +3388,7 @@
         ]
       },
       "safe_buy_range": [
-        23.63,
+        20.14,
         23.63
       ],
       "reasonable_buy_range": [
@@ -3397,7 +3396,7 @@
         26.85
       ],
       "value_anchor_range": [
-        23.63,
+        20.14,
         26.85
       ],
       "formal_buy_zone_status": "ready",
@@ -3412,7 +3411,7 @@
       "production_valuation_ready": true,
       "implied_zone_valuation": {
         "safe_implied_pe": [
-          8.19,
+          6.98,
           8.19
         ],
         "reasonable_implied_pe": [
@@ -3630,7 +3629,7 @@
       "forward_bridge_valid": true,
       "valuation_reference_status": "available",
       "valuation_anchor_status": "valuation_divergence",
-      "independent_v2_anchor_count": 0,
+      "independent_v2_anchor_count": 1,
       "fundamental_anchor_range": [
         194.91,
         265.78
@@ -3683,7 +3682,7 @@
       "forward_bridge_valid": true,
       "valuation_reference_status": "available",
       "valuation_anchor_status": "valid",
-      "independent_v2_anchor_count": 3,
+      "independent_v2_anchor_count": 2,
       "fundamental_anchor_range": [
         40.68,
         56.95
@@ -3713,7 +3712,7 @@
       },
       "formal_buy_zone": {
         "safe": [
-          36.61,
+          33.36,
           36.61
         ],
         "reasonable": [
@@ -3722,7 +3721,7 @@
         ]
       },
       "safe_buy_range": [
-        36.61,
+        33.36,
         36.61
       ],
       "reasonable_buy_range": [
@@ -3730,7 +3729,7 @@
         40.68
       ],
       "value_anchor_range": [
-        36.61,
+        33.36,
         40.68
       ],
       "formal_buy_zone_status": "ready",
@@ -3745,7 +3744,7 @@
       "production_valuation_ready": true,
       "implied_zone_valuation": {
         "safe_implied_pe": [
-          18.0,
+          16.4,
           18.0
         ],
         "reasonable_implied_pe": [
@@ -3803,7 +3802,7 @@
       "forward_bridge_valid": true,
       "valuation_reference_status": "available",
       "valuation_anchor_status": "valid",
-      "independent_v2_anchor_count": 3,
+      "independent_v2_anchor_count": 2,
       "fundamental_anchor_range": [
         5.88,
         7.84
@@ -3833,7 +3832,7 @@
       },
       "formal_buy_zone": {
         "safe": [
-          5.29,
+          4.82,
           5.29
         ],
         "reasonable": [
@@ -3842,7 +3841,7 @@
         ]
       },
       "safe_buy_range": [
-        5.29,
+        4.82,
         5.29
       ],
       "reasonable_buy_range": [
@@ -3850,7 +3849,7 @@
         5.88
       ],
       "value_anchor_range": [
-        5.29,
+        4.82,
         5.88
       ],
       "formal_buy_zone_status": "ready",
@@ -3865,7 +3864,7 @@
       "production_valuation_ready": true,
       "implied_zone_valuation": {
         "safe_implied_pe": [
-          16.19,
+          14.75,
           16.19
         ],
         "reasonable_implied_pe": [
@@ -3883,7 +3882,7 @@
       "forward_bridge_valid": true,
       "valuation_reference_status": "available",
       "valuation_anchor_status": "valid",
-      "independent_v2_anchor_count": 3,
+      "independent_v2_anchor_count": 2,
       "fundamental_anchor_range": [
         13.65,
         19.1
@@ -3913,7 +3912,7 @@
       },
       "formal_buy_zone": {
         "safe": [
-          12.29,
+          11.19,
           12.29
         ],
         "reasonable": [
@@ -3922,7 +3921,7 @@
         ]
       },
       "safe_buy_range": [
-        12.29,
+        11.19,
         12.29
       ],
       "reasonable_buy_range": [
@@ -3930,7 +3929,7 @@
         13.65
       ],
       "value_anchor_range": [
-        12.29,
+        11.19,
         13.65
       ],
       "formal_buy_zone_status": "ready",
@@ -3945,7 +3944,7 @@
       "production_valuation_ready": true,
       "implied_zone_valuation": {
         "safe_implied_pe": [
-          18.01,
+          16.4,
           18.01
         ],
         "reasonable_implied_pe": [
@@ -3963,7 +3962,7 @@
       "forward_bridge_valid": true,
       "valuation_reference_status": "available",
       "valuation_anchor_status": "valid",
-      "independent_v2_anchor_count": 3,
+      "independent_v2_anchor_count": 2,
       "fundamental_anchor_range": [
         146.94,
         205.72
@@ -3993,24 +3992,24 @@
       },
       "formal_buy_zone": {
         "safe": [
-          94.1,
-          94.1
+          120.49,
+          132.25
         ],
         "reasonable": [
-          96.58,
-          102.3
+          132.25,
+          146.94
         ]
       },
       "safe_buy_range": [
-        94.1,
-        94.1
+        120.49,
+        132.25
       ],
       "reasonable_buy_range": [
-        96.58,
-        102.3
+        132.25,
+        146.94
       ],
       "value_anchor_range": [
-        94.1,
+        120.49,
         146.94
       ],
       "formal_buy_zone_status": "ready",
@@ -4025,12 +4024,12 @@
       "production_valuation_ready": true,
       "implied_zone_valuation": {
         "safe_implied_pe": [
-          12.81,
-          12.81
+          16.4,
+          18.0
         ],
         "reasonable_implied_pe": [
-          13.15,
-          13.92
+          18.0,
+          20.0
         ]
       },
       "method_note": "Expectation gap uses V2 formal anchors and buy zones only; V1 values are not consumed."
@@ -4073,8 +4072,8 @@
       },
       "formal_buy_zone": {
         "safe": [
-          89.57,
-          89.57
+          89.76,
+          98.51
         ],
         "reasonable": [
           98.51,
@@ -4082,15 +4081,15 @@
         ]
       },
       "safe_buy_range": [
-        89.57,
-        89.57
+        89.76,
+        98.51
       ],
       "reasonable_buy_range": [
         98.51,
         109.46
       ],
       "value_anchor_range": [
-        89.57,
+        89.76,
         109.46
       ],
       "formal_buy_zone_status": "ready",
@@ -4105,8 +4104,8 @@
       "production_valuation_ready": true,
       "implied_zone_valuation": {
         "safe_implied_pe": [
-          11.62,
-          11.62
+          11.64,
+          12.78
         ],
         "reasonable_implied_pe": [
           12.78,
@@ -4123,7 +4122,7 @@
       "forward_bridge_valid": true,
       "valuation_reference_status": "available",
       "valuation_anchor_status": "valuation_divergence",
-      "independent_v2_anchor_count": 0,
+      "independent_v2_anchor_count": 1,
       "fundamental_anchor_range": [
         25.13,
         34.9
@@ -4216,7 +4215,7 @@
       "forward_bridge_valid": true,
       "valuation_reference_status": "available",
       "valuation_anchor_status": "valuation_divergence",
-      "independent_v2_anchor_count": 0,
+      "independent_v2_anchor_count": 1,
       "fundamental_anchor_range": [
         27.35,
         37.98
@@ -4269,7 +4268,7 @@
       "forward_bridge_valid": true,
       "valuation_reference_status": "available",
       "valuation_anchor_status": "valuation_divergence",
-      "independent_v2_anchor_count": 0,
+      "independent_v2_anchor_count": 1,
       "fundamental_anchor_range": [
         337.54,
         432.05
@@ -4342,7 +4341,7 @@
       },
       "formal_buy_zone": {
         "safe": [
-          12.64,
+          10.77,
           12.64
         ],
         "reasonable": [
@@ -4351,7 +4350,7 @@
         ]
       },
       "safe_buy_range": [
-        12.64,
+        10.77,
         12.64
       ],
       "reasonable_buy_range": [
@@ -4359,7 +4358,7 @@
         14.36
       ],
       "value_anchor_range": [
-        12.64,
+        10.77,
         14.36
       ],
       "formal_buy_zone_status": "ready",
@@ -4374,7 +4373,7 @@
       "production_valuation_ready": true,
       "implied_zone_valuation": {
         "safe_implied_pe": [
-          8.11,
+          6.91,
           8.11
         ],
         "reasonable_implied_pe": [
@@ -4412,7 +4411,7 @@
       },
       "formal_buy_zone": {
         "safe": [
-          16.24,
+          13.76,
           16.24
         ],
         "reasonable": [
@@ -4421,7 +4420,7 @@
         ]
       },
       "safe_buy_range": [
-        16.24,
+        13.76,
         16.24
       ],
       "reasonable_buy_range": [
@@ -4429,7 +4428,7 @@
         18.73
       ],
       "value_anchor_range": [
-        16.24,
+        13.76,
         19.11
       ],
       "formal_buy_zone_status": "ready",
@@ -4444,7 +4443,7 @@
       "production_valuation_ready": true,
       "implied_zone_valuation": {
         "safe_implied_pe": [
-          8.67,
+          7.34,
           8.67
         ],
         "reasonable_implied_pe": [

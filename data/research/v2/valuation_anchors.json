@@ -1,25 +1,34 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "mode": "shadow",
-  "generated_at": "2026-08-30T22:13:45.391992+08:00",
+  "generated_at": "2026-08-30T22:26:25.860932+08:00",
   "reference_trade_date": "2026-08-28",
   "valuation_queue_count": 75,
   "counts": {
-    "formal_zone_ready": 36,
-    "valuation_divergence": 13,
-    "fundamental_unavailable": 26,
-    "peer_available": 32,
-    "history_available": 75
+    "formal_zone_ready": 34,
+    "valuation_divergence": 14,
+    "fundamental_history_divergence": 2,
+    "insufficient_confirming_anchors": 3,
+    "fundamental_unavailable": 22,
+    "peer_available": 36,
+    "peer_confirmed": 22,
+    "history_available": 75,
+    "history_confirmed": 29
   },
   "peer_errors": {
     "600458": "peer_sample_insufficient:2"
+  },
+  "thresholds": {
+    "peer_divergence_block_pct": 45.0,
+    "history_confirmation_max_divergence_pct": 50.0,
+    "history_severe_divergence_pct": 150.0,
+    "minimum_zone_width_pct": 1.0
   },
   "companies": {
     "000066": {
       "code": "000066",
       "name": "中国长城",
       "current_price": 14.26,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "000066",
         "name": "中国长城",
@@ -71,38 +80,20 @@
         "low": 13.15,
         "high": 25.36
       },
-      "formal_buy_zone_ready": true,
-      "independent_anchor_count": 3,
-      "conservative_fair_floor": 0.91,
-      "safe_buy_range": [
-        0.82,
-        0.82
-      ],
-      "reasonable_buy_range": [
-        0.82,
-        0.91
-      ],
-      "value_anchor_range": [
-        0.82,
-        0.91
-      ],
-      "divergence_pct": 22.37,
-      "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
-      "safe_implied_pe": [
-        17.94,
-        17.94
-      ],
-      "reasonable_implied_pe": [
-        17.94,
-        19.91
-      ]
+      "status": "fundamental_history_divergence",
+      "peer_divergence_pct": 22.37,
+      "history_fair_divergence_pct": 1348.86,
+      "peer_confirmed": true,
+      "history_confirmed": false,
+      "independent_anchor_count": 2,
+      "formal_buy_zone_ready": false,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null
     },
     "000338": {
       "code": "000338",
       "name": "潍柴动力",
       "current_price": 27.64,
-      "status": "valuation_divergence",
       "fundamental_anchor": {
         "code": "000338",
         "name": "潍柴动力",
@@ -160,8 +151,14 @@
         "low": 16.706,
         "high": 34.966
       },
-      "divergence_pct": 51.72,
-      "formal_buy_zone_ready": false
+      "status": "valuation_divergence",
+      "peer_divergence_pct": 51.72,
+      "peer_confirmed": false,
+      "history_confirmed": false,
+      "independent_anchor_count": 1,
+      "formal_buy_zone_ready": false,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null
     },
     "000612": {
       "code": "000612",
@@ -191,6 +188,7 @@
         "high": 14.815
       },
       "formal_buy_zone_ready": false,
+      "independent_anchor_count": 0,
       "safe_buy_range": null,
       "reasonable_buy_range": null
     },
@@ -198,7 +196,6 @@
       "code": "000630",
       "name": "铜陵有色",
       "current_price": 6.76,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "000630",
         "name": "铜陵有色",
@@ -273,11 +270,12 @@
         "low": 5.19,
         "high": 9.14
       },
+      "status": "valid",
       "formal_buy_zone_ready": true,
       "independent_anchor_count": 2,
       "conservative_fair_floor": 5.36,
       "safe_buy_range": [
-        4.72,
+        4.02,
         4.72
       ],
       "reasonable_buy_range": [
@@ -285,14 +283,17 @@
         5.36
       ],
       "value_anchor_range": [
-        4.72,
+        4.02,
         5.36
       ],
-      "divergence_pct": null,
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 0.56,
+      "peer_confirmed": false,
+      "history_confirmed": true,
       "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied",
       "safe_implied_pe": [
-        10.34,
+        8.8,
         10.34
       ],
       "reasonable_implied_pe": [
@@ -328,6 +329,7 @@
         "high": 20.43
       },
       "formal_buy_zone_ready": false,
+      "independent_anchor_count": 0,
       "safe_buy_range": null,
       "reasonable_buy_range": null
     },
@@ -335,15 +337,55 @@
       "code": "000776",
       "name": "广发证券",
       "current_price": 21.43,
-      "status": "fundamental_anchor_unavailable",
       "fundamental_anchor": {
         "code": "000776",
         "name": "广发证券",
-        "status": "review_required",
-        "reason": "market_pb_required",
-        "independent_anchor_count": 0
+        "status": "available",
+        "reference_source": "v2_forward_pb_roe_fundamental_anchor_peer_table_self_pb_fallback",
+        "route": "financial",
+        "financial_kind": "broker",
+        "reference_range": [
+          19.37,
+          26.41
+        ],
+        "valuation_model": "broker_forward_pb_roe",
+        "valuation_basis_unit": "PB",
+        "consensus_eps_current_year": 2.159,
+        "consensus_eps_next_year": 2.3985,
+        "forecast_report_count": 21,
+        "book_value_per_share_proxy": 17.6064,
+        "market_pb": 1.2172,
+        "market_indicator_source": "eastmoney_peer_comparison_target_row:市净率-MRQ",
+        "forward_roe_current_year": 0.1226,
+        "forward_roe_next_year": 0.1362,
+        "low_risk_forward_roe": 0.1226,
+        "reasonable_multiple_reference": [
+          1.1,
+          1.5
+        ],
+        "buy_band_policy": {
+          "safe_to_fair_floor": [
+            0.78,
+            0.9
+          ],
+          "reasonable_to_fair_floor": [
+            0.9,
+            1.0
+          ]
+        },
+        "independent_anchor_count": 1
       },
-      "peer_anchor": null,
+      "peer_anchor": {
+        "source": "eastmoney_peer_valuation",
+        "valuation_column": "市净率-MRQ",
+        "sample_count": 6,
+        "peer_multiple_p25": 1.2363,
+        "peer_multiple_p50": 1.3368,
+        "fair_value_range": [
+          21.77,
+          23.54
+        ]
+      },
       "history_cost_anchor": {
         "history_points": 180,
         "p10": 18.37,
@@ -356,9 +398,36 @@
         "low": 17.25,
         "high": 24.36
       },
-      "formal_buy_zone_ready": false,
-      "safe_buy_range": null,
-      "reasonable_buy_range": null
+      "status": "valid",
+      "formal_buy_zone_ready": true,
+      "independent_anchor_count": 3,
+      "conservative_fair_floor": 19.37,
+      "safe_buy_range": [
+        15.11,
+        17.43
+      ],
+      "reasonable_buy_range": [
+        17.43,
+        19.37
+      ],
+      "value_anchor_range": [
+        15.11,
+        19.37
+      ],
+      "peer_divergence_pct": 1.04,
+      "history_fair_divergence_pct": 10.69,
+      "peer_confirmed": true,
+      "history_confirmed": true,
+      "entry_method": "fair_floor_margin_of_safety",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied",
+      "safe_implied_pb": [
+        0.86,
+        0.99
+      ],
+      "reasonable_implied_pb": [
+        0.99,
+        1.1
+      ]
     },
     "000800": {
       "code": "000800",
@@ -386,6 +455,7 @@
         "high": 7.135
       },
       "formal_buy_zone_ready": false,
+      "independent_anchor_count": 0,
       "safe_buy_range": null,
       "reasonable_buy_range": null
     },
@@ -393,7 +463,6 @@
       "code": "000807",
       "name": "云铝股份",
       "current_price": 27.23,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "000807",
         "name": "云铝股份",
@@ -480,11 +549,12 @@
         "low": 21.77,
         "high": 36.621
       },
+      "status": "valid",
       "formal_buy_zone_ready": true,
       "independent_anchor_count": 2,
       "conservative_fair_floor": 25.94,
       "safe_buy_range": [
-        22.83,
+        19.46,
         22.83
       ],
       "reasonable_buy_range": [
@@ -492,14 +562,17 @@
         25.94
       ],
       "value_anchor_range": [
-        22.83,
+        19.46,
         25.94
       ],
-      "divergence_pct": null,
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 5.1,
+      "peer_confirmed": false,
+      "history_confirmed": true,
       "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied",
       "safe_implied_pe": [
-        6.02,
+        5.13,
         6.02
       ],
       "reasonable_implied_pe": [
@@ -511,7 +584,6 @@
       "code": "000933",
       "name": "神火股份",
       "current_price": 27.59,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "000933",
         "name": "神火股份",
@@ -598,11 +670,12 @@
         "low": 21.11,
         "high": 37.246
       },
+      "status": "valid",
       "formal_buy_zone_ready": true,
       "independent_anchor_count": 2,
       "conservative_fair_floor": 25.58,
       "safe_buy_range": [
-        22.51,
+        19.18,
         22.51
       ],
       "reasonable_buy_range": [
@@ -610,14 +683,17 @@
         25.58
       ],
       "value_anchor_range": [
-        22.51,
+        19.18,
         25.58
       ],
-      "divergence_pct": null,
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 4.9,
+      "peer_confirmed": false,
+      "history_confirmed": true,
       "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied",
       "safe_implied_pe": [
-        5.72,
+        4.88,
         5.72
       ],
       "reasonable_implied_pe": [
@@ -629,7 +705,6 @@
       "code": "000938",
       "name": "紫光股份",
       "current_price": 35.89,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "000938",
         "name": "紫光股份",
@@ -681,11 +756,12 @@
         "low": 23.495,
         "high": 44.9
       },
+      "status": "valid",
       "formal_buy_zone_ready": true,
       "independent_anchor_count": 3,
       "conservative_fair_floor": 20.46,
       "safe_buy_range": [
-        18.41,
+        16.78,
         18.41
       ],
       "reasonable_buy_range": [
@@ -693,14 +769,17 @@
         20.46
       ],
       "value_anchor_range": [
-        18.41,
+        16.78,
         20.46
       ],
-      "divergence_pct": 29.06,
+      "peer_divergence_pct": 29.06,
+      "history_fair_divergence_pct": 9.88,
+      "peer_confirmed": true,
+      "history_confirmed": true,
       "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied",
       "safe_implied_pe": [
-        17.99,
+        16.4,
         17.99
       ],
       "reasonable_implied_pe": [
@@ -712,7 +791,6 @@
       "code": "000949",
       "name": "新乡化纤",
       "current_price": 7.38,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "000949",
         "name": "新乡化纤",
@@ -771,38 +849,22 @@
         "low": 4.55,
         "high": 8.27
       },
-      "formal_buy_zone_ready": true,
-      "independent_anchor_count": 2,
+      "status": "insufficient_confirming_anchors",
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 71.17,
+      "peer_confirmed": false,
+      "history_confirmed": false,
+      "independent_anchor_count": 1,
+      "formal_buy_zone_ready": false,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
       "conservative_fair_floor": 3.27,
-      "safe_buy_range": [
-        2.78,
-        2.78
-      ],
-      "reasonable_buy_range": [
-        2.78,
-        3.2
-      ],
-      "value_anchor_range": [
-        2.78,
-        3.27
-      ],
-      "divergence_pct": null,
-      "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
-      "safe_implied_pe": [
-        7.23,
-        7.23
-      ],
-      "reasonable_implied_pe": [
-        7.23,
-        8.33
-      ]
+      "entry_method": "fair_floor_margin_of_safety"
     },
     "000951": {
       "code": "000951",
       "name": "中国重汽",
       "current_price": 21.88,
-      "status": "valuation_divergence",
       "fundamental_anchor": {
         "code": "000951",
         "name": "中国重汽",
@@ -854,14 +916,19 @@
         "low": 16.068,
         "high": 25.918
       },
-      "divergence_pct": 69.76,
-      "formal_buy_zone_ready": false
+      "status": "valuation_divergence",
+      "peer_divergence_pct": 69.76,
+      "peer_confirmed": false,
+      "history_confirmed": false,
+      "independent_anchor_count": 1,
+      "formal_buy_zone_ready": false,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null
     },
     "000977": {
       "code": "000977",
       "name": "浪潮信息",
       "current_price": 77.44,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "000977",
         "name": "浪潮信息",
@@ -913,11 +980,12 @@
         "low": 55.69,
         "high": 90.47
       },
+      "status": "valid",
       "formal_buy_zone_ready": true,
       "independent_anchor_count": 3,
       "conservative_fair_floor": 54.84,
       "safe_buy_range": [
-        49.36,
+        44.97,
         49.36
       ],
       "reasonable_buy_range": [
@@ -925,14 +993,17 @@
         54.84
       ],
       "value_anchor_range": [
-        49.36,
+        44.97,
         54.84
       ],
-      "divergence_pct": 6.91,
+      "peer_divergence_pct": 6.91,
+      "history_fair_divergence_pct": 0.74,
+      "peer_confirmed": true,
+      "history_confirmed": true,
       "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied",
       "safe_implied_pe": [
-        18.0,
+        16.4,
         18.0
       ],
       "reasonable_implied_pe": [
@@ -966,6 +1037,7 @@
         "high": 970.0
       },
       "formal_buy_zone_ready": false,
+      "independent_anchor_count": 0,
       "safe_buy_range": null,
       "reasonable_buy_range": null
     },
@@ -973,7 +1045,6 @@
       "code": "001389",
       "name": "广合科技",
       "current_price": 155.9,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "001389",
         "name": "广合科技",
@@ -1025,11 +1096,12 @@
         "low": 69.284,
         "high": 236.604
       },
+      "status": "valid",
       "formal_buy_zone_ready": true,
       "independent_anchor_count": 3,
       "conservative_fair_floor": 69.75,
       "safe_buy_range": [
-        62.77,
+        57.19,
         62.77
       ],
       "reasonable_buy_range": [
@@ -1037,14 +1109,17 @@
         69.75
       ],
       "value_anchor_range": [
-        62.77,
+        57.19,
         69.75
       ],
-      "divergence_pct": 40.64,
+      "peer_divergence_pct": 40.64,
+      "history_fair_divergence_pct": 32.46,
+      "peer_confirmed": true,
+      "history_confirmed": true,
       "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied",
       "safe_implied_pe": [
-        14.13,
+        12.88,
         14.13
       ],
       "reasonable_implied_pe": [
@@ -1056,7 +1131,6 @@
       "code": "002028",
       "name": "思源电气",
       "current_price": 143.18,
-      "status": "valuation_divergence",
       "fundamental_anchor": {
         "code": "002028",
         "name": "思源电气",
@@ -1108,14 +1182,19 @@
         "low": 143.18,
         "high": 232.81
       },
-      "divergence_pct": 51.31,
-      "formal_buy_zone_ready": false
+      "status": "valuation_divergence",
+      "peer_divergence_pct": 51.31,
+      "peer_confirmed": false,
+      "history_confirmed": false,
+      "independent_anchor_count": 1,
+      "formal_buy_zone_ready": false,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null
     },
     "002064": {
       "code": "002064",
       "name": "华峰化学",
       "current_price": 11.89,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "002064",
         "name": "华峰化学",
@@ -1174,11 +1253,12 @@
         "low": 8.85,
         "high": 13.66
       },
+      "status": "valid",
       "formal_buy_zone_ready": true,
       "independent_anchor_count": 2,
       "conservative_fair_floor": 6.09,
       "safe_buy_range": [
-        5.18,
+        4.38,
         5.18
       ],
       "reasonable_buy_range": [
@@ -1186,14 +1266,17 @@
         5.97
       ],
       "value_anchor_range": [
-        5.18,
+        4.38,
         6.09
       ],
-      "divergence_pct": null,
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 49.66,
+      "peer_confirmed": false,
+      "history_confirmed": true,
       "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied",
       "safe_implied_pe": [
-        7.22,
+        6.11,
         7.22
       ],
       "reasonable_implied_pe": [
@@ -1205,7 +1288,6 @@
       "code": "002128",
       "name": "电投能源",
       "current_price": 29.11,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "002128",
         "name": "电投能源",
@@ -1264,11 +1346,12 @@
         "low": 23.02,
         "high": 33.48
       },
+      "status": "valid",
       "formal_buy_zone_ready": true,
       "independent_anchor_count": 2,
       "conservative_fair_floor": 21.33,
       "safe_buy_range": [
-        18.13,
+        15.36,
         18.13
       ],
       "reasonable_buy_range": [
@@ -1276,14 +1359,17 @@
         20.9
       ],
       "value_anchor_range": [
-        18.13,
+        15.36,
         21.33
       ],
-      "divergence_pct": null,
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 7.84,
+      "peer_confirmed": false,
+      "history_confirmed": true,
       "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied",
       "safe_implied_pe": [
-        5.35,
+        4.54,
         5.35
       ],
       "reasonable_implied_pe": [
@@ -1295,7 +1381,6 @@
       "code": "002156",
       "name": "通富微电",
       "current_price": 63.75,
-      "status": "valuation_divergence",
       "fundamental_anchor": {
         "code": "002156",
         "name": "通富微电",
@@ -1347,14 +1432,19 @@
         "low": 35.209,
         "high": 78.71
       },
-      "divergence_pct": 91.97,
-      "formal_buy_zone_ready": false
+      "status": "valuation_divergence",
+      "peer_divergence_pct": 91.97,
+      "peer_confirmed": false,
+      "history_confirmed": false,
+      "independent_anchor_count": 1,
+      "formal_buy_zone_ready": false,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null
     },
     "002281": {
       "code": "002281",
       "name": "光迅科技",
       "current_price": 173.61,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "002281",
         "name": "光迅科技",
@@ -1406,11 +1496,12 @@
         "low": 60.47,
         "high": 276.08
       },
+      "status": "valid",
       "formal_buy_zone_ready": true,
-      "independent_anchor_count": 3,
+      "independent_anchor_count": 2,
       "conservative_fair_floor": 36.77,
       "safe_buy_range": [
-        33.09,
+        30.15,
         33.09
       ],
       "reasonable_buy_range": [
@@ -1418,14 +1509,17 @@
         36.77
       ],
       "value_anchor_range": [
-        33.09,
+        30.15,
         36.77
       ],
-      "divergence_pct": 34.51,
+      "peer_divergence_pct": 34.51,
+      "history_fair_divergence_pct": 131.07,
+      "peer_confirmed": true,
+      "history_confirmed": false,
       "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
+      "calibration_method": "fundamental_only_history_unavailable",
       "safe_implied_pe": [
-        16.44,
+        14.98,
         16.44
       ],
       "reasonable_implied_pe": [
@@ -1461,6 +1555,7 @@
         "high": 30.28
       },
       "formal_buy_zone_ready": false,
+      "independent_anchor_count": 0,
       "safe_buy_range": null,
       "reasonable_buy_range": null
     },
@@ -1492,6 +1587,7 @@
         "high": 55.25
       },
       "formal_buy_zone_ready": false,
+      "independent_anchor_count": 0,
       "safe_buy_range": null,
       "reasonable_buy_range": null
     },
@@ -1499,7 +1595,6 @@
       "code": "002452",
       "name": "长高电气",
       "current_price": 11.5,
-      "status": "valuation_divergence",
       "fundamental_anchor": {
         "code": "002452",
         "name": "长高电气",
@@ -1557,14 +1652,19 @@
         "low": 7.74,
         "high": 13.83
       },
-      "divergence_pct": 52.21,
-      "formal_buy_zone_ready": false
+      "status": "valuation_divergence",
+      "peer_divergence_pct": 52.21,
+      "peer_confirmed": false,
+      "history_confirmed": false,
+      "independent_anchor_count": 1,
+      "formal_buy_zone_ready": false,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null
     },
     "002463": {
       "code": "002463",
       "name": "沪电股份",
       "current_price": 121.7,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "002463",
         "name": "沪电股份",
@@ -1616,11 +1716,12 @@
         "low": 65.47,
         "high": 154.99
       },
+      "status": "valid",
       "formal_buy_zone_ready": true,
       "independent_anchor_count": 3,
       "conservative_fair_floor": 51.66,
       "safe_buy_range": [
-        46.49,
+        42.36,
         46.49
       ],
       "reasonable_buy_range": [
@@ -1628,14 +1729,17 @@
         51.66
       ],
       "value_anchor_range": [
-        46.49,
+        42.36,
         51.66
       ],
-      "divergence_pct": 24.83,
+      "peer_divergence_pct": 24.83,
+      "history_fair_divergence_pct": 30.69,
+      "peer_confirmed": true,
+      "history_confirmed": true,
       "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied",
       "safe_implied_pe": [
-        14.98,
+        13.65,
         14.98
       ],
       "reasonable_implied_pe": [
@@ -1647,7 +1751,6 @@
       "code": "002475",
       "name": "立讯精密",
       "current_price": 56.6,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "002475",
         "name": "立讯精密",
@@ -1711,38 +1814,41 @@
         "low": 46.141,
         "high": 80.011
       },
+      "status": "valid",
       "formal_buy_zone_ready": true,
       "independent_anchor_count": 3,
       "conservative_fair_floor": 44.1,
       "safe_buy_range": [
-        53.33,
-        53.33
+        57.63,
+        63.97
       ],
       "reasonable_buy_range": [
-        55.89,
-        59.19
+        63.97,
+        69.15
       ],
       "value_anchor_range": [
-        53.33,
-        59.19
+        57.63,
+        69.15
       ],
-      "divergence_pct": 29.5,
+      "peer_divergence_pct": 29.5,
+      "history_fair_divergence_pct": 9.45,
+      "peer_confirmed": true,
+      "history_confirmed": true,
       "entry_method": "explicit_low_risk_multiple_no_extra_discount",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_fundamental_more_conservative_than_history:reasonable_fundamental_more_conservative_than_history",
       "safe_implied_pe": [
-        18.51,
-        18.51
+        20.0,
+        22.2
       ],
       "reasonable_implied_pe": [
-        19.4,
-        20.54
+        22.2,
+        24.0
       ]
     },
     "002532": {
       "code": "002532",
       "name": "天山铝业",
       "current_price": 13.17,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "002532",
         "name": "天山铝业",
@@ -1829,11 +1935,12 @@
         "low": 10.374,
         "high": 20.077
       },
+      "status": "valid",
       "formal_buy_zone_ready": true,
       "independent_anchor_count": 2,
       "conservative_fair_floor": 13.04,
       "safe_buy_range": [
-        11.48,
+        9.78,
         11.48
       ],
       "reasonable_buy_range": [
@@ -1841,14 +1948,17 @@
         13.04
       ],
       "value_anchor_range": [
-        11.48,
+        9.78,
         13.04
       ],
-      "divergence_pct": null,
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 2.59,
+      "peer_confirmed": false,
+      "history_confirmed": true,
       "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied",
       "safe_implied_pe": [
-        5.93,
+        5.05,
         5.93
       ],
       "reasonable_implied_pe": [
@@ -1882,6 +1992,7 @@
         "high": 119.97
       },
       "formal_buy_zone_ready": false,
+      "independent_anchor_count": 0,
       "safe_buy_range": null,
       "reasonable_buy_range": null
     },
@@ -1889,7 +2000,6 @@
       "code": "002709",
       "name": "天赐材料",
       "current_price": 37.15,
-      "status": "valuation_divergence",
       "fundamental_anchor": {
         "code": "002709",
         "name": "天赐材料",
@@ -1947,14 +2057,19 @@
         "low": 33.41,
         "high": 64.0
       },
-      "divergence_pct": 148.32,
-      "formal_buy_zone_ready": false
+      "status": "valuation_divergence",
+      "peer_divergence_pct": 148.32,
+      "peer_confirmed": false,
+      "history_confirmed": false,
+      "independent_anchor_count": 1,
+      "formal_buy_zone_ready": false,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null
     },
     "002812": {
       "code": "002812",
       "name": "恩捷股份",
       "current_price": 54.48,
-      "status": "valuation_divergence",
       "fundamental_anchor": {
         "code": "002812",
         "name": "恩捷股份",
@@ -2006,14 +2121,19 @@
         "low": 44.77,
         "high": 87.55
       },
-      "divergence_pct": 103.03,
-      "formal_buy_zone_ready": false
+      "status": "valuation_divergence",
+      "peer_divergence_pct": 103.03,
+      "peer_confirmed": false,
+      "history_confirmed": false,
+      "independent_anchor_count": 1,
+      "formal_buy_zone_ready": false,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null
     },
     "002916": {
       "code": "002916",
       "name": "深南电路",
       "current_price": 362.4,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "002916",
         "name": "深南电路",
@@ -2065,11 +2185,12 @@
         "low": 187.55,
         "high": 457.9
       },
+      "status": "valid",
       "formal_buy_zone_ready": true,
       "independent_anchor_count": 3,
       "conservative_fair_floor": 138.13,
       "safe_buy_range": [
-        124.32,
+        113.27,
         124.32
       ],
       "reasonable_buy_range": [
@@ -2077,14 +2198,17 @@
         138.13
       ],
       "value_anchor_range": [
-        124.32,
+        113.27,
         138.13
       ],
-      "divergence_pct": 24.82,
+      "peer_divergence_pct": 24.82,
+      "history_fair_divergence_pct": 44.41,
+      "peer_confirmed": true,
+      "history_confirmed": true,
       "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied",
       "safe_implied_pe": [
-        14.98,
+        13.65,
         14.98
       ],
       "reasonable_implied_pe": [
@@ -2118,6 +2242,7 @@
         "high": 7.45
       },
       "formal_buy_zone_ready": false,
+      "independent_anchor_count": 0,
       "safe_buy_range": null,
       "reasonable_buy_range": null
     },
@@ -2125,7 +2250,6 @@
       "code": "600066",
       "name": "宇通客车",
       "current_price": 30.06,
-      "status": "valuation_divergence",
       "fundamental_anchor": {
         "code": "600066",
         "name": "宇通客车",
@@ -2177,14 +2301,19 @@
         "low": 26.04,
         "high": 36.25
       },
-      "divergence_pct": 69.74,
-      "formal_buy_zone_ready": false
+      "status": "valuation_divergence",
+      "peer_divergence_pct": 69.74,
+      "peer_confirmed": false,
+      "history_confirmed": false,
+      "independent_anchor_count": 1,
+      "formal_buy_zone_ready": false,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null
     },
     "600150": {
       "code": "600150",
       "name": "中国船舶",
       "current_price": 34.78,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "600150",
         "name": "中国船舶",
@@ -2236,11 +2365,12 @@
         "low": 30.145,
         "high": 41.405
       },
+      "status": "valid",
       "formal_buy_zone_ready": true,
       "independent_anchor_count": 3,
       "conservative_fair_floor": 35.73,
       "safe_buy_range": [
-        32.16,
+        29.3,
         32.16
       ],
       "reasonable_buy_range": [
@@ -2248,14 +2378,17 @@
         34.98
       ],
       "value_anchor_range": [
-        32.16,
+        29.3,
         35.73
       ],
-      "divergence_pct": 15.87,
+      "peer_divergence_pct": 15.87,
+      "history_fair_divergence_pct": 38.45,
+      "peer_confirmed": true,
+      "history_confirmed": true,
       "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied",
       "safe_implied_pe": [
-        12.78,
+        11.64,
         12.78
       ],
       "reasonable_implied_pe": [
@@ -2267,7 +2400,6 @@
       "code": "600183",
       "name": "生益科技",
       "current_price": 145.65,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "600183",
         "name": "生益科技",
@@ -2319,11 +2451,12 @@
         "low": 50.83,
         "high": 187.2
       },
+      "status": "valid",
       "formal_buy_zone_ready": true,
       "independent_anchor_count": 3,
       "conservative_fair_floor": 46.19,
       "safe_buy_range": [
-        41.57,
+        37.88,
         41.57
       ],
       "reasonable_buy_range": [
@@ -2331,14 +2464,17 @@
         46.19
       ],
       "value_anchor_range": [
-        41.57,
+        37.88,
         46.19
       ],
-      "divergence_pct": 24.82,
+      "peer_divergence_pct": 24.82,
+      "history_fair_divergence_pct": 10.39,
+      "peer_confirmed": true,
+      "history_confirmed": true,
       "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied",
       "safe_implied_pe": [
-        14.98,
+        13.65,
         14.98
       ],
       "reasonable_implied_pe": [
@@ -2350,7 +2486,6 @@
       "code": "600188",
       "name": "兖矿能源",
       "current_price": 23.02,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "600188",
         "name": "兖矿能源",
@@ -2409,11 +2544,12 @@
         "low": 12.81,
         "high": 26.95
       },
+      "status": "valid",
       "formal_buy_zone_ready": true,
       "independent_anchor_count": 2,
       "conservative_fair_floor": 10.83,
       "safe_buy_range": [
-        9.21,
+        7.8,
         9.21
       ],
       "reasonable_buy_range": [
@@ -2421,14 +2557,17 @@
         10.61
       ],
       "value_anchor_range": [
-        9.21,
+        7.8,
         10.83
       ],
-      "divergence_pct": null,
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 45.8,
+      "peer_confirmed": false,
+      "history_confirmed": true,
       "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied",
       "safe_implied_pe": [
-        5.36,
+        4.54,
         5.36
       ],
       "reasonable_implied_pe": [
@@ -2464,6 +2603,7 @@
         "high": 69.87
       },
       "formal_buy_zone_ready": false,
+      "independent_anchor_count": 0,
       "safe_buy_range": null,
       "reasonable_buy_range": null
     },
@@ -2471,7 +2611,6 @@
       "code": "600378",
       "name": "昊华科技",
       "current_price": 53.31,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "600378",
         "name": "昊华科技",
@@ -2530,32 +2669,17 @@
         "low": 29.328,
         "high": 82.17
       },
-      "formal_buy_zone_ready": true,
-      "independent_anchor_count": 2,
+      "status": "insufficient_confirming_anchors",
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 87.6,
+      "peer_confirmed": false,
+      "history_confirmed": false,
+      "independent_anchor_count": 1,
+      "formal_buy_zone_ready": false,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
       "conservative_fair_floor": 16.54,
-      "safe_buy_range": [
-        14.06,
-        14.06
-      ],
-      "reasonable_buy_range": [
-        14.06,
-        16.21
-      ],
-      "value_anchor_range": [
-        14.06,
-        16.54
-      ],
-      "divergence_pct": null,
-      "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
-      "safe_implied_pe": [
-        8.67,
-        8.67
-      ],
-      "reasonable_implied_pe": [
-        8.67,
-        10.0
-      ]
+      "entry_method": "fair_floor_margin_of_safety"
     },
     "600379": {
       "code": "600379",
@@ -2583,6 +2707,7 @@
         "high": 18.912
       },
       "formal_buy_zone_ready": false,
+      "independent_anchor_count": 0,
       "safe_buy_range": null,
       "reasonable_buy_range": null
     },
@@ -2590,7 +2715,6 @@
       "code": "600406",
       "name": "国电南瑞",
       "current_price": 23.01,
-      "status": "valuation_divergence",
       "fundamental_anchor": {
         "code": "600406",
         "name": "国电南瑞",
@@ -2642,14 +2766,19 @@
         "low": 21.68,
         "high": 31.048
       },
-      "divergence_pct": 51.28,
-      "formal_buy_zone_ready": false
+      "status": "valuation_divergence",
+      "peer_divergence_pct": 51.28,
+      "peer_confirmed": false,
+      "history_confirmed": false,
+      "independent_anchor_count": 1,
+      "formal_buy_zone_ready": false,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null
     },
     "600458": {
       "code": "600458",
       "name": "时代新材",
       "current_price": 11.78,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "600458",
         "name": "时代新材",
@@ -2691,11 +2820,12 @@
         "low": 10.038,
         "high": 17.328
       },
+      "status": "valid",
       "formal_buy_zone_ready": true,
       "independent_anchor_count": 2,
       "conservative_fair_floor": 11.07,
       "safe_buy_range": [
-        9.96,
+        9.08,
         9.96
       ],
       "reasonable_buy_range": [
@@ -2703,14 +2833,17 @@
         11.07
       ],
       "value_anchor_range": [
-        9.96,
+        9.08,
         11.07
       ],
-      "divergence_pct": null,
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 0.9,
+      "peer_confirmed": false,
+      "history_confirmed": true,
       "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied",
       "safe_implied_pe": [
-        14.4,
+        13.13,
         14.4
       ],
       "reasonable_implied_pe": [
@@ -2722,7 +2855,6 @@
       "code": "600482",
       "name": "中国动力",
       "current_price": 31.81,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "600482",
         "name": "中国动力",
@@ -2774,11 +2906,12 @@
         "low": 19.267,
         "high": 42.057
       },
+      "status": "valid",
       "formal_buy_zone_ready": true,
       "independent_anchor_count": 3,
       "conservative_fair_floor": 18.71,
       "safe_buy_range": [
-        16.84,
+        15.34,
         16.84
       ],
       "reasonable_buy_range": [
@@ -2786,14 +2919,17 @@
         18.71
       ],
       "value_anchor_range": [
-        16.84,
+        15.34,
         18.71
       ],
-      "divergence_pct": 24.34,
+      "peer_divergence_pct": 24.34,
+      "history_fair_divergence_pct": 12.99,
+      "peer_confirmed": true,
+      "history_confirmed": true,
       "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied",
       "safe_implied_pe": [
-        12.62,
+        11.5,
         12.62
       ],
       "reasonable_implied_pe": [
@@ -2805,7 +2941,6 @@
       "code": "600487",
       "name": "亨通光电",
       "current_price": 68.7,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "600487",
         "name": "亨通光电",
@@ -2857,30 +2992,34 @@
         "low": 19.428,
         "high": 122.728
       },
+      "status": "valid",
       "formal_buy_zone_ready": true,
       "independent_anchor_count": 3,
       "conservative_fair_floor": 53.72,
       "safe_buy_range": [
-        36.92,
-        36.92
+        44.05,
+        48.35
       ],
       "reasonable_buy_range": [
-        47.22,
+        48.35,
         53.72
       ],
       "value_anchor_range": [
-        36.92,
+        44.05,
         53.72
       ],
-      "divergence_pct": 38.42,
+      "peer_divergence_pct": 38.42,
+      "history_fair_divergence_pct": 43.46,
+      "peer_confirmed": true,
+      "history_confirmed": true,
       "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_fundamental_more_conservative_than_history:reasonable_history_ceiling_applied",
       "safe_implied_pe": [
-        12.39,
-        12.39
+        14.79,
+        16.23
       ],
       "reasonable_implied_pe": [
-        15.85,
+        16.23,
         18.03
       ]
     },
@@ -2910,6 +3049,7 @@
         "high": 5.97
       },
       "formal_buy_zone_ready": false,
+      "independent_anchor_count": 0,
       "safe_buy_range": null,
       "reasonable_buy_range": null
     },
@@ -2941,6 +3081,7 @@
         "high": 14.915
       },
       "formal_buy_zone_ready": false,
+      "independent_anchor_count": 0,
       "safe_buy_range": null,
       "reasonable_buy_range": null
     },
@@ -2970,6 +3111,7 @@
         "high": 19.03
       },
       "formal_buy_zone_ready": false,
+      "independent_anchor_count": 0,
       "safe_buy_range": null,
       "reasonable_buy_range": null
     },
@@ -2977,7 +3119,6 @@
       "code": "600595",
       "name": "中孚实业",
       "current_price": 6.34,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "600595",
         "name": "中孚实业",
@@ -3064,11 +3205,12 @@
         "low": 5.54,
         "high": 10.275
       },
+      "status": "valid",
       "formal_buy_zone_ready": true,
       "independent_anchor_count": 2,
       "conservative_fair_floor": 6.26,
       "safe_buy_range": [
-        5.51,
+        4.7,
         5.51
       ],
       "reasonable_buy_range": [
@@ -3076,14 +3218,17 @@
         6.26
       ],
       "value_anchor_range": [
-        5.51,
+        4.7,
         6.26
       ],
-      "divergence_pct": null,
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 0.75,
+      "peer_confirmed": false,
+      "history_confirmed": true,
       "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied",
       "safe_implied_pe": [
-        5.81,
+        4.96,
         5.81
       ],
       "reasonable_implied_pe": [
@@ -3095,7 +3240,6 @@
       "code": "600673",
       "name": "东阳光",
       "current_price": 31.88,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "600673",
         "name": "东阳光",
@@ -3154,32 +3298,15 @@
         "low": 19.73,
         "high": 42.83
       },
-      "formal_buy_zone_ready": true,
-      "independent_anchor_count": 2,
-      "conservative_fair_floor": 5.98,
-      "safe_buy_range": [
-        5.08,
-        5.08
-      ],
-      "reasonable_buy_range": [
-        5.08,
-        5.86
-      ],
-      "value_anchor_range": [
-        5.08,
-        5.98
-      ],
-      "divergence_pct": null,
-      "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
-      "safe_implied_pe": [
-        8.67,
-        8.67
-      ],
-      "reasonable_implied_pe": [
-        8.67,
-        10.0
-      ]
+      "status": "fundamental_history_divergence",
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 361.36,
+      "peer_confirmed": false,
+      "history_confirmed": false,
+      "independent_anchor_count": 1,
+      "formal_buy_zone_ready": false,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null
     },
     "600685": {
       "code": "600685",
@@ -3207,6 +3334,7 @@
         "high": 37.325
       },
       "formal_buy_zone_ready": false,
+      "independent_anchor_count": 0,
       "safe_buy_range": null,
       "reasonable_buy_range": null
     },
@@ -3214,7 +3342,6 @@
       "code": "600710",
       "name": "苏美达",
       "current_price": 10.72,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "600710",
         "name": "苏美达",
@@ -3272,31 +3399,35 @@
         "low": 9.56,
         "high": 14.585
       },
+      "status": "valid",
       "formal_buy_zone_ready": true,
       "independent_anchor_count": 3,
       "conservative_fair_floor": 9.74,
       "safe_buy_range": [
-        10.42,
-        10.42
+        11.22,
+        12.46
       ],
       "reasonable_buy_range": [
-        10.56,
-        11.22
+        12.46,
+        13.47
       ],
       "value_anchor_range": [
-        10.42,
-        11.22
+        11.22,
+        13.47
       ],
-      "divergence_pct": 35.46,
+      "peer_divergence_pct": 35.46,
+      "history_fair_divergence_pct": 24.07,
+      "peer_confirmed": true,
+      "history_confirmed": true,
       "entry_method": "explicit_low_risk_multiple_no_extra_discount",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_fundamental_more_conservative_than_history:reasonable_fundamental_more_conservative_than_history",
       "safe_implied_pe": [
-        9.29,
-        9.29
+        10.0,
+        11.1
       ],
       "reasonable_implied_pe": [
-        9.41,
-        10.0
+        11.1,
+        12.0
       ]
     },
     "600906": {
@@ -3325,6 +3456,7 @@
         "high": 7.92
       },
       "formal_buy_zone_ready": false,
+      "independent_anchor_count": 0,
       "safe_buy_range": null,
       "reasonable_buy_range": null
     },
@@ -3332,15 +3464,55 @@
       "code": "600909",
       "name": "华安证券",
       "current_price": 8.33,
-      "status": "fundamental_anchor_unavailable",
       "fundamental_anchor": {
         "code": "600909",
         "name": "华安证券",
-        "status": "review_required",
-        "reason": "market_pb_required",
-        "independent_anchor_count": 0
+        "status": "available",
+        "reference_source": "v2_forward_pb_roe_fundamental_anchor_peer_table_self_pb_fallback",
+        "route": "financial",
+        "financial_kind": "broker",
+        "reference_range": [
+          5.98,
+          8.16
+        ],
+        "valuation_model": "broker_forward_pb_roe",
+        "valuation_basis_unit": "PB",
+        "consensus_eps_current_year": 0.79,
+        "consensus_eps_next_year": 0.6567,
+        "forecast_report_count": 3,
+        "book_value_per_share_proxy": 5.4368,
+        "market_pb": 1.5321,
+        "market_indicator_source": "eastmoney_peer_comparison_target_row:市净率-MRQ",
+        "forward_roe_current_year": 0.1453,
+        "forward_roe_next_year": 0.1208,
+        "low_risk_forward_roe": 0.1208,
+        "reasonable_multiple_reference": [
+          1.1,
+          1.5
+        ],
+        "buy_band_policy": {
+          "safe_to_fair_floor": [
+            0.78,
+            0.9
+          ],
+          "reasonable_to_fair_floor": [
+            0.9,
+            1.0
+          ]
+        },
+        "independent_anchor_count": 1
       },
-      "peer_anchor": null,
+      "peer_anchor": {
+        "source": "eastmoney_peer_valuation",
+        "valuation_column": "市净率-MRQ",
+        "sample_count": 6,
+        "peer_multiple_p25": 1.2363,
+        "peer_multiple_p50": 1.3368,
+        "fair_value_range": [
+          6.72,
+          7.27
+        ]
+      },
       "history_cost_anchor": {
         "history_points": 180,
         "p10": 5.55,
@@ -3353,23 +3525,90 @@
         "low": 5.32,
         "high": 12.1
       },
-      "formal_buy_zone_ready": false,
-      "safe_buy_range": null,
-      "reasonable_buy_range": null
+      "status": "valid",
+      "formal_buy_zone_ready": true,
+      "independent_anchor_count": 3,
+      "conservative_fair_floor": 5.98,
+      "safe_buy_range": [
+        4.66,
+        5.38
+      ],
+      "reasonable_buy_range": [
+        5.38,
+        5.98
+      ],
+      "value_anchor_range": [
+        4.66,
+        5.98
+      ],
+      "peer_divergence_pct": 1.07,
+      "history_fair_divergence_pct": 3.44,
+      "peer_confirmed": true,
+      "history_confirmed": true,
+      "entry_method": "fair_floor_margin_of_safety",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied",
+      "safe_implied_pb": [
+        0.86,
+        0.99
+      ],
+      "reasonable_implied_pb": [
+        0.99,
+        1.1
+      ]
     },
     "600918": {
       "code": "600918",
       "name": "中泰证券",
       "current_price": 5.74,
-      "status": "fundamental_anchor_unavailable",
       "fundamental_anchor": {
         "code": "600918",
         "name": "中泰证券",
-        "status": "review_required",
-        "reason": "market_pb_required",
-        "independent_anchor_count": 0
+        "status": "available",
+        "reference_source": "v2_forward_pb_roe_fundamental_anchor_peer_table_self_pb_fallback",
+        "route": "financial",
+        "financial_kind": "broker",
+        "reference_range": [
+          4.26,
+          5.4
+        ],
+        "valuation_model": "broker_forward_pb_roe",
+        "valuation_basis_unit": "PB",
+        "consensus_eps_current_year": 0.265,
+        "consensus_eps_next_year": 0.28,
+        "forecast_report_count": 3,
+        "book_value_per_share_proxy": 5.6827,
+        "market_pb": 1.0101,
+        "market_indicator_source": "eastmoney_peer_comparison_target_row:市净率-MRQ",
+        "forward_roe_current_year": 0.0466,
+        "forward_roe_next_year": 0.0493,
+        "low_risk_forward_roe": 0.0466,
+        "reasonable_multiple_reference": [
+          0.75,
+          0.95
+        ],
+        "buy_band_policy": {
+          "safe_to_fair_floor": [
+            0.78,
+            0.9
+          ],
+          "reasonable_to_fair_floor": [
+            0.9,
+            1.0
+          ]
+        },
+        "independent_anchor_count": 1
       },
-      "peer_anchor": null,
+      "peer_anchor": {
+        "source": "eastmoney_peer_valuation",
+        "valuation_column": "市净率-MRQ",
+        "sample_count": 6,
+        "peer_multiple_p25": 1.2363,
+        "peer_multiple_p50": 1.3368,
+        "fair_value_range": [
+          7.03,
+          7.6
+        ]
+      },
       "history_cost_anchor": {
         "history_points": 180,
         "p10": 5.358,
@@ -3382,6 +3621,11 @@
         "low": 5.05,
         "high": 6.74
       },
+      "status": "valuation_divergence",
+      "peer_divergence_pct": 51.45,
+      "peer_confirmed": false,
+      "history_confirmed": false,
+      "independent_anchor_count": 1,
       "formal_buy_zone_ready": false,
       "safe_buy_range": null,
       "reasonable_buy_range": null
@@ -3390,7 +3634,6 @@
       "code": "600971",
       "name": "恒源煤电",
       "current_price": 9.02,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "600971",
         "name": "恒源煤电",
@@ -3449,46 +3692,71 @@
         "low": 5.99,
         "high": 9.02
       },
-      "formal_buy_zone_ready": true,
-      "independent_anchor_count": 2,
+      "status": "insufficient_confirming_anchors",
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 121.43,
+      "peer_confirmed": false,
+      "history_confirmed": false,
+      "independent_anchor_count": 1,
+      "formal_buy_zone_ready": false,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
       "conservative_fair_floor": 2.71,
-      "safe_buy_range": [
-        2.3,
-        2.3
-      ],
-      "reasonable_buy_range": [
-        2.3,
-        2.66
-      ],
-      "value_anchor_range": [
-        2.3,
-        2.71
-      ],
-      "divergence_pct": null,
-      "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
-      "safe_implied_pe": [
-        5.35,
-        5.35
-      ],
-      "reasonable_implied_pe": [
-        5.35,
-        6.19
-      ]
+      "entry_method": "fair_floor_margin_of_safety"
     },
     "600999": {
       "code": "600999",
       "name": "招商证券",
       "current_price": 18.71,
-      "status": "fundamental_anchor_unavailable",
       "fundamental_anchor": {
         "code": "600999",
         "name": "招商证券",
-        "status": "review_required",
-        "reason": "market_pb_required",
-        "independent_anchor_count": 0
+        "status": "available",
+        "reference_source": "v2_forward_pb_roe_fundamental_anchor_peer_table_self_pb_fallback",
+        "route": "financial",
+        "financial_kind": "broker",
+        "reference_range": [
+          15.91,
+          21.7
+        ],
+        "valuation_model": "broker_forward_pb_roe",
+        "valuation_basis_unit": "PB",
+        "consensus_eps_current_year": 2.2006,
+        "consensus_eps_next_year": 2.0275,
+        "forecast_report_count": 16,
+        "book_value_per_share_proxy": 14.4638,
+        "market_pb": 1.2936,
+        "market_indicator_source": "eastmoney_peer_comparison_target_row:市净率-MRQ",
+        "forward_roe_current_year": 0.1521,
+        "forward_roe_next_year": 0.1402,
+        "low_risk_forward_roe": 0.1402,
+        "reasonable_multiple_reference": [
+          1.1,
+          1.5
+        ],
+        "buy_band_policy": {
+          "safe_to_fair_floor": [
+            0.78,
+            0.9
+          ],
+          "reasonable_to_fair_floor": [
+            0.9,
+            1.0
+          ]
+        },
+        "independent_anchor_count": 1
       },
-      "peer_anchor": null,
+      "peer_anchor": {
+        "source": "eastmoney_peer_valuation",
+        "valuation_column": "市净率-MRQ",
+        "sample_count": 6,
+        "peer_multiple_p25": 1.2363,
+        "peer_multiple_p50": 1.3368,
+        "fair_value_range": [
+          17.88,
+          19.34
+        ]
+      },
       "history_cost_anchor": {
         "history_points": 180,
         "p10": 15.219,
@@ -3501,15 +3769,41 @@
         "low": 14.601,
         "high": 22.491
       },
-      "formal_buy_zone_ready": false,
-      "safe_buy_range": null,
-      "reasonable_buy_range": null
+      "status": "valid",
+      "formal_buy_zone_ready": true,
+      "independent_anchor_count": 3,
+      "conservative_fair_floor": 15.91,
+      "safe_buy_range": [
+        12.41,
+        14.32
+      ],
+      "reasonable_buy_range": [
+        14.32,
+        15.91
+      ],
+      "value_anchor_range": [
+        12.41,
+        15.91
+      ],
+      "peer_divergence_pct": 1.05,
+      "history_fair_divergence_pct": 14.27,
+      "peer_confirmed": true,
+      "history_confirmed": true,
+      "entry_method": "fair_floor_margin_of_safety",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied",
+      "safe_implied_pb": [
+        0.86,
+        0.99
+      ],
+      "reasonable_implied_pb": [
+        0.99,
+        1.1
+      ]
     },
     "601101": {
       "code": "601101",
       "name": "昊华能源",
       "current_price": 14.81,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "601101",
         "name": "昊华能源",
@@ -3568,11 +3862,12 @@
         "low": 6.91,
         "high": 14.81
       },
+      "status": "valid",
       "formal_buy_zone_ready": true,
       "independent_anchor_count": 2,
       "conservative_fair_floor": 6.09,
       "safe_buy_range": [
-        5.18,
+        4.38,
         5.18
       ],
       "reasonable_buy_range": [
@@ -3580,14 +3875,17 @@
         5.97
       ],
       "value_anchor_range": [
-        5.18,
+        4.38,
         6.09
       ],
-      "divergence_pct": null,
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 17.24,
+      "peer_confirmed": false,
+      "history_confirmed": true,
       "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied",
       "safe_implied_pe": [
-        5.36,
+        4.53,
         5.36
       ],
       "reasonable_implied_pe": [
@@ -3599,7 +3897,6 @@
       "code": "601138",
       "name": "工业富联",
       "current_price": 64.04,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "601138",
         "name": "工业富联",
@@ -3651,11 +3948,12 @@
         "low": 46.95,
         "high": 80.4
       },
+      "status": "valid",
       "formal_buy_zone_ready": true,
       "independent_anchor_count": 3,
       "conservative_fair_floor": 50.3,
       "safe_buy_range": [
-        45.27,
+        41.25,
         45.27
       ],
       "reasonable_buy_range": [
@@ -3663,14 +3961,17 @@
         50.3
       ],
       "value_anchor_range": [
-        45.27,
+        41.25,
         50.3
       ],
-      "divergence_pct": 30.36,
+      "peer_divergence_pct": 30.36,
+      "history_fair_divergence_pct": 21.77,
+      "peer_confirmed": true,
+      "history_confirmed": true,
       "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied",
       "safe_implied_pe": [
-        14.63,
+        13.33,
         14.63
       ],
       "reasonable_implied_pe": [
@@ -3682,7 +3983,6 @@
       "code": "601168",
       "name": "西部矿业",
       "current_price": 39.12,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "601168",
         "name": "西部矿业",
@@ -3757,11 +4057,12 @@
         "low": 24.0,
         "high": 43.07
       },
+      "status": "valid",
       "formal_buy_zone_ready": true,
       "independent_anchor_count": 2,
       "conservative_fair_floor": 26.85,
       "safe_buy_range": [
-        23.63,
+        20.14,
         23.63
       ],
       "reasonable_buy_range": [
@@ -3769,14 +4070,17 @@
         26.85
       ],
       "value_anchor_range": [
-        23.63,
+        20.14,
         26.85
       ],
-      "divergence_pct": null,
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 4.19,
+      "peer_confirmed": false,
+      "history_confirmed": true,
       "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied",
       "safe_implied_pe": [
-        8.19,
+        6.98,
         8.19
       ],
       "reasonable_implied_pe": [
@@ -3810,6 +4114,7 @@
         "high": 72.57
       },
       "formal_buy_zone_ready": false,
+      "independent_anchor_count": 0,
       "safe_buy_range": null,
       "reasonable_buy_range": null
     },
@@ -3839,6 +4144,7 @@
         "high": 9.785
       },
       "formal_buy_zone_ready": false,
+      "independent_anchor_count": 0,
       "safe_buy_range": null,
       "reasonable_buy_range": null
     },
@@ -3868,6 +4174,7 @@
         "high": 82.95
       },
       "formal_buy_zone_ready": false,
+      "independent_anchor_count": 0,
       "safe_buy_range": null,
       "reasonable_buy_range": null
     },
@@ -3897,6 +4204,7 @@
         "high": 46.74
       },
       "formal_buy_zone_ready": false,
+      "independent_anchor_count": 0,
       "safe_buy_range": null,
       "reasonable_buy_range": null
     },
@@ -3926,6 +4234,7 @@
         "high": 50.412
       },
       "formal_buy_zone_ready": false,
+      "independent_anchor_count": 0,
       "safe_buy_range": null,
       "reasonable_buy_range": null
     },
@@ -3933,7 +4242,6 @@
       "code": "601869",
       "name": "长飞光纤",
       "current_price": 422.36,
-      "status": "valuation_divergence",
       "fundamental_anchor": {
         "code": "601869",
         "name": "长飞光纤",
@@ -3985,14 +4293,19 @@
         "low": 82.345,
         "high": 579.705
       },
-      "divergence_pct": 46.33,
-      "formal_buy_zone_ready": false
+      "status": "valuation_divergence",
+      "peer_divergence_pct": 46.33,
+      "peer_confirmed": false,
+      "history_confirmed": false,
+      "independent_anchor_count": 1,
+      "formal_buy_zone_ready": false,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null
     },
     "603019": {
       "code": "603019",
       "name": "中科曙光",
       "current_price": 85.82,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "603019",
         "name": "中科曙光",
@@ -4044,11 +4357,12 @@
         "low": 77.51,
         "high": 107.5
       },
+      "status": "valid",
       "formal_buy_zone_ready": true,
-      "independent_anchor_count": 3,
+      "independent_anchor_count": 2,
       "conservative_fair_floor": 40.68,
       "safe_buy_range": [
-        36.61,
+        33.36,
         36.61
       ],
       "reasonable_buy_range": [
@@ -4056,14 +4370,17 @@
         40.68
       ],
       "value_anchor_range": [
-        36.61,
+        33.36,
         40.68
       ],
-      "divergence_pct": 22.51,
+      "peer_divergence_pct": 22.51,
+      "history_fair_divergence_pct": 82.34,
+      "peer_confirmed": true,
+      "history_confirmed": false,
       "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
+      "calibration_method": "fundamental_only_history_unavailable",
       "safe_implied_pe": [
-        18.0,
+        16.4,
         18.0
       ],
       "reasonable_implied_pe": [
@@ -4097,6 +4414,7 @@
         "high": 262.21
       },
       "formal_buy_zone_ready": false,
+      "independent_anchor_count": 0,
       "safe_buy_range": null,
       "reasonable_buy_range": null
     },
@@ -4104,7 +4422,6 @@
       "code": "603088",
       "name": "宁波精达",
       "current_price": 10.24,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "603088",
         "name": "宁波精达",
@@ -4156,11 +4473,12 @@
         "low": 8.37,
         "high": 13.7
       },
+      "status": "valid",
       "formal_buy_zone_ready": true,
-      "independent_anchor_count": 3,
+      "independent_anchor_count": 2,
       "conservative_fair_floor": 5.88,
       "safe_buy_range": [
-        5.29,
+        4.82,
         5.29
       ],
       "reasonable_buy_range": [
@@ -4168,14 +4486,17 @@
         5.88
       ],
       "value_anchor_range": [
-        5.29,
+        4.82,
         5.88
       ],
-      "divergence_pct": 8.75,
+      "peer_divergence_pct": 8.75,
+      "history_fair_divergence_pct": 55.69,
+      "peer_confirmed": true,
+      "history_confirmed": false,
       "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
+      "calibration_method": "fundamental_only_history_unavailable",
       "safe_implied_pe": [
-        16.19,
+        14.75,
         16.19
       ],
       "reasonable_implied_pe": [
@@ -4187,7 +4508,6 @@
       "code": "603127",
       "name": "昭衍新药",
       "current_price": 47.54,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "603127",
         "name": "昭衍新药",
@@ -4239,11 +4559,12 @@
         "low": 26.38,
         "high": 53.9
       },
+      "status": "valid",
       "formal_buy_zone_ready": true,
-      "independent_anchor_count": 3,
+      "independent_anchor_count": 2,
       "conservative_fair_floor": 13.65,
       "safe_buy_range": [
-        12.29,
+        11.19,
         12.29
       ],
       "reasonable_buy_range": [
@@ -4251,14 +4572,17 @@
         13.65
       ],
       "value_anchor_range": [
-        12.29,
+        11.19,
         13.65
       ],
-      "divergence_pct": 8.95,
+      "peer_divergence_pct": 8.95,
+      "history_fair_divergence_pct": 129.8,
+      "peer_confirmed": true,
+      "history_confirmed": false,
       "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
+      "calibration_method": "fundamental_only_history_unavailable",
       "safe_implied_pe": [
-        18.01,
+        16.4,
         18.01
       ],
       "reasonable_implied_pe": [
@@ -4270,7 +4594,6 @@
       "code": "603259",
       "name": "药明康德",
       "current_price": 157.4,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "603259",
         "name": "药明康德",
@@ -4322,38 +4645,41 @@
         "low": 86.041,
         "high": 167.9
       },
+      "status": "valid",
       "formal_buy_zone_ready": true,
-      "independent_anchor_count": 3,
+      "independent_anchor_count": 2,
       "conservative_fair_floor": 146.94,
       "safe_buy_range": [
-        94.1,
-        94.1
+        120.49,
+        132.25
       ],
       "reasonable_buy_range": [
-        96.58,
-        102.3
-      ],
-      "value_anchor_range": [
-        94.1,
+        132.25,
         146.94
       ],
-      "divergence_pct": 8.92,
+      "value_anchor_range": [
+        120.49,
+        146.94
+      ],
+      "peer_divergence_pct": 8.92,
+      "history_fair_divergence_pct": 76.75,
+      "peer_confirmed": true,
+      "history_confirmed": false,
       "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
+      "calibration_method": "fundamental_only_history_unavailable",
       "safe_implied_pe": [
-        12.81,
-        12.81
+        16.4,
+        18.0
       ],
       "reasonable_implied_pe": [
-        13.15,
-        13.92
+        18.0,
+        20.0
       ]
     },
     "603268": {
       "code": "603268",
       "name": "松发股份",
       "current_price": 187.3,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "603268",
         "name": "松发股份",
@@ -4405,27 +4731,31 @@
         "low": 72.5,
         "high": 191.2
       },
+      "status": "valid",
       "formal_buy_zone_ready": true,
       "independent_anchor_count": 3,
       "conservative_fair_floor": 109.46,
       "safe_buy_range": [
-        89.57,
-        89.57
+        89.76,
+        98.51
       ],
       "reasonable_buy_range": [
         98.51,
         109.46
       ],
       "value_anchor_range": [
-        89.57,
+        89.76,
         109.46
       ],
-      "divergence_pct": 15.87,
+      "peer_divergence_pct": 15.87,
+      "history_fair_divergence_pct": 11.82,
+      "peer_confirmed": true,
+      "history_confirmed": true,
       "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_fundamental_more_conservative_than_history:reasonable_history_ceiling_applied",
       "safe_implied_pe": [
-        11.62,
-        11.62
+        11.64,
+        12.78
       ],
       "reasonable_implied_pe": [
         12.78,
@@ -4436,7 +4766,6 @@
       "code": "603530",
       "name": "神马电力",
       "current_price": 48.12,
-      "status": "valuation_divergence",
       "fundamental_anchor": {
         "code": "603530",
         "name": "神马电力",
@@ -4488,8 +4817,14 @@
         "low": 40.08,
         "high": 71.14
       },
-      "divergence_pct": 51.32,
-      "formal_buy_zone_ready": false
+      "status": "valuation_divergence",
+      "peer_divergence_pct": 51.32,
+      "peer_confirmed": false,
+      "history_confirmed": false,
+      "independent_anchor_count": 1,
+      "formal_buy_zone_ready": false,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null
     },
     "603538": {
       "code": "603538",
@@ -4517,6 +4852,7 @@
         "high": 48.818
       },
       "formal_buy_zone_ready": false,
+      "independent_anchor_count": 0,
       "safe_buy_range": null,
       "reasonable_buy_range": null
     },
@@ -4524,7 +4860,6 @@
       "code": "603659",
       "name": "璞泰来",
       "current_price": 23.82,
-      "status": "valuation_divergence",
       "fundamental_anchor": {
         "code": "603659",
         "name": "璞泰来",
@@ -4582,14 +4917,19 @@
         "low": 21.42,
         "high": 37.62
       },
-      "divergence_pct": 108.92,
-      "formal_buy_zone_ready": false
+      "status": "valuation_divergence",
+      "peer_divergence_pct": 108.92,
+      "peer_confirmed": false,
+      "history_confirmed": false,
+      "independent_anchor_count": 1,
+      "formal_buy_zone_ready": false,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null
     },
     "603986": {
       "code": "603986",
       "name": "兆易创新",
       "current_price": 396.82,
-      "status": "valuation_divergence",
       "fundamental_anchor": {
         "code": "603986",
         "name": "兆易创新",
@@ -4641,14 +4981,19 @@
         "low": 197.11,
         "high": 840.0
       },
-      "divergence_pct": 110.44,
-      "formal_buy_zone_ready": false
+      "status": "valuation_divergence",
+      "peer_divergence_pct": 110.44,
+      "peer_confirmed": false,
+      "history_confirmed": false,
+      "independent_anchor_count": 1,
+      "formal_buy_zone_ready": false,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null
     },
     "603993": {
       "code": "603993",
       "name": "洛阳钼业",
       "current_price": 19.51,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "603993",
         "name": "洛阳钼业",
@@ -4723,11 +5068,12 @@
         "low": 16.204,
         "high": 26.744
       },
+      "status": "valid",
       "formal_buy_zone_ready": true,
       "independent_anchor_count": 2,
       "conservative_fair_floor": 14.36,
       "safe_buy_range": [
-        12.64,
+        10.77,
         12.64
       ],
       "reasonable_buy_range": [
@@ -4735,14 +5081,17 @@
         14.36
       ],
       "value_anchor_range": [
-        12.64,
+        10.77,
         14.36
       ],
-      "divergence_pct": null,
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 12.45,
+      "peer_confirmed": false,
+      "history_confirmed": true,
       "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied",
       "safe_implied_pe": [
-        8.11,
+        6.91,
         8.11
       ],
       "reasonable_implied_pe": [
@@ -4754,7 +5103,6 @@
       "code": "605020",
       "name": "永和股份",
       "current_price": 34.35,
-      "status": "valid",
       "fundamental_anchor": {
         "code": "605020",
         "name": "永和股份",
@@ -4813,11 +5161,12 @@
         "low": 22.92,
         "high": 48.39
       },
+      "status": "valid",
       "formal_buy_zone_ready": true,
       "independent_anchor_count": 2,
       "conservative_fair_floor": 19.11,
       "safe_buy_range": [
-        16.24,
+        13.76,
         16.24
       ],
       "reasonable_buy_range": [
@@ -4825,14 +5174,17 @@
         18.73
       ],
       "value_anchor_range": [
-        16.24,
+        13.76,
         19.11
       ],
-      "divergence_pct": null,
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 27.72,
+      "peer_confirmed": false,
+      "history_confirmed": true,
       "entry_method": "fair_floor_margin_of_safety",
-      "calibration_method": "fundamental_plus_180d_cost_calibration",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied",
       "safe_implied_pe": [
-        8.67,
+        7.34,
         8.67
       ],
       "reasonable_implied_pe": [
@@ -4841,5 +5193,5 @@
       ]
     }
   },
-  "method_note": "Three-anchor framework: A fundamental valuation, B peer valuation when available, C 180d own-market cost distribution. A formal safe/reasonable zone requires A plus at least one independent B/C anchor and is blocked on severe A/B divergence. History calibrates entry, not fair value."
+  "method_note": "Anchor existence is not enough: B/C count only when they confirm A within explicit economic tolerances. Extreme A-vs-history mismatch blocks formal zones as likely model/basis mismatch. History can lower an entry ceiling but never raise a fundamental lower bound or collapse a zone into a point."
 }

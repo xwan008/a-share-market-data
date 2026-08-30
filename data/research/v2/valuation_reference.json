@@ -1,18 +1,18 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "mode": "shadow",
-  "generated_at": "2026-08-30T22:13:27.205600+08:00",
+  "generated_at": "2026-08-30T22:26:08.276577+08:00",
   "reference_trade_date": "2026-08-28",
   "valuation_queue_count": 75,
-  "available_count": 49,
-  "review_required_count": 26,
+  "available_count": 53,
+  "review_required_count": 22,
   "source_counts": {
     "v2_forward_pe_reference": 33,
-    "v2_forward_pb_reference": 0,
+    "v2_forward_pb_reference": 4,
     "v2_cycle_reference": 16,
     "policy_required": 0,
     "consensus_required": 11,
-    "market_data_required": 9,
+    "market_data_required": 5,
     "cycle_review_required": 6
   },
   "spot_source_errors": [
@@ -166,9 +166,40 @@
     "000776": {
       "code": "000776",
       "name": "广发证券",
-      "status": "review_required",
-      "reason": "market_pb_required",
-      "independent_anchor_count": 0
+      "status": "available",
+      "reference_source": "v2_forward_pb_roe_fundamental_anchor_peer_table_self_pb_fallback",
+      "route": "financial",
+      "financial_kind": "broker",
+      "reference_range": [
+        19.37,
+        26.41
+      ],
+      "valuation_model": "broker_forward_pb_roe",
+      "valuation_basis_unit": "PB",
+      "consensus_eps_current_year": 2.159,
+      "consensus_eps_next_year": 2.3985,
+      "forecast_report_count": 21,
+      "book_value_per_share_proxy": 17.6064,
+      "market_pb": 1.2172,
+      "market_indicator_source": "eastmoney_peer_comparison_target_row:市净率-MRQ",
+      "forward_roe_current_year": 0.1226,
+      "forward_roe_next_year": 0.1362,
+      "low_risk_forward_roe": 0.1226,
+      "reasonable_multiple_reference": [
+        1.1,
+        1.5
+      ],
+      "buy_band_policy": {
+        "safe_to_fair_floor": [
+          0.78,
+          0.9
+        ],
+        "reasonable_to_fair_floor": [
+          0.9,
+          1.0
+        ]
+      },
+      "independent_anchor_count": 1
     },
     "000800": {
       "code": "000800",
@@ -1452,16 +1483,78 @@
     "600909": {
       "code": "600909",
       "name": "华安证券",
-      "status": "review_required",
-      "reason": "market_pb_required",
-      "independent_anchor_count": 0
+      "status": "available",
+      "reference_source": "v2_forward_pb_roe_fundamental_anchor_peer_table_self_pb_fallback",
+      "route": "financial",
+      "financial_kind": "broker",
+      "reference_range": [
+        5.98,
+        8.16
+      ],
+      "valuation_model": "broker_forward_pb_roe",
+      "valuation_basis_unit": "PB",
+      "consensus_eps_current_year": 0.79,
+      "consensus_eps_next_year": 0.6567,
+      "forecast_report_count": 3,
+      "book_value_per_share_proxy": 5.4368,
+      "market_pb": 1.5321,
+      "market_indicator_source": "eastmoney_peer_comparison_target_row:市净率-MRQ",
+      "forward_roe_current_year": 0.1453,
+      "forward_roe_next_year": 0.1208,
+      "low_risk_forward_roe": 0.1208,
+      "reasonable_multiple_reference": [
+        1.1,
+        1.5
+      ],
+      "buy_band_policy": {
+        "safe_to_fair_floor": [
+          0.78,
+          0.9
+        ],
+        "reasonable_to_fair_floor": [
+          0.9,
+          1.0
+        ]
+      },
+      "independent_anchor_count": 1
     },
     "600918": {
       "code": "600918",
       "name": "中泰证券",
-      "status": "review_required",
-      "reason": "market_pb_required",
-      "independent_anchor_count": 0
+      "status": "available",
+      "reference_source": "v2_forward_pb_roe_fundamental_anchor_peer_table_self_pb_fallback",
+      "route": "financial",
+      "financial_kind": "broker",
+      "reference_range": [
+        4.26,
+        5.4
+      ],
+      "valuation_model": "broker_forward_pb_roe",
+      "valuation_basis_unit": "PB",
+      "consensus_eps_current_year": 0.265,
+      "consensus_eps_next_year": 0.28,
+      "forecast_report_count": 3,
+      "book_value_per_share_proxy": 5.6827,
+      "market_pb": 1.0101,
+      "market_indicator_source": "eastmoney_peer_comparison_target_row:市净率-MRQ",
+      "forward_roe_current_year": 0.0466,
+      "forward_roe_next_year": 0.0493,
+      "low_risk_forward_roe": 0.0466,
+      "reasonable_multiple_reference": [
+        0.75,
+        0.95
+      ],
+      "buy_band_policy": {
+        "safe_to_fair_floor": [
+          0.78,
+          0.9
+        ],
+        "reasonable_to_fair_floor": [
+          0.9,
+          1.0
+        ]
+      },
+      "independent_anchor_count": 1
     },
     "600971": {
       "code": "600971",
@@ -1511,9 +1604,40 @@
     "600999": {
       "code": "600999",
       "name": "招商证券",
-      "status": "review_required",
-      "reason": "market_pb_required",
-      "independent_anchor_count": 0
+      "status": "available",
+      "reference_source": "v2_forward_pb_roe_fundamental_anchor_peer_table_self_pb_fallback",
+      "route": "financial",
+      "financial_kind": "broker",
+      "reference_range": [
+        15.91,
+        21.7
+      ],
+      "valuation_model": "broker_forward_pb_roe",
+      "valuation_basis_unit": "PB",
+      "consensus_eps_current_year": 2.2006,
+      "consensus_eps_next_year": 2.0275,
+      "forecast_report_count": 16,
+      "book_value_per_share_proxy": 14.4638,
+      "market_pb": 1.2936,
+      "market_indicator_source": "eastmoney_peer_comparison_target_row:市净率-MRQ",
+      "forward_roe_current_year": 0.1521,
+      "forward_roe_next_year": 0.1402,
+      "low_risk_forward_roe": 0.1402,
+      "reasonable_multiple_reference": [
+        1.1,
+        1.5
+      ],
+      "buy_band_policy": {
+        "safe_to_fair_floor": [
+          0.78,
+          0.9
+        ],
+        "reasonable_to_fair_floor": [
+          0.9,
+          1.0
+        ]
+      },
+      "independent_anchor_count": 1
     },
     "601101": {
       "code": "601101",
@@ -2063,5 +2187,13 @@
       "method_note": "Cycle anchor normalizes earnings first. Anchorless cycles use one conservative cycle factor=min(structural haircut, base regime factor), not multiplicative repeated haircuts."
     }
   },
-  "method_note": "V2 first valuation anchor is rebuilt from V2 policies only; no V1 valuation result is consumed. Business uses forward PE, financials use forward ROE/PB, and cycle names use normalized earnings with explicit anti-double-haircut discipline."
+  "method_note": "V2 first valuation anchor is rebuilt from V2 policies only; no V1 valuation result is consumed. Business uses forward PE, financials use forward ROE/PB, and cycle names use normalized earnings with explicit anti-double-haircut discipline. Financial PB fallback reads the target company own PB-MRQ row from Eastmoney peer-comparison data when bulk spot PB is unavailable; peer median is not substituted for target PB.",
+  "financial_pb_fallback_repaired_count": 4,
+  "financial_pb_fallback_errors": {
+    "601318": "KeyError:\"['EV/EBITDA-24A'] not in index\"",
+    "601319": "KeyError:\"['EV/EBITDA-24A'] not in index\"",
+    "601336": "KeyError:\"['EV/EBITDA-24A'] not in index\"",
+    "601601": "KeyError:\"['EV/EBITDA-24A'] not in index\"",
+    "601628": "KeyError:\"['EV/EBITDA-24A'] not in index\""
+  }
 }
