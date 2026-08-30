@@ -1,6 +1,11 @@
 from copy import deepcopy
+from pathlib import Path
+import sys
 
-from scripts.company_index_fingerprint import company_index_fingerprint
+SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
+sys.path.insert(0, str(SCRIPTS))
+
+from company_index_fingerprint import company_index_fingerprint
 
 
 def sample_index() -> dict:
