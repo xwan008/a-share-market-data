@@ -20,34 +20,51 @@ def main() -> int:
         errors.append(f"fundamental_schema_too_old:{data.get('schema_version')}")
 
     for code, row in rows.items():
-        if row.get('valuation_status') != 'valid' or row.get('valuation_basis_unit') != 'PE':
+        if row.get('valuation_status') != 'valid':
             continue
-        theoretical = row.get('theoretical_business_multiple_range')
-        low_risk = row.get('reasonable_multiple_range')
-        business_fair = row.get('business_fair_value_range')
-        anchor = row.get('value_anchor_range')
-        safe = row.get('safe_buy_range')
-        reasonable = row.get('reasonable_buy_range')
-        if not valid_range(theoretical): errors.append(f'{code}:missing_theoretical_business_multiple_range')
-        if not valid_range(low_risk): errors.append(f'{code}:missing_low_risk_multiple_range')
-        if not valid_range(business_fair): errors.append(f'{code}:missing_business_fair_value_range')
-        if not valid_range(anchor): errors.append(f'{code}:missing_low_risk_value_anchor_range')
-        if not valid_range(safe): errors.append(f'{code}:missing_safe_buy_range')
-        if not valid_range(reasonable): errors.append(f'{code}:missing_reasonable_buy_range')
-        if not row.get('low_risk_pe_method'): errors.append(f'{code}:missing_low_risk_pe_method')
-        if not isinstance(row.get('consensus_eps_current_year'), (int, float)) or row['consensus_eps_current_year'] <= 0:
-            errors.append(f'{code}:missing_current_year_eps_anchor')
-        if valid_range(theoretical) and valid_range(low_risk):
-            if low_risk[0] > theoretical[0] + 1e-9 or low_risk[1] > theoretical[1] + 1e-9:
-                errors.append(f'{code}:low_risk_pe_exceeds_theoretical:{low_risk}>{theoretical}')
-        if valid_range(business_fair) and valid_range(anchor):
-            if anchor[0] > business_fair[0] + 0.02 or anchor[1] > business_fair[1] + 0.02:
-                errors.append(f'{code}:low_risk_anchor_exceeds_business_fair:{anchor}>{business_fair}')
-        if valid_range(anchor) and valid_range(reasonable):
-            if reasonable[1] > anchor[0] + 0.02:
-                errors.append(f'{code}:reasonable_buy_above_low_risk_fair_floor:{reasonable}>{anchor}')
-        if valid_range(safe) and valid_range(reasonable) and safe[1] > reasonable[1] + 1e-9:
-            errors.append(f'{code}:safe_zone_above_reasonable_zone')
+        unit = row.get('valuation_basis_unit')
+        if unit == 'PE':
+            theoretical = row.get('theoretical_business_multiple_range')
+            low_risk = row.get('reasonable_multiple_range')
+            business_fair = row.get('business_fair_value_range')
+            anchor = row.get('value_anchor_range')
+            safe = row.get('safe_buy_range')
+            reasonable = row.get('reasonable_buy_range')
+            if not valid_range(theoretical): errors.append(f'{code}:missing_theoretical_business_multiple_range')
+            if not valid_range(low_risk): errors.append(f'{code}:missing_low_risk_multiple_range')
+            if not valid_range(business_fair): errors.append(f'{code}:missing_business_fair_value_range')
+            if not valid_range(anchor): errors.append(f'{code}:missing_low_risk_value_anchor_range')
+            if not valid_range(safe): errors.append(f'{code}:missing_safe_buy_range')
+            if not valid_range(reasonable): errors.append(f'{code}:missing_reasonable_buy_range')
+            if not row.get('low_risk_pe_method'): errors.append(f'{code}:missing_low_risk_pe_method')
+            if not isinstance(row.get('consensus_eps_current_year'), (int, float)) or row['consensus_eps_current_year'] <= 0:
+                errors.append(f'{code}:missing_current_year_eps_anchor')
+            if valid_range(theoretical) and valid_range(low_risk):
+                if low_risk[0] > theoretical[0] + 1e-9 or low_risk[1] > theoretical[1] + 1e-9:
+                    errors.append(f'{code}:low_risk_pe_exceeds_theoretical:{low_risk}>{theoretical}')
+            if valid_range(business_fair) and valid_range(anchor):
+                if anchor[0] > business_fair[0] + 0.02 or anchor[1] > business_fair[1] + 0.02:
+                    errors.append(f'{code}:low_risk_anchor_exceeds_business_fair:{anchor}>{business_fair}')
+            if valid_range(anchor) and valid_range(reasonable):
+                if reasonable[1] > anchor[0] + 0.02:
+                    errors.append(f'{code}:reasonable_buy_above_low_risk_fair_floor:{reasonable}>{anchor}')
+            if valid_range(safe) and valid_range(reasonable) and safe[1] > reasonable[1] + 1e-9:
+                errors.append(f'{code}:safe_zone_above_reasonable_zone')
+        elif unit == 'PB':
+            roe_now = row.get('forward_roe_current_year')
+            roe_next = row.get('forward_roe_next_year')
+            low_risk_roe = row.get('low_risk_forward_roe')
+            method = row.get('low_risk_roe_method')
+            if not isinstance(roe_now, (int, float)):
+                errors.append(f'{code}:missing_current_year_roe_anchor')
+            if not isinstance(low_risk_roe, (int, float)):
+                errors.append(f'{code}:missing_low_risk_forward_roe')
+            if not method:
+                errors.append(f'{code}:missing_low_risk_roe_method')
+            if isinstance(roe_now, (int, float)) and isinstance(low_risk_roe, (int, float)) and low_risk_roe > roe_now + 1e-4:
+                errors.append(f'{code}:low_risk_roe_above_current_year:{low_risk_roe}>{roe_now}')
+            if isinstance(roe_next, (int, float)) and isinstance(low_risk_roe, (int, float)) and low_risk_roe > roe_next + 1e-4:
+                errors.append(f'{code}:low_risk_roe_ignores_next_year_downside:{low_risk_roe}>{roe_next}')
 
     # Regression locks: ranges are intentionally broad enough to allow small consensus EPS revisions,
     # but narrow enough to catch a return to the old industry-PE inflation bug.
@@ -74,7 +91,12 @@ def main() -> int:
     if errors:
         print(json.dumps({'status': 'FAIL', 'errors': errors}, ensure_ascii=False, indent=2))
         return 1
-    print(json.dumps({'status': 'PASS', 'valid_pe_rows': sum(1 for r in rows.values() if r.get('valuation_status') == 'valid' and r.get('valuation_basis_unit') == 'PE'), 'focus_codes': sorted(focus)}, ensure_ascii=False))
+    print(json.dumps({
+        'status': 'PASS',
+        'valid_pe_rows': sum(1 for r in rows.values() if r.get('valuation_status') == 'valid' and r.get('valuation_basis_unit') == 'PE'),
+        'valid_pb_rows': sum(1 for r in rows.values() if r.get('valuation_status') == 'valid' and r.get('valuation_basis_unit') == 'PB'),
+        'focus_codes': sorted(focus),
+    }, ensure_ascii=False))
     return 0
 
 
