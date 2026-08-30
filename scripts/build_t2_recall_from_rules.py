@@ -16,13 +16,25 @@ OUTPUT = ROOT / "data" / "research" / "pipeline" / "t2_company_recall.json"
 TZ = ZoneInfo("Asia/Shanghai")
 
 
-def t2_keys(scan: dict) -> set[tuple[str, str]]:
-    out = set()
+DIRECT_RECALL_STATUSES = {"T2"}
+CONDITIONAL_RECALL_STATUSES = {"T1"}
+
+
+def recall_keys(scan: dict) -> dict[tuple[str, str], str]:
+    """Return subchains that are eligible for company-level recall.
+
+    T2 chains are direct recall. T1 chains are conditional recall and must pass a
+    stricter company-level earnings gate downstream. unconfirmed chains are not
+    promoted automatically; they remain candidates for reverse-trigger review
+    when strong company-level signals are detected by a dedicated audit/review.
+    """
+    out: dict[tuple[str, str], str] = {}
     for industry in scan.get("broad_industries", []):
         bid = industry.get("id")
         for row in industry.get("subchains", []):
-            if row.get("status") == "T2":
-                out.add((bid, row.get("name")))
+            status = row.get("status")
+            if status in DIRECT_RECALL_STATUSES | CONDITIONAL_RECALL_STATUSES:
+                out[(bid, row.get("name"))] = status
     return out
 
 
@@ -40,13 +52,13 @@ def main() -> int:
     rule_data = json.loads(RULES.read_text(encoding="utf-8"))
     previous = json.loads(OUTPUT.read_text(encoding="utf-8")) if OUTPUT.exists() else {}
     rule_map = {(r["broad_industry_id"], r["subchain"]): r for r in rule_data.get("chains", [])}
-    required = t2_keys(scan)
-    missing_rules = sorted(required - set(rule_map))
-    extra_rules = sorted(set(rule_map) - required)
+    required = recall_keys(scan)
+    missing_rules = sorted(set(required) - set(rule_map))
+    extra_rules = sorted(set(rule_map) - set(required))
     if missing_rules:
-        raise SystemExit(f"missing T2 exposure rules: {missing_rules}")
+        raise SystemExit(f"missing recall exposure rules: {missing_rules}")
     if extra_rules:
-        print(json.dumps({"warning":"rules_for_non_t2_ignored","rules":extra_rules}, ensure_ascii=False))
+        print(json.dumps({"warning":"rules_for_non_recall_chain_ignored","rules":extra_rules}, ensure_ascii=False))
 
     companies = index.get("companies", {})
     quotes = latest.get("stocks", {})
@@ -56,6 +68,8 @@ def main() -> int:
     rows = []
 
     for broad, subchain in sorted(required):
+        industry_status = required[(broad, subchain)]
+        recall_mode = "direct" if industry_status == "T2" else "conditional"
         rule = rule_map[(broad, subchain)]
         explicit = set(str(c).zfill(6) for c in rule.get("explicit_exposed", []))
         broad_codes = {
@@ -96,6 +110,8 @@ def main() -> int:
                     "status": "exposed",
                     "reason": f"{name}对{subchain}的{rule['value_chain_link']}存在直接或实质业务暴露",
                     "evidence_sources": evidence,
+                    "industry_status": industry_status,
+                    "recall_mode": recall_mode,
                 }
                 exposed_rows.append({
                     "code": code,
@@ -103,19 +119,28 @@ def main() -> int:
                     "exposure_summary": f"{rule['value_chain_link']}业务暴露；判定依据={basis}",
                     "exposure_materiality": "material",
                     "evidence_sources": evidence,
+                    "industry_status": industry_status,
+                    "recall_mode": recall_mode,
                 })
                 counts["exposed"] += 1
             else:
                 if code in unknown:
-                    reason = "公司行业索引缺失/未映射；本轮跨行业业务检索未发现对该T2链的可验证直接暴露"
+                    reason = "公司行业索引缺失/未映射；本轮跨行业业务检索未发现对该召回链的可验证直接暴露"
                 else:
                     reason = f"已机械纳入{broad}大行业候选，但CNINFO细分类与显式业务映射均未命中{subchain}"
-                classifications[code] = {"status": "not_exposed", "reason": reason}
+                classifications[code] = {
+                    "status": "not_exposed",
+                    "reason": reason,
+                    "industry_status": industry_status,
+                    "recall_mode": recall_mode,
+                }
                 counts["not_exposed"] += 1
 
         rows.append({
             "broad_industry_id": broad,
             "subchain": subchain,
+            "industry_status": industry_status,
+            "recall_mode": recall_mode,
             "candidate_universe_count": len(candidate_codes),
             "classifications": classifications,
             "classification_counts": counts,
@@ -141,11 +166,16 @@ def main() -> int:
     frozen_at = previous.get("t2_recall_frozen_at") if semantic_unchanged else now
 
     payload = {
-        "schema_version": 2,
+        "schema_version": 3,
         "industry_scan_frozen_at": scan.get("industry_frozen_at"),
         "company_index_generated_at": index.get("generated_at"),
         "company_index_fingerprint": company_index_fingerprint(index),
         "weekly_pool_read": False,
+        "recall_policy": {
+            "T2": "direct company recall; normal company earnings gate downstream",
+            "T1": "conditional company recall; stricter company earnings confirmation required downstream",
+            "unconfirmed": "no automatic recall; strong company earnings anomalies should trigger subchain re-review rather than automatic promotion"
+        },
         "t2_recall_frozen_at": frozen_at,
         "t2_subchains": rows,
     }
@@ -157,7 +187,9 @@ def main() -> int:
         "semantic_unchanged": semantic_unchanged,
         "company_index_fingerprint": payload["company_index_fingerprint"],
         "t2_recall_frozen_at": payload["t2_recall_frozen_at"],
-        "t2_subchains":len(rows),
+        "recalled_subchains":len(rows),
+        "direct_t2_subchains":sum(1 for r in rows if r["industry_status"] == "T2"),
+        "conditional_t1_subchains":sum(1 for r in rows if r["industry_status"] == "T1"),
         "candidate_classifications":sum(r["candidate_universe_count"] for r in rows),
         "exposed_company_rows":sum(r["classification_counts"]["exposed"] for r in rows),
         "cross_industry_discoveries":sum(len(r["cross_industry_discoveries"]) for r in rows),
