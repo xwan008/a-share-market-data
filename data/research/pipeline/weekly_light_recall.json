@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-30T08:55:26.591242+08:00",
+  "generated_at": "2026-08-30T08:59:05.491956+08:00",
   "t2_recall_frozen_at": "2026-08-30T08:49:08.100552+08:00",
-  "weekly_stage_started_at": "2026-08-30T08:55:26.591242+08:00",
+  "weekly_stage_started_at": "2026-08-30T08:59:05.491956+08:00",
   "universe_count": 3177,
   "screened_count": 3177,
   "source_status": {
@@ -15,8 +15,8 @@
   },
   "status_counts": {
     "pass": 496,
-    "uncertain": 829,
-    "reject": 1852
+    "uncertain": 833,
+    "reject": 1848
   },
   "screen_results": {
     "000001": {
@@ -25514,8 +25514,8 @@
       "triage_score": 7.089
     },
     "600458": {
-      "status": "reject",
-      "reason": "最新公开财务数据未达到宽召回阈值",
+      "status": "uncertain",
+      "reason": "最新公开财务数据未达到宽召回阈值；旧周度active候选，按状态迁移规则强制进入深验，不代表自动保留",
       "name": "时代新材",
       "metrics": {
         "revenue_yoy_pct": 13.0874937431,
@@ -25752,8 +25752,8 @@
       "triage_score": 0.0
     },
     "600482": {
-      "status": "reject",
-      "reason": "未取得足以触发本周宽召回的最新财报/预告证据",
+      "status": "uncertain",
+      "reason": "未取得足以触发本周宽召回的最新财报/预告证据；旧周度active候选，按状态迁移规则强制进入深验，不代表自动保留",
       "name": "中国动力",
       "metrics": {
         "revenue_yoy_pct": null,
@@ -28370,8 +28370,8 @@
       "triage_score": 0.0
     },
     "600710": {
-      "status": "reject",
-      "reason": "最新公开财务数据未达到宽召回阈值",
+      "status": "uncertain",
+      "reason": "最新公开财务数据未达到宽召回阈值；旧周度active候选，按状态迁移规则强制进入深验，不代表自动保留",
       "name": "苏美达",
       "metrics": {
         "revenue_yoy_pct": 19.6573775947,
@@ -34516,8 +34516,8 @@
       "triage_score": 21.554
     },
     "601991": {
-      "status": "reject",
-      "reason": "最新公开财务数据未达到宽召回阈值",
+      "status": "uncertain",
+      "reason": "最新公开财务数据未达到宽召回阈值；旧周度active候选，按状态迁移规则强制进入深验，不代表自动保留",
       "name": "大唐发电",
       "metrics": {
         "revenue_yoy_pct": 2.1427061621,
@@ -44497,5 +44497,11 @@
       },
       "triage_score": 0.0
     }
-  }
+  },
+  "legacy_migration_forced_review_codes": [
+    "600710",
+    "600458",
+    "600482",
+    "601991"
+  ]
 }
