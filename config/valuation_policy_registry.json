@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-08-30",
+  "forecast_policy": {
+    "primary_source": "akshare.stock_profit_forecast_em consensus EPS",
+    "minimum_report_count": 3,
+    "fallback_h1_annualization_formal": false,
+    "rule": "Formal valuation should use externally formed forward earnings consensus or an explicit company-level forecast model. H1 EPS times two is diagnostic fallback only and cannot by itself create a formal value anchor."
+  },
+  "default_buy_band": {
+    "safe_to_fair_floor": [0.75, 0.88],
+    "reasonable_to_fair_floor": [0.88, 1.0]
+  },
+  "business_policies": {
+    "shipbuilding": {"multiple_range": [16, 22]},
+    "heavy_truck": {"multiple_range": [13, 17]},
+    "cxo_cdmo": {"multiple_range": [20, 28]},
+    "grid_equipment": {"multiple_range": [18, 25]},
+    "ai_server": {"multiple_range": [20, 28]},
+    "optical": {"multiple_range": [22, 30]},
+    "pcb_ccl": {"multiple_range": [20, 28]}
+  },
+  "company_overrides": {
+    "000338": {
+      "name": "潍柴动力",
+      "valuation_model": "diversified_powertrain_data_center_forward_pe",
+      "multiple_range": [16, 20],
+      "safe_to_fair_floor": [0.78, 0.88],
+      "reasonable_to_fair_floor": [0.88, 1.0],
+      "rationale": "2026盈利增长由高端大缸径发动机、数据中心发电与新能源动力共同驱动；周期属性仍要求折价，但不应按传统重卡纯周期12-16倍机械定价。",
+      "review_triggers": ["2026/2027一致预期EPS变化超过10%", "数据中心发电订单趋势反转", "重卡/发动机需求趋势明显反转"]
+    },
+    "002475": {
+      "name": "立讯精密",
+      "valuation_model": "multi_engine_precision_manufacturing_forward_pe",
+      "multiple_range": [20, 24],
+      "safe_to_fair_floor": [0.78, 0.88],
+      "reasonable_to_fair_floor": [0.88, 0.92],
+      "rationale": "消费电子基本盘叠加AI数据中心互连/热管理/电源与汽车电子，多业务增长结构和明确前三季度指引支持高于传统消费电子代工的估值；同时保留整合与利润率风险折价。",
+      "review_triggers": ["2026/2027一致预期EPS变化超过10%", "通信/数据中心增速明显转弱", "汽车电子整合利润率显著偏离预期"]
+    },
+    "600066": {"name": "宇通客车", "valuation_model": "bus_export_forward_pe", "multiple_range": [13, 17]},
+    "600458": {"name": "时代新材", "valuation_model": "wind_new_material_forward_pe", "multiple_range": [16, 22]},
+    "600482": {"name": "中国动力", "valuation_model": "marine_power_forward_pe", "multiple_range": [18, 24]},
+    "600685": {"name": "中船防务", "valuation_model": "shipbuilding_forward_pe", "multiple_range": [18, 24]},
+    "600710": {"name": "苏美达", "valuation_model": "ship_supply_chain_forward_pe", "multiple_range": [10, 14]},
+    "603088": {"name": "宁波精达", "valuation_model": "equipment_forward_pe", "multiple_range": [18, 24]},
+    "603259": {"name": "药明康德", "valuation_model": "cxo_forward_pe", "multiple_range": [20, 28]},
+    "603659": {"name": "璞泰来", "valuation_model": "battery_equipment_material_forward_pe", "multiple_range": [18, 25]},
+    "603986": {"name": "兆易创新", "valuation_model": "semiconductor_forward_pe", "multiple_range": [25, 32]},
+    "601869": {"name": "长飞光纤", "valuation_model": "optical_infrastructure_forward_pe", "multiple_range": [22, 30]},
+    "001309": {"name": "德明利", "valuation_model": "memory_growth_forward_pe", "multiple_range": [22, 30]},
+    "002709": {"name": "天赐材料", "valuation_model": "battery_material_forward_pe", "multiple_range": [20, 28]},
+    "002812": {"name": "恩捷股份", "valuation_model": "separator_forward_pe", "multiple_range": [18, 25]}
+  }
+}
