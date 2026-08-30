@@ -30,9 +30,12 @@ def main() -> int:
         if "t1" in sid or "t2" in sid: errors.append(f"tier_stage_forbidden:{sid}")
     if (m.get("validation_policy") or {}).get("case_free") is not True: errors.append("validation_policy_not_case_free")
 
-    sanity_text = "\n".join(m.get("economic_sanity", {}).get("checks") or [])
+    # Generic invariants may live in economic_sanity, a stage contract, buy_zone_policy,
+    # or production_gate. Validate the whole manifest contract rather than requiring
+    # duplicate wording inside one subsection.
+    manifest_text = json.dumps(m, ensure_ascii=False)
     for phrase in ["重复折价","valuation_divergence","价格结构扫描","固定股票代码","风险警示","量价确认","相对强度"]:
-        if phrase not in sanity_text: errors.append(f"generic_invariant_missing:{phrase}")
+        if phrase not in manifest_text: errors.append(f"generic_invariant_missing:{phrase}")
 
     if PRICE.exists():
         p = load(PRICE); companies = p.get("companies") or {}; candidates = p.get("right_candidate_codes") or []
