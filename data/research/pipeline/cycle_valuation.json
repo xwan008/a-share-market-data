@@ -1,8 +1,11 @@
 {
-  "schema_version": 2,
-  "generated_at": "2026-08-30T10:01:48.304449+08:00",
+  "schema_version": 3,
+  "generated_at": "2026-08-30T10:29:39.378836+08:00",
   "reference_trade_date": "2026-08-28",
   "max_anchor_age_days": 7,
+  "cycle_regime_registry_reviewed_at": "2026-08-30",
+  "cycle_regime_age_days": -2,
+  "max_cycle_regime_age_days": 45,
   "common_pool_count": 138,
   "cycle_company_count": 32,
   "cycle_codes": [
@@ -65,18 +68,17 @@
       "cycle_tag": "coal::动力煤",
       "current_price": 2.73,
       "valuation_status": "unavailable",
-      "valuation_model": "commodity_scenario_forward_pe",
-      "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
+      "valuation_model": "forward_cycle_scenario",
+      "execution_state": "input_data_insufficient",
+      "forward_earnings_basis": "2026/2027 consensus plus commodity and 6-18m regime are mandatory for resource valuation.",
       "commodity_anchors": [],
-      "reasonable_multiple_range": [
-        7,
-        10
-      ],
+      "reasonable_multiple_range": null,
       "value_anchor_range": null,
       "safe_buy_range": null,
       "reasonable_buy_range": null,
       "left_conclusion": "unavailable",
       "reason": "commodity_anchor_fetch_failed:['ZC0']",
+      "cycle_regime": null,
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
     },
     {
@@ -85,8 +87,9 @@
       "cycle_tag": "nonferrous::电解铝",
       "current_price": 11.46,
       "valuation_status": "unavailable",
-      "valuation_model": "commodity_scenario_forward_pe",
-      "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
+      "valuation_model": "forward_cycle_scenario",
+      "execution_state": "input_data_insufficient",
+      "forward_earnings_basis": "2026/2027 consensus plus commodity and 6-18m regime are mandatory for resource valuation.",
       "commodity_anchors": [
         {
           "symbol": "AL0",
@@ -117,15 +120,13 @@
           "direction": -1.0
         }
       ],
-      "reasonable_multiple_range": [
-        10,
-        14
-      ],
+      "reasonable_multiple_range": null,
       "value_anchor_range": null,
       "safe_buy_range": null,
       "reasonable_buy_range": null,
       "left_conclusion": "unavailable",
-      "reason": "forward_consensus_insufficient:reports=0,eps=None",
+      "reason": "forward_consensus_insufficient:reports=0,eps_2026=None,eps_2027=None",
+      "cycle_regime": "near_term_tight_medium_term_normalizing",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
     },
     {
@@ -134,10 +135,23 @@
       "cycle_tag": "nonferrous::铜矿资源",
       "current_price": 6.76,
       "valuation_status": "valid",
-      "valuation_model": "commodity_scenario_forward_pe",
+      "execution_state": "valid",
+      "valuation_model": "forward_cycle_scenario",
+      "valuation_basis_unit": "PE",
       "forecast_source": "akshare.stock_profit_forecast_em",
       "forecast_report_count": 3,
       "consensus_eps_current_year": 0.4567,
+      "consensus_eps_next_year": 0.72,
+      "next_year_eps_growth_pct": 57.66,
+      "forward_12m_eps_proxy": 0.6322,
+      "forward_eps_weights": {
+        "current_year": 0.3333,
+        "next_year": 0.6667
+      },
+      "market_forward_pe_current_year": 14.8,
+      "market_forward_pe_next_year": 9.39,
+      "market_forward_pe_12m_proxy": 10.69,
+      "market_pe_dynamic": null,
       "commodity_anchors": [
         {
           "symbol": "CU0",
@@ -154,44 +168,63 @@
           "direction": 1.0
         }
       ],
+      "short_term_anchor_effect_on_eps": 0.0259,
       "profit_sensitivity": 0.75,
-      "bear_base_bull_anchor_factor": [
-        0.9545,
-        1.0345,
-        1.1145
+      "cycle_regime": "tight_spot_medium_term_balancing",
+      "cycle_regime_reviewed_at": "2026-08-30",
+      "cycle_regime_age_days": -2,
+      "cycle_regime_summary": "现货/区域流动性偏紧与矿端扰动支撑价格，但2026全球统计口径仍可能呈现供应过剩，估值不能把短期高铜价永久化。",
+      "cycle_regime_scores": {
+        "supply": 0.0,
+        "demand": 0.5,
+        "inventory": 0.5
+      },
+      "cycle_regime_evidence": [
+        {
+          "date": "2026-08-25",
+          "source": "Reuters",
+          "url": "https://www.reuters.com/business/us-tariff-threat-upends-copper-surplus-prices-test-all-time-peak-2026-08-25/",
+          "effect": "mixed",
+          "note": "Copper near record highs amid US tariff-driven inventory relocation, mine disruptions and smelter outages, while analysts still estimate a 2026 global surplus."
+        }
+      ],
+      "bear_base_bull_regime_factor": [
+        0.9,
+        0.98,
+        1.08
       ],
       "bear_base_bull_forward_eps": [
-        0.4411,
-        0.4685,
-        0.4959
+        0.5837,
+        0.6356,
+        0.7005
       ],
-      "forward_earnings_basis": "2026一致预期EPS=0.4567 → 商品/成本锚相对60日中枢 → sensitivity=0.75 → bear/base/bull盈利。",
+      "forward_earnings_basis": "2026/2027 consensus -> calendar-weighted forward-12m EPS 0.6322 -> structured 6-18m regime -> capped short-term commodity modifier +2.59%.",
       "reasonable_multiple_range": [
-        12.0,
-        16.0
+        11.0,
+        15.0
       ],
-      "multiple_rationale": "按资源/周期业务质量和周期波动采用版本化估值区间。",
+      "multiple_rationale": "现货/区域流动性偏紧与矿端扰动支撑价格，但2026全球统计口径仍可能呈现供应过剩，估值不能把短期高铜价永久化。",
       "value_anchor_range": [
-        5.29,
-        7.93
+        6.42,
+        10.51
       ],
-      "base_fair_value_floor": 5.62,
+      "base_fair_value_floor": 6.99,
       "safe_buy_range": [
-        4.22,
-        4.95
+        5.24,
+        6.15
       ],
       "reasonable_buy_range": [
-        4.95,
-        5.62
+        6.15,
+        6.99
       ],
       "key_sensitivities": [
-        "商品价格中枢",
-        "成本锚",
-        "产量/销量",
-        "一致预期EPS修正"
+        "6-18m supply-demand regime",
+        "next-year consensus EPS",
+        "commodity/cost anchor",
+        "production/sales"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "above_buy_zone"
+      "left_conclusion": "reasonable_buy_zone"
     },
     {
       "code": "000737",
@@ -199,8 +232,9 @@
       "cycle_tag": "nonferrous::铜矿资源",
       "current_price": 15.37,
       "valuation_status": "unavailable",
-      "valuation_model": "commodity_scenario_forward_pe",
-      "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
+      "valuation_model": "forward_cycle_scenario",
+      "execution_state": "input_data_insufficient",
+      "forward_earnings_basis": "2026/2027 consensus plus commodity and 6-18m regime are mandatory for resource valuation.",
       "commodity_anchors": [
         {
           "symbol": "CU0",
@@ -217,15 +251,13 @@
           "direction": 1.0
         }
       ],
-      "reasonable_multiple_range": [
-        12,
-        16
-      ],
+      "reasonable_multiple_range": null,
       "value_anchor_range": null,
       "safe_buy_range": null,
       "reasonable_buy_range": null,
       "left_conclusion": "unavailable",
-      "reason": "forward_consensus_insufficient:reports=0,eps=None",
+      "reason": "forward_consensus_insufficient:reports=0,eps_2026=None,eps_2027=None",
+      "cycle_regime": "tight_spot_medium_term_balancing",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
     },
     {
@@ -234,10 +266,23 @@
       "cycle_tag": "nonferrous::电解铝",
       "current_price": 27.23,
       "valuation_status": "valid",
-      "valuation_model": "commodity_scenario_forward_pe",
+      "execution_state": "valid",
+      "valuation_model": "forward_cycle_scenario",
+      "valuation_basis_unit": "PE",
       "forecast_source": "akshare.stock_profit_forecast_em",
       "forecast_report_count": 19,
       "consensus_eps_current_year": 3.794,
+      "consensus_eps_next_year": 4.1861,
+      "next_year_eps_growth_pct": 10.33,
+      "forward_12m_eps_proxy": 4.0554,
+      "forward_eps_weights": {
+        "current_year": 0.3333,
+        "next_year": 0.6667
+      },
+      "market_forward_pe_current_year": 7.18,
+      "market_forward_pe_next_year": 6.5,
+      "market_forward_pe_12m_proxy": 6.71,
+      "market_pe_dynamic": null,
       "commodity_anchors": [
         {
           "symbol": "AL0",
@@ -268,44 +313,77 @@
           "direction": -1.0
         }
       ],
+      "short_term_anchor_effect_on_eps": 0.02,
       "profit_sensitivity": 0.95,
-      "bear_base_bull_anchor_factor": [
-        0.941,
-        1.021,
-        1.101
+      "cycle_regime": "near_term_tight_medium_term_normalizing",
+      "cycle_regime_reviewed_at": "2026-08-30",
+      "cycle_regime_age_days": -2,
+      "cycle_regime_summary": "近端库存与地缘扰动仍支撑铝价，但中东复产快于此前预期、2027库存重建/供给过剩风险意味着当前高利润不应直接按高倍PE资本化。",
+      "cycle_regime_scores": {
+        "supply": -1.0,
+        "demand": -0.5,
+        "inventory": 1.0
+      },
+      "cycle_regime_evidence": [
+        {
+          "date": "2026-07-06",
+          "source": "Goldman Sachs summary via AEGIS/Newsquawk",
+          "url": "https://instanext.com/insights/metals/daily-first-look/2026-07-06",
+          "effect": "medium_term_supply_bearish",
+          "note": "Middle East supply recovery faster than expected; Q4 2026 LME forecast cut to 2950/t and 2027 average to 2700/t; inventories expected to rebuild into 2027."
+        },
+        {
+          "date": "2026-07-06",
+          "source": "Newsquawk summary of Goldman Sachs",
+          "url": "https://www.newsquawk.com/headlines/goldman-sachs-lowered-its-lme-aluminium-price-forecast-to-usd-2950t-for-q4-2026-and-lowered-its-2027-average-forecast-to-usd-2700t",
+          "effect": "medium_term_balance_bearish",
+          "note": "2026 deficit cut to about 100kt and 2027 surplus raised to about 1.5mt."
+        },
+        {
+          "date": "2026-08-13",
+          "source": "Reuters",
+          "url": "https://www.reuters.com/commentary/reuters-open-interest/aluminium-thin-ice-lme-stocks-hit-36-year-low-2026-08-13/",
+          "effect": "near_term_inventory_bullish",
+          "note": "LME aluminium stocks at a 36-year low, while the market simultaneously prices recovering Middle East/Indonesia/China supply."
+        }
+      ],
+      "bear_base_bull_regime_factor": [
+        0.78,
+        0.9,
+        1.02
       ],
       "bear_base_bull_forward_eps": [
-        3.5815,
-        3.8699,
-        4.1582
+        3.2264,
+        3.7228,
+        4.2192
       ],
-      "forward_earnings_basis": "2026一致预期EPS=3.7940 → 商品/成本锚相对60日中枢 → sensitivity=0.95 → bear/base/bull盈利。",
+      "forward_earnings_basis": "2026/2027 consensus -> calendar-weighted forward-12m EPS 4.0554 -> structured 6-18m regime -> capped short-term commodity modifier +2.00%.",
       "reasonable_multiple_range": [
-        11.0,
-        15.0
+        8.0,
+        11.0
       ],
-      "multiple_rationale": "低成本水电铝与一体化优势使盈利对铝价上行/氧化铝成本回落具有高弹性，同时给予成本优势一定估值溢价。",
+      "multiple_rationale": "近端库存与地缘扰动仍支撑铝价，但中东复产快于此前预期、2027库存重建/供给过剩风险意味着当前高利润不应直接按高倍PE资本化。",
       "value_anchor_range": [
-        39.4,
-        62.37
+        25.81,
+        46.41
       ],
-      "base_fair_value_floor": 42.57,
+      "base_fair_value_floor": 29.78,
       "safe_buy_range": [
-        31.93,
-        37.46
+        22.34,
+        26.21
       ],
       "reasonable_buy_range": [
-        37.46,
-        42.57
+        26.21,
+        29.78
       ],
       "key_sensitivities": [
-        "商品价格中枢",
-        "成本锚",
-        "产量/销量",
-        "一致预期EPS修正"
+        "6-18m supply-demand regime",
+        "next-year consensus EPS",
+        "commodity/cost anchor",
+        "production/sales"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "safe_buy_zone"
+      "left_conclusion": "reasonable_buy_zone"
     },
     {
       "code": "000878",
@@ -313,10 +391,23 @@
       "cycle_tag": "nonferrous::铜矿资源",
       "current_price": 17.85,
       "valuation_status": "valid",
-      "valuation_model": "commodity_scenario_forward_pe",
+      "execution_state": "valid",
+      "valuation_model": "forward_cycle_scenario",
+      "valuation_basis_unit": "PE",
       "forecast_source": "akshare.stock_profit_forecast_em",
       "forecast_report_count": 3,
       "consensus_eps_current_year": 1.1867,
+      "consensus_eps_next_year": 1.3167,
+      "next_year_eps_growth_pct": 10.96,
+      "forward_12m_eps_proxy": 1.2733,
+      "forward_eps_weights": {
+        "current_year": 0.3333,
+        "next_year": 0.6667
+      },
+      "market_forward_pe_current_year": 15.04,
+      "market_forward_pe_next_year": 13.56,
+      "market_forward_pe_12m_proxy": 14.02,
+      "market_pe_dynamic": null,
       "commodity_anchors": [
         {
           "symbol": "CU0",
@@ -333,41 +424,60 @@
           "direction": 1.0
         }
       ],
+      "short_term_anchor_effect_on_eps": 0.0259,
       "profit_sensitivity": 0.75,
-      "bear_base_bull_anchor_factor": [
-        0.9545,
-        1.0345,
-        1.1145
+      "cycle_regime": "tight_spot_medium_term_balancing",
+      "cycle_regime_reviewed_at": "2026-08-30",
+      "cycle_regime_age_days": -2,
+      "cycle_regime_summary": "现货/区域流动性偏紧与矿端扰动支撑价格，但2026全球统计口径仍可能呈现供应过剩，估值不能把短期高铜价永久化。",
+      "cycle_regime_scores": {
+        "supply": 0.0,
+        "demand": 0.5,
+        "inventory": 0.5
+      },
+      "cycle_regime_evidence": [
+        {
+          "date": "2026-08-25",
+          "source": "Reuters",
+          "url": "https://www.reuters.com/business/us-tariff-threat-upends-copper-surplus-prices-test-all-time-peak-2026-08-25/",
+          "effect": "mixed",
+          "note": "Copper near record highs amid US tariff-driven inventory relocation, mine disruptions and smelter outages, while analysts still estimate a 2026 global surplus."
+        }
+      ],
+      "bear_base_bull_regime_factor": [
+        0.9,
+        0.98,
+        1.08
       ],
       "bear_base_bull_forward_eps": [
-        1.1462,
-        1.2174,
-        1.2886
+        1.1756,
+        1.2802,
+        1.4108
       ],
-      "forward_earnings_basis": "2026一致预期EPS=1.1867 → 商品/成本锚相对60日中枢 → sensitivity=0.75 → bear/base/bull盈利。",
+      "forward_earnings_basis": "2026/2027 consensus -> calendar-weighted forward-12m EPS 1.2733 -> structured 6-18m regime -> capped short-term commodity modifier +2.59%.",
       "reasonable_multiple_range": [
-        12.0,
-        16.0
+        11.0,
+        15.0
       ],
-      "multiple_rationale": "按资源/周期业务质量和周期波动采用版本化估值区间。",
+      "multiple_rationale": "现货/区域流动性偏紧与矿端扰动支撑价格，但2026全球统计口径仍可能呈现供应过剩，估值不能把短期高铜价永久化。",
       "value_anchor_range": [
-        13.75,
-        20.62
+        12.93,
+        21.16
       ],
-      "base_fair_value_floor": 14.61,
+      "base_fair_value_floor": 14.08,
       "safe_buy_range": [
-        10.96,
-        12.86
+        10.56,
+        12.39
       ],
       "reasonable_buy_range": [
-        12.86,
-        14.61
+        12.39,
+        14.08
       ],
       "key_sensitivities": [
-        "商品价格中枢",
-        "成本锚",
-        "产量/销量",
-        "一致预期EPS修正"
+        "6-18m supply-demand regime",
+        "next-year consensus EPS",
+        "commodity/cost anchor",
+        "production/sales"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone"
@@ -378,10 +488,23 @@
       "cycle_tag": "nonferrous::电解铝",
       "current_price": 27.59,
       "valuation_status": "valid",
-      "valuation_model": "commodity_scenario_forward_pe",
+      "execution_state": "valid",
+      "valuation_model": "forward_cycle_scenario",
+      "valuation_basis_unit": "PE",
       "forecast_source": "akshare.stock_profit_forecast_em",
       "forecast_report_count": 20,
       "consensus_eps_current_year": 3.9321,
+      "consensus_eps_next_year": 3.9973,
+      "next_year_eps_growth_pct": 1.66,
+      "forward_12m_eps_proxy": 3.9755,
+      "forward_eps_weights": {
+        "current_year": 0.3333,
+        "next_year": 0.6667
+      },
+      "market_forward_pe_current_year": 7.02,
+      "market_forward_pe_next_year": 6.9,
+      "market_forward_pe_12m_proxy": 6.94,
+      "market_pe_dynamic": null,
       "commodity_anchors": [
         {
           "symbol": "AL0",
@@ -412,44 +535,77 @@
           "direction": -1.0
         }
       ],
+      "short_term_anchor_effect_on_eps": 0.0189,
       "profit_sensitivity": 0.9,
-      "bear_base_bull_anchor_factor": [
-        0.941,
-        1.021,
-        1.101
+      "cycle_regime": "near_term_tight_medium_term_normalizing",
+      "cycle_regime_reviewed_at": "2026-08-30",
+      "cycle_regime_age_days": -2,
+      "cycle_regime_summary": "近端库存与地缘扰动仍支撑铝价，但中东复产快于此前预期、2027库存重建/供给过剩风险意味着当前高利润不应直接按高倍PE资本化。",
+      "cycle_regime_scores": {
+        "supply": -1.0,
+        "demand": -0.5,
+        "inventory": 1.0
+      },
+      "cycle_regime_evidence": [
+        {
+          "date": "2026-07-06",
+          "source": "Goldman Sachs summary via AEGIS/Newsquawk",
+          "url": "https://instanext.com/insights/metals/daily-first-look/2026-07-06",
+          "effect": "medium_term_supply_bearish",
+          "note": "Middle East supply recovery faster than expected; Q4 2026 LME forecast cut to 2950/t and 2027 average to 2700/t; inventories expected to rebuild into 2027."
+        },
+        {
+          "date": "2026-07-06",
+          "source": "Newsquawk summary of Goldman Sachs",
+          "url": "https://www.newsquawk.com/headlines/goldman-sachs-lowered-its-lme-aluminium-price-forecast-to-usd-2950t-for-q4-2026-and-lowered-its-2027-average-forecast-to-usd-2700t",
+          "effect": "medium_term_balance_bearish",
+          "note": "2026 deficit cut to about 100kt and 2027 surplus raised to about 1.5mt."
+        },
+        {
+          "date": "2026-08-13",
+          "source": "Reuters",
+          "url": "https://www.reuters.com/commentary/reuters-open-interest/aluminium-thin-ice-lme-stocks-hit-36-year-low-2026-08-13/",
+          "effect": "near_term_inventory_bullish",
+          "note": "LME aluminium stocks at a 36-year low, while the market simultaneously prices recovering Middle East/Indonesia/China supply."
+        }
+      ],
+      "bear_base_bull_regime_factor": [
+        0.78,
+        0.9,
+        1.02
       ],
       "bear_base_bull_forward_eps": [
-        3.7235,
-        4.0066,
-        4.2897
+        3.1597,
+        3.6458,
+        4.1319
       ],
-      "forward_earnings_basis": "2026一致预期EPS=3.9321 → 商品/成本锚相对60日中枢 → sensitivity=0.90 → bear/base/bull盈利。",
+      "forward_earnings_basis": "2026/2027 consensus -> calendar-weighted forward-12m EPS 3.9755 -> structured 6-18m regime -> capped short-term commodity modifier +1.89%.",
       "reasonable_multiple_range": [
-        10.0,
-        14.0
+        8.0,
+        11.0
       ],
-      "multiple_rationale": "按资源/周期业务质量和周期波动采用版本化估值区间。",
+      "multiple_rationale": "近端库存与地缘扰动仍支撑铝价，但中东复产快于此前预期、2027库存重建/供给过剩风险意味着当前高利润不应直接按高倍PE资本化。",
       "value_anchor_range": [
-        37.23,
-        60.06
+        25.28,
+        45.45
       ],
-      "base_fair_value_floor": 40.07,
+      "base_fair_value_floor": 29.17,
       "safe_buy_range": [
-        30.05,
-        35.26
+        21.87,
+        25.67
       ],
       "reasonable_buy_range": [
-        35.26,
-        40.07
+        25.67,
+        29.17
       ],
       "key_sensitivities": [
-        "商品价格中枢",
-        "成本锚",
-        "产量/销量",
-        "一致预期EPS修正"
+        "6-18m supply-demand regime",
+        "next-year consensus EPS",
+        "commodity/cost anchor",
+        "production/sales"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "safe_buy_zone"
+      "left_conclusion": "reasonable_buy_zone"
     },
     {
       "code": "000949",
@@ -458,7 +614,8 @@
       "current_price": 7.38,
       "valuation_status": "unavailable",
       "valuation_model": "manual_spread_anchor_required",
-      "forward_earnings_basis": "该细分链尚无可机械验证的商品/价差锚；不得退回TTM PE。",
+      "execution_state": "machine_anchor_policy_missing",
+      "forward_earnings_basis": "This subchain has no machine-verifiable commodity/spread anchor; TTM PE is not an allowed substitute.",
       "commodity_anchors": [],
       "reasonable_multiple_range": null,
       "value_anchor_range": null,
@@ -475,7 +632,8 @@
       "current_price": 11.89,
       "valuation_status": "unavailable",
       "valuation_model": "manual_spread_anchor_required",
-      "forward_earnings_basis": "该细分链尚无可机械验证的商品/价差锚；不得退回TTM PE。",
+      "execution_state": "machine_anchor_policy_missing",
+      "forward_earnings_basis": "This subchain has no machine-verifiable commodity/spread anchor; TTM PE is not an allowed substitute.",
       "commodity_anchors": [],
       "reasonable_multiple_range": null,
       "value_anchor_range": null,
@@ -491,18 +649,17 @@
       "cycle_tag": "coal::动力煤",
       "current_price": 29.11,
       "valuation_status": "unavailable",
-      "valuation_model": "commodity_scenario_forward_pe",
-      "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
+      "valuation_model": "forward_cycle_scenario",
+      "execution_state": "input_data_insufficient",
+      "forward_earnings_basis": "2026/2027 consensus plus commodity and 6-18m regime are mandatory for resource valuation.",
       "commodity_anchors": [],
-      "reasonable_multiple_range": [
-        7,
-        10
-      ],
+      "reasonable_multiple_range": null,
       "value_anchor_range": null,
       "safe_buy_range": null,
       "reasonable_buy_range": null,
       "left_conclusion": "unavailable",
       "reason": "commodity_anchor_fetch_failed:['ZC0']",
+      "cycle_regime": null,
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
     },
     {
@@ -512,7 +669,8 @@
       "current_price": 19.09,
       "valuation_status": "unavailable",
       "valuation_model": "manual_spread_anchor_required",
-      "forward_earnings_basis": "该细分链尚无可机械验证的商品/价差锚；不得退回TTM PE。",
+      "execution_state": "machine_anchor_policy_missing",
+      "forward_earnings_basis": "This subchain has no machine-verifiable commodity/spread anchor; TTM PE is not an allowed substitute.",
       "commodity_anchors": [],
       "reasonable_multiple_range": null,
       "value_anchor_range": null,
@@ -529,7 +687,8 @@
       "current_price": 36.94,
       "valuation_status": "unavailable",
       "valuation_model": "manual_spread_anchor_required",
-      "forward_earnings_basis": "该细分链尚无可机械验证的商品/价差锚；不得退回TTM PE。",
+      "execution_state": "machine_anchor_policy_missing",
+      "forward_earnings_basis": "This subchain has no machine-verifiable commodity/spread anchor; TTM PE is not an allowed substitute.",
       "commodity_anchors": [],
       "reasonable_multiple_range": null,
       "value_anchor_range": null,
@@ -545,10 +704,23 @@
       "cycle_tag": "nonferrous::电解铝",
       "current_price": 13.17,
       "valuation_status": "valid",
-      "valuation_model": "commodity_scenario_forward_pe",
+      "execution_state": "valid",
+      "valuation_model": "forward_cycle_scenario",
+      "valuation_basis_unit": "PE",
       "forecast_source": "akshare.stock_profit_forecast_em",
       "forecast_report_count": 18,
       "consensus_eps_current_year": 1.9353,
+      "consensus_eps_next_year": 2.0729,
+      "next_year_eps_growth_pct": 7.11,
+      "forward_12m_eps_proxy": 2.0271,
+      "forward_eps_weights": {
+        "current_year": 0.3333,
+        "next_year": 0.6667
+      },
+      "market_forward_pe_current_year": 6.81,
+      "market_forward_pe_next_year": 6.35,
+      "market_forward_pe_12m_proxy": 6.5,
+      "market_pe_dynamic": null,
       "commodity_anchors": [
         {
           "symbol": "AL0",
@@ -579,44 +751,77 @@
           "direction": -1.0
         }
       ],
+      "short_term_anchor_effect_on_eps": 0.0189,
       "profit_sensitivity": 0.9,
-      "bear_base_bull_anchor_factor": [
-        0.941,
-        1.021,
-        1.101
+      "cycle_regime": "near_term_tight_medium_term_normalizing",
+      "cycle_regime_reviewed_at": "2026-08-30",
+      "cycle_regime_age_days": -2,
+      "cycle_regime_summary": "近端库存与地缘扰动仍支撑铝价，但中东复产快于此前预期、2027库存重建/供给过剩风险意味着当前高利润不应直接按高倍PE资本化。",
+      "cycle_regime_scores": {
+        "supply": -1.0,
+        "demand": -0.5,
+        "inventory": 1.0
+      },
+      "cycle_regime_evidence": [
+        {
+          "date": "2026-07-06",
+          "source": "Goldman Sachs summary via AEGIS/Newsquawk",
+          "url": "https://instanext.com/insights/metals/daily-first-look/2026-07-06",
+          "effect": "medium_term_supply_bearish",
+          "note": "Middle East supply recovery faster than expected; Q4 2026 LME forecast cut to 2950/t and 2027 average to 2700/t; inventories expected to rebuild into 2027."
+        },
+        {
+          "date": "2026-07-06",
+          "source": "Newsquawk summary of Goldman Sachs",
+          "url": "https://www.newsquawk.com/headlines/goldman-sachs-lowered-its-lme-aluminium-price-forecast-to-usd-2950t-for-q4-2026-and-lowered-its-2027-average-forecast-to-usd-2700t",
+          "effect": "medium_term_balance_bearish",
+          "note": "2026 deficit cut to about 100kt and 2027 surplus raised to about 1.5mt."
+        },
+        {
+          "date": "2026-08-13",
+          "source": "Reuters",
+          "url": "https://www.reuters.com/commentary/reuters-open-interest/aluminium-thin-ice-lme-stocks-hit-36-year-low-2026-08-13/",
+          "effect": "near_term_inventory_bullish",
+          "note": "LME aluminium stocks at a 36-year low, while the market simultaneously prices recovering Middle East/Indonesia/China supply."
+        }
+      ],
+      "bear_base_bull_regime_factor": [
+        0.78,
+        0.9,
+        1.02
       ],
       "bear_base_bull_forward_eps": [
-        1.8326,
-        1.972,
-        2.1113
+        1.6111,
+        1.8589,
+        2.1068
       ],
-      "forward_earnings_basis": "2026一致预期EPS=1.9353 → 商品/成本锚相对60日中枢 → sensitivity=0.90 → bear/base/bull盈利。",
+      "forward_earnings_basis": "2026/2027 consensus -> calendar-weighted forward-12m EPS 2.0271 -> structured 6-18m regime -> capped short-term commodity modifier +1.89%.",
       "reasonable_multiple_range": [
-        10.0,
-        14.0
+        8.0,
+        11.0
       ],
-      "multiple_rationale": "按资源/周期业务质量和周期波动采用版本化估值区间。",
+      "multiple_rationale": "近端库存与地缘扰动仍支撑铝价，但中东复产快于此前预期、2027库存重建/供给过剩风险意味着当前高利润不应直接按高倍PE资本化。",
       "value_anchor_range": [
-        18.33,
-        29.56
+        12.89,
+        23.17
       ],
-      "base_fair_value_floor": 19.72,
+      "base_fair_value_floor": 14.87,
       "safe_buy_range": [
-        14.79,
-        17.35
+        11.15,
+        13.09
       ],
       "reasonable_buy_range": [
-        17.35,
-        19.72
+        13.09,
+        14.87
       ],
       "key_sensitivities": [
-        "商品价格中枢",
-        "成本锚",
-        "产量/销量",
-        "一致预期EPS修正"
+        "6-18m supply-demand regime",
+        "next-year consensus EPS",
+        "commodity/cost anchor",
+        "production/sales"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "safe_buy_zone"
+      "left_conclusion": "reasonable_buy_zone"
     },
     {
       "code": "002915",
@@ -625,7 +830,8 @@
       "current_price": 18.87,
       "valuation_status": "unavailable",
       "valuation_model": "manual_spread_anchor_required",
-      "forward_earnings_basis": "该细分链尚无可机械验证的商品/价差锚；不得退回TTM PE。",
+      "execution_state": "machine_anchor_policy_missing",
+      "forward_earnings_basis": "This subchain has no machine-verifiable commodity/spread anchor; TTM PE is not an allowed substitute.",
       "commodity_anchors": [],
       "reasonable_multiple_range": null,
       "value_anchor_range": null,
@@ -642,7 +848,8 @@
       "current_price": 40.54,
       "valuation_status": "unavailable",
       "valuation_model": "manual_spread_anchor_required",
-      "forward_earnings_basis": "该细分链尚无可机械验证的商品/价差锚；不得退回TTM PE。",
+      "execution_state": "machine_anchor_policy_missing",
+      "forward_earnings_basis": "This subchain has no machine-verifiable commodity/spread anchor; TTM PE is not an allowed substitute.",
       "commodity_anchors": [],
       "reasonable_multiple_range": null,
       "value_anchor_range": null,
@@ -658,18 +865,17 @@
       "cycle_tag": "coal::动力煤",
       "current_price": 23.02,
       "valuation_status": "unavailable",
-      "valuation_model": "commodity_scenario_forward_pe",
-      "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
+      "valuation_model": "forward_cycle_scenario",
+      "execution_state": "input_data_insufficient",
+      "forward_earnings_basis": "2026/2027 consensus plus commodity and 6-18m regime are mandatory for resource valuation.",
       "commodity_anchors": [],
-      "reasonable_multiple_range": [
-        7,
-        10
-      ],
+      "reasonable_multiple_range": null,
       "value_anchor_range": null,
       "safe_buy_range": null,
       "reasonable_buy_range": null,
       "left_conclusion": "unavailable",
       "reason": "commodity_anchor_fetch_failed:['ZC0']",
+      "cycle_regime": null,
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
     },
     {
@@ -678,8 +884,9 @@
       "cycle_tag": "nonferrous::铜矿资源",
       "current_price": 49.01,
       "valuation_status": "unavailable",
-      "valuation_model": "commodity_scenario_forward_pe",
-      "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
+      "valuation_model": "forward_cycle_scenario",
+      "execution_state": "input_data_insufficient",
+      "forward_earnings_basis": "2026/2027 consensus plus commodity and 6-18m regime are mandatory for resource valuation.",
       "commodity_anchors": [
         {
           "symbol": "CU0",
@@ -696,15 +903,13 @@
           "direction": 1.0
         }
       ],
-      "reasonable_multiple_range": [
-        12,
-        16
-      ],
+      "reasonable_multiple_range": null,
       "value_anchor_range": null,
       "safe_buy_range": null,
       "reasonable_buy_range": null,
       "left_conclusion": "unavailable",
-      "reason": "forward_consensus_insufficient:reports=2,eps=4.29",
+      "reason": "forward_consensus_insufficient:reports=2,eps_2026=4.29,eps_2027=4.645",
+      "cycle_regime": "tight_spot_medium_term_balancing",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
     },
     {
@@ -714,7 +919,8 @@
       "current_price": 53.31,
       "valuation_status": "unavailable",
       "valuation_model": "manual_spread_anchor_required",
-      "forward_earnings_basis": "该细分链尚无可机械验证的商品/价差锚；不得退回TTM PE。",
+      "execution_state": "machine_anchor_policy_missing",
+      "forward_earnings_basis": "This subchain has no machine-verifiable commodity/spread anchor; TTM PE is not an allowed substitute.",
       "commodity_anchors": [],
       "reasonable_multiple_range": null,
       "value_anchor_range": null,
@@ -730,18 +936,17 @@
       "cycle_tag": "coal::动力煤",
       "current_price": 13.99,
       "valuation_status": "unavailable",
-      "valuation_model": "commodity_scenario_forward_pe",
-      "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
+      "valuation_model": "forward_cycle_scenario",
+      "execution_state": "input_data_insufficient",
+      "forward_earnings_basis": "2026/2027 consensus plus commodity and 6-18m regime are mandatory for resource valuation.",
       "commodity_anchors": [],
-      "reasonable_multiple_range": [
-        7,
-        10
-      ],
+      "reasonable_multiple_range": null,
       "value_anchor_range": null,
       "safe_buy_range": null,
       "reasonable_buy_range": null,
       "left_conclusion": "unavailable",
-      "reason": "commodity_anchor_fetch_failed:['ZC0'];forward_consensus_insufficient:reports=0,eps=None",
+      "reason": "commodity_anchor_fetch_failed:['ZC0'];forward_consensus_insufficient:reports=0,eps_2026=None,eps_2027=None",
+      "cycle_regime": null,
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
     },
     {
@@ -750,10 +955,23 @@
       "cycle_tag": "nonferrous::电解铝",
       "current_price": 6.34,
       "valuation_status": "valid",
-      "valuation_model": "commodity_scenario_forward_pe",
+      "execution_state": "valid",
+      "valuation_model": "forward_cycle_scenario",
+      "valuation_basis_unit": "PE",
       "forecast_source": "akshare.stock_profit_forecast_em",
       "forecast_report_count": 6,
       "consensus_eps_current_year": 0.9483,
+      "consensus_eps_next_year": 0.985,
+      "next_year_eps_growth_pct": 3.87,
+      "forward_12m_eps_proxy": 0.9728,
+      "forward_eps_weights": {
+        "current_year": 0.3333,
+        "next_year": 0.6667
+      },
+      "market_forward_pe_current_year": 6.69,
+      "market_forward_pe_next_year": 6.44,
+      "market_forward_pe_12m_proxy": 6.52,
+      "market_pe_dynamic": null,
       "commodity_anchors": [
         {
           "symbol": "AL0",
@@ -784,44 +1002,77 @@
           "direction": -1.0
         }
       ],
+      "short_term_anchor_effect_on_eps": 0.0189,
       "profit_sensitivity": 0.9,
-      "bear_base_bull_anchor_factor": [
-        0.941,
-        1.021,
-        1.101
+      "cycle_regime": "near_term_tight_medium_term_normalizing",
+      "cycle_regime_reviewed_at": "2026-08-30",
+      "cycle_regime_age_days": -2,
+      "cycle_regime_summary": "近端库存与地缘扰动仍支撑铝价，但中东复产快于此前预期、2027库存重建/供给过剩风险意味着当前高利润不应直接按高倍PE资本化。",
+      "cycle_regime_scores": {
+        "supply": -1.0,
+        "demand": -0.5,
+        "inventory": 1.0
+      },
+      "cycle_regime_evidence": [
+        {
+          "date": "2026-07-06",
+          "source": "Goldman Sachs summary via AEGIS/Newsquawk",
+          "url": "https://instanext.com/insights/metals/daily-first-look/2026-07-06",
+          "effect": "medium_term_supply_bearish",
+          "note": "Middle East supply recovery faster than expected; Q4 2026 LME forecast cut to 2950/t and 2027 average to 2700/t; inventories expected to rebuild into 2027."
+        },
+        {
+          "date": "2026-07-06",
+          "source": "Newsquawk summary of Goldman Sachs",
+          "url": "https://www.newsquawk.com/headlines/goldman-sachs-lowered-its-lme-aluminium-price-forecast-to-usd-2950t-for-q4-2026-and-lowered-its-2027-average-forecast-to-usd-2700t",
+          "effect": "medium_term_balance_bearish",
+          "note": "2026 deficit cut to about 100kt and 2027 surplus raised to about 1.5mt."
+        },
+        {
+          "date": "2026-08-13",
+          "source": "Reuters",
+          "url": "https://www.reuters.com/commentary/reuters-open-interest/aluminium-thin-ice-lme-stocks-hit-36-year-low-2026-08-13/",
+          "effect": "near_term_inventory_bullish",
+          "note": "LME aluminium stocks at a 36-year low, while the market simultaneously prices recovering Middle East/Indonesia/China supply."
+        }
+      ],
+      "bear_base_bull_regime_factor": [
+        0.78,
+        0.9,
+        1.02
       ],
       "bear_base_bull_forward_eps": [
-        0.898,
-        0.9663,
-        1.0346
+        0.7731,
+        0.8921,
+        1.011
       ],
-      "forward_earnings_basis": "2026一致预期EPS=0.9483 → 商品/成本锚相对60日中枢 → sensitivity=0.90 → bear/base/bull盈利。",
+      "forward_earnings_basis": "2026/2027 consensus -> calendar-weighted forward-12m EPS 0.9728 -> structured 6-18m regime -> capped short-term commodity modifier +1.89%.",
       "reasonable_multiple_range": [
-        10.0,
-        14.0
+        8.0,
+        11.0
       ],
-      "multiple_rationale": "按资源/周期业务质量和周期波动采用版本化估值区间。",
+      "multiple_rationale": "近端库存与地缘扰动仍支撑铝价，但中东复产快于此前预期、2027库存重建/供给过剩风险意味着当前高利润不应直接按高倍PE资本化。",
       "value_anchor_range": [
-        8.98,
-        14.48
+        6.19,
+        11.12
       ],
-      "base_fair_value_floor": 9.66,
+      "base_fair_value_floor": 7.14,
       "safe_buy_range": [
-        7.25,
-        8.5
+        5.35,
+        6.28
       ],
       "reasonable_buy_range": [
-        8.5,
-        9.66
+        6.28,
+        7.14
       ],
       "key_sensitivities": [
-        "商品价格中枢",
-        "成本锚",
-        "产量/销量",
-        "一致预期EPS修正"
+        "6-18m supply-demand regime",
+        "next-year consensus EPS",
+        "commodity/cost anchor",
+        "production/sales"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "safe_buy_zone"
+      "left_conclusion": "reasonable_buy_zone"
     },
     {
       "code": "600673",
@@ -830,7 +1081,8 @@
       "current_price": 31.88,
       "valuation_status": "unavailable",
       "valuation_model": "manual_spread_anchor_required",
-      "forward_earnings_basis": "该细分链尚无可机械验证的商品/价差锚；不得退回TTM PE。",
+      "execution_state": "machine_anchor_policy_missing",
+      "forward_earnings_basis": "This subchain has no machine-verifiable commodity/spread anchor; TTM PE is not an allowed substitute.",
       "commodity_anchors": [],
       "reasonable_multiple_range": null,
       "value_anchor_range": null,
@@ -846,10 +1098,23 @@
       "cycle_tag": "nonferrous::铜矿资源",
       "current_price": 12.0,
       "valuation_status": "valid",
-      "valuation_model": "commodity_scenario_forward_pe",
+      "execution_state": "valid",
+      "valuation_model": "forward_cycle_scenario",
+      "valuation_basis_unit": "PE",
       "forecast_source": "akshare.stock_profit_forecast_em",
       "forecast_report_count": 4,
       "consensus_eps_current_year": 1.13,
+      "consensus_eps_next_year": 1.475,
+      "next_year_eps_growth_pct": 30.53,
+      "forward_12m_eps_proxy": 1.36,
+      "forward_eps_weights": {
+        "current_year": 0.3333,
+        "next_year": 0.6667
+      },
+      "market_forward_pe_current_year": 10.62,
+      "market_forward_pe_next_year": 8.14,
+      "market_forward_pe_12m_proxy": 8.82,
+      "market_pe_dynamic": null,
       "commodity_anchors": [
         {
           "symbol": "CU0",
@@ -866,41 +1131,60 @@
           "direction": 1.0
         }
       ],
+      "short_term_anchor_effect_on_eps": 0.0259,
       "profit_sensitivity": 0.75,
-      "bear_base_bull_anchor_factor": [
-        0.9545,
-        1.0345,
-        1.1145
+      "cycle_regime": "tight_spot_medium_term_balancing",
+      "cycle_regime_reviewed_at": "2026-08-30",
+      "cycle_regime_age_days": -2,
+      "cycle_regime_summary": "现货/区域流动性偏紧与矿端扰动支撑价格，但2026全球统计口径仍可能呈现供应过剩，估值不能把短期高铜价永久化。",
+      "cycle_regime_scores": {
+        "supply": 0.0,
+        "demand": 0.5,
+        "inventory": 0.5
+      },
+      "cycle_regime_evidence": [
+        {
+          "date": "2026-08-25",
+          "source": "Reuters",
+          "url": "https://www.reuters.com/business/us-tariff-threat-upends-copper-surplus-prices-test-all-time-peak-2026-08-25/",
+          "effect": "mixed",
+          "note": "Copper near record highs amid US tariff-driven inventory relocation, mine disruptions and smelter outages, while analysts still estimate a 2026 global surplus."
+        }
+      ],
+      "bear_base_bull_regime_factor": [
+        0.9,
+        0.98,
+        1.08
       ],
       "bear_base_bull_forward_eps": [
-        1.0914,
-        1.1592,
-        1.227
+        1.2557,
+        1.3673,
+        1.5068
       ],
-      "forward_earnings_basis": "2026一致预期EPS=1.1300 → 商品/成本锚相对60日中枢 → sensitivity=0.75 → bear/base/bull盈利。",
+      "forward_earnings_basis": "2026/2027 consensus -> calendar-weighted forward-12m EPS 1.3600 -> structured 6-18m regime -> capped short-term commodity modifier +2.59%.",
       "reasonable_multiple_range": [
-        12.0,
-        16.0
+        11.0,
+        15.0
       ],
-      "multiple_rationale": "按资源/周期业务质量和周期波动采用版本化估值区间。",
+      "multiple_rationale": "现货/区域流动性偏紧与矿端扰动支撑价格，但2026全球统计口径仍可能呈现供应过剩，估值不能把短期高铜价永久化。",
       "value_anchor_range": [
-        13.1,
-        19.63
+        13.81,
+        22.6
       ],
-      "base_fair_value_floor": 13.91,
+      "base_fair_value_floor": 15.04,
       "safe_buy_range": [
-        10.43,
-        12.24
+        11.28,
+        13.24
       ],
       "reasonable_buy_range": [
-        12.24,
-        13.91
+        13.24,
+        15.04
       ],
       "key_sensitivities": [
-        "商品价格中枢",
-        "成本锚",
-        "产量/销量",
-        "一致预期EPS修正"
+        "6-18m supply-demand regime",
+        "next-year consensus EPS",
+        "commodity/cost anchor",
+        "production/sales"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "safe_buy_zone"
@@ -911,18 +1195,17 @@
       "cycle_tag": "coal::动力煤",
       "current_price": 9.02,
       "valuation_status": "unavailable",
-      "valuation_model": "commodity_scenario_forward_pe",
-      "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
+      "valuation_model": "forward_cycle_scenario",
+      "execution_state": "input_data_insufficient",
+      "forward_earnings_basis": "2026/2027 consensus plus commodity and 6-18m regime are mandatory for resource valuation.",
       "commodity_anchors": [],
-      "reasonable_multiple_range": [
-        7,
-        10
-      ],
+      "reasonable_multiple_range": null,
       "value_anchor_range": null,
       "safe_buy_range": null,
       "reasonable_buy_range": null,
       "left_conclusion": "unavailable",
       "reason": "commodity_anchor_fetch_failed:['ZC0']",
+      "cycle_regime": null,
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
     },
     {
@@ -931,18 +1214,17 @@
       "cycle_tag": "coal::动力煤",
       "current_price": 47.63,
       "valuation_status": "unavailable",
-      "valuation_model": "commodity_scenario_forward_pe",
-      "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
+      "valuation_model": "forward_cycle_scenario",
+      "execution_state": "input_data_insufficient",
+      "forward_earnings_basis": "2026/2027 consensus plus commodity and 6-18m regime are mandatory for resource valuation.",
       "commodity_anchors": [],
-      "reasonable_multiple_range": [
-        7,
-        10
-      ],
+      "reasonable_multiple_range": null,
       "value_anchor_range": null,
       "safe_buy_range": null,
       "reasonable_buy_range": null,
       "left_conclusion": "unavailable",
       "reason": "commodity_anchor_fetch_failed:['ZC0']",
+      "cycle_regime": null,
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
     },
     {
@@ -951,18 +1233,17 @@
       "cycle_tag": "coal::动力煤",
       "current_price": 14.81,
       "valuation_status": "unavailable",
-      "valuation_model": "commodity_scenario_forward_pe",
-      "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
+      "valuation_model": "forward_cycle_scenario",
+      "execution_state": "input_data_insufficient",
+      "forward_earnings_basis": "2026/2027 consensus plus commodity and 6-18m regime are mandatory for resource valuation.",
       "commodity_anchors": [],
-      "reasonable_multiple_range": [
-        7,
-        10
-      ],
+      "reasonable_multiple_range": null,
       "value_anchor_range": null,
       "safe_buy_range": null,
       "reasonable_buy_range": null,
       "left_conclusion": "unavailable",
       "reason": "commodity_anchor_fetch_failed:['ZC0']",
+      "cycle_regime": null,
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
     },
     {
@@ -971,10 +1252,23 @@
       "cycle_tag": "nonferrous::铜矿资源",
       "current_price": 39.12,
       "valuation_status": "valid",
-      "valuation_model": "commodity_scenario_forward_pe",
+      "execution_state": "valid",
+      "valuation_model": "forward_cycle_scenario",
+      "valuation_basis_unit": "PE",
       "forecast_source": "akshare.stock_profit_forecast_em",
       "forecast_report_count": 19,
       "consensus_eps_current_year": 2.8868,
+      "consensus_eps_next_year": 3.3105,
+      "next_year_eps_growth_pct": 14.68,
+      "forward_12m_eps_proxy": 3.1693,
+      "forward_eps_weights": {
+        "current_year": 0.3333,
+        "next_year": 0.6667
+      },
+      "market_forward_pe_current_year": 13.55,
+      "market_forward_pe_next_year": 11.82,
+      "market_forward_pe_12m_proxy": 12.34,
+      "market_pe_dynamic": null,
       "commodity_anchors": [
         {
           "symbol": "CU0",
@@ -991,41 +1285,60 @@
           "direction": 1.0
         }
       ],
+      "short_term_anchor_effect_on_eps": 0.0259,
       "profit_sensitivity": 0.75,
-      "bear_base_bull_anchor_factor": [
-        0.9545,
-        1.0345,
-        1.1145
+      "cycle_regime": "tight_spot_medium_term_balancing",
+      "cycle_regime_reviewed_at": "2026-08-30",
+      "cycle_regime_age_days": -2,
+      "cycle_regime_summary": "现货/区域流动性偏紧与矿端扰动支撑价格，但2026全球统计口径仍可能呈现供应过剩，估值不能把短期高铜价永久化。",
+      "cycle_regime_scores": {
+        "supply": 0.0,
+        "demand": 0.5,
+        "inventory": 0.5
+      },
+      "cycle_regime_evidence": [
+        {
+          "date": "2026-08-25",
+          "source": "Reuters",
+          "url": "https://www.reuters.com/business/us-tariff-threat-upends-copper-surplus-prices-test-all-time-peak-2026-08-25/",
+          "effect": "mixed",
+          "note": "Copper near record highs amid US tariff-driven inventory relocation, mine disruptions and smelter outages, while analysts still estimate a 2026 global surplus."
+        }
+      ],
+      "bear_base_bull_regime_factor": [
+        0.9,
+        0.98,
+        1.08
       ],
       "bear_base_bull_forward_eps": [
-        2.7883,
-        2.9615,
-        3.1347
+        2.9262,
+        3.1863,
+        3.5114
       ],
-      "forward_earnings_basis": "2026一致预期EPS=2.8868 → 商品/成本锚相对60日中枢 → sensitivity=0.75 → bear/base/bull盈利。",
+      "forward_earnings_basis": "2026/2027 consensus -> calendar-weighted forward-12m EPS 3.1693 -> structured 6-18m regime -> capped short-term commodity modifier +2.59%.",
       "reasonable_multiple_range": [
-        12.0,
-        16.0
+        11.0,
+        15.0
       ],
-      "multiple_rationale": "按资源/周期业务质量和周期波动采用版本化估值区间。",
+      "multiple_rationale": "现货/区域流动性偏紧与矿端扰动支撑价格，但2026全球统计口径仍可能呈现供应过剩，估值不能把短期高铜价永久化。",
       "value_anchor_range": [
-        33.46,
-        50.16
+        32.19,
+        52.67
       ],
-      "base_fair_value_floor": 35.54,
+      "base_fair_value_floor": 35.05,
       "safe_buy_range": [
-        26.65,
-        31.27
+        26.29,
+        30.84
       ],
       "reasonable_buy_range": [
-        31.27,
-        35.54
+        30.84,
+        35.05
       ],
       "key_sensitivities": [
-        "商品价格中枢",
-        "成本锚",
-        "产量/销量",
-        "一致预期EPS修正"
+        "6-18m supply-demand regime",
+        "next-year consensus EPS",
+        "commodity/cost anchor",
+        "production/sales"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone"
@@ -1036,18 +1349,17 @@
       "cycle_tag": "coal::动力煤",
       "current_price": 27.07,
       "valuation_status": "unavailable",
-      "valuation_model": "commodity_scenario_forward_pe",
-      "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
+      "valuation_model": "forward_cycle_scenario",
+      "execution_state": "input_data_insufficient",
+      "forward_earnings_basis": "2026/2027 consensus plus commodity and 6-18m regime are mandatory for resource valuation.",
       "commodity_anchors": [],
-      "reasonable_multiple_range": [
-        7,
-        10
-      ],
+      "reasonable_multiple_range": null,
       "value_anchor_range": null,
       "safe_buy_range": null,
       "reasonable_buy_range": null,
       "left_conclusion": "unavailable",
       "reason": "commodity_anchor_fetch_failed:['ZC0']",
+      "cycle_regime": null,
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
     },
     {
@@ -1056,10 +1368,23 @@
       "cycle_tag": "nonferrous::电解铝",
       "current_price": 9.82,
       "valuation_status": "valid",
-      "valuation_model": "commodity_scenario_forward_pe",
+      "execution_state": "valid",
+      "valuation_model": "forward_cycle_scenario",
+      "valuation_basis_unit": "PE",
       "forecast_source": "akshare.stock_profit_forecast_em",
       "forecast_report_count": 10,
       "consensus_eps_current_year": 1.2972,
+      "consensus_eps_next_year": 1.3624,
+      "next_year_eps_growth_pct": 5.03,
+      "forward_12m_eps_proxy": 1.3407,
+      "forward_eps_weights": {
+        "current_year": 0.3333,
+        "next_year": 0.6667
+      },
+      "market_forward_pe_current_year": 7.57,
+      "market_forward_pe_next_year": 7.21,
+      "market_forward_pe_12m_proxy": 7.32,
+      "market_pe_dynamic": null,
       "commodity_anchors": [
         {
           "symbol": "AL0",
@@ -1090,44 +1415,77 @@
           "direction": -1.0
         }
       ],
+      "short_term_anchor_effect_on_eps": 0.0189,
       "profit_sensitivity": 0.9,
-      "bear_base_bull_anchor_factor": [
-        0.941,
-        1.021,
-        1.101
+      "cycle_regime": "near_term_tight_medium_term_normalizing",
+      "cycle_regime_reviewed_at": "2026-08-30",
+      "cycle_regime_age_days": -2,
+      "cycle_regime_summary": "近端库存与地缘扰动仍支撑铝价，但中东复产快于此前预期、2027库存重建/供给过剩风险意味着当前高利润不应直接按高倍PE资本化。",
+      "cycle_regime_scores": {
+        "supply": -1.0,
+        "demand": -0.5,
+        "inventory": 1.0
+      },
+      "cycle_regime_evidence": [
+        {
+          "date": "2026-07-06",
+          "source": "Goldman Sachs summary via AEGIS/Newsquawk",
+          "url": "https://instanext.com/insights/metals/daily-first-look/2026-07-06",
+          "effect": "medium_term_supply_bearish",
+          "note": "Middle East supply recovery faster than expected; Q4 2026 LME forecast cut to 2950/t and 2027 average to 2700/t; inventories expected to rebuild into 2027."
+        },
+        {
+          "date": "2026-07-06",
+          "source": "Newsquawk summary of Goldman Sachs",
+          "url": "https://www.newsquawk.com/headlines/goldman-sachs-lowered-its-lme-aluminium-price-forecast-to-usd-2950t-for-q4-2026-and-lowered-its-2027-average-forecast-to-usd-2700t",
+          "effect": "medium_term_balance_bearish",
+          "note": "2026 deficit cut to about 100kt and 2027 surplus raised to about 1.5mt."
+        },
+        {
+          "date": "2026-08-13",
+          "source": "Reuters",
+          "url": "https://www.reuters.com/commentary/reuters-open-interest/aluminium-thin-ice-lme-stocks-hit-36-year-low-2026-08-13/",
+          "effect": "near_term_inventory_bullish",
+          "note": "LME aluminium stocks at a 36-year low, while the market simultaneously prices recovering Middle East/Indonesia/China supply."
+        }
+      ],
+      "bear_base_bull_regime_factor": [
+        0.78,
+        0.9,
+        1.02
       ],
       "bear_base_bull_forward_eps": [
-        1.2284,
-        1.3218,
-        1.4152
+        1.0655,
+        1.2295,
+        1.3934
       ],
-      "forward_earnings_basis": "2026一致预期EPS=1.2972 → 商品/成本锚相对60日中枢 → sensitivity=0.90 → bear/base/bull盈利。",
+      "forward_earnings_basis": "2026/2027 consensus -> calendar-weighted forward-12m EPS 1.3407 -> structured 6-18m regime -> capped short-term commodity modifier +1.89%.",
       "reasonable_multiple_range": [
-        10.0,
-        14.0
+        8.0,
+        11.0
       ],
-      "multiple_rationale": "原铝板块为主要利润弹性来源，氧化铝同时是业务与成本变量；必须联合观察铝价和氧化铝成本方向。",
+      "multiple_rationale": "近端库存与地缘扰动仍支撑铝价，但中东复产快于此前预期、2027库存重建/供给过剩风险意味着当前高利润不应直接按高倍PE资本化。",
       "value_anchor_range": [
-        12.28,
-        19.81
+        8.52,
+        15.33
       ],
-      "base_fair_value_floor": 13.22,
+      "base_fair_value_floor": 9.84,
       "safe_buy_range": [
-        9.91,
-        11.63
+        7.38,
+        8.66
       ],
       "reasonable_buy_range": [
-        11.63,
-        13.22
+        8.66,
+        9.84
       ],
       "key_sensitivities": [
-        "商品价格中枢",
-        "成本锚",
-        "产量/销量",
-        "一致预期EPS修正"
+        "6-18m supply-demand regime",
+        "next-year consensus EPS",
+        "commodity/cost anchor",
+        "production/sales"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "safe_buy_zone"
+      "left_conclusion": "reasonable_buy_zone"
     },
     {
       "code": "601899",
@@ -1135,10 +1493,23 @@
       "cycle_tag": "nonferrous::铜矿资源",
       "current_price": 34.65,
       "valuation_status": "valid",
-      "valuation_model": "commodity_scenario_forward_pe",
+      "execution_state": "valid",
+      "valuation_model": "forward_cycle_scenario",
+      "valuation_basis_unit": "PE",
       "forecast_source": "akshare.stock_profit_forecast_em",
       "forecast_report_count": 21,
       "consensus_eps_current_year": 3.1176,
+      "consensus_eps_next_year": 3.6524,
+      "next_year_eps_growth_pct": 17.15,
+      "forward_12m_eps_proxy": 3.4741,
+      "forward_eps_weights": {
+        "current_year": 0.3333,
+        "next_year": 0.6667
+      },
+      "market_forward_pe_current_year": 11.11,
+      "market_forward_pe_next_year": 9.49,
+      "market_forward_pe_12m_proxy": 9.97,
+      "market_pe_dynamic": null,
       "commodity_anchors": [
         {
           "symbol": "AU0",
@@ -1169,41 +1540,60 @@
           "direction": 1.0
         }
       ],
+      "short_term_anchor_effect_on_eps": 0.0441,
       "profit_sensitivity": 0.7,
-      "bear_base_bull_anchor_factor": [
-        0.983,
-        1.063,
-        1.143
+      "cycle_regime": "gold_copper_diversified_constructive",
+      "cycle_regime_reviewed_at": "2026-08-30",
+      "cycle_regime_age_days": -2,
+      "cycle_regime_summary": "黄金与铜双主业降低单一铜周期误判；仍需用2027盈利中枢而不是当前高商品价格直接外推。",
+      "cycle_regime_scores": {
+        "supply": 0.0,
+        "demand": 0.5,
+        "inventory": 0.5
+      },
+      "cycle_regime_evidence": [
+        {
+          "date": "2026-08-25",
+          "source": "Reuters",
+          "url": "https://www.reuters.com/business/us-tariff-threat-upends-copper-surplus-prices-test-all-time-peak-2026-08-25/",
+          "effect": "mixed",
+          "note": "Copper near record highs amid US tariff-driven inventory relocation, mine disruptions and smelter outages, while analysts still estimate a 2026 global surplus."
+        }
+      ],
+      "bear_base_bull_regime_factor": [
+        0.94,
+        1.02,
+        1.1
       ],
       "bear_base_bull_forward_eps": [
-        3.0806,
-        3.2552,
-        3.4298
+        3.4098,
+        3.7,
+        3.9902
       ],
-      "forward_earnings_basis": "2026一致预期EPS=3.1176 → 商品/成本锚相对60日中枢 → sensitivity=0.70 → bear/base/bull盈利。",
+      "forward_earnings_basis": "2026/2027 consensus -> calendar-weighted forward-12m EPS 3.4741 -> structured 6-18m regime -> capped short-term commodity modifier +4.41%.",
       "reasonable_multiple_range": [
-        13.0,
-        17.0
+        12.0,
+        16.0
       ],
-      "multiple_rationale": "2026H1黄金和铜合计贡献集团毛利约75.5%，以黄金/铜双商品锚而不是单一铜价或TTM PE决定前瞻盈利中枢。",
+      "multiple_rationale": "黄金与铜双主业降低单一铜周期误判；仍需用2027盈利中枢而不是当前高商品价格直接外推。",
       "value_anchor_range": [
-        40.05,
-        58.31
+        40.92,
+        63.84
       ],
-      "base_fair_value_floor": 42.32,
+      "base_fair_value_floor": 44.4,
       "safe_buy_range": [
-        32.16,
-        37.24
+        33.74,
+        39.07
       ],
       "reasonable_buy_range": [
-        37.24,
-        42.32
+        39.07,
+        44.4
       ],
       "key_sensitivities": [
-        "商品价格中枢",
-        "成本锚",
-        "产量/销量",
-        "一致预期EPS修正"
+        "6-18m supply-demand regime",
+        "next-year consensus EPS",
+        "commodity/cost anchor",
+        "production/sales"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "safe_buy_zone"
@@ -1214,18 +1604,17 @@
       "cycle_tag": "coal::动力煤",
       "current_price": 10.88,
       "valuation_status": "unavailable",
-      "valuation_model": "commodity_scenario_forward_pe",
-      "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
+      "valuation_model": "forward_cycle_scenario",
+      "execution_state": "input_data_insufficient",
+      "forward_earnings_basis": "2026/2027 consensus plus commodity and 6-18m regime are mandatory for resource valuation.",
       "commodity_anchors": [],
-      "reasonable_multiple_range": [
-        7,
-        10
-      ],
+      "reasonable_multiple_range": null,
       "value_anchor_range": null,
       "safe_buy_range": null,
       "reasonable_buy_range": null,
       "left_conclusion": "unavailable",
       "reason": "commodity_anchor_fetch_failed:['ZC0']",
+      "cycle_regime": null,
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
     },
     {
@@ -1234,10 +1623,23 @@
       "cycle_tag": "nonferrous::铜矿资源",
       "current_price": 19.51,
       "valuation_status": "valid",
-      "valuation_model": "commodity_scenario_forward_pe",
+      "execution_state": "valid",
+      "valuation_model": "forward_cycle_scenario",
+      "valuation_basis_unit": "PE",
       "forecast_source": "akshare.stock_profit_forecast_em",
       "forecast_report_count": 20,
       "consensus_eps_current_year": 1.5585,
+      "consensus_eps_next_year": 1.7625,
+      "next_year_eps_growth_pct": 13.09,
+      "forward_12m_eps_proxy": 1.6945,
+      "forward_eps_weights": {
+        "current_year": 0.3333,
+        "next_year": 0.6667
+      },
+      "market_forward_pe_current_year": 12.52,
+      "market_forward_pe_next_year": 11.07,
+      "market_forward_pe_12m_proxy": 11.51,
+      "market_pe_dynamic": null,
       "commodity_anchors": [
         {
           "symbol": "CU0",
@@ -1254,41 +1656,60 @@
           "direction": 1.0
         }
       ],
+      "short_term_anchor_effect_on_eps": 0.0259,
       "profit_sensitivity": 0.75,
-      "bear_base_bull_anchor_factor": [
-        0.9545,
-        1.0345,
-        1.1145
+      "cycle_regime": "tight_spot_medium_term_balancing",
+      "cycle_regime_reviewed_at": "2026-08-30",
+      "cycle_regime_age_days": -2,
+      "cycle_regime_summary": "现货/区域流动性偏紧与矿端扰动支撑价格，但2026全球统计口径仍可能呈现供应过剩，估值不能把短期高铜价永久化。",
+      "cycle_regime_scores": {
+        "supply": 0.0,
+        "demand": 0.5,
+        "inventory": 0.5
+      },
+      "cycle_regime_evidence": [
+        {
+          "date": "2026-08-25",
+          "source": "Reuters",
+          "url": "https://www.reuters.com/business/us-tariff-threat-upends-copper-surplus-prices-test-all-time-peak-2026-08-25/",
+          "effect": "mixed",
+          "note": "Copper near record highs amid US tariff-driven inventory relocation, mine disruptions and smelter outages, while analysts still estimate a 2026 global surplus."
+        }
+      ],
+      "bear_base_bull_regime_factor": [
+        0.9,
+        0.98,
+        1.08
       ],
       "bear_base_bull_forward_eps": [
-        1.5053,
-        1.5988,
-        1.6923
+        1.5645,
+        1.7036,
+        1.8774
       ],
-      "forward_earnings_basis": "2026一致预期EPS=1.5585 → 商品/成本锚相对60日中枢 → sensitivity=0.75 → bear/base/bull盈利。",
+      "forward_earnings_basis": "2026/2027 consensus -> calendar-weighted forward-12m EPS 1.6945 -> structured 6-18m regime -> capped short-term commodity modifier +2.59%.",
       "reasonable_multiple_range": [
-        12.0,
-        16.0
+        11.0,
+        15.0
       ],
-      "multiple_rationale": "按资源/周期业务质量和周期波动采用版本化估值区间。",
+      "multiple_rationale": "现货/区域流动性偏紧与矿端扰动支撑价格，但2026全球统计口径仍可能呈现供应过剩，估值不能把短期高铜价永久化。",
       "value_anchor_range": [
-        18.06,
-        27.08
+        17.21,
+        28.16
       ],
-      "base_fair_value_floor": 19.19,
+      "base_fair_value_floor": 18.74,
       "safe_buy_range": [
-        14.39,
-        16.88
+        14.05,
+        16.49
       ],
       "reasonable_buy_range": [
-        16.88,
-        19.19
+        16.49,
+        18.74
       ],
       "key_sensitivities": [
-        "商品价格中枢",
-        "成本锚",
-        "产量/销量",
-        "一致预期EPS修正"
+        "6-18m supply-demand regime",
+        "next-year consensus EPS",
+        "commodity/cost anchor",
+        "production/sales"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone"
@@ -1300,7 +1721,8 @@
       "current_price": 34.35,
       "valuation_status": "unavailable",
       "valuation_model": "manual_spread_anchor_required",
-      "forward_earnings_basis": "该细分链尚无可机械验证的商品/价差锚；不得退回TTM PE。",
+      "execution_state": "machine_anchor_policy_missing",
+      "forward_earnings_basis": "This subchain has no machine-verifiable commodity/spread anchor; TTM PE is not an allowed substitute.",
       "commodity_anchors": [],
       "reasonable_multiple_range": null,
       "value_anchor_range": null,
@@ -1312,6 +1734,7 @@
     }
   ],
   "left_set_codes": [
+    "000630",
     "000807",
     "000933",
     "002532",
@@ -1320,5 +1743,5 @@
     "601600",
     "601899"
   ],
-  "method_note": "Resource cycle valuation requires fresh commodity anchors near the market trade date; stale continuous contracts become explicit unavailable inputs instead of silently entering valuation."
+  "method_note": "Resource cycle valuation uses current+next-year consensus to build a forward-12m earnings proxy, then applies a reviewed 6-18m supply-demand regime. Current/MA60 futures strength is capped as a near-term modifier and cannot override medium-term normalization risk."
 }
