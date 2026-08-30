@@ -95,11 +95,24 @@ def main() -> int:
         name = q.get("name") or index.get("companies", {}).get(code, {}).get("name") or code
         row = reports.get(code)
         frows = forecasts.get(code, [])
-        rev_yoy = num(col(row or {}, ["营业总收入同比", "营业收入同比", "营业收入同比增长", "营业总收入同比增长率"]))
-        profit_yoy = num(col(row or {}, ["净利润同比", "归母净利润同比", "净利润同比增长", "归母净利润同比增长率"]))
-        profit_qoq = num(col(row or {}, ["净利润季度环比", "归母净利润季度环比", "净利润环比"]))
-        revenue = num(col(row or {}, ["营业总收入", "营业收入"]))
-        profit = num(col(row or {}, ["净利润", "归母净利润"]))
+        rev_yoy = num(col(row or {}, [
+            "营业总收入-同比增长", "营业收入-同比增长",
+            "营业总收入同比", "营业收入同比", "营业收入同比增长", "营业总收入同比增长率"
+        ]))
+        profit_yoy = num(col(row or {}, [
+            "净利润-同比增长", "归母净利润-同比增长",
+            "净利润同比", "归母净利润同比", "净利润同比增长", "归母净利润同比增长率"
+        ]))
+        profit_qoq = num(col(row or {}, [
+            "净利润-季度环比增长", "归母净利润-季度环比增长",
+            "净利润季度环比", "归母净利润季度环比", "净利润环比"
+        ]))
+        revenue = num(col(row or {}, [
+            "营业总收入-营业总收入", "营业收入-营业收入", "营业总收入", "营业收入"
+        ]))
+        profit = num(col(row or {}, [
+            "净利润-净利润", "归母净利润-净利润", "净利润", "归母净利润"
+        ]))
         ftext = " ".join(str(v) for r in frows for v in r.values() if v not in (None, ""))
         positive_forecast = any(k in ftext for k in ("预增", "扭亏", "略增", "续盈", "增长")) and not any(k in ftext for k in ("预减", "首亏", "续亏"))
 
@@ -116,15 +129,18 @@ def main() -> int:
                 score += min(profit_yoy, 200) * 0.35 + min(rev_yoy, 100) * 0.3
                 reasons.append(f"H1收入同比{rev_yoy:.1f}%且净利同比{profit_yoy:.1f}%")
             elif profit_yoy is not None and rev_yoy is not None and profit_yoy >= 20 and rev_yoy >= 5:
-                if status != "pass": status = "uncertain"
+                if status != "pass":
+                    status = "uncertain"
                 score += min(profit_yoy, 150) * 0.25 + min(rev_yoy, 80) * 0.2
                 reasons.append(f"H1收入/利润同时改善: {rev_yoy:.1f}%/{profit_yoy:.1f}%")
             elif profit_yoy is not None and profit_yoy >= 60 and (rev_yoy is None or rev_yoy >= 0):
-                if status != "pass": status = "uncertain"
+                if status != "pass":
+                    status = "uncertain"
                 score += min(profit_yoy, 200) * 0.25
                 reasons.append(f"H1净利高增{profit_yoy:.1f}%，需排除低基数/一次性因素")
             if profit_qoq is not None and profit_qoq >= 30 and profit is not None and profit > 0:
-                if status == "reject": status = "uncertain"
+                if status == "reject":
+                    status = "uncertain"
                 score += min(profit_qoq, 200) * 0.15
                 reasons.append(f"最新季度净利环比改善{profit_qoq:.1f}%")
         if not reasons:
