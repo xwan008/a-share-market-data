@@ -7,7 +7,13 @@ on:
     paths:
       - 'scripts/build_common_qualification_pool.py'
       - 'scripts/validate_common_pool_diversification.py'
+      - 'scripts/repair_anchorless_cycle_valuation.py'
+      - 'scripts/validate_cycle_valuation_v2.py'
+      - 'scripts/build_t2_valuation_coverage_audit.py'
       - 'config/t2_representative_policy.json'
+      - 'config/cycle_valuation_policy.json'
+      - 'config/cycle_regime_registry.json'
+      - 'tests/test_cycle_coverage_v6.py'
       - '.github/workflows/build-common-qualification-pool.yml'
 
 permissions:
@@ -41,7 +47,7 @@ jobs:
         run: python scripts/validate_common_pool_diversification.py
 
       - name: Run valuation regression tests
-        run: pytest -q tests/test_valuation_v4.py tests/test_valuation_v5.py
+        run: pytest -q tests/test_valuation_v4.py tests/test_valuation_v5.py tests/test_cycle_coverage_v6.py
       - name: Build non-cycle forward valuation
         run: python scripts/build_forward_valuation_v5.py
       - name: Validate non-cycle valuation contract
@@ -50,12 +56,16 @@ jobs:
         run: python scripts/validate_pe_low_risk_contract.py
       - name: Build resource and cycle valuation
         run: python scripts/build_cycle_valuation.py
-      - name: Validate cycle valuation contract
-        run: python scripts/validate_research_outputs.py cycle-valuation data/research/pipeline/cycle_valuation.json
+      - name: Repair anchorless cycle valuation gaps
+        run: python scripts/repair_anchorless_cycle_valuation.py
+      - name: Validate cycle valuation contract v2
+        run: python scripts/validate_cycle_valuation_v2.py
       - name: Build valuation policy coverage audit
         run: python scripts/build_valuation_policy_audit.py
       - name: Validate valuation policy coverage audit
         run: python scripts/validate_research_outputs.py valuation-policy-audit data/research/pipeline/valuation_policy_audit.json
+      - name: Build and enforce T2 valuation coverage health
+        run: python scripts/build_t2_valuation_coverage_audit.py
       - name: Merge left valuation engines
         run: python scripts/merge_left_valuation.py
       - name: Validate full left coverage
@@ -101,15 +111,17 @@ jobs:
         run: python scripts/build_final_selection.py
       - name: Validate final selection
         run: python scripts/validate_research_outputs.py final-selection data/research/pipeline/final_selection.json
-      - name: Print diversification diagnostics
+      - name: Print diversification and coverage diagnostics
         run: |
           python - <<'PY'
           import json
           common=json.load(open('data/research/pipeline/common_qualification_pool.json',encoding='utf-8'))
           audit=common.get('t2_representative_selection',{})
-          focus={k:v for k,v in audit.items() if k in {'nonbank_finance::证券','nonferrous::电解铝'}}
+          focus={k:v for k,v in audit.items() if k in {'nonbank_finance::证券','nonferrous::电解铝','coal::动力煤','chemicals::氟化工','chemicals::氨纶'}}
+          coverage=json.load(open('data/research/pipeline/t2_valuation_coverage_audit.json',encoding='utf-8'))
           final=json.load(open('data/research/pipeline/final_selection.json',encoding='utf-8'))
           print(json.dumps({'arithmetic':common.get('arithmetic'),'focus':focus},ensure_ascii=False,indent=2))
+          print(json.dumps({'overall_valid_ratio':coverage['overall_valid_ratio'],'structural_blind_spot_tags':coverage['structural_blind_spot_tags'],'coverage_warnings':coverage['coverage_warnings']},ensure_ascii=False,indent=2))
           print(json.dumps({'left_set_codes':final['left_set_codes'],'right_set_codes':final['right_set_codes'],'intersection':final['initial_intersection_codes'],'top3':final['top3_codes']},ensure_ascii=False,indent=2))
           PY
 
@@ -122,6 +134,7 @@ jobs:
                   data/research/pipeline/fundamental_valuation.json \
                   data/research/pipeline/cycle_valuation.json \
                   data/research/pipeline/valuation_policy_audit.json \
+                  data/research/pipeline/t2_valuation_coverage_audit.json \
                   data/research/pipeline/left_valuation_scan.json \
                   data/research/pipeline/right_structure_scan.json \
                   data/research/pipeline/final_selection.json \
