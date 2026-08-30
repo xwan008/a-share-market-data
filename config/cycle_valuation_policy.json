@@ -15,11 +15,11 @@
     "rule": "Current and next-year consensus are an input to normalized earnings, not the final earnings anchor. At late-cycle or normalization risk, consensus must be normalized against a long-window neutral commodity/cost level before any low-risk price band is produced."
   },
   "neutral_commodity_policy": {
-    "window_sessions": 252,
-    "minimum_sessions": 180,
+    "window_sessions": 504,
+    "minimum_sessions": 252,
     "method": "median_of_long_window",
     "min_normalization_factor": 0.7,
-    "rule": "For resource companies, compare current revenue-price and input-cost anchors with their long-window neutral medians. Commodity windfall already embedded in consensus can only reduce normalized earnings. A weak current commodity price must not mechanically increase the low-risk earnings base."
+    "rule": "For resource companies, compare current revenue-price and input-cost anchors with an approximately two-year neutral median when available. A single high-price year must not redefine the neutral commodity level. Commodity windfall already embedded in consensus can only reduce normalized earnings; weak current commodity conditions do not mechanically increase the low-risk earnings base."
   },
   "short_term_anchor_policy": {
     "max_absolute_effect_on_eps": 0.05,
@@ -30,11 +30,11 @@
     "window_sessions": 180,
     "minimum_sessions": 120,
     "history_shard_key_length": 4,
-    "safe_percentiles": [0.15, 0.35],
-    "reasonable_percentiles": [0.35, 0.60],
+    "safe_percentiles": [0.0, 0.10],
+    "reasonable_percentiles": [0.10, 0.60],
     "max_reasonable_to_ma60": 1.06,
     "macro_uncertainty_haircut": 0.95,
-    "rule": "The stock's own bounded 180-session adjusted close distribution is a calibration constraint, not an intrinsic-value model. Safe buy uses the lower historical distribution and reasonable buy uses the middle-lower distribution. The upper reasonable boundary is capped by both normalized fundamental fair value and MA60 plus a small tolerance. This prevents analyst EPS and rising futures prices from mechanically dragging low-risk entry prices upward."
+    "rule": "The stock's own bounded 180-session adjusted close distribution is a calibration constraint, not an intrinsic-value model. The safety zone is anchored to the extreme lower-cost decile of the last 180 sessions; the reasonable zone begins at P10 and may extend toward the middle distribution, but its upper boundary is capped by both normalized fundamental fair value and MA60 plus a small tolerance. This prevents analyst EPS and rising futures prices from mechanically dragging low-risk entry prices upward."
   },
   "subchain_policies": {
     "nonferrous::铜矿资源": {
