@@ -1,5 +1,5 @@
 {
-  "schema_version": 11,
+  "schema_version": 12,
   "pipeline": "a_share_low_risk_v2",
   "mode": "shadow",
   "purpose": "从正在改善的细分盈利驱动中，寻找未来1-2季度仍有兑现预期、但股价尚未充分定价的公司；优先寻找基本面已拐、价格刚启势的机会。",
@@ -8,7 +8,7 @@
     "研究单位是细分盈利驱动链，不是宽泛行业或T1/T2等级",
     "召回要宽，淘汰要晚，公司级盈利验证才是真正筛选",
     "估值使用独立交叉锚，禁止重复折价和虚假精度",
-    "价格结构必须全市场独立扫描，不能受左侧/基本面候选池限制",
+    "价格结构必须全市场独立扫描，不能受基本面候选池限制",
     "Validator只验证通用经济与结构不变量，不使用任何固定个股作为正确答案"
   ],
   "authoritative_skills": {
@@ -36,63 +36,12 @@
     "opportunity_ranking": "data/research/v2/opportunity_ranking.json"
   },
   "stages": [
-    {
-      "id": "data_health",
-      "purpose": "确认主板全集、最新交易日、180日OHLCV与基础财务数据可用",
-      "failure_policy": "数据缺失必须显式披露；不能解释为没有机会"
-    },
-    {
-      "id": "earnings_driver_scan",
-      "skill": "skills/a-share-low-risk/earnings-driver-scan/SKILL.md",
-      "requires": ["data_health"],
-      "output": "data/research/v2/earnings_driver_scan.json",
-      "rule": "直接扫描细分盈利驱动；大行业只做导航；confidence不进入估值公式；不使用T1/T2作为准入等级"
-    },
-    {
-      "id": "company_research",
-      "skill": "skills/a-share-low-risk/company-research/SKILL.md",
-      "requires": ["earnings_driver_scan"],
-      "recall_union": ["driver_exposure", "earnings_anomaly", "weekly_full_market_recall"],
-      "output": "data/research/v2/company_research.json",
-      "rule": "召回宁宽不漏；公司级验证主营/扣非盈利、现金流、一次性收益与未来1-2季度Bridge；估值前每条driver只轻压缩到3-5家"
-    },
-    {
-      "id": "full_market_price_structure",
-      "skill": "skills/a-share-low-risk/price-expectation-gap/SKILL.md",
-      "requires": ["data_health"],
-      "universe": "all_mainboard_codes_with_fresh_180d_history",
-      "input": "data/history_shards/*.json",
-      "output": "data/research/v2/full_market_price_structure.json",
-      "rule": "与company_research独立；识别base_not_started/trend_continuation/breakout/pullback/overheated/damaged；创新高不是缺少压力"
-    },
-    {
-      "id": "price_expectation_gap",
-      "skill": "skills/a-share-low-risk/price-expectation-gap/SKILL.md",
-      "requires": ["company_research", "full_market_price_structure"],
-      "output": "data/research/v2/price_expectation_gap.json",
-      "valuation_routes": [
-        "stable_growth_forward_pe_plus_history",
-        "financial_pb_forward_roe",
-        "commodity_normalized_eps_pe",
-        "complex_cycle_pe_plus_pb_history_crosscheck"
-      ],
-      "hard_rules": [
-        "industry_or_driver_confidence_never_multiplies_into_value",
-        "no_repeated_cycle_haircuts",
-        "safe_zone_requires_independent_anchor_overlap",
-        "valuation_divergence_blocks_formal_buy_zone",
-        "implied_pe_pb_sanity_is_mandatory"
-      ]
-    },
-    {
-      "id": "opportunity_ranking",
-      "skill": "skills/a-share-low-risk/opportunity-ranking/SKILL.md",
-      "requires": ["price_expectation_gap"],
-      "output": "data/research/v2/opportunity_ranking.json",
-      "states": ["LEFT_WATCH", "WAIT_BREAKOUT", "PRIORITY_INFLECTION", "RIGHT_PARTICIPATE", "WAIT_PULLBACK", "REJECT"],
-      "priority": "earnings_improving + forward_bridge_valid + expectation_gap_remaining + price_just_starting",
-      "top3_policy": "允许少于3只或为空；不得为数量降低盈利/预期差/价格风险标准"
-    }
+    {"id":"data_health","purpose":"确认主板全集、最新交易日、180日OHLCV与基础财务数据可用","failure_policy":"数据缺失必须显式披露；不能解释为没有机会"},
+    {"id":"earnings_driver_scan","skill":"skills/a-share-low-risk/earnings-driver-scan/SKILL.md","requires":["data_health"],"output":"data/research/v2/earnings_driver_scan.json","rule":"直接扫描细分盈利驱动；大行业只做导航；confidence不进入估值公式；不使用T1/T2作为准入等级"},
+    {"id":"company_research","skill":"skills/a-share-low-risk/company-research/SKILL.md","requires":["earnings_driver_scan"],"recall_union":["driver_exposure","earnings_anomaly","weekly_full_market_recall"],"output":"data/research/v2/company_research.json","rule":"召回宁宽不漏；机械归母利润只用于召回；正式研究必须验证主营/扣非盈利、现金流、一次性收益和未来1-2季度Bridge；风险警示证券可被扫描但不得进入低风险主榜；估值前每条driver只轻压缩到3-5家"},
+    {"id":"full_market_price_structure","skill":"skills/a-share-low-risk/price-expectation-gap/SKILL.md","requires":["data_health"],"universe":"all_mainboard_codes_with_fresh_180d_history","input":"data/history_shards/*.json","output":"data/research/v2/full_market_price_structure.json","rule":"与company_research独立；全市场扫描后再应用低风险资格；breakout必须价格+成交量+收盘位置确认；pullback必须保持不显著弱于市场的20日相对强度；创新高不是缺少压力"},
+    {"id":"price_expectation_gap","skill":"skills/a-share-low-risk/price-expectation-gap/SKILL.md","requires":["company_research","full_market_price_structure"],"output":"data/research/v2/price_expectation_gap.json","valuation_routes":["stable_growth_forward_pe_plus_history","financial_pb_forward_roe","commodity_normalized_eps_pe","complex_cycle_pe_plus_pb_history_crosscheck"],"hard_rules":["industry_or_driver_confidence_never_multiplies_into_value","no_repeated_cycle_haircuts","safe_zone_requires_independent_anchor_overlap","valuation_divergence_blocks_formal_buy_zone","implied_pe_pb_sanity_is_mandatory"]},
+    {"id":"opportunity_ranking","skill":"skills/a-share-low-risk/opportunity-ranking/SKILL.md","requires":["price_expectation_gap"],"output":"data/research/v2/opportunity_ranking.json","states":["LEFT_WATCH","WAIT_BREAKOUT","PRIORITY_INFLECTION","RIGHT_PARTICIPATE","WAIT_PULLBACK","REJECT"],"priority":"earnings_improving + forward_bridge_valid + expectation_gap_remaining + price_just_starting","top3_policy":"允许少于3只或为空；不得为数量降低盈利/预期差/价格风险标准"}
   ],
   "economic_sanity": {
     "mandatory": true,
@@ -102,34 +51,13 @@
       "独立估值方法严重冲突时必须输出valuation_divergence而不是强行给正式买点",
       "创新高或进入价格发现阶段不得因为缺少历史压力位自动判弱",
       "价格结构扫描的股票全集不得由company_research、估值结果或任何基本面候选池定义",
+      "风险警示证券必须保持全市场扫描覆盖但不得进入低风险机会候选",
+      "breakout必须通过价格、成交量价确认和收盘位置确认，贴近前高但未确认只能等待突破",
+      "pullback必须保有不显著弱于市场的20日相对强度，明显弱势不能直接标记参与",
       "Validator不得包含固定股票代码、固定股票名称、固定买入价或固定估值区间作为PASS条件"
     ],
-    "failure_states": ["sanity_check_failed", "valuation_divergence"]
+    "failure_states": ["sanity_check_failed","valuation_divergence"]
   },
-  "validation_policy": {
-    "case_free": true,
-    "principle": "只验证流程覆盖、数据完整性、公式不变量和经济一致性；任何个股历史案例只能用于人工复盘，不能成为机器筛选或Validator的先验答案。",
-    "shadow_trading_days_required_before_production": 3
-  },
-  "legacy_v1": {
-    "status": "frozen_for_comparison_only",
-    "formal_outputs_must_not_be_overwritten_by_v2_shadow": true,
-    "deprecated_business_skills": [
-      "industry-scan",
-      "t2-company-recall",
-      "weekly-opportunity-scan",
-      "earnings-validation",
-      "fundamental-valuation",
-      "cycle-valuation",
-      "technical-structure",
-      "final-selection"
-    ],
-    "deprecated_principles": [
-      "T1/T2 controls company eligibility",
-      "T1/T2 confidence directly discounts valuation",
-      "anchorless EPS haircut times regime haircut times buy-zone haircut",
-      "right-side universe equals common fundamental pool",
-      "first resistance less than 10 percent automatically rejects breakout opportunities"
-    ]
-  }
+  "validation_policy": {"case_free":true,"principle":"只验证流程覆盖、数据完整性、公式不变量和经济一致性；任何个股历史案例只能用于人工复盘，不能成为机器筛选或Validator的先验答案。","shadow_trading_days_required_before_production":3},
+  "legacy_v1": {"status":"frozen_for_comparison_only","formal_outputs_must_not_be_overwritten_by_v2_shadow":true,"deprecated_business_skills":["industry-scan","t2-company-recall","weekly-opportunity-scan","earnings-validation","fundamental-valuation","cycle-valuation","technical-structure","final-selection"],"deprecated_principles":["T1/T2 controls company eligibility","T1/T2 confidence directly discounts valuation","anchorless EPS haircut times regime haircut times buy-zone haircut","right-side universe equals common fundamental pool","first resistance less than 10 percent automatically rejects breakout opportunities"]}
 }
