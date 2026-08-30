@@ -9,6 +9,16 @@ SIGNALS = ROOT / "config" / "current_industry_scan_signals.json"
 OUTPUT = ROOT / "data" / "research" / "pipeline" / "industry_scan.json"
 
 
+def normalize_signal(value: dict, *, default_source: str) -> dict:
+    row = dict(value)
+    row.pop("broad_industry_id", None)
+    name = row.pop("subchain", None)
+    if name:
+        row["name"] = name
+    row.setdefault("registry_source", default_source)
+    return row
+
+
 def main() -> int:
     registry = json.loads(REGISTRY.read_text(encoding="utf-8"))
     signals = json.loads(SIGNALS.read_text(encoding="utf-8"))
@@ -22,13 +32,14 @@ def main() -> int:
             key = (bid, name)
             base = {"name": name, "registry_source": "minimum", "status": "unconfirmed", "stage": None, "evidence_for": [], "evidence_against": []}
             if key in overrides:
-                value = dict(overrides[key]); value.pop("broad_industry_id", None); value.setdefault("registry_source", "minimum"); base.update(value); seen.add(key)
+                base.update(normalize_signal(overrides[key], default_source="minimum"))
+                seen.add(key)
             rows.append(base)
         for key, value in overrides.items():
             if key[0] != bid or key in seen:
                 continue
-            row = dict(value); row.pop("broad_industry_id", None); row.setdefault("registry_source", "dynamic")
-            rows.append(row); seen.add(key)
+            rows.append(normalize_signal(value, default_source="dynamic"))
+            seen.add(key)
         broad_out.append({"id": bid, "name": spec["name"], "subchains": rows, "coverage_gap": []})
     missing_signal_industries = sorted({k[0] for k in overrides if k not in seen})
     if missing_signal_industries:
