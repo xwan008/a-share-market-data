@@ -8,13 +8,16 @@ on:
       - 'skills/a-share-low-risk/**'
       - 'config/research_pipeline_manifest.json'
       - 'scripts/build_v2_earnings_anomaly_recall.py'
+      - 'scripts/build_v2_earnings_driver_scan.py'
+      - 'scripts/build_v2_company_research.py'
       - 'scripts/build_v2_full_market_price_structure.py'
+      - 'scripts/build_v2_price_expectation_gap.py'
+      - 'scripts/build_v2_opportunity_ranking.py'
       - 'scripts/build_v2_shadow_crosscheck.py'
       - 'scripts/validate_v2_blueprint.py'
+      - 'scripts/validate_v2_closed_loop.py'
       - '.github/workflows/build-low-risk-v2-shadow.yml'
   schedule:
-    # update-market runs at 16:10 and 16:30 Beijing time. Run V2 mechanical
-    # shadow scans after those closed-session refreshes.
     - cron: '50 16 * * 1-5'
       timezone: 'Asia/Shanghai'
 
@@ -28,7 +31,7 @@ concurrency:
 jobs:
   shadow:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
         with:
@@ -47,34 +50,59 @@ jobs:
         run: pip install -r requirements-research.txt
       - name: Build full-market earnings anomaly recall
         run: python scripts/build_v2_earnings_anomaly_recall.py
+      - name: Build earnings-driver research state
+        run: python scripts/build_v2_earnings_driver_scan.py
+      - name: Build company-research skeleton and valuation queue
+        run: python scripts/build_v2_company_research.py
       - name: Build independent full-market price structure
         run: python scripts/build_v2_full_market_price_structure.py
+      - name: Build price expectation gap
+        run: python scripts/build_v2_price_expectation_gap.py
+      - name: Build opportunity ranking
+        run: python scripts/build_v2_opportunity_ranking.py
       - name: Build case-free mechanical crosscheck
         run: python scripts/build_v2_shadow_crosscheck.py
       - name: Validate V2 case-free invariants
         run: python scripts/validate_v2_blueprint.py
-      - name: Print market-wide structure summary
+      - name: Validate V2 closed loop
+        run: python scripts/validate_v2_closed_loop.py
+      - name: Print closed-loop summary
         run: |
           python - <<'PY'
           import json
+          d=json.load(open('data/research/v2/earnings_driver_scan.json',encoding='utf-8'))
+          c=json.load(open('data/research/v2/company_research.json',encoding='utf-8'))
           p=json.load(open('data/research/v2/full_market_price_structure.json',encoding='utf-8'))
-          c=json.load(open('data/research/v2/shadow_crosscheck.json',encoding='utf-8'))
+          g=json.load(open('data/research/v2/price_expectation_gap.json',encoding='utf-8'))
+          r=json.load(open('data/research/v2/opportunity_ranking.json',encoding='utf-8'))
           print(json.dumps({
             'universe_count':p.get('universe_count'),
-            'verified_count':p.get('verified_count'),
-            'structure_type_counts':p.get('structure_type_counts'),
-            'right_candidate_count':len(p.get('right_candidate_codes',[])),
-            'crosscheck_counts':c.get('counts')
+            'active_driver_count':d.get('active_driver_count'),
+            'company_recall_count':c.get('recall_count'),
+            'research_status_counts':c.get('research_status_counts'),
+            'valuation_queue_count':g.get('valuation_queue_count'),
+            'valuation_reference_covered_count':g.get('valuation_reference_covered_count'),
+            'expectation_gap_state_counts':g.get('expectation_gap_state_counts'),
+            'opportunity_state_counts':r.get('state_counts'),
+            'shadow_top3':[x.get('code') for x in r.get('shadow_top3',[])],
+            'production_top3':[x.get('code') for x in r.get('production_top3',[])]
           },ensure_ascii=False,indent=2))
           PY
-      - name: Commit shadow mechanical outputs
+      - name: Commit V2 closed-loop shadow outputs
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/research/v2/earnings_anomaly_recall.json data/research/v2/full_market_price_structure.json data/research/v2/shadow_crosscheck.json
+          git add \
+            data/research/v2/earnings_anomaly_recall.json \
+            data/research/v2/earnings_driver_scan.json \
+            data/research/v2/company_research.json \
+            data/research/v2/full_market_price_structure.json \
+            data/research/v2/price_expectation_gap.json \
+            data/research/v2/opportunity_ranking.json \
+            data/research/v2/shadow_crosscheck.json
           if git diff --cached --quiet; then exit 0; fi
-          git commit -m "research-v2: refresh shadow mechanical scans"
+          git commit -m "research-v2: refresh closed-loop shadow outputs"
           for attempt in 1 2 3; do
             git pull --rebase origin main
             if git push origin HEAD:main; then exit 0; fi
