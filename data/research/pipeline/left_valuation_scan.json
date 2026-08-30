@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-30T16:26:26.607967+08:00",
+  "generated_at": "2026-08-30T16:50:36.047976+08:00",
   "common_pool_count": 138,
   "fundamental_count": 106,
   "cycle_count": 32,
@@ -237,19 +237,127 @@
       "name": "甘肃能化",
       "cycle_tag": "coal::动力煤",
       "current_price": 2.73,
-      "valuation_status": "unavailable",
-      "valuation_model": "normalized_forward_cycle_low_risk",
-      "execution_state": "input_data_insufficient",
-      "forward_earnings_basis": "2026/2027 consensus plus neutral commodity anchor, 6-18m regime and price-history calibration are mandatory for resource valuation.",
+      "valuation_status": "valid",
+      "valuation_model": "conservative_consensus_cycle_low_risk",
+      "execution_state": "valid",
+      "forward_earnings_basis": "2026 EPS 0.1000 primary; 2027 EPS 0.1800 only downside guard -> haircut 0.90 -> reviewed regime -> 180d calibration.",
       "commodity_anchors": [],
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "safe_buy_range": null,
-      "reasonable_buy_range": null,
-      "left_conclusion": "unavailable",
-      "reason": "commodity_anchor_fetch_failed:['ZC0']",
-      "cycle_regime": null,
+      "reasonable_multiple_range": [
+        7.0,
+        10.0
+      ],
+      "value_anchor_range": [
+        0.43,
+        0.59
+      ],
+      "safe_buy_range": [
+        0.43,
+        0.51
+      ],
+      "reasonable_buy_range": [
+        0.51,
+        0.59
+      ],
+      "left_conclusion": "above_buy_zone",
+      "reason": null,
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "valuation_mode": "conservative_consensus_cycle",
+      "valuation_basis_unit": "PE",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 3,
+      "consensus_eps_current_year": 0.1,
+      "consensus_eps_next_year": 0.18,
+      "next_year_eps_growth_pct": 80.0,
+      "forward_12m_eps_proxy": 0.1533,
+      "forward_eps_weights": {
+        "current_year": 0.3333,
+        "next_year": 0.6667
+      },
+      "low_risk_eps_pre_haircut": 0.1,
+      "low_risk_eps_guard_method": "current_year_primary_no_positive_next_year_uplift",
+      "anchorless_cycle_haircut": 0.9,
+      "normalized_forward_eps": 0.09,
+      "neutralization_factor": 0.9,
+      "weighted_neutral_commodity_delta": null,
+      "market_forward_pe_current_year": 27.3,
+      "market_forward_pe_next_year": 15.17,
+      "market_forward_pe_12m_proxy": 17.8,
+      "short_term_anchor_effect_on_eps": null,
+      "low_risk_short_term_effect_on_eps": 0.0,
+      "profit_sensitivity": null,
+      "cycle_regime": "price_recovery_with_policy_supply_constraint",
+      "cycle_regime_reviewed_at": "2026-08-30",
+      "cycle_regime_age_days": -2,
+      "cycle_regime_summary": "2026年以来动力煤价格中枢抬升、煤企盈利改善，安监与反超产限制供给弹性；但煤炭仍是强政策/天气周期行业，低风险估值不把现货上涨直接外推，基准盈利继续保留折价。",
+      "cycle_regime_scores": {
+        "supply": 0.5,
+        "demand": 0.5,
+        "inventory": 0.0
+      },
+      "cycle_regime_evidence": [
+        {
+          "date": "2026-08-30",
+          "source": "data/research/pipeline/industry_scan.json",
+          "effect": "constructive",
+          "note": "动力煤被识别为T2 early；8月28日秦皇岛Q5500约867元/吨，1-7月煤炭开采洗选利润明显改善。"
+        },
+        {
+          "date": "2026-07-13",
+          "source": "中泰证券煤炭行业公开观点",
+          "url": "https://finance.sina.com.cn/wm/2026-07-13/doc-inihrhfn9075972.shtml",
+          "effect": "constructive_with_cycle_risk",
+          "note": "2026H1动力煤价格中枢同比上升，供给受安监与进口约束；仍需防范季节、政策和需求波动。"
+        }
+      ],
+      "bear_base_bull_regime_factor": [
+        0.82,
+        0.95,
+        1.05
+      ],
+      "bear_base_bull_forward_eps": [
+        0.0738,
+        0.0855,
+        0.0945
+      ],
+      "multiple_rationale": "动力煤连续期货已不能作为可靠低风险机器锚。正式估值改用2026一致预期为主锚、2027只做下行约束，再做周期折价与180日价格校准；不因煤价短期上涨抬高买点。",
+      "scenario_fair_value_range": [
+        0.52,
+        0.95
+      ],
+      "normalized_base_fair_value_floor": 0.6,
+      "base_fair_value_floor": 0.6,
+      "market_price_anchor_180d": {
+        "history_points": 180,
+        "history_basis": "tencent_qfq_plus_live_tail",
+        "last_history_date": "2026-08-28",
+        "low_180d": 2.24,
+        "high_180d": 2.93,
+        "median_180d": 2.54,
+        "ma60": 2.5251666666666663,
+        "safe_percentile_band": [
+          2.24,
+          2.35
+        ],
+        "reasonable_percentile_band": [
+          2.35,
+          2.59
+        ],
+        "percentiles": {
+          "p15": 2.36,
+          "p25": 2.4075,
+          "p35": 2.48,
+          "p50": 2.54,
+          "p60": 2.59
+        }
+      },
+      "price_calibration_method": "valuation_dominant_below_market_p35",
+      "key_sensitivities": [
+        "2026 consensus EPS",
+        "2027 downside durability",
+        "cycle regime",
+        "structural haircut",
+        "180d market price distribution"
+      ],
       "left_engine": "cycle"
     },
     {
@@ -309,6 +417,7 @@
       "reason": "forward_consensus_insufficient:reports=0,eps_2026=None,eps_2027=None",
       "cycle_regime": "near_term_tight_medium_term_normalizing",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "valuation_mode": "commodity_anchor_normalized",
       "left_engine": "cycle"
     },
     {
@@ -447,6 +556,7 @@
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
+      "valuation_mode": "commodity_anchor_normalized",
       "left_engine": "cycle"
     },
     {
@@ -549,6 +659,7 @@
       "reason": "forward_consensus_insufficient:reports=0,eps_2026=None,eps_2027=None",
       "cycle_regime": "tight_spot_medium_term_balancing",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "valuation_mode": "commodity_anchor_normalized",
       "left_engine": "cycle"
     },
     {
@@ -884,6 +995,7 @@
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
+      "valuation_mode": "commodity_anchor_normalized",
       "left_engine": "cycle"
     },
     {
@@ -1053,6 +1165,7 @@
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
+      "valuation_mode": "commodity_anchor_normalized",
       "left_engine": "cycle"
     },
     {
@@ -1224,6 +1337,7 @@
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
+      "valuation_mode": "commodity_anchor_normalized",
       "left_engine": "cycle"
     },
     {
@@ -1286,18 +1400,127 @@
       "name": "新乡化纤",
       "cycle_tag": "chemicals::氨纶",
       "current_price": 7.38,
-      "valuation_status": "unavailable",
-      "valuation_model": "manual_spread_anchor_required",
-      "execution_state": "machine_anchor_policy_missing",
-      "forward_earnings_basis": "This subchain has no machine-verifiable commodity/spread anchor; TTM PE is not an allowed substitute.",
+      "valuation_status": "valid",
+      "valuation_model": "conservative_consensus_cycle_low_risk",
+      "execution_state": "valid",
+      "forward_earnings_basis": "2026 EPS 0.3843 primary; 2027 EPS 0.4929 only downside guard -> haircut 0.85 -> reviewed regime -> 180d calibration.",
       "commodity_anchors": [],
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "safe_buy_range": null,
-      "reasonable_buy_range": null,
-      "left_conclusion": "unavailable",
-      "reason": "cycle_policy_missing_machine_readable_anchor",
+      "reasonable_multiple_range": [
+        10.0,
+        14.0
+      ],
+      "value_anchor_range": [
+        2.12,
+        2.88
+      ],
+      "safe_buy_range": [
+        2.12,
+        2.5
+      ],
+      "reasonable_buy_range": [
+        2.5,
+        2.88
+      ],
+      "left_conclusion": "above_buy_zone",
+      "reason": null,
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "valuation_mode": "conservative_consensus_cycle",
+      "valuation_basis_unit": "PE",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 8,
+      "consensus_eps_current_year": 0.3843,
+      "consensus_eps_next_year": 0.4929,
+      "next_year_eps_growth_pct": 28.25,
+      "forward_12m_eps_proxy": 0.4567,
+      "forward_eps_weights": {
+        "current_year": 0.3333,
+        "next_year": 0.6667
+      },
+      "low_risk_eps_pre_haircut": 0.3843,
+      "low_risk_eps_guard_method": "current_year_primary_no_positive_next_year_uplift",
+      "anchorless_cycle_haircut": 0.85,
+      "normalized_forward_eps": 0.3266,
+      "neutralization_factor": 0.85,
+      "weighted_neutral_commodity_delta": null,
+      "market_forward_pe_current_year": 19.2,
+      "market_forward_pe_next_year": 14.97,
+      "market_forward_pe_12m_proxy": 16.16,
+      "short_term_anchor_effect_on_eps": null,
+      "low_risk_short_term_effect_on_eps": 0.0,
+      "profit_sensitivity": null,
+      "cycle_regime": "early_recovery_with_export_and_capacity_risk",
+      "cycle_regime_reviewed_at": "2026-08-30",
+      "cycle_regime_age_days": -2,
+      "cycle_regime_summary": "氨纶价格和价差较低位修复、龙头H1盈利超预期，但出口同比偏弱且新增产能/原料波动仍在，属于早期修复而非稳定高景气；基准盈利按90%周期因子处理。",
+      "cycle_regime_scores": {
+        "supply": 0.0,
+        "demand": 0.0,
+        "inventory": 0.5
+      },
+      "cycle_regime_evidence": [
+        {
+          "date": "2026-08-30",
+          "source": "data/research/pipeline/industry_scan.json",
+          "effect": "constructive",
+          "note": "氨纶为T2 early；华峰化学H1氨纶收入和毛利改善，新乡化纤H1净利同比大增。"
+        },
+        {
+          "date": "2026-08-07",
+          "source": "华峰化学2026H1公开研报汇总",
+          "url": "https://basic.10jqka.com.cn/002064/worth.html",
+          "effect": "constructive_with_risk",
+          "note": "H1氨纶业务景气修复，但行业仍需观察出口、需求和新增产能。"
+        }
+      ],
+      "bear_base_bull_regime_factor": [
+        0.75,
+        0.9,
+        1.05
+      ],
+      "bear_base_bull_forward_eps": [
+        0.245,
+        0.294,
+        0.343
+      ],
+      "multiple_rationale": "氨纶盈利取决于售价与PTMEG/MDI等原料价差，公开机器序列覆盖不足且行业处于修复早期。正式低风险估值以2026 EPS主锚、2027下行约束、结构折价和180日价格校准，避免低基数盈利反弹被高倍资本化。",
+      "scenario_fair_value_range": [
+        2.45,
+        4.8
+      ],
+      "normalized_base_fair_value_floor": 2.94,
+      "base_fair_value_floor": 2.94,
+      "market_price_anchor_180d": {
+        "history_points": 180,
+        "history_basis": "tencent_qfq_plus_live_tail",
+        "last_history_date": "2026-08-28",
+        "low_180d": 4.55,
+        "high_180d": 8.27,
+        "median_180d": 6.71,
+        "ma60": 6.328333333333333,
+        "safe_percentile_band": [
+          4.55,
+          5.4079999999999995
+        ],
+        "reasonable_percentile_band": [
+          5.4079999999999995,
+          6.896
+        ],
+        "percentiles": {
+          "p15": 5.5485,
+          "p25": 6.0625,
+          "p35": 6.45,
+          "p50": 6.71,
+          "p60": 6.896
+        }
+      },
+      "price_calibration_method": "valuation_dominant_below_market_p35",
+      "key_sensitivities": [
+        "2026 consensus EPS",
+        "2027 downside durability",
+        "cycle regime",
+        "structural haircut",
+        "180d market price distribution"
+      ],
       "left_engine": "cycle"
     },
     {
@@ -1556,18 +1779,127 @@
       "name": "华峰化学",
       "cycle_tag": "chemicals::氨纶",
       "current_price": 11.89,
-      "valuation_status": "unavailable",
-      "valuation_model": "manual_spread_anchor_required",
-      "execution_state": "machine_anchor_policy_missing",
-      "forward_earnings_basis": "This subchain has no machine-verifiable commodity/spread anchor; TTM PE is not an allowed substitute.",
+      "valuation_status": "valid",
+      "valuation_model": "conservative_consensus_cycle_low_risk",
+      "execution_state": "valid",
+      "forward_earnings_basis": "2026 EPS 0.7170 primary; 2027 EPS 0.8365 only downside guard -> haircut 0.85 -> reviewed regime -> 180d calibration.",
       "commodity_anchors": [],
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "safe_buy_range": null,
-      "reasonable_buy_range": null,
-      "left_conclusion": "unavailable",
-      "reason": "cycle_policy_missing_machine_readable_anchor",
+      "reasonable_multiple_range": [
+        10.0,
+        14.0
+      ],
+      "value_anchor_range": [
+        3.95,
+        5.38
+      ],
+      "safe_buy_range": [
+        3.95,
+        4.66
+      ],
+      "reasonable_buy_range": [
+        4.66,
+        5.38
+      ],
+      "left_conclusion": "above_buy_zone",
+      "reason": null,
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "valuation_mode": "conservative_consensus_cycle",
+      "valuation_basis_unit": "PE",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 22,
+      "consensus_eps_current_year": 0.717,
+      "consensus_eps_next_year": 0.8365,
+      "next_year_eps_growth_pct": 16.66,
+      "forward_12m_eps_proxy": 0.7966,
+      "forward_eps_weights": {
+        "current_year": 0.3333,
+        "next_year": 0.6667
+      },
+      "low_risk_eps_pre_haircut": 0.717,
+      "low_risk_eps_guard_method": "current_year_primary_no_positive_next_year_uplift",
+      "anchorless_cycle_haircut": 0.85,
+      "normalized_forward_eps": 0.6094,
+      "neutralization_factor": 0.85,
+      "weighted_neutral_commodity_delta": null,
+      "market_forward_pe_current_year": 16.58,
+      "market_forward_pe_next_year": 14.21,
+      "market_forward_pe_12m_proxy": 14.93,
+      "short_term_anchor_effect_on_eps": null,
+      "low_risk_short_term_effect_on_eps": 0.0,
+      "profit_sensitivity": null,
+      "cycle_regime": "early_recovery_with_export_and_capacity_risk",
+      "cycle_regime_reviewed_at": "2026-08-30",
+      "cycle_regime_age_days": -2,
+      "cycle_regime_summary": "氨纶价格和价差较低位修复、龙头H1盈利超预期，但出口同比偏弱且新增产能/原料波动仍在，属于早期修复而非稳定高景气；基准盈利按90%周期因子处理。",
+      "cycle_regime_scores": {
+        "supply": 0.0,
+        "demand": 0.0,
+        "inventory": 0.5
+      },
+      "cycle_regime_evidence": [
+        {
+          "date": "2026-08-30",
+          "source": "data/research/pipeline/industry_scan.json",
+          "effect": "constructive",
+          "note": "氨纶为T2 early；华峰化学H1氨纶收入和毛利改善，新乡化纤H1净利同比大增。"
+        },
+        {
+          "date": "2026-08-07",
+          "source": "华峰化学2026H1公开研报汇总",
+          "url": "https://basic.10jqka.com.cn/002064/worth.html",
+          "effect": "constructive_with_risk",
+          "note": "H1氨纶业务景气修复，但行业仍需观察出口、需求和新增产能。"
+        }
+      ],
+      "bear_base_bull_regime_factor": [
+        0.75,
+        0.9,
+        1.05
+      ],
+      "bear_base_bull_forward_eps": [
+        0.4571,
+        0.5485,
+        0.6399
+      ],
+      "multiple_rationale": "氨纶盈利取决于售价与PTMEG/MDI等原料价差，公开机器序列覆盖不足且行业处于修复早期。正式低风险估值以2026 EPS主锚、2027下行约束、结构折价和180日价格校准，避免低基数盈利反弹被高倍资本化。",
+      "scenario_fair_value_range": [
+        4.57,
+        8.96
+      ],
+      "normalized_base_fair_value_floor": 5.49,
+      "base_fair_value_floor": 5.49,
+      "market_price_anchor_180d": {
+        "history_points": 180,
+        "history_basis": "tencent_qfq_plus_live_tail",
+        "last_history_date": "2026-08-28",
+        "low_180d": 8.85,
+        "high_180d": 13.66,
+        "median_180d": 10.94,
+        "ma60": 10.774333333333335,
+        "safe_percentile_band": [
+          8.85,
+          9.836
+        ],
+        "reasonable_percentile_band": [
+          9.836,
+          11.158000000000001
+        ],
+        "percentiles": {
+          "p15": 10.0455,
+          "p25": 10.23,
+          "p35": 10.446499999999999,
+          "p50": 10.94,
+          "p60": 11.158000000000001
+        }
+      },
+      "price_calibration_method": "valuation_dominant_below_market_p35",
+      "key_sensitivities": [
+        "2026 consensus EPS",
+        "2027 downside durability",
+        "cycle regime",
+        "structural haircut",
+        "180d market price distribution"
+      ],
       "left_engine": "cycle"
     },
     {
@@ -1575,19 +1907,127 @@
       "name": "电投能源",
       "cycle_tag": "coal::动力煤",
       "current_price": 29.11,
-      "valuation_status": "unavailable",
-      "valuation_model": "normalized_forward_cycle_low_risk",
-      "execution_state": "input_data_insufficient",
-      "forward_earnings_basis": "2026/2027 consensus plus neutral commodity anchor, 6-18m regime and price-history calibration are mandatory for resource valuation.",
+      "valuation_status": "valid",
+      "valuation_model": "conservative_consensus_cycle_low_risk",
+      "execution_state": "valid",
+      "forward_earnings_basis": "2026 EPS 3.3864 primary; 2027 EPS 3.6345 only downside guard -> haircut 0.90 -> reviewed regime -> 180d calibration.",
       "commodity_anchors": [],
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "safe_buy_range": null,
-      "reasonable_buy_range": null,
-      "left_conclusion": "unavailable",
-      "reason": "commodity_anchor_fetch_failed:['ZC0']",
-      "cycle_regime": null,
+      "reasonable_multiple_range": [
+        7.0,
+        10.0
+      ],
+      "value_anchor_range": [
+        14.59,
+        19.86
+      ],
+      "safe_buy_range": [
+        14.59,
+        17.23
+      ],
+      "reasonable_buy_range": [
+        17.23,
+        19.86
+      ],
+      "left_conclusion": "above_buy_zone",
+      "reason": null,
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "valuation_mode": "conservative_consensus_cycle",
+      "valuation_basis_unit": "PE",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 11,
+      "consensus_eps_current_year": 3.3864,
+      "consensus_eps_next_year": 3.6345,
+      "next_year_eps_growth_pct": 7.33,
+      "forward_12m_eps_proxy": 3.5518,
+      "forward_eps_weights": {
+        "current_year": 0.3333,
+        "next_year": 0.6667
+      },
+      "low_risk_eps_pre_haircut": 3.3864,
+      "low_risk_eps_guard_method": "current_year_primary_no_positive_next_year_uplift",
+      "anchorless_cycle_haircut": 0.9,
+      "normalized_forward_eps": 3.0477,
+      "neutralization_factor": 0.9,
+      "weighted_neutral_commodity_delta": null,
+      "market_forward_pe_current_year": 8.6,
+      "market_forward_pe_next_year": 8.01,
+      "market_forward_pe_12m_proxy": 8.2,
+      "short_term_anchor_effect_on_eps": null,
+      "low_risk_short_term_effect_on_eps": 0.0,
+      "profit_sensitivity": null,
+      "cycle_regime": "price_recovery_with_policy_supply_constraint",
+      "cycle_regime_reviewed_at": "2026-08-30",
+      "cycle_regime_age_days": -2,
+      "cycle_regime_summary": "2026年以来动力煤价格中枢抬升、煤企盈利改善，安监与反超产限制供给弹性；但煤炭仍是强政策/天气周期行业，低风险估值不把现货上涨直接外推，基准盈利继续保留折价。",
+      "cycle_regime_scores": {
+        "supply": 0.5,
+        "demand": 0.5,
+        "inventory": 0.0
+      },
+      "cycle_regime_evidence": [
+        {
+          "date": "2026-08-30",
+          "source": "data/research/pipeline/industry_scan.json",
+          "effect": "constructive",
+          "note": "动力煤被识别为T2 early；8月28日秦皇岛Q5500约867元/吨，1-7月煤炭开采洗选利润明显改善。"
+        },
+        {
+          "date": "2026-07-13",
+          "source": "中泰证券煤炭行业公开观点",
+          "url": "https://finance.sina.com.cn/wm/2026-07-13/doc-inihrhfn9075972.shtml",
+          "effect": "constructive_with_cycle_risk",
+          "note": "2026H1动力煤价格中枢同比上升，供给受安监与进口约束；仍需防范季节、政策和需求波动。"
+        }
+      ],
+      "bear_base_bull_regime_factor": [
+        0.82,
+        0.95,
+        1.05
+      ],
+      "bear_base_bull_forward_eps": [
+        2.4991,
+        2.8953,
+        3.2001
+      ],
+      "multiple_rationale": "动力煤连续期货已不能作为可靠低风险机器锚。正式估值改用2026一致预期为主锚、2027只做下行约束，再做周期折价与180日价格校准；不因煤价短期上涨抬高买点。",
+      "scenario_fair_value_range": [
+        17.49,
+        32.0
+      ],
+      "normalized_base_fair_value_floor": 20.27,
+      "base_fair_value_floor": 20.27,
+      "market_price_anchor_180d": {
+        "history_points": 180,
+        "history_basis": "tencent_qfq_plus_live_tail",
+        "last_history_date": "2026-08-28",
+        "low_180d": 23.02,
+        "high_180d": 33.48,
+        "median_180d": 27.935000000000002,
+        "ma60": 26.229166666666668,
+        "safe_percentile_band": [
+          23.02,
+          25.282999999999998
+        ],
+        "reasonable_percentile_band": [
+          25.282999999999998,
+          28.625999999999998
+        ],
+        "percentiles": {
+          "p15": 25.851,
+          "p25": 26.517500000000002,
+          "p35": 27.1065,
+          "p50": 27.935000000000002,
+          "p60": 28.625999999999998
+        }
+      },
+      "price_calibration_method": "valuation_dominant_below_market_p35",
+      "key_sensitivities": [
+        "2026 consensus EPS",
+        "2027 downside durability",
+        "cycle regime",
+        "structural haircut",
+        "180d market price distribution"
+      ],
       "left_engine": "cycle"
     },
     {
@@ -1768,17 +2208,18 @@
       "cycle_tag": "chemicals::氟化工",
       "current_price": 19.09,
       "valuation_status": "unavailable",
-      "valuation_model": "manual_spread_anchor_required",
-      "execution_state": "machine_anchor_policy_missing",
-      "forward_earnings_basis": "This subchain has no machine-verifiable commodity/spread anchor; TTM PE is not an allowed substitute.",
+      "valuation_model": "conservative_consensus_cycle_low_risk",
+      "execution_state": "input_data_insufficient",
+      "forward_earnings_basis": "2026 EPS primary; 2027 only downside guard; no TTM/H1 annualization substitute.",
       "commodity_anchors": [],
       "reasonable_multiple_range": null,
       "value_anchor_range": null,
       "safe_buy_range": null,
       "reasonable_buy_range": null,
       "left_conclusion": "unavailable",
-      "reason": "cycle_policy_missing_machine_readable_anchor",
+      "reason": "forward_consensus_insufficient:reports=0,eps_2026=None,eps_2027=None",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "valuation_mode": "conservative_consensus_cycle",
       "left_engine": "cycle"
     },
     {
@@ -1842,17 +2283,18 @@
       "cycle_tag": "chemicals::氟化工",
       "current_price": 36.94,
       "valuation_status": "unavailable",
-      "valuation_model": "manual_spread_anchor_required",
-      "execution_state": "machine_anchor_policy_missing",
-      "forward_earnings_basis": "This subchain has no machine-verifiable commodity/spread anchor; TTM PE is not an allowed substitute.",
+      "valuation_model": "conservative_consensus_cycle_low_risk",
+      "execution_state": "input_data_insufficient",
+      "forward_earnings_basis": "2026 EPS primary; 2027 only downside guard; no TTM/H1 annualization substitute.",
       "commodity_anchors": [],
       "reasonable_multiple_range": null,
       "value_anchor_range": null,
       "safe_buy_range": null,
       "reasonable_buy_range": null,
       "left_conclusion": "unavailable",
-      "reason": "cycle_policy_missing_machine_readable_anchor",
+      "reason": "forward_consensus_insufficient:reports=2,eps_2026=1.955,eps_2027=2.39",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "valuation_mode": "conservative_consensus_cycle",
       "left_engine": "cycle"
     },
     {
@@ -2275,6 +2717,7 @@
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
+      "valuation_mode": "commodity_anchor_normalized",
       "left_engine": "cycle"
     },
     {
@@ -2681,17 +3124,18 @@
       "cycle_tag": "chemicals::氟化工",
       "current_price": 18.87,
       "valuation_status": "unavailable",
-      "valuation_model": "manual_spread_anchor_required",
-      "execution_state": "machine_anchor_policy_missing",
-      "forward_earnings_basis": "This subchain has no machine-verifiable commodity/spread anchor; TTM PE is not an allowed substitute.",
+      "valuation_model": "conservative_consensus_cycle_low_risk",
+      "execution_state": "input_data_insufficient",
+      "forward_earnings_basis": "2026 EPS primary; 2027 only downside guard; no TTM/H1 annualization substitute.",
       "commodity_anchors": [],
       "reasonable_multiple_range": null,
       "value_anchor_range": null,
       "safe_buy_range": null,
       "reasonable_buy_range": null,
       "left_conclusion": "unavailable",
-      "reason": "cycle_policy_missing_machine_readable_anchor",
+      "reason": "forward_consensus_insufficient:reports=0,eps_2026=None,eps_2027=None",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "valuation_mode": "conservative_consensus_cycle",
       "left_engine": "cycle"
     },
     {
@@ -3130,18 +3574,127 @@
       "name": "巨化股份",
       "cycle_tag": "chemicals::氟化工",
       "current_price": 40.54,
-      "valuation_status": "unavailable",
-      "valuation_model": "manual_spread_anchor_required",
-      "execution_state": "machine_anchor_policy_missing",
-      "forward_earnings_basis": "This subchain has no machine-verifiable commodity/spread anchor; TTM PE is not an allowed substitute.",
+      "valuation_status": "valid",
+      "valuation_model": "conservative_consensus_cycle_low_risk",
+      "execution_state": "valid",
+      "forward_earnings_basis": "2026 EPS 2.1324 primary; 2027 EPS 2.5586 only downside guard -> haircut 0.85 -> reviewed regime -> 180d calibration.",
       "commodity_anchors": [],
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "safe_buy_range": null,
-      "reasonable_buy_range": null,
-      "left_conclusion": "unavailable",
-      "reason": "cycle_policy_missing_machine_readable_anchor",
+      "reasonable_multiple_range": [
+        12.0,
+        16.0
+      ],
+      "value_anchor_range": [
+        14.88,
+        20.25
+      ],
+      "safe_buy_range": [
+        14.88,
+        17.56
+      ],
+      "reasonable_buy_range": [
+        17.56,
+        20.25
+      ],
+      "left_conclusion": "above_buy_zone",
+      "reason": null,
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "valuation_mode": "conservative_consensus_cycle",
+      "valuation_basis_unit": "PE",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 21,
+      "consensus_eps_current_year": 2.1324,
+      "consensus_eps_next_year": 2.5586,
+      "next_year_eps_growth_pct": 19.99,
+      "forward_12m_eps_proxy": 2.4165,
+      "forward_eps_weights": {
+        "current_year": 0.3333,
+        "next_year": 0.6667
+      },
+      "low_risk_eps_pre_haircut": 2.1324,
+      "low_risk_eps_guard_method": "current_year_primary_no_positive_next_year_uplift",
+      "anchorless_cycle_haircut": 0.85,
+      "normalized_forward_eps": 1.8125,
+      "neutralization_factor": 0.85,
+      "weighted_neutral_commodity_delta": null,
+      "market_forward_pe_current_year": 19.01,
+      "market_forward_pe_next_year": 15.84,
+      "market_forward_pe_12m_proxy": 16.78,
+      "short_term_anchor_effect_on_eps": null,
+      "low_risk_short_term_effect_on_eps": 0.0,
+      "profit_sensitivity": null,
+      "cycle_regime": "quota_supported_high_spread_with_demand_risk",
+      "cycle_regime_reviewed_at": "2026-08-30",
+      "cycle_regime_age_days": -2,
+      "cycle_regime_summary": "三代制冷剂配额约束仍支撑供给纪律，2026H1价格和龙头利润继续改善；但空调等终端排产波动意味着当前高价差不能永久资本化，低风险基准盈利按95%周期因子处理。",
+      "cycle_regime_scores": {
+        "supply": 1.0,
+        "demand": 0.0,
+        "inventory": 0.0
+      },
+      "cycle_regime_evidence": [
+        {
+          "date": "2026-08-30",
+          "source": "data/research/pipeline/industry_scan.json",
+          "effect": "constructive",
+          "note": "氟化工为T2 mid；2026H1制冷剂均价同比约+15.6%，龙头利润已明显受益。"
+        },
+        {
+          "date": "2026-08-29",
+          "source": "巨化股份2026H1公开研报汇总",
+          "url": "https://basic.10jqka.com.cn/144/600160/worth.html",
+          "effect": "constructive",
+          "note": "H1制冷剂销售价格同比提升，Q3初主要制冷剂价格仍处高位。"
+        }
+      ],
+      "bear_base_bull_regime_factor": [
+        0.8,
+        0.95,
+        1.05
+      ],
+      "bear_base_bull_forward_eps": [
+        1.45,
+        1.7219,
+        1.9032
+      ],
+      "multiple_rationale": "制冷剂配额约束使行业具备较强景气，但R32/R134a/R125产品结构和萤石/氢氟酸等成本难以用单一稳定公开序列机器化。低风险估值以2026 EPS主锚、2027下行约束、额外周期折价和180日价格校准为主，不把当前高价差永久资本化。",
+      "scenario_fair_value_range": [
+        17.4,
+        30.45
+      ],
+      "normalized_base_fair_value_floor": 20.66,
+      "base_fair_value_floor": 20.66,
+      "market_price_anchor_180d": {
+        "history_points": 180,
+        "history_basis": "tencent_qfq_plus_live_tail",
+        "last_history_date": "2026-08-28",
+        "low_180d": 32.08,
+        "high_180d": 55.85,
+        "median_180d": 37.89,
+        "ma60": 43.01366666666667,
+        "safe_percentile_band": [
+          32.08,
+          34.03
+        ],
+        "reasonable_percentile_band": [
+          34.03,
+          38.902
+        ],
+        "percentiles": {
+          "p15": 34.4895,
+          "p25": 35.38,
+          "p35": 36.3735,
+          "p50": 37.89,
+          "p60": 38.902
+        }
+      },
+      "price_calibration_method": "valuation_dominant_below_market_p35",
+      "key_sensitivities": [
+        "2026 consensus EPS",
+        "2027 downside durability",
+        "cycle regime",
+        "structural haircut",
+        "180d market price distribution"
+      ],
       "left_engine": "cycle"
     },
     {
@@ -3259,19 +3812,127 @@
       "name": "兖矿能源",
       "cycle_tag": "coal::动力煤",
       "current_price": 23.02,
-      "valuation_status": "unavailable",
-      "valuation_model": "normalized_forward_cycle_low_risk",
-      "execution_state": "input_data_insufficient",
-      "forward_earnings_basis": "2026/2027 consensus plus neutral commodity anchor, 6-18m regime and price-history calibration are mandatory for resource valuation.",
+      "valuation_status": "valid",
+      "valuation_model": "conservative_consensus_cycle_low_risk",
+      "execution_state": "valid",
+      "forward_earnings_basis": "2026 EPS 1.7183 primary; 2027 EPS 1.8230 only downside guard -> haircut 0.90 -> reviewed regime -> 180d calibration.",
       "commodity_anchors": [],
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "safe_buy_range": null,
-      "reasonable_buy_range": null,
-      "left_conclusion": "unavailable",
-      "reason": "commodity_anchor_fetch_failed:['ZC0']",
-      "cycle_regime": null,
+      "reasonable_multiple_range": [
+        7.0,
+        10.0
+      ],
+      "value_anchor_range": [
+        7.4,
+        10.08
+      ],
+      "safe_buy_range": [
+        7.4,
+        8.74
+      ],
+      "reasonable_buy_range": [
+        8.74,
+        10.08
+      ],
+      "left_conclusion": "above_buy_zone",
+      "reason": null,
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "valuation_mode": "conservative_consensus_cycle",
+      "valuation_basis_unit": "PE",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 23,
+      "consensus_eps_current_year": 1.7183,
+      "consensus_eps_next_year": 1.823,
+      "next_year_eps_growth_pct": 6.1,
+      "forward_12m_eps_proxy": 1.7881,
+      "forward_eps_weights": {
+        "current_year": 0.3333,
+        "next_year": 0.6667
+      },
+      "low_risk_eps_pre_haircut": 1.7183,
+      "low_risk_eps_guard_method": "current_year_primary_no_positive_next_year_uplift",
+      "anchorless_cycle_haircut": 0.9,
+      "normalized_forward_eps": 1.5464,
+      "neutralization_factor": 0.9,
+      "weighted_neutral_commodity_delta": null,
+      "market_forward_pe_current_year": 13.4,
+      "market_forward_pe_next_year": 12.63,
+      "market_forward_pe_12m_proxy": 12.87,
+      "short_term_anchor_effect_on_eps": null,
+      "low_risk_short_term_effect_on_eps": 0.0,
+      "profit_sensitivity": null,
+      "cycle_regime": "price_recovery_with_policy_supply_constraint",
+      "cycle_regime_reviewed_at": "2026-08-30",
+      "cycle_regime_age_days": -2,
+      "cycle_regime_summary": "2026年以来动力煤价格中枢抬升、煤企盈利改善，安监与反超产限制供给弹性；但煤炭仍是强政策/天气周期行业，低风险估值不把现货上涨直接外推，基准盈利继续保留折价。",
+      "cycle_regime_scores": {
+        "supply": 0.5,
+        "demand": 0.5,
+        "inventory": 0.0
+      },
+      "cycle_regime_evidence": [
+        {
+          "date": "2026-08-30",
+          "source": "data/research/pipeline/industry_scan.json",
+          "effect": "constructive",
+          "note": "动力煤被识别为T2 early；8月28日秦皇岛Q5500约867元/吨，1-7月煤炭开采洗选利润明显改善。"
+        },
+        {
+          "date": "2026-07-13",
+          "source": "中泰证券煤炭行业公开观点",
+          "url": "https://finance.sina.com.cn/wm/2026-07-13/doc-inihrhfn9075972.shtml",
+          "effect": "constructive_with_cycle_risk",
+          "note": "2026H1动力煤价格中枢同比上升，供给受安监与进口约束；仍需防范季节、政策和需求波动。"
+        }
+      ],
+      "bear_base_bull_regime_factor": [
+        0.82,
+        0.95,
+        1.05
+      ],
+      "bear_base_bull_forward_eps": [
+        1.2681,
+        1.4691,
+        1.6238
+      ],
+      "multiple_rationale": "动力煤连续期货已不能作为可靠低风险机器锚。正式估值改用2026一致预期为主锚、2027只做下行约束，再做周期折价与180日价格校准；不因煤价短期上涨抬高买点。",
+      "scenario_fair_value_range": [
+        8.88,
+        16.24
+      ],
+      "normalized_base_fair_value_floor": 10.28,
+      "base_fair_value_floor": 10.28,
+      "market_price_anchor_180d": {
+        "history_points": 180,
+        "history_basis": "tencent_qfq_plus_live_tail",
+        "last_history_date": "2026-08-28",
+        "low_180d": 12.81,
+        "high_180d": 26.95,
+        "median_180d": 19.165,
+        "ma60": 20.3555,
+        "safe_percentile_band": [
+          12.81,
+          13.24
+        ],
+        "reasonable_percentile_band": [
+          13.24,
+          19.862
+        ],
+        "percentiles": {
+          "p15": 13.587,
+          "p25": 15.2175,
+          "p35": 17.805,
+          "p50": 19.165,
+          "p60": 19.862
+        }
+      },
+      "price_calibration_method": "valuation_dominant_below_market_p35",
+      "key_sensitivities": [
+        "2026 consensus EPS",
+        "2027 downside durability",
+        "cycle regime",
+        "structural haircut",
+        "180d market price distribution"
+      ],
       "left_engine": "cycle"
     },
     {
@@ -3312,6 +3973,7 @@
       "reason": "forward_consensus_insufficient:reports=2,eps_2026=4.29,eps_2027=4.645",
       "cycle_regime": "tight_spot_medium_term_balancing",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "valuation_mode": "commodity_anchor_normalized",
       "left_engine": "cycle"
     },
     {
@@ -3381,18 +4043,127 @@
       "name": "昊华科技",
       "cycle_tag": "chemicals::氟化工",
       "current_price": 53.31,
-      "valuation_status": "unavailable",
-      "valuation_model": "manual_spread_anchor_required",
-      "execution_state": "machine_anchor_policy_missing",
-      "forward_earnings_basis": "This subchain has no machine-verifiable commodity/spread anchor; TTM PE is not an allowed substitute.",
+      "valuation_status": "valid",
+      "valuation_model": "conservative_consensus_cycle_low_risk",
+      "execution_state": "valid",
+      "forward_earnings_basis": "2026 EPS 1.6217 primary; 2027 EPS 1.9192 only downside guard -> haircut 0.85 -> reviewed regime -> 180d calibration.",
       "commodity_anchors": [],
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "safe_buy_range": null,
-      "reasonable_buy_range": null,
-      "left_conclusion": "unavailable",
-      "reason": "cycle_policy_missing_machine_readable_anchor",
+      "reasonable_multiple_range": [
+        12.0,
+        16.0
+      ],
+      "value_anchor_range": [
+        11.31,
+        15.4
+      ],
+      "safe_buy_range": [
+        11.31,
+        13.36
+      ],
+      "reasonable_buy_range": [
+        13.36,
+        15.4
+      ],
+      "left_conclusion": "above_buy_zone",
+      "reason": null,
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "valuation_mode": "conservative_consensus_cycle",
+      "valuation_basis_unit": "PE",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 12,
+      "consensus_eps_current_year": 1.6217,
+      "consensus_eps_next_year": 1.9192,
+      "next_year_eps_growth_pct": 18.35,
+      "forward_12m_eps_proxy": 1.82,
+      "forward_eps_weights": {
+        "current_year": 0.3333,
+        "next_year": 0.6667
+      },
+      "low_risk_eps_pre_haircut": 1.6217,
+      "low_risk_eps_guard_method": "current_year_primary_no_positive_next_year_uplift",
+      "anchorless_cycle_haircut": 0.85,
+      "normalized_forward_eps": 1.3784,
+      "neutralization_factor": 0.85,
+      "weighted_neutral_commodity_delta": null,
+      "market_forward_pe_current_year": 32.87,
+      "market_forward_pe_next_year": 27.78,
+      "market_forward_pe_12m_proxy": 29.29,
+      "short_term_anchor_effect_on_eps": null,
+      "low_risk_short_term_effect_on_eps": 0.0,
+      "profit_sensitivity": null,
+      "cycle_regime": "quota_supported_high_spread_with_demand_risk",
+      "cycle_regime_reviewed_at": "2026-08-30",
+      "cycle_regime_age_days": -2,
+      "cycle_regime_summary": "三代制冷剂配额约束仍支撑供给纪律，2026H1价格和龙头利润继续改善；但空调等终端排产波动意味着当前高价差不能永久资本化，低风险基准盈利按95%周期因子处理。",
+      "cycle_regime_scores": {
+        "supply": 1.0,
+        "demand": 0.0,
+        "inventory": 0.0
+      },
+      "cycle_regime_evidence": [
+        {
+          "date": "2026-08-30",
+          "source": "data/research/pipeline/industry_scan.json",
+          "effect": "constructive",
+          "note": "氟化工为T2 mid；2026H1制冷剂均价同比约+15.6%，龙头利润已明显受益。"
+        },
+        {
+          "date": "2026-08-29",
+          "source": "巨化股份2026H1公开研报汇总",
+          "url": "https://basic.10jqka.com.cn/144/600160/worth.html",
+          "effect": "constructive",
+          "note": "H1制冷剂销售价格同比提升，Q3初主要制冷剂价格仍处高位。"
+        }
+      ],
+      "bear_base_bull_regime_factor": [
+        0.8,
+        0.95,
+        1.05
+      ],
+      "bear_base_bull_forward_eps": [
+        1.1027,
+        1.3095,
+        1.4473
+      ],
+      "multiple_rationale": "制冷剂配额约束使行业具备较强景气，但R32/R134a/R125产品结构和萤石/氢氟酸等成本难以用单一稳定公开序列机器化。低风险估值以2026 EPS主锚、2027下行约束、额外周期折价和180日价格校准为主，不把当前高价差永久资本化。",
+      "scenario_fair_value_range": [
+        13.23,
+        23.16
+      ],
+      "normalized_base_fair_value_floor": 15.71,
+      "base_fair_value_floor": 15.71,
+      "market_price_anchor_180d": {
+        "history_points": 180,
+        "history_basis": "tencent_qfq_plus_live_tail",
+        "last_history_date": "2026-08-28",
+        "low_180d": 29.328,
+        "high_180d": 82.17,
+        "median_180d": 36.198,
+        "ma60": 53.8785,
+        "safe_percentile_band": [
+          29.328,
+          30.397
+        ],
+        "reasonable_percentile_band": [
+          30.397,
+          38.176
+        ],
+        "percentiles": {
+          "p15": 31.310499999999998,
+          "p25": 33.1405,
+          "p35": 34.62350000000001,
+          "p50": 36.198,
+          "p60": 38.176
+        }
+      },
+      "price_calibration_method": "valuation_dominant_below_market_p35",
+      "key_sensitivities": [
+        "2026 consensus EPS",
+        "2027 downside durability",
+        "cycle regime",
+        "structural haircut",
+        "180d market price distribution"
+      ],
       "left_engine": "cycle"
     },
     {
@@ -3652,18 +4423,18 @@
       "cycle_tag": "coal::动力煤",
       "current_price": 13.99,
       "valuation_status": "unavailable",
-      "valuation_model": "normalized_forward_cycle_low_risk",
+      "valuation_model": "conservative_consensus_cycle_low_risk",
       "execution_state": "input_data_insufficient",
-      "forward_earnings_basis": "2026/2027 consensus plus neutral commodity anchor, 6-18m regime and price-history calibration are mandatory for resource valuation.",
+      "forward_earnings_basis": "2026 EPS primary; 2027 only downside guard; no TTM/H1 annualization substitute.",
       "commodity_anchors": [],
       "reasonable_multiple_range": null,
       "value_anchor_range": null,
       "safe_buy_range": null,
       "reasonable_buy_range": null,
       "left_conclusion": "unavailable",
-      "reason": "commodity_anchor_fetch_failed:['ZC0'];forward_consensus_insufficient:reports=0,eps_2026=None,eps_2027=None",
-      "cycle_regime": null,
+      "reason": "forward_consensus_insufficient:reports=0,eps_2026=None,eps_2027=None",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "valuation_mode": "conservative_consensus_cycle",
       "left_engine": "cycle"
     },
     {
@@ -3866,6 +4637,7 @@
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
+      "valuation_mode": "commodity_anchor_normalized",
       "left_engine": "cycle"
     },
     {
@@ -3935,18 +4707,127 @@
       "name": "东阳光",
       "cycle_tag": "chemicals::氟化工",
       "current_price": 31.88,
-      "valuation_status": "unavailable",
-      "valuation_model": "manual_spread_anchor_required",
-      "execution_state": "machine_anchor_policy_missing",
-      "forward_earnings_basis": "This subchain has no machine-verifiable commodity/spread anchor; TTM PE is not an allowed substitute.",
+      "valuation_status": "valid",
+      "valuation_model": "conservative_consensus_cycle_low_risk",
+      "execution_state": "valid",
+      "forward_earnings_basis": "2026 EPS 0.5862 primary; 2027 EPS 0.7542 only downside guard -> haircut 0.85 -> reviewed regime -> 180d calibration.",
       "commodity_anchors": [],
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "safe_buy_range": null,
-      "reasonable_buy_range": null,
-      "left_conclusion": "unavailable",
-      "reason": "cycle_policy_missing_machine_readable_anchor",
+      "reasonable_multiple_range": [
+        12.0,
+        16.0
+      ],
+      "value_anchor_range": [
+        4.09,
+        5.57
+      ],
+      "safe_buy_range": [
+        4.09,
+        4.83
+      ],
+      "reasonable_buy_range": [
+        4.83,
+        5.57
+      ],
+      "left_conclusion": "above_buy_zone",
+      "reason": null,
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "valuation_mode": "conservative_consensus_cycle",
+      "valuation_basis_unit": "PE",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 6,
+      "consensus_eps_current_year": 0.5862,
+      "consensus_eps_next_year": 0.7542,
+      "next_year_eps_growth_pct": 28.66,
+      "forward_12m_eps_proxy": 0.6982,
+      "forward_eps_weights": {
+        "current_year": 0.3333,
+        "next_year": 0.6667
+      },
+      "low_risk_eps_pre_haircut": 0.5862,
+      "low_risk_eps_guard_method": "current_year_primary_no_positive_next_year_uplift",
+      "anchorless_cycle_haircut": 0.85,
+      "normalized_forward_eps": 0.4982,
+      "neutralization_factor": 0.85,
+      "weighted_neutral_commodity_delta": null,
+      "market_forward_pe_current_year": 54.39,
+      "market_forward_pe_next_year": 42.27,
+      "market_forward_pe_12m_proxy": 45.66,
+      "short_term_anchor_effect_on_eps": null,
+      "low_risk_short_term_effect_on_eps": 0.0,
+      "profit_sensitivity": null,
+      "cycle_regime": "quota_supported_high_spread_with_demand_risk",
+      "cycle_regime_reviewed_at": "2026-08-30",
+      "cycle_regime_age_days": -2,
+      "cycle_regime_summary": "三代制冷剂配额约束仍支撑供给纪律，2026H1价格和龙头利润继续改善；但空调等终端排产波动意味着当前高价差不能永久资本化，低风险基准盈利按95%周期因子处理。",
+      "cycle_regime_scores": {
+        "supply": 1.0,
+        "demand": 0.0,
+        "inventory": 0.0
+      },
+      "cycle_regime_evidence": [
+        {
+          "date": "2026-08-30",
+          "source": "data/research/pipeline/industry_scan.json",
+          "effect": "constructive",
+          "note": "氟化工为T2 mid；2026H1制冷剂均价同比约+15.6%，龙头利润已明显受益。"
+        },
+        {
+          "date": "2026-08-29",
+          "source": "巨化股份2026H1公开研报汇总",
+          "url": "https://basic.10jqka.com.cn/144/600160/worth.html",
+          "effect": "constructive",
+          "note": "H1制冷剂销售价格同比提升，Q3初主要制冷剂价格仍处高位。"
+        }
+      ],
+      "bear_base_bull_regime_factor": [
+        0.8,
+        0.95,
+        1.05
+      ],
+      "bear_base_bull_forward_eps": [
+        0.3986,
+        0.4733,
+        0.5232
+      ],
+      "multiple_rationale": "制冷剂配额约束使行业具备较强景气，但R32/R134a/R125产品结构和萤石/氢氟酸等成本难以用单一稳定公开序列机器化。低风险估值以2026 EPS主锚、2027下行约束、额外周期折价和180日价格校准为主，不把当前高价差永久资本化。",
+      "scenario_fair_value_range": [
+        4.78,
+        8.37
+      ],
+      "normalized_base_fair_value_floor": 5.68,
+      "base_fair_value_floor": 5.68,
+      "market_price_anchor_180d": {
+        "history_points": 180,
+        "history_basis": "tencent_qfq_plus_live_tail",
+        "last_history_date": "2026-08-28",
+        "low_180d": 19.73,
+        "high_180d": 42.83,
+        "median_180d": 32.18,
+        "ma60": 33.48416666666667,
+        "safe_percentile_band": [
+          19.73,
+          22.257
+        ],
+        "reasonable_percentile_band": [
+          22.257,
+          33.262
+        ],
+        "percentiles": {
+          "p15": 23.2285,
+          "p25": 28.6725,
+          "p35": 29.936,
+          "p50": 32.18,
+          "p60": 33.262
+        }
+      },
+      "price_calibration_method": "valuation_dominant_below_market_p35",
+      "key_sensitivities": [
+        "2026 consensus EPS",
+        "2027 downside durability",
+        "cycle regime",
+        "structural haircut",
+        "180d market price distribution"
+      ],
       "left_engine": "cycle"
     },
     {
@@ -4171,6 +5052,7 @@
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
+      "valuation_mode": "commodity_anchor_normalized",
       "left_engine": "cycle"
     },
     {
@@ -4393,19 +5275,127 @@
       "name": "恒源煤电",
       "cycle_tag": "coal::动力煤",
       "current_price": 9.02,
-      "valuation_status": "unavailable",
-      "valuation_model": "normalized_forward_cycle_low_risk",
-      "execution_state": "input_data_insufficient",
-      "forward_earnings_basis": "2026/2027 consensus plus neutral commodity anchor, 6-18m regime and price-history calibration are mandatory for resource valuation.",
+      "valuation_status": "valid",
+      "valuation_model": "conservative_consensus_cycle_low_risk",
+      "execution_state": "valid",
+      "forward_earnings_basis": "2026 EPS 0.4300 primary; 2027 EPS 0.5880 only downside guard -> haircut 0.90 -> reviewed regime -> 180d calibration.",
       "commodity_anchors": [],
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "safe_buy_range": null,
-      "reasonable_buy_range": null,
-      "left_conclusion": "unavailable",
-      "reason": "commodity_anchor_fetch_failed:['ZC0']",
-      "cycle_regime": null,
+      "reasonable_multiple_range": [
+        7.0,
+        10.0
+      ],
+      "value_anchor_range": [
+        1.85,
+        2.52
+      ],
+      "safe_buy_range": [
+        1.85,
+        2.19
+      ],
+      "reasonable_buy_range": [
+        2.19,
+        2.52
+      ],
+      "left_conclusion": "above_buy_zone",
+      "reason": null,
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "valuation_mode": "conservative_consensus_cycle",
+      "valuation_basis_unit": "PE",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 5,
+      "consensus_eps_current_year": 0.43,
+      "consensus_eps_next_year": 0.588,
+      "next_year_eps_growth_pct": 36.74,
+      "forward_12m_eps_proxy": 0.5353,
+      "forward_eps_weights": {
+        "current_year": 0.3333,
+        "next_year": 0.6667
+      },
+      "low_risk_eps_pre_haircut": 0.43,
+      "low_risk_eps_guard_method": "current_year_primary_no_positive_next_year_uplift",
+      "anchorless_cycle_haircut": 0.9,
+      "normalized_forward_eps": 0.387,
+      "neutralization_factor": 0.9,
+      "weighted_neutral_commodity_delta": null,
+      "market_forward_pe_current_year": 20.98,
+      "market_forward_pe_next_year": 15.34,
+      "market_forward_pe_12m_proxy": 16.85,
+      "short_term_anchor_effect_on_eps": null,
+      "low_risk_short_term_effect_on_eps": 0.0,
+      "profit_sensitivity": null,
+      "cycle_regime": "price_recovery_with_policy_supply_constraint",
+      "cycle_regime_reviewed_at": "2026-08-30",
+      "cycle_regime_age_days": -2,
+      "cycle_regime_summary": "2026年以来动力煤价格中枢抬升、煤企盈利改善，安监与反超产限制供给弹性；但煤炭仍是强政策/天气周期行业，低风险估值不把现货上涨直接外推，基准盈利继续保留折价。",
+      "cycle_regime_scores": {
+        "supply": 0.5,
+        "demand": 0.5,
+        "inventory": 0.0
+      },
+      "cycle_regime_evidence": [
+        {
+          "date": "2026-08-30",
+          "source": "data/research/pipeline/industry_scan.json",
+          "effect": "constructive",
+          "note": "动力煤被识别为T2 early；8月28日秦皇岛Q5500约867元/吨，1-7月煤炭开采洗选利润明显改善。"
+        },
+        {
+          "date": "2026-07-13",
+          "source": "中泰证券煤炭行业公开观点",
+          "url": "https://finance.sina.com.cn/wm/2026-07-13/doc-inihrhfn9075972.shtml",
+          "effect": "constructive_with_cycle_risk",
+          "note": "2026H1动力煤价格中枢同比上升，供给受安监与进口约束；仍需防范季节、政策和需求波动。"
+        }
+      ],
+      "bear_base_bull_regime_factor": [
+        0.82,
+        0.95,
+        1.05
+      ],
+      "bear_base_bull_forward_eps": [
+        0.3173,
+        0.3676,
+        0.4064
+      ],
+      "multiple_rationale": "动力煤连续期货已不能作为可靠低风险机器锚。正式估值改用2026一致预期为主锚、2027只做下行约束，再做周期折价与180日价格校准；不因煤价短期上涨抬高买点。",
+      "scenario_fair_value_range": [
+        2.22,
+        4.06
+      ],
+      "normalized_base_fair_value_floor": 2.57,
+      "base_fair_value_floor": 2.57,
+      "market_price_anchor_180d": {
+        "history_points": 180,
+        "history_basis": "tencent_qfq_plus_live_tail",
+        "last_history_date": "2026-08-28",
+        "low_180d": 5.99,
+        "high_180d": 9.02,
+        "median_180d": 7.285,
+        "ma60": 7.834333333333333,
+        "safe_percentile_band": [
+          5.99,
+          6.089
+        ],
+        "reasonable_percentile_band": [
+          6.089,
+          7.44
+        ],
+        "percentiles": {
+          "p15": 6.21,
+          "p25": 6.659999999999999,
+          "p35": 7.04,
+          "p50": 7.285,
+          "p60": 7.44
+        }
+      },
+      "price_calibration_method": "valuation_dominant_below_market_p35",
+      "key_sensitivities": [
+        "2026 consensus EPS",
+        "2027 downside durability",
+        "cycle regime",
+        "structural haircut",
+        "180d market price distribution"
+      ],
       "left_engine": "cycle"
     },
     {
@@ -4546,19 +5536,127 @@
       "name": "中国神华",
       "cycle_tag": "coal::动力煤",
       "current_price": 47.63,
-      "valuation_status": "unavailable",
-      "valuation_model": "normalized_forward_cycle_low_risk",
-      "execution_state": "input_data_insufficient",
-      "forward_earnings_basis": "2026/2027 consensus plus neutral commodity anchor, 6-18m regime and price-history calibration are mandatory for resource valuation.",
+      "valuation_status": "valid",
+      "valuation_model": "conservative_consensus_cycle_low_risk",
+      "execution_state": "valid",
+      "forward_earnings_basis": "2026 EPS 2.7330 primary; 2027 EPS 2.8487 only downside guard -> haircut 0.90 -> reviewed regime -> 180d calibration.",
       "commodity_anchors": [],
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "safe_buy_range": null,
-      "reasonable_buy_range": null,
-      "left_conclusion": "unavailable",
-      "reason": "commodity_anchor_fetch_failed:['ZC0']",
-      "cycle_regime": null,
+      "reasonable_multiple_range": [
+        7.0,
+        10.0
+      ],
+      "value_anchor_range": [
+        11.78,
+        16.03
+      ],
+      "safe_buy_range": [
+        11.78,
+        13.9
+      ],
+      "reasonable_buy_range": [
+        13.9,
+        16.03
+      ],
+      "left_conclusion": "above_buy_zone",
+      "reason": null,
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "valuation_mode": "conservative_consensus_cycle",
+      "valuation_basis_unit": "PE",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 23,
+      "consensus_eps_current_year": 2.733,
+      "consensus_eps_next_year": 2.8487,
+      "next_year_eps_growth_pct": 4.23,
+      "forward_12m_eps_proxy": 2.8101,
+      "forward_eps_weights": {
+        "current_year": 0.3333,
+        "next_year": 0.6667
+      },
+      "low_risk_eps_pre_haircut": 2.733,
+      "low_risk_eps_guard_method": "current_year_primary_no_positive_next_year_uplift",
+      "anchorless_cycle_haircut": 0.9,
+      "normalized_forward_eps": 2.4597,
+      "neutralization_factor": 0.9,
+      "weighted_neutral_commodity_delta": null,
+      "market_forward_pe_current_year": 17.43,
+      "market_forward_pe_next_year": 16.72,
+      "market_forward_pe_12m_proxy": 16.95,
+      "short_term_anchor_effect_on_eps": null,
+      "low_risk_short_term_effect_on_eps": 0.0,
+      "profit_sensitivity": null,
+      "cycle_regime": "price_recovery_with_policy_supply_constraint",
+      "cycle_regime_reviewed_at": "2026-08-30",
+      "cycle_regime_age_days": -2,
+      "cycle_regime_summary": "2026年以来动力煤价格中枢抬升、煤企盈利改善，安监与反超产限制供给弹性；但煤炭仍是强政策/天气周期行业，低风险估值不把现货上涨直接外推，基准盈利继续保留折价。",
+      "cycle_regime_scores": {
+        "supply": 0.5,
+        "demand": 0.5,
+        "inventory": 0.0
+      },
+      "cycle_regime_evidence": [
+        {
+          "date": "2026-08-30",
+          "source": "data/research/pipeline/industry_scan.json",
+          "effect": "constructive",
+          "note": "动力煤被识别为T2 early；8月28日秦皇岛Q5500约867元/吨，1-7月煤炭开采洗选利润明显改善。"
+        },
+        {
+          "date": "2026-07-13",
+          "source": "中泰证券煤炭行业公开观点",
+          "url": "https://finance.sina.com.cn/wm/2026-07-13/doc-inihrhfn9075972.shtml",
+          "effect": "constructive_with_cycle_risk",
+          "note": "2026H1动力煤价格中枢同比上升，供给受安监与进口约束；仍需防范季节、政策和需求波动。"
+        }
+      ],
+      "bear_base_bull_regime_factor": [
+        0.82,
+        0.95,
+        1.05
+      ],
+      "bear_base_bull_forward_eps": [
+        2.017,
+        2.3368,
+        2.5827
+      ],
+      "multiple_rationale": "动力煤连续期货已不能作为可靠低风险机器锚。正式估值改用2026一致预期为主锚、2027只做下行约束，再做周期折价与180日价格校准；不因煤价短期上涨抬高买点。",
+      "scenario_fair_value_range": [
+        14.12,
+        25.83
+      ],
+      "normalized_base_fair_value_floor": 16.36,
+      "base_fair_value_floor": 16.36,
+      "market_price_anchor_180d": {
+        "history_points": 180,
+        "history_basis": "tencent_qfq_plus_live_tail",
+        "last_history_date": "2026-08-28",
+        "low_180d": 38.01,
+        "high_180d": 49.73,
+        "median_180d": 44.105000000000004,
+        "ma60": 43.702666666666666,
+        "safe_percentile_band": [
+          38.01,
+          39.215999999999994
+        ],
+        "reasonable_percentile_band": [
+          39.215999999999994,
+          44.8
+        ],
+        "percentiles": {
+          "p15": 39.6285,
+          "p25": 40.495,
+          "p35": 41.1695,
+          "p50": 44.105000000000004,
+          "p60": 44.8
+        }
+      },
+      "price_calibration_method": "valuation_dominant_below_market_p35",
+      "key_sensitivities": [
+        "2026 consensus EPS",
+        "2027 downside durability",
+        "cycle regime",
+        "structural haircut",
+        "180d market price distribution"
+      ],
       "left_engine": "cycle"
     },
     {
@@ -4597,19 +5695,127 @@
       "name": "昊华能源",
       "cycle_tag": "coal::动力煤",
       "current_price": 14.81,
-      "valuation_status": "unavailable",
-      "valuation_model": "normalized_forward_cycle_low_risk",
-      "execution_state": "input_data_insufficient",
-      "forward_earnings_basis": "2026/2027 consensus plus neutral commodity anchor, 6-18m regime and price-history calibration are mandatory for resource valuation.",
+      "valuation_status": "valid",
+      "valuation_model": "conservative_consensus_cycle_low_risk",
+      "execution_state": "valid",
+      "forward_earnings_basis": "2026 EPS 0.9663 primary; 2027 EPS 1.1000 only downside guard -> haircut 0.90 -> reviewed regime -> 180d calibration.",
       "commodity_anchors": [],
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "safe_buy_range": null,
-      "reasonable_buy_range": null,
-      "left_conclusion": "unavailable",
-      "reason": "commodity_anchor_fetch_failed:['ZC0']",
-      "cycle_regime": null,
+      "reasonable_multiple_range": [
+        7.0,
+        10.0
+      ],
+      "value_anchor_range": [
+        4.16,
+        5.67
+      ],
+      "safe_buy_range": [
+        4.16,
+        4.92
+      ],
+      "reasonable_buy_range": [
+        4.92,
+        5.67
+      ],
+      "left_conclusion": "above_buy_zone",
+      "reason": null,
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "valuation_mode": "conservative_consensus_cycle",
+      "valuation_basis_unit": "PE",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 8,
+      "consensus_eps_current_year": 0.9663,
+      "consensus_eps_next_year": 1.1,
+      "next_year_eps_growth_pct": 13.84,
+      "forward_12m_eps_proxy": 1.0554,
+      "forward_eps_weights": {
+        "current_year": 0.3333,
+        "next_year": 0.6667
+      },
+      "low_risk_eps_pre_haircut": 0.9663,
+      "low_risk_eps_guard_method": "current_year_primary_no_positive_next_year_uplift",
+      "anchorless_cycle_haircut": 0.9,
+      "normalized_forward_eps": 0.8696,
+      "neutralization_factor": 0.9,
+      "weighted_neutral_commodity_delta": null,
+      "market_forward_pe_current_year": 15.33,
+      "market_forward_pe_next_year": 13.46,
+      "market_forward_pe_12m_proxy": 14.03,
+      "short_term_anchor_effect_on_eps": null,
+      "low_risk_short_term_effect_on_eps": 0.0,
+      "profit_sensitivity": null,
+      "cycle_regime": "price_recovery_with_policy_supply_constraint",
+      "cycle_regime_reviewed_at": "2026-08-30",
+      "cycle_regime_age_days": -2,
+      "cycle_regime_summary": "2026年以来动力煤价格中枢抬升、煤企盈利改善，安监与反超产限制供给弹性；但煤炭仍是强政策/天气周期行业，低风险估值不把现货上涨直接外推，基准盈利继续保留折价。",
+      "cycle_regime_scores": {
+        "supply": 0.5,
+        "demand": 0.5,
+        "inventory": 0.0
+      },
+      "cycle_regime_evidence": [
+        {
+          "date": "2026-08-30",
+          "source": "data/research/pipeline/industry_scan.json",
+          "effect": "constructive",
+          "note": "动力煤被识别为T2 early；8月28日秦皇岛Q5500约867元/吨，1-7月煤炭开采洗选利润明显改善。"
+        },
+        {
+          "date": "2026-07-13",
+          "source": "中泰证券煤炭行业公开观点",
+          "url": "https://finance.sina.com.cn/wm/2026-07-13/doc-inihrhfn9075972.shtml",
+          "effect": "constructive_with_cycle_risk",
+          "note": "2026H1动力煤价格中枢同比上升，供给受安监与进口约束；仍需防范季节、政策和需求波动。"
+        }
+      ],
+      "bear_base_bull_regime_factor": [
+        0.82,
+        0.95,
+        1.05
+      ],
+      "bear_base_bull_forward_eps": [
+        0.7131,
+        0.8261,
+        0.9131
+      ],
+      "multiple_rationale": "动力煤连续期货已不能作为可靠低风险机器锚。正式估值改用2026一致预期为主锚、2027只做下行约束，再做周期折价与180日价格校准；不因煤价短期上涨抬高买点。",
+      "scenario_fair_value_range": [
+        4.99,
+        9.13
+      ],
+      "normalized_base_fair_value_floor": 5.78,
+      "base_fair_value_floor": 5.78,
+      "market_price_anchor_180d": {
+        "history_points": 180,
+        "history_basis": "tencent_qfq_plus_live_tail",
+        "last_history_date": "2026-08-28",
+        "low_180d": 6.91,
+        "high_180d": 14.81,
+        "median_180d": 8.67,
+        "ma60": 11.9645,
+        "safe_percentile_band": [
+          6.91,
+          7.12
+        ],
+        "reasonable_percentile_band": [
+          7.12,
+          10.600000000000001
+        ],
+        "percentiles": {
+          "p15": 7.2485,
+          "p25": 7.614999999999999,
+          "p35": 8.056500000000002,
+          "p50": 8.67,
+          "p60": 10.600000000000001
+        }
+      },
+      "price_calibration_method": "valuation_dominant_below_market_p35",
+      "key_sensitivities": [
+        "2026 consensus EPS",
+        "2027 downside durability",
+        "cycle regime",
+        "structural haircut",
+        "180d market price distribution"
+      ],
       "left_engine": "cycle"
     },
     {
@@ -4885,6 +6091,7 @@
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
+      "valuation_mode": "commodity_anchor_normalized",
       "left_engine": "cycle"
     },
     {
@@ -5029,19 +6236,127 @@
       "name": "陕西煤业",
       "cycle_tag": "coal::动力煤",
       "current_price": 27.07,
-      "valuation_status": "unavailable",
-      "valuation_model": "normalized_forward_cycle_low_risk",
-      "execution_state": "input_data_insufficient",
-      "forward_earnings_basis": "2026/2027 consensus plus neutral commodity anchor, 6-18m regime and price-history calibration are mandatory for resource valuation.",
+      "valuation_status": "valid",
+      "valuation_model": "conservative_consensus_cycle_low_risk",
+      "execution_state": "valid",
+      "forward_earnings_basis": "2026 EPS 2.1359 primary; 2027 EPS 2.2929 only downside guard -> haircut 0.90 -> reviewed regime -> 180d calibration.",
       "commodity_anchors": [],
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "safe_buy_range": null,
-      "reasonable_buy_range": null,
-      "left_conclusion": "unavailable",
-      "reason": "commodity_anchor_fetch_failed:['ZC0']",
-      "cycle_regime": null,
+      "reasonable_multiple_range": [
+        7.0,
+        10.0
+      ],
+      "value_anchor_range": [
+        9.2,
+        12.53
+      ],
+      "safe_buy_range": [
+        9.2,
+        10.87
+      ],
+      "reasonable_buy_range": [
+        10.87,
+        12.53
+      ],
+      "left_conclusion": "above_buy_zone",
+      "reason": null,
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "valuation_mode": "conservative_consensus_cycle",
+      "valuation_basis_unit": "PE",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 17,
+      "consensus_eps_current_year": 2.1359,
+      "consensus_eps_next_year": 2.2929,
+      "next_year_eps_growth_pct": 7.35,
+      "forward_12m_eps_proxy": 2.2406,
+      "forward_eps_weights": {
+        "current_year": 0.3333,
+        "next_year": 0.6667
+      },
+      "low_risk_eps_pre_haircut": 2.1359,
+      "low_risk_eps_guard_method": "current_year_primary_no_positive_next_year_uplift",
+      "anchorless_cycle_haircut": 0.9,
+      "normalized_forward_eps": 1.9223,
+      "neutralization_factor": 0.9,
+      "weighted_neutral_commodity_delta": null,
+      "market_forward_pe_current_year": 12.67,
+      "market_forward_pe_next_year": 11.81,
+      "market_forward_pe_12m_proxy": 12.08,
+      "short_term_anchor_effect_on_eps": null,
+      "low_risk_short_term_effect_on_eps": 0.0,
+      "profit_sensitivity": null,
+      "cycle_regime": "price_recovery_with_policy_supply_constraint",
+      "cycle_regime_reviewed_at": "2026-08-30",
+      "cycle_regime_age_days": -2,
+      "cycle_regime_summary": "2026年以来动力煤价格中枢抬升、煤企盈利改善，安监与反超产限制供给弹性；但煤炭仍是强政策/天气周期行业，低风险估值不把现货上涨直接外推，基准盈利继续保留折价。",
+      "cycle_regime_scores": {
+        "supply": 0.5,
+        "demand": 0.5,
+        "inventory": 0.0
+      },
+      "cycle_regime_evidence": [
+        {
+          "date": "2026-08-30",
+          "source": "data/research/pipeline/industry_scan.json",
+          "effect": "constructive",
+          "note": "动力煤被识别为T2 early；8月28日秦皇岛Q5500约867元/吨，1-7月煤炭开采洗选利润明显改善。"
+        },
+        {
+          "date": "2026-07-13",
+          "source": "中泰证券煤炭行业公开观点",
+          "url": "https://finance.sina.com.cn/wm/2026-07-13/doc-inihrhfn9075972.shtml",
+          "effect": "constructive_with_cycle_risk",
+          "note": "2026H1动力煤价格中枢同比上升，供给受安监与进口约束；仍需防范季节、政策和需求波动。"
+        }
+      ],
+      "bear_base_bull_regime_factor": [
+        0.82,
+        0.95,
+        1.05
+      ],
+      "bear_base_bull_forward_eps": [
+        1.5763,
+        1.8262,
+        2.0184
+      ],
+      "multiple_rationale": "动力煤连续期货已不能作为可靠低风险机器锚。正式估值改用2026一致预期为主锚、2027只做下行约束，再做周期折价与180日价格校准；不因煤价短期上涨抬高买点。",
+      "scenario_fair_value_range": [
+        11.03,
+        20.18
+      ],
+      "normalized_base_fair_value_floor": 12.78,
+      "base_fair_value_floor": 12.78,
+      "market_price_anchor_180d": {
+        "history_points": 180,
+        "history_basis": "tencent_qfq_plus_live_tail",
+        "last_history_date": "2026-08-28",
+        "low_180d": 19.941,
+        "high_180d": 27.07,
+        "median_180d": 23.8105,
+        "ma60": 24.260733333333334,
+        "safe_percentile_band": [
+          19.941,
+          20.857
+        ],
+        "reasonable_percentile_band": [
+          20.857,
+          24.355
+        ],
+        "percentiles": {
+          "p15": 21.00085,
+          "p25": 21.53525,
+          "p35": 22.404,
+          "p50": 23.8105,
+          "p60": 24.355
+        }
+      },
+      "price_calibration_method": "valuation_dominant_below_market_p35",
+      "key_sensitivities": [
+        "2026 consensus EPS",
+        "2027 downside durability",
+        "cycle regime",
+        "structural haircut",
+        "180d market price distribution"
+      ],
       "left_engine": "cycle"
     },
     {
@@ -5499,6 +6814,7 @@
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
+      "valuation_mode": "commodity_anchor_normalized",
       "left_engine": "cycle"
     },
     {
@@ -5965,7 +7281,7 @@
       "cycle_regime": "gold_copper_diversified_constructive",
       "cycle_regime_reviewed_at": "2026-08-30",
       "cycle_regime_age_days": -2,
-      "cycle_regime_summary": "黄金与铜双主业降低单一铜周期误判；仍需用2027盈利中枢而不是当前高商品价格直接外推。",
+      "cycle_regime_summary": "黄金与铜双主业降低单一铜周期误判；仍需用正常化盈利中枢而不是当前高商品价格直接外推。",
       "cycle_regime_scores": {
         "supply": 0.0,
         "demand": 0.5,
@@ -5995,7 +7311,7 @@
         12.0,
         16.0
       ],
-      "multiple_rationale": "黄金与铜双主业降低单一铜周期误判；仍需用2027盈利中枢而不是当前高商品价格直接外推。",
+      "multiple_rationale": "黄金与铜双主业降低单一铜周期误判；仍需用正常化盈利中枢而不是当前高商品价格直接外推。",
       "scenario_fair_value_range": [
         32.2,
         50.24
@@ -6048,6 +7364,7 @@
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
+      "valuation_mode": "commodity_anchor_normalized",
       "left_engine": "cycle"
     },
     {
@@ -6106,19 +7423,127 @@
       "name": "新集能源",
       "cycle_tag": "coal::动力煤",
       "current_price": 10.88,
-      "valuation_status": "unavailable",
-      "valuation_model": "normalized_forward_cycle_low_risk",
-      "execution_state": "input_data_insufficient",
-      "forward_earnings_basis": "2026/2027 consensus plus neutral commodity anchor, 6-18m regime and price-history calibration are mandatory for resource valuation.",
+      "valuation_status": "valid",
+      "valuation_model": "conservative_consensus_cycle_low_risk",
+      "execution_state": "valid",
+      "forward_earnings_basis": "2026 EPS 0.9476 primary; 2027 EPS 1.0347 only downside guard -> haircut 0.90 -> reviewed regime -> 180d calibration.",
       "commodity_anchors": [],
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "safe_buy_range": null,
-      "reasonable_buy_range": null,
-      "left_conclusion": "unavailable",
-      "reason": "commodity_anchor_fetch_failed:['ZC0']",
-      "cycle_regime": null,
+      "reasonable_multiple_range": [
+        7.0,
+        10.0
+      ],
+      "value_anchor_range": [
+        4.08,
+        5.56
+      ],
+      "safe_buy_range": [
+        4.08,
+        4.82
+      ],
+      "reasonable_buy_range": [
+        4.82,
+        5.56
+      ],
+      "left_conclusion": "above_buy_zone",
+      "reason": null,
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "valuation_mode": "conservative_consensus_cycle",
+      "valuation_basis_unit": "PE",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 17,
+      "consensus_eps_current_year": 0.9476,
+      "consensus_eps_next_year": 1.0347,
+      "next_year_eps_growth_pct": 9.19,
+      "forward_12m_eps_proxy": 1.0057,
+      "forward_eps_weights": {
+        "current_year": 0.3333,
+        "next_year": 0.6667
+      },
+      "low_risk_eps_pre_haircut": 0.9476,
+      "low_risk_eps_guard_method": "current_year_primary_no_positive_next_year_uplift",
+      "anchorless_cycle_haircut": 0.9,
+      "normalized_forward_eps": 0.8529,
+      "neutralization_factor": 0.9,
+      "weighted_neutral_commodity_delta": null,
+      "market_forward_pe_current_year": 11.48,
+      "market_forward_pe_next_year": 10.52,
+      "market_forward_pe_12m_proxy": 10.82,
+      "short_term_anchor_effect_on_eps": null,
+      "low_risk_short_term_effect_on_eps": 0.0,
+      "profit_sensitivity": null,
+      "cycle_regime": "price_recovery_with_policy_supply_constraint",
+      "cycle_regime_reviewed_at": "2026-08-30",
+      "cycle_regime_age_days": -2,
+      "cycle_regime_summary": "2026年以来动力煤价格中枢抬升、煤企盈利改善，安监与反超产限制供给弹性；但煤炭仍是强政策/天气周期行业，低风险估值不把现货上涨直接外推，基准盈利继续保留折价。",
+      "cycle_regime_scores": {
+        "supply": 0.5,
+        "demand": 0.5,
+        "inventory": 0.0
+      },
+      "cycle_regime_evidence": [
+        {
+          "date": "2026-08-30",
+          "source": "data/research/pipeline/industry_scan.json",
+          "effect": "constructive",
+          "note": "动力煤被识别为T2 early；8月28日秦皇岛Q5500约867元/吨，1-7月煤炭开采洗选利润明显改善。"
+        },
+        {
+          "date": "2026-07-13",
+          "source": "中泰证券煤炭行业公开观点",
+          "url": "https://finance.sina.com.cn/wm/2026-07-13/doc-inihrhfn9075972.shtml",
+          "effect": "constructive_with_cycle_risk",
+          "note": "2026H1动力煤价格中枢同比上升，供给受安监与进口约束；仍需防范季节、政策和需求波动。"
+        }
+      ],
+      "bear_base_bull_regime_factor": [
+        0.82,
+        0.95,
+        1.05
+      ],
+      "bear_base_bull_forward_eps": [
+        0.6994,
+        0.8102,
+        0.8955
+      ],
+      "multiple_rationale": "动力煤连续期货已不能作为可靠低风险机器锚。正式估值改用2026一致预期为主锚、2027只做下行约束，再做周期折价与180日价格校准；不因煤价短期上涨抬高买点。",
+      "scenario_fair_value_range": [
+        4.9,
+        8.96
+      ],
+      "normalized_base_fair_value_floor": 5.67,
+      "base_fair_value_floor": 5.67,
+      "market_price_anchor_180d": {
+        "history_points": 180,
+        "history_basis": "tencent_qfq_plus_live_tail",
+        "last_history_date": "2026-08-28",
+        "low_180d": 6.41,
+        "high_180d": 11.16,
+        "median_180d": 8.03,
+        "ma60": 9.655333333333335,
+        "safe_percentile_band": [
+          6.41,
+          6.729
+        ],
+        "reasonable_percentile_band": [
+          6.729,
+          8.684
+        ],
+        "percentiles": {
+          "p15": 6.8084999999999996,
+          "p25": 7.147500000000001,
+          "p35": 7.416500000000001,
+          "p50": 8.03,
+          "p60": 8.684
+        }
+      },
+      "price_calibration_method": "valuation_dominant_below_market_p35",
+      "key_sensitivities": [
+        "2026 consensus EPS",
+        "2027 downside durability",
+        "cycle regime",
+        "structural haircut",
+        "180d market price distribution"
+      ],
       "left_engine": "cycle"
     },
     {
@@ -6982,6 +8407,7 @@
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone",
+      "valuation_mode": "commodity_anchor_normalized",
       "left_engine": "cycle"
     },
     {
@@ -6989,18 +8415,127 @@
       "name": "永和股份",
       "cycle_tag": "chemicals::氟化工",
       "current_price": 34.35,
-      "valuation_status": "unavailable",
-      "valuation_model": "manual_spread_anchor_required",
-      "execution_state": "machine_anchor_policy_missing",
-      "forward_earnings_basis": "This subchain has no machine-verifiable commodity/spread anchor; TTM PE is not an allowed substitute.",
+      "valuation_status": "valid",
+      "valuation_model": "conservative_consensus_cycle_low_risk",
+      "execution_state": "valid",
+      "forward_earnings_basis": "2026 EPS 1.8736 primary; 2027 EPS 2.2682 only downside guard -> haircut 0.85 -> reviewed regime -> 180d calibration.",
       "commodity_anchors": [],
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "safe_buy_range": null,
-      "reasonable_buy_range": null,
-      "left_conclusion": "unavailable",
-      "reason": "cycle_policy_missing_machine_readable_anchor",
+      "reasonable_multiple_range": [
+        12.0,
+        16.0
+      ],
+      "value_anchor_range": [
+        13.07,
+        17.79
+      ],
+      "safe_buy_range": [
+        13.07,
+        15.43
+      ],
+      "reasonable_buy_range": [
+        15.43,
+        17.79
+      ],
+      "left_conclusion": "above_buy_zone",
+      "reason": null,
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "valuation_mode": "conservative_consensus_cycle",
+      "valuation_basis_unit": "PE",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 11,
+      "consensus_eps_current_year": 1.8736,
+      "consensus_eps_next_year": 2.2682,
+      "next_year_eps_growth_pct": 21.06,
+      "forward_12m_eps_proxy": 2.1367,
+      "forward_eps_weights": {
+        "current_year": 0.3333,
+        "next_year": 0.6667
+      },
+      "low_risk_eps_pre_haircut": 1.8736,
+      "low_risk_eps_guard_method": "current_year_primary_no_positive_next_year_uplift",
+      "anchorless_cycle_haircut": 0.85,
+      "normalized_forward_eps": 1.5926,
+      "neutralization_factor": 0.85,
+      "weighted_neutral_commodity_delta": null,
+      "market_forward_pe_current_year": 18.33,
+      "market_forward_pe_next_year": 15.14,
+      "market_forward_pe_12m_proxy": 16.08,
+      "short_term_anchor_effect_on_eps": null,
+      "low_risk_short_term_effect_on_eps": 0.0,
+      "profit_sensitivity": null,
+      "cycle_regime": "quota_supported_high_spread_with_demand_risk",
+      "cycle_regime_reviewed_at": "2026-08-30",
+      "cycle_regime_age_days": -2,
+      "cycle_regime_summary": "三代制冷剂配额约束仍支撑供给纪律，2026H1价格和龙头利润继续改善；但空调等终端排产波动意味着当前高价差不能永久资本化，低风险基准盈利按95%周期因子处理。",
+      "cycle_regime_scores": {
+        "supply": 1.0,
+        "demand": 0.0,
+        "inventory": 0.0
+      },
+      "cycle_regime_evidence": [
+        {
+          "date": "2026-08-30",
+          "source": "data/research/pipeline/industry_scan.json",
+          "effect": "constructive",
+          "note": "氟化工为T2 mid；2026H1制冷剂均价同比约+15.6%，龙头利润已明显受益。"
+        },
+        {
+          "date": "2026-08-29",
+          "source": "巨化股份2026H1公开研报汇总",
+          "url": "https://basic.10jqka.com.cn/144/600160/worth.html",
+          "effect": "constructive",
+          "note": "H1制冷剂销售价格同比提升，Q3初主要制冷剂价格仍处高位。"
+        }
+      ],
+      "bear_base_bull_regime_factor": [
+        0.8,
+        0.95,
+        1.05
+      ],
+      "bear_base_bull_forward_eps": [
+        1.2741,
+        1.513,
+        1.6722
+      ],
+      "multiple_rationale": "制冷剂配额约束使行业具备较强景气，但R32/R134a/R125产品结构和萤石/氢氟酸等成本难以用单一稳定公开序列机器化。低风险估值以2026 EPS主锚、2027下行约束、额外周期折价和180日价格校准为主，不把当前高价差永久资本化。",
+      "scenario_fair_value_range": [
+        15.29,
+        26.76
+      ],
+      "normalized_base_fair_value_floor": 18.16,
+      "base_fair_value_floor": 18.16,
+      "market_price_anchor_180d": {
+        "history_points": 180,
+        "history_basis": "tencent_qfq_plus_live_tail",
+        "last_history_date": "2026-08-28",
+        "low_180d": 22.92,
+        "high_180d": 48.39,
+        "median_180d": 28.475,
+        "ma60": 35.32116666666666,
+        "safe_percentile_band": [
+          22.92,
+          24.978
+        ],
+        "reasonable_percentile_band": [
+          24.978,
+          31.209999999999997
+        ],
+        "percentiles": {
+          "p15": 25.418,
+          "p25": 26.4075,
+          "p35": 26.815999999999995,
+          "p50": 28.475,
+          "p60": 31.209999999999997
+        }
+      },
+      "price_calibration_method": "valuation_dominant_below_market_p35",
+      "key_sensitivities": [
+        "2026 consensus EPS",
+        "2027 downside durability",
+        "cycle regime",
+        "structural haircut",
+        "180d market price distribution"
+      ],
       "left_engine": "cycle"
     }
   ],
