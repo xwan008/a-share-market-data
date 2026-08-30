@@ -1,93 +1,78 @@
 # A股低风险研究 V2 编排 Skill
 
 ## 目标
-V2只做一件事：从正在改善的细分盈利驱动中，找到未来1–2季度仍有兑现逻辑、但股价尚未充分定价的公司，并识别“未启动 / 初启 / 趋势确认 / 过热”状态。
+V2从正在改善的细分盈利驱动中，找到未来1–2季度仍有兑现逻辑、但股价尚未充分定价的公司，并最终形成可解释的**基本面估值锚、价值锚、安全买入区、合理买入区和价格状态**。
 
 核心内核：
-1. 先找盈利改善，而不是先找形态。
-2. 研究单位是“盈利驱动链”，不是宽泛行业，也不是T1/T2等级。
-3. 找盈利改善速度与股价定价速度之间的预期差。
-4. 最好的机会通常是“基本面已拐、价格刚启势”，而不是极端便宜或已经大涨。
+1. 先找盈利改善，不先找形态。
+2. 研究单位是盈利驱动链，不是宽泛行业或T1/T2等级。
+3. 公允价值和低风险买点分层：先回答“值多少钱”，再回答“什么价格值得买”。
+4. 估值至少两把独立锚交叉，禁止重复折价和用当前价反推目标价。
+5. 最好的机会通常是“基本面已拐、价格刚启势”，而不是极端便宜或已经大涨。
 
 ## 唯一编排入口
-先读取 `config/research_pipeline_manifest.json`。V2业务Skill只保留：
-- `earnings-driver-scan`
-- `company-research`
-- `price-expectation-gap`
-- `opportunity-ranking`
+先读取`config/research_pipeline_manifest.json`。业务Skill仍只有：`earnings-driver-scan / company-research / price-expectation-gap / opportunity-ranking`；估值参考与多锚买点属于`price-expectation-gap`的机器执行子阶段。
 
-Orchestrator只负责数据版本、阶段顺序、失败隔离和产物发布，不参与股票价值判断。
+## 固定执行阶段
+### 0 DATA_HEALTH
+检查主板全集、最新交易日、180日OHLCV、财务源、公司索引。数据缺失要显式披露，不能解释为“没有机会”。
 
-## 固定阶段
-### 0. DATA_HEALTH
-- 检查主板股票全集、最新交易日、180日有界OHLCV、财务数据源和公司索引。
-- 数据缺失要显式披露，但不能被解释为“没有机会”。
+### 1 EARNINGS_ANOMALY_RECALL + EARNINGS_DRIVER_SCAN
+全主板机械宽召回，并独立识别细分盈利Driver。大行业只导航，Driver必须有直接盈利变量、正向证据、未来1–2季度传导和失效条件。历史T1/T2不控制准入，confidence不进入估值公式。
 
-### 1. EARNINGS_DRIVER_SCAN
-- 从商品价格/价差、订单、出货、库存、开工率、利用率、审批、终端销售、财报等证据中识别正在改善的细分盈利驱动链。
-- 大行业仅用于导航；例如“化工”不能直接成为机会判断单位，必须落到制冷剂、MDI/TDI、氨纶、磷化工等可解释盈利驱动。
-- 输出方向、核心变量、证据、未来1–2季度传导、置信度和失效条件。
-- 置信度只是研究信息，不得直接乘进EPS、PE/PB或买入区。
+### 2 COMPANY_RESEARCH
+召回取`Driver直接暴露 ∪ 盈利异常 ∪ 周度全市场深验`。公司级验证必须回答主营/扣非、现金流、一次性收益、Forward Bridge和失效条件。估值前每条Driver仅轻压缩到约3–5家，不提前只留1家。
 
-### 2. COMPANY_RESEARCH
-召回来源取并集：
-- 盈利驱动链直接暴露公司；
-- 全市场盈利异常公司；
-- 周度全市场盈利宽召回池。
+### 3 VALUATION_REFERENCE：第一基本面锚
+V2必须自己重建，不读取V1估值数值：
+- 普通成长/制造：当年Forward EPS × 版本化业务PE；
+- 金融：Forward ROE → PB合理带；
+- 周期：正常化盈利 → 周期PE。
 
-召回宁可稍宽，淘汰必须发生在公司级验证后。每家公司必须回答：
-- 为什么盈利改善；
-- 当前改善是不是主营、扣非、现金流支持，而非一次性收益；
-- 未来1–2季度为什么可能继续；
-- 什么条件会使逻辑失效。
+周期纪律：有商品锚时“长期中性商品条件去windfall”和“6–18个月regime”必须解释不同经济含义；无商品锚时只使用一个`single_cycle_factor=min(structural_factor, base_regime_factor)`，禁止结构折价与regime折价重复相乘。
 
-估值前只做轻度代表性压缩：每条盈利驱动链保留约3–5家研究候选，禁止在估值前只留1家。
+输出`valuation_reference.json`，只回答公允基本面价值，不直接生成最终买点。
 
-### 3. PRICE_EXPECTATION_GAP
-同一阶段同时处理“价值是否已透支”和“价格是否开始确认”，但保持两个子判断独立：
+### 4 VALUATION_ANCHORS：独立交叉与正式买点
+三锚：
+- A 基本面价值锚；
+- B 同行Forward PE/PB估值锚；
+- C 公司自身180日历史成本锚。
 
-A. 价值/预期差：
-- 稳定成长/制造：Forward PE为主，历史PE分位交叉检查；
-- 银行/保险/券商：PB + Forward ROE；
-- 标准商品周期：中性商品价格 → 正常化EPS → PE；
-- 复杂周期制造：PE + PB/历史估值至少两把尺子交叉。
-- 禁止 `EPS haircut × regime haircut × PE haircut × buy-zone haircut` 这类重复折价。
-- 安全区来自多个独立估值锚重叠，不来自统一乘0.8。
-- 输出合理精度即可，禁止制造虚假的小数精度。
+A决定价值，B检查倍数是否脱离同行，C校准低风险entry。正式安全/合理区至少需要A+(B或C)。A/B公允中值偏离>45% => `valuation_divergence`，不得强行平均。
 
-B. 价格状态：
-- 对全主板独立扫描，不能只扫描左侧基本面候选。
-- 至少识别 `trend_continuation / breakout / pullback / base_not_started / overheated / damaged`。
-- 创新高或上方无历史压力可以是强结构，不能自动判为缺少压力地图。
-- 第一压力不足10%不能一刀切淘汰突破型机会。
-- 必须单独计算追高风险/乖离风险；趋势强和买点好是两个不同判断。
+买点：
+- 普通公司无显式entry multiple时，以公允下沿的82%–90%形成基本面安全边界、90%–100%形成合理边界，再由P10/P25/P35/P60与MA60校准；
+- 有显式`low_risk_multiple_range`时直接使用entry multiple，禁止再叠加统一折价；
+- 金融以PB/ROE为主并反推PB sanity；
+- 周期使用细分政策自己的safe/reasonable-to-fair-floor，当前商品走强不能抬低风险买点。
 
-### 4. OPPORTUNITY_RANKING
-对通过公司盈利研究的候选统一回答：
-- 盈利确定性如何；
-- 预期差还有多少；
-- 股价处于未启动、初启、趋势确认还是过热；
-- 当前动作：左侧关注 / 等突破 / 可参与 / 等回踩 / 放弃。
+输出`valuation_anchors.json`，必须包含`fundamental_anchor_range / value_anchor_range / safe_buy_range / reasonable_buy_range / independent_anchor_count / implied PE或PB`。
 
-最终重点机会优先寻找：
-`盈利改善明确 + 未来1–2季度Bridge成立 + 市场尚未充分定价 + 价格刚启势或处于低风险回踩`。
+### 5 FULL_MARKET_PRICE_STRUCTURE
+对全部有新鲜180日历史的主板独立扫描，不能只扫描基本面候选。至少识别`base_not_started / transition / breakout / pullback / trend_continuation / overheated / damaged`。Breakout要求价格+成交量+收盘位置确认；Pullback要求20日相对强度不显著弱于市场；创新高不能因无历史压力被判弱。
 
-Top3允许少于3只或为空，禁止为了数量降低标准。
+### 6 PRICE_EXPECTATION_GAP
+在正式估值区间形成后判断当前价位置：安全区、合理区、区间上方仍有空间、充分定价、深度折价待复核或估值未完成。再与独立价格结构合成预期差状态。
 
-## 右侧独立性硬规则
-- 右侧候选宇宙 = 全部主板可用180日历史股票。
-- 左侧公司研究池不能限制右侧扫描。
-- 任何股票只要结构满足趋势延续/突破且追高风险可接受，都必须能进入右侧观察/参与集合，不得因为不在基本面研究池而失去被扫描资格。
+### 7 OPPORTUNITY_RANKING
+每只候选固定输出：股票/代码/当前价、盈利Driver、Forward Bridge、基本面锚、价值锚、安全区、合理区、当前价值位置、价格结构、追高风险、动作、失效条件和blocker。
+
+优先寻找：`盈利改善明确 + Forward Bridge成立 + 正式估值区成立 + 预期差仍在 + 价格刚启势/低风险回踩`。
+
+Shadow可以展示高研究价值但尚缺正式买点的公司；Production必须同时满足公司证据ready、正式买点ready和合格价格状态。Top3允许少于3只或为空。
 
 ## 经济常识 Validator
-程序完整性通过不代表研究结论合理。V2至少必须拦截：
-- 合理买入区反推PE/PB显著低于公司/行业历史底部，但没有极端盈利恶化证据；
-- 周期股在没有中性盈利证据时被多层折价到极端个位数Forward PE；
-- 多种独立估值方法严重冲突却仍输出正式买点；
-- 右侧因“无上方压力”淘汰创新高强趋势；
-- 右侧因不在左侧/基本面研究池而未被扫描。
+至少拦截：
+- 同一风险在EPS、regime、PE/PB和买点区重复折价；
+- A/B严重冲突仍生成正式买点；
+- 少于2锚生成正式买点；
+- 安全区与合理区顺序异常；
+- 正式区间无法反推可解释PE/PB；
+- 历史价格反向抬高基本面公允价值；
+- 右侧因无上方压力淘汰创新高，或因不在基本面池而未扫描。
 
-触发时标记 `sanity_check_failed` 或 `valuation_divergence`，不得发布正式买点。
+触发必须`sanity_check_failed / valuation_divergence / review_required`，不得通过分数修复。
 
-## 影子运行原则
-V2在通用经济/结构不变量、历史回放和连续影子运行完成验证前只输出 shadow 结果，不覆盖V1正式文件。测试与Validator必须case-free：不得用固定股票、固定价格区间或历史人工结论作为PASS/FAIL条件。当前V1数据资产保留用于对照，但其T1/T2、anchorless repair、多层折价和共同池限定右侧的决策逻辑不再作为V2权威规则。
+## Shadow原则
+在历史回放与连续Shadow验证完成前不覆盖V1正式榜单。V1只保留对照，不得把其估值数值、旧买点、共同池右侧边界或T1/T2准入逻辑注入V2。Validator必须case-free，不得用固定股票、固定价格区间或人工历史答案作为PASS条件。
