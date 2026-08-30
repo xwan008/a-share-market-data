@@ -1,0 +1,51 @@
+name: Build industry scan stage
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'config/current_industry_scan_signals.json'
+      - 'config/industry_scan_universe.json'
+      - 'scripts/build_industry_scan_from_signals.py'
+      - 'scripts/validate_research_pipeline.py'
+      - '.github/workflows/build-industry-scan.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: a-share-industry-scan-stage
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build industry scan from registry and signals
+        run: python scripts/build_industry_scan_from_signals.py
+      - name: Validate industry scan hard contract
+        run: python scripts/validate_research_pipeline.py industry-scan data/research/pipeline/industry_scan.json
+      - name: Commit validated stage
+        shell: bash
+        run: |
+          if git status --porcelain -- data/research/pipeline/industry_scan.json | grep -q .; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add data/research/pipeline/industry_scan.json
+            git commit -m "research: freeze validated industry scan"
+            for attempt in 1 2 3; do
+              git pull --rebase origin main
+              if git push; then exit 0; fi
+              sleep $((attempt * 2))
+            done
+            exit 1
+          else
+            echo "No industry scan changes."
+          fi
