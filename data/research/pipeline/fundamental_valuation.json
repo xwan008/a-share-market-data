@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "generated_at": "2026-08-30T10:33:24.773695+08:00",
+  "generated_at": "2026-08-30T10:37:22.595281+08:00",
   "common_pool_count": 138,
   "fundamental_company_count": 106,
   "deferred_cycle_codes": [
@@ -37,11 +37,7 @@
     "603993",
     "605020"
   ],
-  "market_indicator_errors": [
-    "stock_zh_a_spot_em:ConnectionError:('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
-    "stock_sh_a_spot_em:ConnectionError:('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
-    "stock_sz_a_spot_em:ConnectionError:('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
-  ],
+  "market_indicator_errors": [],
   "policy_coverage": {
     "noncycle_count": 106,
     "supported_policy_count": 106,
@@ -156,9 +152,9 @@
     ],
     "unsupported_policy_codes": [],
     "execution_counts": {
-      "valid": 40,
+      "valid": 68,
       "consensus_insufficient": 37,
-      "market_data_missing": 28,
+      "market_data_missing": 0,
       "normalization_required": 1,
       "unsupported_policy": 0
     },
@@ -473,57 +469,95 @@
       "code": "000776",
       "name": "广发证券",
       "current_price": 21.43,
-      "valuation_status": "unavailable",
-      "execution_state": "market_data_missing",
+      "valuation_status": "valid",
+      "execution_state": "valid",
       "policy_status": "supported",
       "valuation_model": "broker_forward_pb_roe",
       "valuation_basis_unit": "PB",
-      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_source": "akshare.stock_profit_forecast_em+Eastmoney_A_share_spot",
       "forecast_report_count": 21,
       "consensus_eps_current_year": 2.159,
       "consensus_eps_next_year": 2.3985,
-      "forward_earnings_basis": "Forward ROE-PB bridge requires current PB/BVPS proxy; all-A and SH/SZ fallback endpoints returned no positive PB.",
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "reasonable_buy_range": null,
-      "safe_buy_range": null,
-      "market_indicator_source": null,
+      "book_value_per_share_proxy": 22.5931,
+      "market_pb": 0.9485,
+      "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
+      "forward_roe_current_year": 0.0956,
+      "forward_roe_next_year": 0.1062,
+      "market_pe_dynamic": null,
+      "market_forward_pe_current_year": 9.93,
+      "market_forward_pe_next_year": 8.93,
+      "forward_earnings_basis": "BVPS proxy=22.5931 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "reasonable_multiple_range": [
+        0.95,
+        1.3
+      ],
+      "multiple_rationale": "券商利润高度受市场成交、投行与自营周期影响，正式估值采用Forward ROE对应的PB区间；PE只作交叉检查。",
+      "value_anchor_range": [
+        21.46,
+        29.37
+      ],
+      "safe_buy_range": [
+        16.74,
+        19.32
+      ],
+      "reasonable_buy_range": [
+        19.32,
+        21.46
+      ],
       "key_sensitivities": [
         "forward ROE",
-        "market activity/investment return",
-        "book value quality"
+        "book value quality",
+        "market activity/investment return"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "unavailable",
-      "reason": "market_pb_missing"
+      "left_conclusion": "reasonable_buy_zone"
     },
     {
       "code": "000783",
       "name": "长江证券",
       "current_price": 9.21,
-      "valuation_status": "unavailable",
-      "execution_state": "market_data_missing",
+      "valuation_status": "valid",
+      "execution_state": "valid",
       "policy_status": "supported",
       "valuation_model": "broker_forward_pb_roe",
       "valuation_basis_unit": "PB",
-      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_source": "akshare.stock_profit_forecast_em+Eastmoney_A_share_spot",
       "forecast_report_count": 6,
       "consensus_eps_current_year": 0.9,
       "consensus_eps_next_year": 0.89,
-      "forward_earnings_basis": "Forward ROE-PB bridge requires current PB/BVPS proxy; all-A and SH/SZ fallback endpoints returned no positive PB.",
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "reasonable_buy_range": null,
-      "safe_buy_range": null,
-      "market_indicator_source": null,
+      "book_value_per_share_proxy": 7.7583,
+      "market_pb": 1.1871,
+      "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
+      "forward_roe_current_year": 0.116,
+      "forward_roe_next_year": 0.1147,
+      "market_pe_dynamic": null,
+      "market_forward_pe_current_year": 10.23,
+      "market_forward_pe_next_year": 10.35,
+      "forward_earnings_basis": "BVPS proxy=7.7583 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "reasonable_multiple_range": [
+        0.95,
+        1.3
+      ],
+      "multiple_rationale": "券商利润高度受市场成交、投行与自营周期影响，正式估值采用Forward ROE对应的PB区间；PE只作交叉检查。",
+      "value_anchor_range": [
+        7.37,
+        10.09
+      ],
+      "safe_buy_range": [
+        5.75,
+        6.63
+      ],
+      "reasonable_buy_range": [
+        6.63,
+        7.37
+      ],
       "key_sensitivities": [
         "forward ROE",
-        "market activity/investment return",
-        "book value quality"
+        "book value quality",
+        "market activity/investment return"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "unavailable",
-      "reason": "market_pb_missing"
+      "left_conclusion": "above_buy_zone"
     },
     {
       "code": "000800",
@@ -1388,57 +1422,95 @@
       "code": "002736",
       "name": "国信证券",
       "current_price": 10.28,
-      "valuation_status": "unavailable",
-      "execution_state": "market_data_missing",
+      "valuation_status": "valid",
+      "execution_state": "valid",
       "policy_status": "supported",
       "valuation_model": "broker_forward_pb_roe",
       "valuation_basis_unit": "PB",
-      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_source": "akshare.stock_profit_forecast_em+Eastmoney_A_share_spot",
       "forecast_report_count": 6,
       "consensus_eps_current_year": 1.142,
       "consensus_eps_next_year": 1.248,
-      "forward_earnings_basis": "Forward ROE-PB bridge requires current PB/BVPS proxy; all-A and SH/SZ fallback endpoints returned no positive PB.",
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "reasonable_buy_range": null,
-      "safe_buy_range": null,
-      "market_indicator_source": null,
+      "book_value_per_share_proxy": 12.4263,
+      "market_pb": 0.8273,
+      "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
+      "forward_roe_current_year": 0.0919,
+      "forward_roe_next_year": 0.1004,
+      "market_pe_dynamic": null,
+      "market_forward_pe_current_year": 9.0,
+      "market_forward_pe_next_year": 8.24,
+      "forward_earnings_basis": "BVPS proxy=12.4263 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "reasonable_multiple_range": [
+        0.95,
+        1.3
+      ],
+      "multiple_rationale": "券商利润高度受市场成交、投行与自营周期影响，正式估值采用Forward ROE对应的PB区间；PE只作交叉检查。",
+      "value_anchor_range": [
+        11.8,
+        16.15
+      ],
+      "safe_buy_range": [
+        9.21,
+        10.62
+      ],
+      "reasonable_buy_range": [
+        10.62,
+        11.8
+      ],
       "key_sensitivities": [
         "forward ROE",
-        "market activity/investment return",
-        "book value quality"
+        "book value quality",
+        "market activity/investment return"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "unavailable",
-      "reason": "market_pb_missing"
+      "left_conclusion": "safe_buy_zone"
     },
     {
       "code": "002797",
       "name": "第一创业",
       "current_price": 6.54,
-      "valuation_status": "unavailable",
-      "execution_state": "market_data_missing",
+      "valuation_status": "valid",
+      "execution_state": "valid",
       "policy_status": "supported",
       "valuation_model": "broker_forward_pb_roe",
       "valuation_basis_unit": "PB",
-      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_source": "akshare.stock_profit_forecast_em+Eastmoney_A_share_spot",
       "forecast_report_count": 7,
       "consensus_eps_current_year": 0.2387,
       "consensus_eps_next_year": 0.26,
-      "forward_earnings_basis": "Forward ROE-PB bridge requires current PB/BVPS proxy; all-A and SH/SZ fallback endpoints returned no positive PB.",
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "reasonable_buy_range": null,
-      "safe_buy_range": null,
-      "market_indicator_source": null,
+      "book_value_per_share_proxy": 4.114,
+      "market_pb": 1.5897,
+      "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
+      "forward_roe_current_year": 0.058,
+      "forward_roe_next_year": 0.0632,
+      "market_pe_dynamic": null,
+      "market_forward_pe_current_year": 27.39,
+      "market_forward_pe_next_year": 25.15,
+      "forward_earnings_basis": "BVPS proxy=4.1140 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "reasonable_multiple_range": [
+        0.85,
+        1.1
+      ],
+      "multiple_rationale": "券商利润高度受市场成交、投行与自营周期影响，正式估值采用Forward ROE对应的PB区间；PE只作交叉检查。",
+      "value_anchor_range": [
+        3.5,
+        4.53
+      ],
+      "safe_buy_range": [
+        2.73,
+        3.15
+      ],
+      "reasonable_buy_range": [
+        3.15,
+        3.5
+      ],
       "key_sensitivities": [
         "forward ROE",
-        "market activity/investment return",
-        "book value quality"
+        "book value quality",
+        "market activity/investment return"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "unavailable",
-      "reason": "market_pb_missing"
+      "left_conclusion": "above_buy_zone"
     },
     {
       "code": "002812",
@@ -1590,29 +1662,48 @@
       "code": "002926",
       "name": "华西证券",
       "current_price": 8.61,
-      "valuation_status": "unavailable",
-      "execution_state": "market_data_missing",
+      "valuation_status": "valid",
+      "execution_state": "valid",
       "policy_status": "supported",
       "valuation_model": "broker_forward_pb_roe",
       "valuation_basis_unit": "PB",
-      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_source": "akshare.stock_profit_forecast_em+Eastmoney_A_share_spot",
       "forecast_report_count": 3,
       "consensus_eps_current_year": 0.67,
       "consensus_eps_next_year": 0.735,
-      "forward_earnings_basis": "Forward ROE-PB bridge requires current PB/BVPS proxy; all-A and SH/SZ fallback endpoints returned no positive PB.",
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "reasonable_buy_range": null,
-      "safe_buy_range": null,
-      "market_indicator_source": null,
+      "book_value_per_share_proxy": 9.6503,
+      "market_pb": 0.8922,
+      "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
+      "forward_roe_current_year": 0.0694,
+      "forward_roe_next_year": 0.0762,
+      "market_pe_dynamic": null,
+      "market_forward_pe_current_year": 12.85,
+      "market_forward_pe_next_year": 11.71,
+      "forward_earnings_basis": "BVPS proxy=9.6503 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "reasonable_multiple_range": [
+        0.85,
+        1.1
+      ],
+      "multiple_rationale": "券商利润高度受市场成交、投行与自营周期影响，正式估值采用Forward ROE对应的PB区间；PE只作交叉检查。",
+      "value_anchor_range": [
+        8.2,
+        10.62
+      ],
+      "safe_buy_range": [
+        6.4,
+        7.38
+      ],
+      "reasonable_buy_range": [
+        7.38,
+        8.2
+      ],
       "key_sensitivities": [
         "forward ROE",
-        "market activity/investment return",
-        "book value quality"
+        "book value quality",
+        "market activity/investment return"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "unavailable",
-      "reason": "market_pb_missing"
+      "left_conclusion": "above_buy_zone"
     },
     {
       "code": "002938",
@@ -1721,29 +1812,48 @@
       "code": "600030",
       "name": "中信证券",
       "current_price": 27.93,
-      "valuation_status": "unavailable",
-      "execution_state": "market_data_missing",
+      "valuation_status": "valid",
+      "execution_state": "valid",
       "policy_status": "supported",
       "valuation_model": "broker_forward_pb_roe",
       "valuation_basis_unit": "PB",
-      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_source": "akshare.stock_profit_forecast_em+Eastmoney_A_share_spot",
       "forecast_report_count": 26,
       "consensus_eps_current_year": 2.5632,
       "consensus_eps_next_year": 2.7832,
-      "forward_earnings_basis": "Forward ROE-PB bridge requires current PB/BVPS proxy; all-A and SH/SZ fallback endpoints returned no positive PB.",
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "reasonable_buy_range": null,
-      "safe_buy_range": null,
-      "market_indicator_source": null,
+      "book_value_per_share_proxy": 23.6858,
+      "market_pb": 1.1792,
+      "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
+      "forward_roe_current_year": 0.1082,
+      "forward_roe_next_year": 0.1175,
+      "market_pe_dynamic": null,
+      "market_forward_pe_current_year": 10.9,
+      "market_forward_pe_next_year": 10.04,
+      "forward_earnings_basis": "BVPS proxy=23.6858 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "reasonable_multiple_range": [
+        0.95,
+        1.3
+      ],
+      "multiple_rationale": "券商利润高度受市场成交、投行与自营周期影响，正式估值采用Forward ROE对应的PB区间；PE只作交叉检查。",
+      "value_anchor_range": [
+        22.5,
+        30.79
+      ],
+      "safe_buy_range": [
+        17.55,
+        20.25
+      ],
+      "reasonable_buy_range": [
+        20.25,
+        22.5
+      ],
       "key_sensitivities": [
         "forward ROE",
-        "market activity/investment return",
-        "book value quality"
+        "book value quality",
+        "market activity/investment return"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "unavailable",
-      "reason": "market_pb_missing"
+      "left_conclusion": "above_buy_zone"
     },
     {
       "code": "600066",
@@ -1792,57 +1902,95 @@
       "code": "600095",
       "name": "湘财股份",
       "current_price": 9.55,
-      "valuation_status": "unavailable",
-      "execution_state": "market_data_missing",
+      "valuation_status": "valid",
+      "execution_state": "valid",
       "policy_status": "supported",
       "valuation_model": "broker_forward_pb_roe",
       "valuation_basis_unit": "PB",
-      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_source": "akshare.stock_profit_forecast_em+Eastmoney_A_share_spot",
       "forecast_report_count": 3,
       "consensus_eps_current_year": 0.24,
       "consensus_eps_next_year": 0.26,
-      "forward_earnings_basis": "Forward ROE-PB bridge requires current PB/BVPS proxy; all-A and SH/SZ fallback endpoints returned no positive PB.",
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "reasonable_buy_range": null,
-      "safe_buy_range": null,
-      "market_indicator_source": null,
+      "book_value_per_share_proxy": 4.4844,
+      "market_pb": 2.1296,
+      "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
+      "forward_roe_current_year": 0.0535,
+      "forward_roe_next_year": 0.058,
+      "market_pe_dynamic": null,
+      "market_forward_pe_current_year": 39.79,
+      "market_forward_pe_next_year": 36.73,
+      "forward_earnings_basis": "BVPS proxy=4.4844 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "reasonable_multiple_range": [
+        0.85,
+        1.1
+      ],
+      "multiple_rationale": "券商利润高度受市场成交、投行与自营周期影响，正式估值采用Forward ROE对应的PB区间；PE只作交叉检查。",
+      "value_anchor_range": [
+        3.81,
+        4.93
+      ],
+      "safe_buy_range": [
+        2.97,
+        3.43
+      ],
+      "reasonable_buy_range": [
+        3.43,
+        3.81
+      ],
       "key_sensitivities": [
         "forward ROE",
-        "market activity/investment return",
-        "book value quality"
+        "book value quality",
+        "market activity/investment return"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "unavailable",
-      "reason": "market_pb_missing"
+      "left_conclusion": "above_buy_zone"
     },
     {
       "code": "600109",
       "name": "国金证券",
       "current_price": 8.75,
-      "valuation_status": "unavailable",
-      "execution_state": "market_data_missing",
+      "valuation_status": "valid",
+      "execution_state": "valid",
       "policy_status": "supported",
       "valuation_model": "broker_forward_pb_roe",
       "valuation_basis_unit": "PB",
-      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_source": "akshare.stock_profit_forecast_em+Eastmoney_A_share_spot",
       "forecast_report_count": 5,
       "consensus_eps_current_year": 0.686,
       "consensus_eps_next_year": 0.758,
-      "forward_earnings_basis": "Forward ROE-PB bridge requires current PB/BVPS proxy; all-A and SH/SZ fallback endpoints returned no positive PB.",
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "reasonable_buy_range": null,
-      "safe_buy_range": null,
-      "market_indicator_source": null,
+      "book_value_per_share_proxy": 9.7935,
+      "market_pb": 0.8934,
+      "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
+      "forward_roe_current_year": 0.07,
+      "forward_roe_next_year": 0.0774,
+      "market_pe_dynamic": null,
+      "market_forward_pe_current_year": 12.76,
+      "market_forward_pe_next_year": 11.54,
+      "forward_earnings_basis": "BVPS proxy=9.7935 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "reasonable_multiple_range": [
+        0.85,
+        1.1
+      ],
+      "multiple_rationale": "券商利润高度受市场成交、投行与自营周期影响，正式估值采用Forward ROE对应的PB区间；PE只作交叉检查。",
+      "value_anchor_range": [
+        8.32,
+        10.77
+      ],
+      "safe_buy_range": [
+        6.49,
+        7.49
+      ],
+      "reasonable_buy_range": [
+        7.49,
+        8.32
+      ],
       "key_sensitivities": [
         "forward ROE",
-        "market activity/investment return",
-        "book value quality"
+        "book value quality",
+        "market activity/investment return"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "unavailable",
-      "reason": "market_pb_missing"
+      "left_conclusion": "above_buy_zone"
     },
     {
       "code": "600166",
@@ -2419,113 +2567,189 @@
       "code": "600909",
       "name": "华安证券",
       "current_price": 8.33,
-      "valuation_status": "unavailable",
-      "execution_state": "market_data_missing",
+      "valuation_status": "valid",
+      "execution_state": "valid",
       "policy_status": "supported",
       "valuation_model": "broker_forward_pb_roe",
       "valuation_basis_unit": "PB",
-      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_source": "akshare.stock_profit_forecast_em+Eastmoney_A_share_spot",
       "forecast_report_count": 3,
       "consensus_eps_current_year": 0.79,
       "consensus_eps_next_year": 0.6567,
-      "forward_earnings_basis": "Forward ROE-PB bridge requires current PB/BVPS proxy; all-A and SH/SZ fallback endpoints returned no positive PB.",
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "reasonable_buy_range": null,
-      "safe_buy_range": null,
-      "market_indicator_source": null,
+      "book_value_per_share_proxy": 5.4368,
+      "market_pb": 1.5322,
+      "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
+      "forward_roe_current_year": 0.1453,
+      "forward_roe_next_year": 0.1208,
+      "market_pe_dynamic": null,
+      "market_forward_pe_current_year": 10.54,
+      "market_forward_pe_next_year": 12.69,
+      "forward_earnings_basis": "BVPS proxy=5.4368 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "reasonable_multiple_range": [
+        1.1,
+        1.5
+      ],
+      "multiple_rationale": "券商利润高度受市场成交、投行与自营周期影响，正式估值采用Forward ROE对应的PB区间；PE只作交叉检查。",
+      "value_anchor_range": [
+        5.98,
+        8.16
+      ],
+      "safe_buy_range": [
+        4.66,
+        5.38
+      ],
+      "reasonable_buy_range": [
+        5.38,
+        5.98
+      ],
       "key_sensitivities": [
         "forward ROE",
-        "market activity/investment return",
-        "book value quality"
+        "book value quality",
+        "market activity/investment return"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "unavailable",
-      "reason": "market_pb_missing"
+      "left_conclusion": "above_buy_zone"
     },
     {
       "code": "600918",
       "name": "中泰证券",
       "current_price": 5.74,
-      "valuation_status": "unavailable",
-      "execution_state": "market_data_missing",
+      "valuation_status": "valid",
+      "execution_state": "valid",
       "policy_status": "supported",
       "valuation_model": "broker_forward_pb_roe",
       "valuation_basis_unit": "PB",
-      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_source": "akshare.stock_profit_forecast_em+Eastmoney_A_share_spot",
       "forecast_report_count": 3,
       "consensus_eps_current_year": 0.265,
       "consensus_eps_next_year": 0.28,
-      "forward_earnings_basis": "Forward ROE-PB bridge requires current PB/BVPS proxy; all-A and SH/SZ fallback endpoints returned no positive PB.",
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "reasonable_buy_range": null,
-      "safe_buy_range": null,
-      "market_indicator_source": null,
+      "book_value_per_share_proxy": 6.3142,
+      "market_pb": 0.9091,
+      "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
+      "forward_roe_current_year": 0.042,
+      "forward_roe_next_year": 0.0443,
+      "market_pe_dynamic": null,
+      "market_forward_pe_current_year": 21.66,
+      "market_forward_pe_next_year": 20.5,
+      "forward_earnings_basis": "BVPS proxy=6.3142 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "reasonable_multiple_range": [
+        0.75,
+        0.95
+      ],
+      "multiple_rationale": "券商利润高度受市场成交、投行与自营周期影响，正式估值采用Forward ROE对应的PB区间；PE只作交叉检查。",
+      "value_anchor_range": [
+        4.74,
+        6.0
+      ],
+      "safe_buy_range": [
+        3.69,
+        4.26
+      ],
+      "reasonable_buy_range": [
+        4.26,
+        4.74
+      ],
       "key_sensitivities": [
         "forward ROE",
-        "market activity/investment return",
-        "book value quality"
+        "book value quality",
+        "market activity/investment return"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "unavailable",
-      "reason": "market_pb_missing"
+      "left_conclusion": "above_buy_zone"
     },
     {
       "code": "600958",
       "name": "东方证券",
       "current_price": 9.19,
-      "valuation_status": "unavailable",
-      "execution_state": "market_data_missing",
+      "valuation_status": "valid",
+      "execution_state": "valid",
       "policy_status": "supported",
       "valuation_model": "broker_forward_pb_roe",
       "valuation_basis_unit": "PB",
-      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_source": "akshare.stock_profit_forecast_em+Eastmoney_A_share_spot",
       "forecast_report_count": 20,
       "consensus_eps_current_year": 0.7617,
       "consensus_eps_next_year": 0.8289,
-      "forward_earnings_basis": "Forward ROE-PB bridge requires current PB/BVPS proxy; all-A and SH/SZ fallback endpoints returned no positive PB.",
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "reasonable_buy_range": null,
-      "safe_buy_range": null,
-      "market_indicator_source": null,
+      "book_value_per_share_proxy": 9.9593,
+      "market_pb": 0.9228,
+      "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
+      "forward_roe_current_year": 0.0765,
+      "forward_roe_next_year": 0.0832,
+      "market_pe_dynamic": null,
+      "market_forward_pe_current_year": 12.07,
+      "market_forward_pe_next_year": 11.09,
+      "forward_earnings_basis": "BVPS proxy=9.9593 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "reasonable_multiple_range": [
+        0.95,
+        1.3
+      ],
+      "multiple_rationale": "券商利润高度受市场成交、投行与自营周期影响，正式估值采用Forward ROE对应的PB区间；PE只作交叉检查。",
+      "value_anchor_range": [
+        9.46,
+        12.95
+      ],
+      "safe_buy_range": [
+        7.38,
+        8.52
+      ],
+      "reasonable_buy_range": [
+        8.52,
+        9.46
+      ],
       "key_sensitivities": [
         "forward ROE",
-        "market activity/investment return",
-        "book value quality"
+        "book value quality",
+        "market activity/investment return"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "unavailable",
-      "reason": "market_pb_missing"
+      "left_conclusion": "reasonable_buy_zone"
     },
     {
       "code": "600999",
       "name": "招商证券",
       "current_price": 18.71,
-      "valuation_status": "unavailable",
-      "execution_state": "market_data_missing",
+      "valuation_status": "valid",
+      "execution_state": "valid",
       "policy_status": "supported",
       "valuation_model": "broker_forward_pb_roe",
       "valuation_basis_unit": "PB",
-      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_source": "akshare.stock_profit_forecast_em+Eastmoney_A_share_spot",
       "forecast_report_count": 16,
       "consensus_eps_current_year": 2.2006,
       "consensus_eps_next_year": 2.0275,
-      "forward_earnings_basis": "Forward ROE-PB bridge requires current PB/BVPS proxy; all-A and SH/SZ fallback endpoints returned no positive PB.",
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "reasonable_buy_range": null,
-      "safe_buy_range": null,
-      "market_indicator_source": null,
+      "book_value_per_share_proxy": 16.6486,
+      "market_pb": 1.1238,
+      "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
+      "forward_roe_current_year": 0.1322,
+      "forward_roe_next_year": 0.1218,
+      "market_pe_dynamic": null,
+      "market_forward_pe_current_year": 8.5,
+      "market_forward_pe_next_year": 9.23,
+      "forward_earnings_basis": "BVPS proxy=16.6486 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "reasonable_multiple_range": [
+        1.1,
+        1.5
+      ],
+      "multiple_rationale": "券商利润高度受市场成交、投行与自营周期影响，正式估值采用Forward ROE对应的PB区间；PE只作交叉检查。",
+      "value_anchor_range": [
+        18.31,
+        24.97
+      ],
+      "safe_buy_range": [
+        14.28,
+        16.48
+      ],
+      "reasonable_buy_range": [
+        16.48,
+        18.31
+      ],
       "key_sensitivities": [
         "forward ROE",
-        "market activity/investment return",
-        "book value quality"
+        "book value quality",
+        "market activity/investment return"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "unavailable",
-      "reason": "market_pb_missing"
+      "left_conclusion": "above_buy_zone"
     },
     {
       "code": "601059",
@@ -2561,29 +2785,48 @@
       "code": "601066",
       "name": "中信建投",
       "current_price": 25.58,
-      "valuation_status": "unavailable",
-      "execution_state": "market_data_missing",
+      "valuation_status": "valid",
+      "execution_state": "valid",
       "policy_status": "supported",
       "valuation_model": "broker_forward_pb_roe",
       "valuation_basis_unit": "PB",
-      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_source": "akshare.stock_profit_forecast_em+Eastmoney_A_share_spot",
       "forecast_report_count": 5,
       "consensus_eps_current_year": 1.608,
       "consensus_eps_next_year": 1.664,
-      "forward_earnings_basis": "Forward ROE-PB bridge requires current PB/BVPS proxy; all-A and SH/SZ fallback endpoints returned no positive PB.",
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "reasonable_buy_range": null,
-      "safe_buy_range": null,
-      "market_indicator_source": null,
+      "book_value_per_share_proxy": 16.21,
+      "market_pb": 1.578,
+      "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
+      "forward_roe_current_year": 0.0992,
+      "forward_roe_next_year": 0.1027,
+      "market_pe_dynamic": null,
+      "market_forward_pe_current_year": 15.91,
+      "market_forward_pe_next_year": 15.37,
+      "forward_earnings_basis": "BVPS proxy=16.2100 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "reasonable_multiple_range": [
+        0.95,
+        1.3
+      ],
+      "multiple_rationale": "券商利润高度受市场成交、投行与自营周期影响，正式估值采用Forward ROE对应的PB区间；PE只作交叉检查。",
+      "value_anchor_range": [
+        15.4,
+        21.07
+      ],
+      "safe_buy_range": [
+        12.01,
+        13.86
+      ],
+      "reasonable_buy_range": [
+        13.86,
+        15.4
+      ],
       "key_sensitivities": [
         "forward ROE",
-        "market activity/investment return",
-        "book value quality"
+        "book value quality",
+        "market activity/investment return"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "unavailable",
-      "reason": "market_pb_missing"
+      "left_conclusion": "above_buy_zone"
     },
     {
       "code": "601099",
@@ -2619,29 +2862,48 @@
       "code": "601108",
       "name": "财通证券",
       "current_price": 8.78,
-      "valuation_status": "unavailable",
-      "execution_state": "market_data_missing",
+      "valuation_status": "valid",
+      "execution_state": "valid",
       "policy_status": "supported",
       "valuation_model": "broker_forward_pb_roe",
       "valuation_basis_unit": "PB",
-      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_source": "akshare.stock_profit_forecast_em+Eastmoney_A_share_spot",
       "forecast_report_count": 14,
       "consensus_eps_current_year": 0.6546,
       "consensus_eps_next_year": 0.7146,
-      "forward_earnings_basis": "Forward ROE-PB bridge requires current PB/BVPS proxy; all-A and SH/SZ fallback endpoints returned no positive PB.",
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "reasonable_buy_range": null,
-      "safe_buy_range": null,
-      "market_indicator_source": null,
+      "book_value_per_share_proxy": 8.4968,
+      "market_pb": 1.0333,
+      "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
+      "forward_roe_current_year": 0.077,
+      "forward_roe_next_year": 0.0841,
+      "market_pe_dynamic": null,
+      "market_forward_pe_current_year": 13.41,
+      "market_forward_pe_next_year": 12.29,
+      "forward_earnings_basis": "BVPS proxy=8.4968 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "reasonable_multiple_range": [
+        0.95,
+        1.3
+      ],
+      "multiple_rationale": "券商利润高度受市场成交、投行与自营周期影响，正式估值采用Forward ROE对应的PB区间；PE只作交叉检查。",
+      "value_anchor_range": [
+        8.07,
+        11.05
+      ],
+      "safe_buy_range": [
+        6.3,
+        7.26
+      ],
+      "reasonable_buy_range": [
+        7.26,
+        8.07
+      ],
       "key_sensitivities": [
         "forward ROE",
-        "market activity/investment return",
-        "book value quality"
+        "book value quality",
+        "market activity/investment return"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "unavailable",
-      "reason": "market_pb_missing"
+      "left_conclusion": "above_buy_zone"
     },
     {
       "code": "601136",
@@ -2793,113 +3055,189 @@
       "code": "601211",
       "name": "国泰海通",
       "current_price": 17.92,
-      "valuation_status": "unavailable",
-      "execution_state": "market_data_missing",
+      "valuation_status": "valid",
+      "execution_state": "valid",
       "policy_status": "supported",
       "valuation_model": "broker_forward_pb_roe",
       "valuation_basis_unit": "PB",
-      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_source": "akshare.stock_profit_forecast_em+Eastmoney_A_share_spot",
       "forecast_report_count": 23,
       "consensus_eps_current_year": 1.8814,
       "consensus_eps_next_year": 2.0005,
-      "forward_earnings_basis": "Forward ROE-PB bridge requires current PB/BVPS proxy; all-A and SH/SZ fallback endpoints returned no positive PB.",
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "reasonable_buy_range": null,
-      "safe_buy_range": null,
-      "market_indicator_source": null,
+      "book_value_per_share_proxy": 18.9,
+      "market_pb": 0.9481,
+      "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
+      "forward_roe_current_year": 0.0995,
+      "forward_roe_next_year": 0.1058,
+      "market_pe_dynamic": null,
+      "market_forward_pe_current_year": 9.53,
+      "market_forward_pe_next_year": 8.96,
+      "forward_earnings_basis": "BVPS proxy=18.9000 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "reasonable_multiple_range": [
+        0.95,
+        1.3
+      ],
+      "multiple_rationale": "券商利润高度受市场成交、投行与自营周期影响，正式估值采用Forward ROE对应的PB区间；PE只作交叉检查。",
+      "value_anchor_range": [
+        17.95,
+        24.57
+      ],
+      "safe_buy_range": [
+        14.0,
+        16.16
+      ],
+      "reasonable_buy_range": [
+        16.16,
+        17.95
+      ],
       "key_sensitivities": [
         "forward ROE",
-        "market activity/investment return",
-        "book value quality"
+        "book value quality",
+        "market activity/investment return"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "unavailable",
-      "reason": "market_pb_missing"
+      "left_conclusion": "reasonable_buy_zone"
     },
     {
       "code": "601318",
       "name": "中国平安",
       "current_price": 55.85,
-      "valuation_status": "unavailable",
-      "execution_state": "market_data_missing",
+      "valuation_status": "valid",
+      "execution_state": "valid",
       "policy_status": "supported",
       "valuation_model": "insurance_forward_pb_roe_proxy",
       "valuation_basis_unit": "PB",
-      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_source": "akshare.stock_profit_forecast_em+Eastmoney_A_share_spot",
       "forecast_report_count": 28,
       "consensus_eps_current_year": 8.2904,
       "consensus_eps_next_year": 9.0352,
-      "forward_earnings_basis": "Forward ROE-PB bridge requires current PB/BVPS proxy; all-A and SH/SZ fallback endpoints returned no positive PB.",
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "reasonable_buy_range": null,
-      "safe_buy_range": null,
-      "market_indicator_source": null,
+      "book_value_per_share_proxy": 56.78,
+      "market_pb": 0.9836,
+      "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
+      "forward_roe_current_year": 0.146,
+      "forward_roe_next_year": 0.1591,
+      "market_pe_dynamic": null,
+      "market_forward_pe_current_year": 6.74,
+      "market_forward_pe_next_year": 6.18,
+      "forward_earnings_basis": "BVPS proxy=56.7800 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "reasonable_multiple_range": [
+        0.9,
+        1.25
+      ],
+      "multiple_rationale": "保险公司更完整模型应包含P/EV，但在缺少统一可机器读取EV时，使用Forward ROE-PB桥作为保守代理并显式标记proxy；PE不作为主锚。",
+      "value_anchor_range": [
+        51.1,
+        70.97
+      ],
+      "safe_buy_range": [
+        39.86,
+        45.99
+      ],
+      "reasonable_buy_range": [
+        45.99,
+        51.1
+      ],
       "key_sensitivities": [
         "forward ROE",
-        "market activity/investment return",
-        "book value quality"
+        "book value quality",
+        "market activity/investment return"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "unavailable",
-      "reason": "market_pb_missing"
+      "left_conclusion": "above_buy_zone"
     },
     {
       "code": "601319",
       "name": "中国人保",
       "current_price": 7.14,
-      "valuation_status": "unavailable",
-      "execution_state": "market_data_missing",
+      "valuation_status": "valid",
+      "execution_state": "valid",
       "policy_status": "supported",
       "valuation_model": "insurance_forward_pb_roe_proxy",
       "valuation_basis_unit": "PB",
-      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_source": "akshare.stock_profit_forecast_em+Eastmoney_A_share_spot",
       "forecast_report_count": 16,
       "consensus_eps_current_year": 1.1485,
       "consensus_eps_next_year": 1.2762,
-      "forward_earnings_basis": "Forward ROE-PB bridge requires current PB/BVPS proxy; all-A and SH/SZ fallback endpoints returned no positive PB.",
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "reasonable_buy_range": null,
-      "safe_buy_range": null,
-      "market_indicator_source": null,
+      "book_value_per_share_proxy": 7.69,
+      "market_pb": 0.9285,
+      "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
+      "forward_roe_current_year": 0.1493,
+      "forward_roe_next_year": 0.1659,
+      "market_pe_dynamic": null,
+      "market_forward_pe_current_year": 6.22,
+      "market_forward_pe_next_year": 5.59,
+      "forward_earnings_basis": "BVPS proxy=7.6900 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "reasonable_multiple_range": [
+        1.0,
+        1.4
+      ],
+      "multiple_rationale": "保险公司更完整模型应包含P/EV，但在缺少统一可机器读取EV时，使用Forward ROE-PB桥作为保守代理并显式标记proxy；PE不作为主锚。",
+      "value_anchor_range": [
+        7.69,
+        10.77
+      ],
+      "safe_buy_range": [
+        6.0,
+        6.92
+      ],
+      "reasonable_buy_range": [
+        6.92,
+        7.69
+      ],
       "key_sensitivities": [
         "forward ROE",
-        "market activity/investment return",
-        "book value quality"
+        "book value quality",
+        "market activity/investment return"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "unavailable",
-      "reason": "market_pb_missing"
+      "left_conclusion": "reasonable_buy_zone"
     },
     {
       "code": "601336",
       "name": "新华保险",
       "current_price": 59.8,
-      "valuation_status": "unavailable",
-      "execution_state": "market_data_missing",
+      "valuation_status": "valid",
+      "execution_state": "valid",
       "policy_status": "supported",
       "valuation_model": "insurance_forward_pb_roe_proxy",
       "valuation_basis_unit": "PB",
-      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_source": "akshare.stock_profit_forecast_em+Eastmoney_A_share_spot",
       "forecast_report_count": 25,
       "consensus_eps_current_year": 12.0164,
       "consensus_eps_next_year": 12.8123,
-      "forward_earnings_basis": "Forward ROE-PB bridge requires current PB/BVPS proxy; all-A and SH/SZ fallback endpoints returned no positive PB.",
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "reasonable_buy_range": null,
-      "safe_buy_range": null,
-      "market_indicator_source": null,
+      "book_value_per_share_proxy": 39.61,
+      "market_pb": 1.5097,
+      "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
+      "forward_roe_current_year": 0.3034,
+      "forward_roe_next_year": 0.3235,
+      "market_pe_dynamic": null,
+      "market_forward_pe_current_year": 4.98,
+      "market_forward_pe_next_year": 4.67,
+      "forward_earnings_basis": "BVPS proxy=39.6100 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "reasonable_multiple_range": [
+        1.1,
+        1.55
+      ],
+      "multiple_rationale": "保险公司更完整模型应包含P/EV，但在缺少统一可机器读取EV时，使用Forward ROE-PB桥作为保守代理并显式标记proxy；PE不作为主锚。",
+      "value_anchor_range": [
+        43.57,
+        61.4
+      ],
+      "safe_buy_range": [
+        33.99,
+        39.21
+      ],
+      "reasonable_buy_range": [
+        39.21,
+        43.57
+      ],
       "key_sensitivities": [
         "forward ROE",
-        "market activity/investment return",
-        "book value quality"
+        "book value quality",
+        "market activity/investment return"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "unavailable",
-      "reason": "market_pb_missing"
+      "left_conclusion": "above_buy_zone"
     },
     {
       "code": "601375",
@@ -2935,141 +3273,236 @@
       "code": "601377",
       "name": "兴业证券",
       "current_price": 5.93,
-      "valuation_status": "unavailable",
-      "execution_state": "market_data_missing",
+      "valuation_status": "valid",
+      "execution_state": "valid",
       "policy_status": "supported",
       "valuation_model": "broker_forward_pb_roe",
       "valuation_basis_unit": "PB",
-      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_source": "akshare.stock_profit_forecast_em+Eastmoney_A_share_spot",
       "forecast_report_count": 12,
       "consensus_eps_current_year": 0.4345,
       "consensus_eps_next_year": 0.4845,
-      "forward_earnings_basis": "Forward ROE-PB bridge requires current PB/BVPS proxy; all-A and SH/SZ fallback endpoints returned no positive PB.",
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "reasonable_buy_range": null,
-      "safe_buy_range": null,
-      "market_indicator_source": null,
+      "book_value_per_share_proxy": 7.1715,
+      "market_pb": 0.8269,
+      "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
+      "forward_roe_current_year": 0.0606,
+      "forward_roe_next_year": 0.0676,
+      "market_pe_dynamic": null,
+      "market_forward_pe_current_year": 13.65,
+      "market_forward_pe_next_year": 12.24,
+      "forward_earnings_basis": "BVPS proxy=7.1715 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "reasonable_multiple_range": [
+        0.85,
+        1.1
+      ],
+      "multiple_rationale": "券商利润高度受市场成交、投行与自营周期影响，正式估值采用Forward ROE对应的PB区间；PE只作交叉检查。",
+      "value_anchor_range": [
+        6.1,
+        7.89
+      ],
+      "safe_buy_range": [
+        4.75,
+        5.49
+      ],
+      "reasonable_buy_range": [
+        5.49,
+        6.1
+      ],
       "key_sensitivities": [
         "forward ROE",
-        "market activity/investment return",
-        "book value quality"
+        "book value quality",
+        "market activity/investment return"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "unavailable",
-      "reason": "market_pb_missing"
+      "left_conclusion": "reasonable_buy_zone"
     },
     {
       "code": "601456",
       "name": "国联民生",
       "current_price": 8.91,
-      "valuation_status": "unavailable",
-      "execution_state": "market_data_missing",
+      "valuation_status": "valid",
+      "execution_state": "valid",
       "policy_status": "supported",
       "valuation_model": "broker_forward_pb_roe",
       "valuation_basis_unit": "PB",
-      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_source": "akshare.stock_profit_forecast_em+Eastmoney_A_share_spot",
       "forecast_report_count": 11,
       "consensus_eps_current_year": 0.4009,
       "consensus_eps_next_year": 0.4527,
-      "forward_earnings_basis": "Forward ROE-PB bridge requires current PB/BVPS proxy; all-A and SH/SZ fallback endpoints returned no positive PB.",
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "reasonable_buy_range": null,
-      "safe_buy_range": null,
-      "market_indicator_source": null,
+      "book_value_per_share_proxy": 9.2378,
+      "market_pb": 0.9645,
+      "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
+      "forward_roe_current_year": 0.0434,
+      "forward_roe_next_year": 0.049,
+      "market_pe_dynamic": null,
+      "market_forward_pe_current_year": 22.22,
+      "market_forward_pe_next_year": 19.68,
+      "forward_earnings_basis": "BVPS proxy=9.2378 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "reasonable_multiple_range": [
+        0.75,
+        0.95
+      ],
+      "multiple_rationale": "券商利润高度受市场成交、投行与自营周期影响，正式估值采用Forward ROE对应的PB区间；PE只作交叉检查。",
+      "value_anchor_range": [
+        6.93,
+        8.78
+      ],
+      "safe_buy_range": [
+        5.4,
+        6.24
+      ],
+      "reasonable_buy_range": [
+        6.24,
+        6.93
+      ],
       "key_sensitivities": [
         "forward ROE",
-        "market activity/investment return",
-        "book value quality"
+        "book value quality",
+        "market activity/investment return"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "unavailable",
-      "reason": "market_pb_missing"
+      "left_conclusion": "above_buy_zone"
     },
     {
       "code": "601601",
       "name": "中国太保",
       "current_price": 31.77,
-      "valuation_status": "unavailable",
-      "execution_state": "market_data_missing",
+      "valuation_status": "valid",
+      "execution_state": "valid",
       "policy_status": "supported",
       "valuation_model": "insurance_forward_pb_roe_proxy",
       "valuation_basis_unit": "PB",
-      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_source": "akshare.stock_profit_forecast_em+Eastmoney_A_share_spot",
       "forecast_report_count": 25,
       "consensus_eps_current_year": 5.9157,
       "consensus_eps_next_year": 6.4317,
-      "forward_earnings_basis": "Forward ROE-PB bridge requires current PB/BVPS proxy; all-A and SH/SZ fallback endpoints returned no positive PB.",
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "reasonable_buy_range": null,
-      "safe_buy_range": null,
-      "market_indicator_source": null,
+      "book_value_per_share_proxy": 33.18,
+      "market_pb": 0.9575,
+      "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
+      "forward_roe_current_year": 0.1783,
+      "forward_roe_next_year": 0.1938,
+      "market_pe_dynamic": null,
+      "market_forward_pe_current_year": 5.37,
+      "market_forward_pe_next_year": 4.94,
+      "forward_earnings_basis": "BVPS proxy=33.1800 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "reasonable_multiple_range": [
+        1.0,
+        1.4
+      ],
+      "multiple_rationale": "保险公司更完整模型应包含P/EV，但在缺少统一可机器读取EV时，使用Forward ROE-PB桥作为保守代理并显式标记proxy；PE不作为主锚。",
+      "value_anchor_range": [
+        33.18,
+        46.45
+      ],
+      "safe_buy_range": [
+        25.88,
+        29.86
+      ],
+      "reasonable_buy_range": [
+        29.86,
+        33.18
+      ],
       "key_sensitivities": [
         "forward ROE",
-        "market activity/investment return",
-        "book value quality"
+        "book value quality",
+        "market activity/investment return"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "unavailable",
-      "reason": "market_pb_missing"
+      "left_conclusion": "reasonable_buy_zone"
     },
     {
       "code": "601628",
       "name": "中国人寿",
       "current_price": 38.27,
-      "valuation_status": "unavailable",
-      "execution_state": "market_data_missing",
+      "valuation_status": "valid",
+      "execution_state": "valid",
       "policy_status": "supported",
       "valuation_model": "insurance_forward_pb_roe_proxy",
       "valuation_basis_unit": "PB",
-      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_source": "akshare.stock_profit_forecast_em+Eastmoney_A_share_spot",
       "forecast_report_count": 26,
       "consensus_eps_current_year": 5.5626,
       "consensus_eps_next_year": 5.7735,
-      "forward_earnings_basis": "Forward ROE-PB bridge requires current PB/BVPS proxy; all-A and SH/SZ fallback endpoints returned no positive PB.",
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "reasonable_buy_range": null,
-      "safe_buy_range": null,
-      "market_indicator_source": null,
+      "book_value_per_share_proxy": 23.5,
+      "market_pb": 1.6285,
+      "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
+      "forward_roe_current_year": 0.2367,
+      "forward_roe_next_year": 0.2457,
+      "market_pe_dynamic": null,
+      "market_forward_pe_current_year": 6.88,
+      "market_forward_pe_next_year": 6.63,
+      "forward_earnings_basis": "BVPS proxy=23.5000 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "reasonable_multiple_range": [
+        1.1,
+        1.55
+      ],
+      "multiple_rationale": "保险公司更完整模型应包含P/EV，但在缺少统一可机器读取EV时，使用Forward ROE-PB桥作为保守代理并显式标记proxy；PE不作为主锚。",
+      "value_anchor_range": [
+        25.85,
+        36.43
+      ],
+      "safe_buy_range": [
+        20.16,
+        23.27
+      ],
+      "reasonable_buy_range": [
+        23.27,
+        25.85
+      ],
       "key_sensitivities": [
         "forward ROE",
-        "market activity/investment return",
-        "book value quality"
+        "book value quality",
+        "market activity/investment return"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "unavailable",
-      "reason": "market_pb_missing"
+      "left_conclusion": "above_buy_zone"
     },
     {
       "code": "601688",
       "name": "华泰证券",
       "current_price": 19.41,
-      "valuation_status": "unavailable",
-      "execution_state": "market_data_missing",
+      "valuation_status": "valid",
+      "execution_state": "valid",
       "policy_status": "supported",
       "valuation_model": "broker_forward_pb_roe",
       "valuation_basis_unit": "PB",
-      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_source": "akshare.stock_profit_forecast_em+Eastmoney_A_share_spot",
       "forecast_report_count": 22,
       "consensus_eps_current_year": 2.1248,
       "consensus_eps_next_year": 2.3481,
-      "forward_earnings_basis": "Forward ROE-PB bridge requires current PB/BVPS proxy; all-A and SH/SZ fallback endpoints returned no positive PB.",
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "reasonable_buy_range": null,
-      "safe_buy_range": null,
-      "market_indicator_source": null,
+      "book_value_per_share_proxy": 23.9446,
+      "market_pb": 0.8106,
+      "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
+      "forward_roe_current_year": 0.0887,
+      "forward_roe_next_year": 0.0981,
+      "market_pe_dynamic": null,
+      "market_forward_pe_current_year": 9.14,
+      "market_forward_pe_next_year": 8.27,
+      "forward_earnings_basis": "BVPS proxy=23.9446 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "reasonable_multiple_range": [
+        0.95,
+        1.3
+      ],
+      "multiple_rationale": "券商利润高度受市场成交、投行与自营周期影响，正式估值采用Forward ROE对应的PB区间；PE只作交叉检查。",
+      "value_anchor_range": [
+        22.75,
+        31.13
+      ],
+      "safe_buy_range": [
+        17.74,
+        20.47
+      ],
+      "reasonable_buy_range": [
+        20.47,
+        22.75
+      ],
       "key_sensitivities": [
         "forward ROE",
-        "market activity/investment return",
-        "book value quality"
+        "book value quality",
+        "market activity/investment return"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "unavailable",
-      "reason": "market_pb_missing"
+      "left_conclusion": "safe_buy_zone"
     },
     {
       "code": "601696",
@@ -3105,29 +3538,48 @@
       "code": "601788",
       "name": "XD光大证",
       "current_price": 14.76,
-      "valuation_status": "unavailable",
-      "execution_state": "market_data_missing",
+      "valuation_status": "valid",
+      "execution_state": "valid",
       "policy_status": "supported",
       "valuation_model": "broker_forward_pb_roe",
       "valuation_basis_unit": "PB",
-      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_source": "akshare.stock_profit_forecast_em+Eastmoney_A_share_spot",
       "forecast_report_count": 3,
       "consensus_eps_current_year": 0.9667,
       "consensus_eps_next_year": 1.0133,
-      "forward_earnings_basis": "Forward ROE-PB bridge requires current PB/BVPS proxy; all-A and SH/SZ fallback endpoints returned no positive PB.",
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "reasonable_buy_range": null,
-      "safe_buy_range": null,
-      "market_indicator_source": null,
+      "book_value_per_share_proxy": 16.1514,
+      "market_pb": 0.9139,
+      "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
+      "forward_roe_current_year": 0.0599,
+      "forward_roe_next_year": 0.0627,
+      "market_pe_dynamic": null,
+      "market_forward_pe_current_year": 15.27,
+      "market_forward_pe_next_year": 14.57,
+      "forward_earnings_basis": "BVPS proxy=16.1514 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "reasonable_multiple_range": [
+        0.85,
+        1.1
+      ],
+      "multiple_rationale": "券商利润高度受市场成交、投行与自营周期影响，正式估值采用Forward ROE对应的PB区间；PE只作交叉检查。",
+      "value_anchor_range": [
+        13.73,
+        17.77
+      ],
+      "safe_buy_range": [
+        10.71,
+        12.36
+      ],
+      "reasonable_buy_range": [
+        12.36,
+        13.73
+      ],
       "key_sensitivities": [
         "forward ROE",
-        "market activity/investment return",
-        "book value quality"
+        "book value quality",
+        "market activity/investment return"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "unavailable",
-      "reason": "market_pb_missing"
+      "left_conclusion": "above_buy_zone"
     },
     {
       "code": "601869",
@@ -3176,85 +3628,142 @@
       "code": "601878",
       "name": "浙商证券",
       "current_price": 9.37,
-      "valuation_status": "unavailable",
-      "execution_state": "market_data_missing",
+      "valuation_status": "valid",
+      "execution_state": "valid",
       "policy_status": "supported",
       "valuation_model": "broker_forward_pb_roe",
       "valuation_basis_unit": "PB",
-      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_source": "akshare.stock_profit_forecast_em+Eastmoney_A_share_spot",
       "forecast_report_count": 5,
       "consensus_eps_current_year": 0.672,
       "consensus_eps_next_year": 0.718,
-      "forward_earnings_basis": "Forward ROE-PB bridge requires current PB/BVPS proxy; all-A and SH/SZ fallback endpoints returned no positive PB.",
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "reasonable_buy_range": null,
-      "safe_buy_range": null,
-      "market_indicator_source": null,
+      "book_value_per_share_proxy": 8.2098,
+      "market_pb": 1.1413,
+      "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
+      "forward_roe_current_year": 0.0819,
+      "forward_roe_next_year": 0.0875,
+      "market_pe_dynamic": null,
+      "market_forward_pe_current_year": 13.94,
+      "market_forward_pe_next_year": 13.05,
+      "forward_earnings_basis": "BVPS proxy=8.2098 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "reasonable_multiple_range": [
+        0.95,
+        1.3
+      ],
+      "multiple_rationale": "券商利润高度受市场成交、投行与自营周期影响，正式估值采用Forward ROE对应的PB区间；PE只作交叉检查。",
+      "value_anchor_range": [
+        7.8,
+        10.67
+      ],
+      "safe_buy_range": [
+        6.08,
+        7.02
+      ],
+      "reasonable_buy_range": [
+        7.02,
+        7.8
+      ],
       "key_sensitivities": [
         "forward ROE",
-        "market activity/investment return",
-        "book value quality"
+        "book value quality",
+        "market activity/investment return"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "unavailable",
-      "reason": "market_pb_missing"
+      "left_conclusion": "above_buy_zone"
     },
     {
       "code": "601881",
       "name": "中国银河",
       "current_price": 12.31,
-      "valuation_status": "unavailable",
-      "execution_state": "market_data_missing",
+      "valuation_status": "valid",
+      "execution_state": "valid",
       "policy_status": "supported",
       "valuation_model": "broker_forward_pb_roe",
       "valuation_basis_unit": "PB",
-      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_source": "akshare.stock_profit_forecast_em+Eastmoney_A_share_spot",
       "forecast_report_count": 11,
       "consensus_eps_current_year": 1.235,
       "consensus_eps_next_year": 1.361,
-      "forward_earnings_basis": "Forward ROE-PB bridge requires current PB/BVPS proxy; all-A and SH/SZ fallback endpoints returned no positive PB.",
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "reasonable_buy_range": null,
-      "safe_buy_range": null,
-      "market_indicator_source": null,
+      "book_value_per_share_proxy": 14.2397,
+      "market_pb": 0.8645,
+      "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
+      "forward_roe_current_year": 0.0867,
+      "forward_roe_next_year": 0.0956,
+      "market_pe_dynamic": null,
+      "market_forward_pe_current_year": 9.97,
+      "market_forward_pe_next_year": 9.04,
+      "forward_earnings_basis": "BVPS proxy=14.2397 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "reasonable_multiple_range": [
+        0.95,
+        1.3
+      ],
+      "multiple_rationale": "券商利润高度受市场成交、投行与自营周期影响，正式估值采用Forward ROE对应的PB区间；PE只作交叉检查。",
+      "value_anchor_range": [
+        13.53,
+        18.51
+      ],
+      "safe_buy_range": [
+        10.55,
+        12.17
+      ],
+      "reasonable_buy_range": [
+        12.17,
+        13.53
+      ],
       "key_sensitivities": [
         "forward ROE",
-        "market activity/investment return",
-        "book value quality"
+        "book value quality",
+        "market activity/investment return"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "unavailable",
-      "reason": "market_pb_missing"
+      "left_conclusion": "reasonable_buy_zone"
     },
     {
       "code": "601901",
       "name": "方正证券",
       "current_price": 6.92,
-      "valuation_status": "unavailable",
-      "execution_state": "market_data_missing",
+      "valuation_status": "valid",
+      "execution_state": "valid",
       "policy_status": "supported",
       "valuation_model": "broker_forward_pb_roe",
       "valuation_basis_unit": "PB",
-      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_source": "akshare.stock_profit_forecast_em+Eastmoney_A_share_spot",
       "forecast_report_count": 5,
       "consensus_eps_current_year": 0.566,
       "consensus_eps_next_year": 0.608,
-      "forward_earnings_basis": "Forward ROE-PB bridge requires current PB/BVPS proxy; all-A and SH/SZ fallback endpoints returned no positive PB.",
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "reasonable_buy_range": null,
-      "safe_buy_range": null,
-      "market_indicator_source": null,
+      "book_value_per_share_proxy": 6.41,
+      "market_pb": 1.0796,
+      "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
+      "forward_roe_current_year": 0.0883,
+      "forward_roe_next_year": 0.0949,
+      "market_pe_dynamic": null,
+      "market_forward_pe_current_year": 12.23,
+      "market_forward_pe_next_year": 11.38,
+      "forward_earnings_basis": "BVPS proxy=6.4100 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "reasonable_multiple_range": [
+        0.95,
+        1.3
+      ],
+      "multiple_rationale": "券商利润高度受市场成交、投行与自营周期影响，正式估值采用Forward ROE对应的PB区间；PE只作交叉检查。",
+      "value_anchor_range": [
+        6.09,
+        8.33
+      ],
+      "safe_buy_range": [
+        4.75,
+        5.48
+      ],
+      "reasonable_buy_range": [
+        5.48,
+        6.09
+      ],
       "key_sensitivities": [
         "forward ROE",
-        "market activity/investment return",
-        "book value quality"
+        "book value quality",
+        "market activity/investment return"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "unavailable",
-      "reason": "market_pb_missing"
+      "left_conclusion": "above_buy_zone"
     },
     {
       "code": "601990",
@@ -3290,29 +3799,48 @@
       "code": "601995",
       "name": "中金公司",
       "current_price": 34.71,
-      "valuation_status": "unavailable",
-      "execution_state": "market_data_missing",
+      "valuation_status": "valid",
+      "execution_state": "valid",
       "policy_status": "supported",
       "valuation_model": "broker_forward_pb_roe",
       "valuation_basis_unit": "PB",
-      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_source": "akshare.stock_profit_forecast_em+Eastmoney_A_share_spot",
       "forecast_report_count": 12,
       "consensus_eps_current_year": 2.5692,
       "consensus_eps_next_year": 2.8458,
-      "forward_earnings_basis": "Forward ROE-PB bridge requires current PB/BVPS proxy; all-A and SH/SZ fallback endpoints returned no positive PB.",
-      "reasonable_multiple_range": null,
-      "value_anchor_range": null,
-      "reasonable_buy_range": null,
-      "safe_buy_range": null,
-      "market_indicator_source": null,
+      "book_value_per_share_proxy": 27.7715,
+      "market_pb": 1.2498,
+      "market_indicator_source": "akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS",
+      "forward_roe_current_year": 0.0925,
+      "forward_roe_next_year": 0.1025,
+      "market_pe_dynamic": null,
+      "market_forward_pe_current_year": 13.51,
+      "market_forward_pe_next_year": 12.2,
+      "forward_earnings_basis": "BVPS proxy=27.7715 from market PB (akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS); 2026/2027 consensus maps to Forward ROE then versioned PB band.",
+      "reasonable_multiple_range": [
+        0.95,
+        1.3
+      ],
+      "multiple_rationale": "券商利润高度受市场成交、投行与自营周期影响，正式估值采用Forward ROE对应的PB区间；PE只作交叉检查。",
+      "value_anchor_range": [
+        26.38,
+        36.1
+      ],
+      "safe_buy_range": [
+        20.58,
+        23.74
+      ],
+      "reasonable_buy_range": [
+        23.74,
+        26.38
+      ],
       "key_sensitivities": [
         "forward ROE",
-        "market activity/investment return",
-        "book value quality"
+        "book value quality",
+        "market activity/investment return"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "unavailable",
-      "reason": "market_pb_missing"
+      "left_conclusion": "above_buy_zone"
     },
     {
       "code": "603019",
@@ -3836,12 +4364,21 @@
     }
   ],
   "left_set_codes": [
+    "000776",
     "000951",
     "002452",
     "002709",
+    "002736",
     "600066",
     "600166",
     "600710",
+    "600958",
+    "601211",
+    "601319",
+    "601377",
+    "601601",
+    "601688",
+    "601881",
     "603659"
   ],
   "method_note": "All non-cycle candidates require versioned policy. PE uses consensus Forward EPS. Brokers/insurers execute Forward ROE-PB; PB is loaded from all-A Eastmoney data with SH-A/SZ-A fallback. Data insufficiency remains explicit."
