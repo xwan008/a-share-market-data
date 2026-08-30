@@ -2,6 +2,9 @@ name: Build common qualification pool
 
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows: ["Build weekly deep review"]
+    types: [completed]
   push:
     branches: [main]
     paths:
@@ -43,6 +46,7 @@ concurrency:
 
 jobs:
   build:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 40
     steps:
