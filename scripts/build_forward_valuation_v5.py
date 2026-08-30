@@ -9,6 +9,7 @@ SPEC = importlib.util.spec_from_file_location('forward_base', ROOT / 'scripts/bu
 BASE = importlib.util.module_from_spec(SPEC)
 assert SPEC and SPEC.loader
 SPEC.loader.exec_module(BASE)
+CONSENSUS_CACHE = None
 
 
 def latest_financial_bvps(ak, code: str) -> tuple[float | None, str | None, str | None]:
@@ -28,9 +29,7 @@ def latest_financial_bvps(ak, code: str) -> tuple[float | None, str | None, str 
     bps_cols = [c for c in bps_cols if c is not None]
     if not date_col or not bps_cols:
         return None, None, f'bvps_columns_missing:{list(df.columns)}'
-    tmp = df.copy()
-    tmp['_date'] = tmp[date_col].astype(str)
-    tmp = tmp.sort_values('_date', ascending=False)
+    tmp = df.copy(); tmp['_date'] = tmp[date_col].astype(str); tmp = tmp.sort_values('_date', ascending=False)
     for _, row in tmp.iterrows():
         for col in bps_cols:
             value = BASE.num(row.get(col))
@@ -40,36 +39,29 @@ def latest_financial_bvps(ak, code: str) -> tuple[float | None, str | None, str 
 
 
 def load_financial_indicators(ak):
-    common = BASE.load(BASE.COMMON)
-    latest = BASE.load(BASE.LATEST)
-    stocks = latest.get('stocks', {})
-    out = {}
-    errors = []
+    common = BASE.load(BASE.COMMON); latest = BASE.load(BASE.LATEST); policies = BASE.load(BASE.POLICY)
+    stocks = latest.get('stocks', {}); out = {}; errors = []
+    year = datetime.now(BASE.TZ).year; min_reports = int(policies.get('forecast_policy', {}).get('minimum_report_count', 3))
+    consensus = CONSENSUS_CACHE or {}
     for code in common.get('common_pool_codes', []):
-        gate = common['future_earnings_gate'][code]
-        tags = gate.get('t2_tags') or []
-        text = ' '.join(tags)
-        if '证券' not in text and '保险' not in text:
-            continue
+        gate = common['future_earnings_gate'][code]; text = ' '.join(gate.get('t2_tags') or [])
+        if '证券' not in text and '保险' not in text: continue
+        c = consensus.get(code, {'report_count': 0, 'eps': {}})
+        if int(c.get('report_count') or 0) < min_reports or BASE.num(c.get('eps', {}).get(year)) is None: continue
         price = BASE.num((stocks.get(code) or {}).get('price'))
-        if price is None or price <= 0:
-            continue
+        if price is None or price <= 0: continue
         bvps, report_date, err = latest_financial_bvps(ak, code)
         if err:
-            errors.append(f'{code}:{err}')
-            continue
-        out[code] = {
-            'pb': price / bvps,
-            'pe_dynamic': None,
-            'source': 'akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS',
-            'reported_bvps': bvps,
-            'reported_bvps_date': report_date,
-        }
+            errors.append(f'{code}:{err}'); continue
+        out[code] = {'pb': price / bvps, 'pe_dynamic': None, 'source': 'akshare.stock_financial_analysis_indicator(Sina)_reported_BVPS', 'reported_bvps': bvps, 'reported_bvps_date': report_date}
     return out, errors
 
 
 def main() -> int:
-    # Replace unstable real-time PB fetch with reported BVPS-derived PB for financial companies.
+    import akshare as ak
+    global CONSENSUS_CACHE
+    CONSENSUS_CACHE = BASE.load_consensus(ak)
+    BASE.load_consensus = lambda _: CONSENSUS_CACHE
     BASE.load_spot_indicators = load_financial_indicators
     return BASE.main()
 
