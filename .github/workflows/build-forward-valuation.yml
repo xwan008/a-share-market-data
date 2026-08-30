@@ -10,6 +10,7 @@ on:
       - 'scripts/build_cycle_valuation.py'
       - 'scripts/build_valuation_policy_audit.py'
       - 'scripts/merge_left_valuation.py'
+      - 'scripts/build_final_selection.py'
       - 'scripts/validate_research_outputs.py'
       - 'scripts/validate_pe_low_risk_contract.py'
       - 'config/valuation_policy_registry.json'
@@ -62,6 +63,12 @@ jobs:
         run: python scripts/merge_left_valuation.py
       - name: Validate full left coverage
         run: python scripts/validate_research_outputs.py left-valuation data/research/pipeline/left_valuation_scan.json
+      - name: Revalidate right structure before final selection
+        run: python scripts/validate_research_outputs.py right-structure data/research/pipeline/right_structure_scan.json
+      - name: Build final selection from refreshed left valuation
+        run: python scripts/build_final_selection.py
+      - name: Validate refreshed final selection
+        run: python scripts/validate_research_outputs.py final-selection data/research/pipeline/final_selection.json
       - name: Print focus valuation diagnostics
         run: |
           python - <<'PY'
@@ -72,14 +79,16 @@ jobs:
           print(json.dumps(rows,ensure_ascii=False,indent=2))
           audit=json.load(open('data/research/pipeline/valuation_policy_audit.json',encoding='utf-8'))
           print(json.dumps(audit['noncycle_policy_coverage'],ensure_ascii=False,indent=2))
+          final=json.load(open('data/research/pipeline/final_selection.json',encoding='utf-8'))
+          print(json.dumps({'left_set_codes':final['left_set_codes'],'right_set_codes':final['right_set_codes'],'intersection':final['initial_intersection_codes'],'top3':final['top3_codes']},ensure_ascii=False,indent=2))
           PY
-      - name: Commit valuation scans
+      - name: Commit valuation and final-selection scans
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/research/pipeline/fundamental_valuation.json data/research/pipeline/cycle_valuation.json data/research/pipeline/valuation_policy_audit.json data/research/pipeline/left_valuation_scan.json
+          git add data/research/pipeline/fundamental_valuation.json data/research/pipeline/cycle_valuation.json data/research/pipeline/valuation_policy_audit.json data/research/pipeline/left_valuation_scan.json data/research/pipeline/final_selection.json data/research/pipeline/final_selection_summary.json
           if git diff --cached --quiet; then exit 0; fi
-          git commit -m "research: freeze valuation v5 scans"
+          git commit -m "research: freeze valuation v5 and final selection"
           git pull --rebase origin "${GITHUB_REF_NAME}"
           git push origin "HEAD:${GITHUB_REF_NAME}"
