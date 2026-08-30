@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import json
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -11,13 +12,16 @@ import requests
 
 try:
     from .history_store import ROLLING_DAYS, read_json, write_history_shards
+    from .sharded_backfill_plan import codes_for_partition
 except ImportError:  # direct script execution
     from history_store import ROLLING_DAYS, read_json, write_history_shards
+    from sharded_backfill_plan import codes_for_partition
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data"
 LATEST_PATH = DATA_DIR / "latest.json"
 STATUS_PATH = DATA_DIR / "backfill_status.json"
+PART_STATUS_DIR = DATA_DIR / "backfill_parts"
 
 URL = "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get"
 PRIMARY_WORKERS = 6
@@ -28,7 +32,7 @@ REQUEST_BARS = 270
 LONG_TERM_WINDOW = 252
 RETRIES = 4
 RECOVERY_PAUSE_SECONDS = 5
-MIN_COMMIT_SUCCESS_RATIO = 0.20
+MIN_PART_SUCCESS_RATIO = 0.85
 TENCENT_VOLUME_LOT_SIZE = 100
 
 
@@ -56,8 +60,6 @@ def build_long_term_summary(history: list[dict], refreshed_at: str) -> dict | No
     high_value, high_date = max(highs, key=lambda x: x[0])
     low_value, low_date = min(lows, key=lambda x: x[0])
 
-    # Weekly pivot highs are enough to preserve older, potentially relevant
-    # resistance outside the full 180-session local-history window.
     weeks: dict[tuple[int, int], dict] = {}
     for r in rows:
         try:
@@ -206,7 +208,18 @@ def fetch_codes(
     return results, failures
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Refresh bounded qfq history, optionally for one physical-shard partition")
+    parser.add_argument("--partition-index", type=int)
+    parser.add_argument("--partition-count", type=int)
+    return parser.parse_args()
+
+
 def main() -> int:
+    args = parse_args()
+    if (args.partition_index is None) != (args.partition_count is None):
+        raise SystemExit("--partition-index and --partition-count must be provided together")
+
     latest = read_json(LATEST_PATH, {})
     stocks = latest.get("stocks", {})
     latest_generated_at = latest.get("generated_at")
@@ -215,7 +228,14 @@ def main() -> int:
         print("latest.json has no stocks")
         return 2
 
-    codes = sorted(stocks)
+    all_codes = sorted(stocks)
+    if args.partition_index is not None:
+        codes, owned_shard_keys = codes_for_partition(all_codes, args.partition_index, args.partition_count)
+        partition_mode = True
+    else:
+        codes, owned_shard_keys = all_codes, sorted({code[:4] for code in all_codes})
+        partition_mode = False
+
     results, failures = fetch_codes(codes, stocks, refreshed_at, PRIMARY_WORKERS)
     first_pass_success = len(results)
 
@@ -234,21 +254,26 @@ def main() -> int:
     else:
         recovered = 0
 
-    success_ratio = len(results) / len(codes) if codes else 0.0
+    success_ratio = len(results) / len(codes) if codes else 1.0
 
-    # replace=True replaces only successfully fetched symbols. Failed symbols
-    # retain their previous bounded history and summary, so a degraded refresh
-    # never destroys the last good local data.
+    # In partition mode, never prune global shards: this job owns only the shard
+    # keys assigned by codes_for_partition(). Because ownership is by code[:4],
+    # concurrent matrix jobs cannot modify the same history shard file.
     shard_count = write_history_shards(
         results,
         refreshed_at,
         replace=True,
-        prune_to_codes=stocks.keys(),
+        prune_to_codes=None if partition_mode else stocks.keys(),
     )
 
     status = {
-        "schema_version": 5,
+        "schema_version": 6,
         "source": "tencent_qfq_day",
+        "mode": "partition" if partition_mode else "full",
+        "partition_index": args.partition_index,
+        "partition_count": args.partition_count,
+        "owned_shard_keys": owned_shard_keys,
+        "requested_codes": codes,
         "requested_stocks": len(codes),
         "successful_stocks": len(results),
         "failed_stocks": len(failures),
@@ -269,11 +294,21 @@ def main() -> int:
         "latest_trade_date": latest.get("trade_date"),
         "latest_generated_at": latest_generated_at,
         "history_refreshed_at": refreshed_at,
-        "sample_failures": dict(list(failures.items())[:30]),
+        "failures": failures,
     }
-    STATUS_PATH.write_text(json.dumps(status, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(json.dumps(status, ensure_ascii=False))
-    return 0 if success_ratio >= MIN_COMMIT_SUCCESS_RATIO else 3
+
+    if partition_mode:
+        PART_STATUS_DIR.mkdir(parents=True, exist_ok=True)
+        status_path = PART_STATUS_DIR / f"part-{args.partition_index}.json"
+    else:
+        status_path = STATUS_PATH
+    status_path.write_text(json.dumps(status, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(json.dumps({k: v for k, v in status.items() if k not in {"requested_codes", "failures"}}, ensure_ascii=False))
+
+    if partition_mode and success_ratio < MIN_PART_SUCCESS_RATIO:
+        print(f"partition success ratio {success_ratio:.3f} below required {MIN_PART_SUCCESS_RATIO:.3f}")
+        return 3
+    return 0
 
 
 if __name__ == "__main__":
