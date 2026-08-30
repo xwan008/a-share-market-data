@@ -1,5 +1,5 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "reviewed_at": "2026-08-30",
   "anchor_series": {
     "CU0": {"name": "沪铜连续", "role": "revenue_price"},
@@ -9,14 +9,32 @@
     "ZC0": {"name": "动力煤连续", "role": "revenue_price"}
   },
   "forward_earnings_policy": {
-    "method": "calendar_weighted_current_next_consensus",
+    "method": "calendar_weighted_current_next_consensus_as_input_not_value_anchor",
     "minimum_report_count": 3,
     "require_next_year_eps_for_resource": true,
-    "rule": "At late-cycle or normalization risk, current-year peak EPS must not be capitalized alone. Build a forward-12-month proxy by calendar-weighting current-year and next-year consensus EPS, then stress it with the structured 6-18m cycle regime and only a limited short-term commodity-anchor adjustment."
+    "rule": "Current and next-year consensus are an input to normalized earnings, not the final earnings anchor. At late-cycle or normalization risk, consensus must be normalized against a long-window neutral commodity/cost level before any low-risk price band is produced."
+  },
+  "neutral_commodity_policy": {
+    "window_sessions": 252,
+    "minimum_sessions": 180,
+    "method": "median_of_long_window",
+    "min_normalization_factor": 0.7,
+    "rule": "For resource companies, compare current revenue-price and input-cost anchors with their long-window neutral medians. Commodity windfall already embedded in consensus can only reduce normalized earnings. A weak current commodity price must not mechanically increase the low-risk earnings base."
   },
   "short_term_anchor_policy": {
     "max_absolute_effect_on_eps": 0.05,
-    "rule": "Current/MA60 commodity strength is a near-term modifier only. It cannot override a bearish/normalizing 6-18m supply-demand regime."
+    "positive_strength_can_raise_low_risk_buy_zone": false,
+    "rule": "Current/MA60 strength is a short-term diagnostic. Negative deterioration may lower the low-risk earnings base, but positive short-term commodity strength cannot lift the low-risk buy zone because that would chase the commodity cycle upward."
+  },
+  "low_risk_price_calibration": {
+    "window_sessions": 180,
+    "minimum_sessions": 120,
+    "history_shard_key_length": 4,
+    "safe_percentiles": [0.15, 0.35],
+    "reasonable_percentiles": [0.35, 0.60],
+    "max_reasonable_to_ma60": 1.06,
+    "macro_uncertainty_haircut": 0.95,
+    "rule": "The stock's own bounded 180-session adjusted close distribution is a calibration constraint, not an intrinsic-value model. Safe buy uses the lower historical distribution and reasonable buy uses the middle-lower distribution. The upper reasonable boundary is capped by both normalized fundamental fair value and MA60 plus a small tolerance. This prevents analyst EPS and rising futures prices from mechanically dragging low-risk entry prices upward."
   },
   "subchain_policies": {
     "nonferrous::铜矿资源": {
@@ -55,23 +73,23 @@
       "fallback_multiple_range": [12, 16],
       "safe_to_fair_floor": [0.76, 0.88],
       "reasonable_to_fair_floor": [0.88, 1.0],
-      "rationale": "2026H1黄金和铜合计贡献集团毛利约75.5%，以黄金/铜双商品锚和跨年度Forward盈利中枢共同决定估值。"
+      "rationale": "Gold and copper diversification supports earnings quality, but low-risk pricing must normalize current gold/copper windfall first and then be checked against the stock's own 180-session market-cost distribution."
     },
     "601600": {
       "name": "中国铝业",
       "earnings_sensitivity": 0.9,
       "fallback_multiple_range": [8, 11],
-      "rationale": "原铝板块为主要利润弹性来源，氧化铝同时是业务与成本变量；高利润阶段必须用2027供给恢复风险压测Forward盈利。"
+      "rationale": "原铝板块为主要利润弹性来源，氧化铝同时是业务与成本变量；高利润阶段必须先还原中性铝价/氧化铝成本下的盈利，再用2027供给恢复风险与180日价格分布约束低风险买入区。"
     },
     "000807": {
       "name": "云铝股份",
       "earnings_sensitivity": 0.95,
       "fallback_multiple_range": [9, 12],
-      "rationale": "低成本水电铝与一体化优势支持相对溢价，但中东复产、库存重建和需求正常化风险意味着不能把当前高吨铝利润按11-15倍永久资本化。"
+      "rationale": "低成本水电铝与一体化优势支持相对溢价，但中东复产、库存重建和需求正常化风险意味着不能把当前高吨铝利润永久资本化；低风险买点还必须接受180日价格中枢校准。"
     }
   },
   "scenario_rules": {
     "short_term_anchor_ratio_clip": [0.95, 1.05],
-    "rule": "Final cycle EPS scenario starts from calendar-weighted 2026/2027 consensus, applies structured 6-18m regime bear/base/bull factors, then applies only a capped short-term commodity/MA60 adjustment through earnings sensitivity."
+    "rule": "Scenario EPS starts from calendar-weighted consensus, removes commodity windfall versus a long-window neutral anchor, applies the reviewed 6-18m regime, and allows only negative short-term commodity deterioration to lower low-risk pricing. Bear/base/bull theoretical fair values are diagnostics and are not themselves buy zones."
   }
 }
