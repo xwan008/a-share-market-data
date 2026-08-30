@@ -1,10 +1,23 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "pool_name": "A股周度全市场盈利机会池",
-  "purpose": "作为A股低风险买点榜的补漏召回层。周度扫描全市场主板公司，识别未来1-2季度盈利趋势向上或拐点明确、但不一定处于T2正式景气行业的公司。行情与技术结构不在本文件重复存储，统一读取本仓库data/health.json与data/shards。",
+  "purpose": "独立于产业T2的公司级补漏召回层；只保留未来1-2季度盈利向上或明确拐点且有可验证前瞻桥的公司。",
   "universe": {
-    "included_prefixes": ["600", "601", "603", "605", "000", "001", "002", "003"],
-    "excluded": ["创业板", "科创板", "北交所"]
+    "included_prefixes": [
+      "600",
+      "601",
+      "603",
+      "605",
+      "000",
+      "001",
+      "002",
+      "003"
+    ],
+    "excluded": [
+      "创业板",
+      "科创板",
+      "北交所"
+    ]
   },
   "market_data_source": {
     "repository": "xwan008/a-share-market-data",
@@ -12,169 +25,432 @@
     "quote_shards": "data/shards/<dynamic-key>.json",
     "rule": "本池不复制价格、K线、支撑压力、HH/HL等行情字段；需要时按health.shard_key_length读取对应shard。"
   },
-  "selection_principle": "核心只判断公司未来1-2季度盈利趋势是否向上或拐点是否明确。T2行业景气是增强置信度的标签，不再是本补漏池的必要准入条件。",
-  "required_fields_per_candidate": ["code", "name", "first_added_date", "last_review_date", "status", "earnings_direction", "earnings_driver", "evidence", "key_validation_metric", "invalidation_condition", "industry_t2_tag", "source_summary"],
-  "allowed_status": ["新发现", "继续保留", "盈利强化", "盈利转弱", "移除"],
-  "generated_at": "2026-08-29T21:35:55+08:00",
-  "scan_as_of": "2026-08-29",
+  "selection_principle": "全主板机械宽召回后深验；历史高增本身不构成准入。周期资源公司必须让当前商品锚支持未来盈利方向。",
+  "required_fields_per_candidate": [
+    "code",
+    "name",
+    "first_added_date",
+    "last_review_date",
+    "status",
+    "earnings_direction",
+    "earnings_driver",
+    "evidence",
+    "key_validation_metric",
+    "invalidation_condition",
+    "industry_t2_tag",
+    "source_summary"
+  ],
+  "allowed_status": [
+    "新发现",
+    "继续保留",
+    "盈利强化",
+    "盈利转弱",
+    "移除"
+  ],
+  "generated_at": "2026-08-30T09:17:13.081752+08:00",
+  "scan_as_of": "2026-08-30",
   "market_trade_date": "2026-08-28",
-  "scan_mode": "one_off_initialization",
+  "scan_mode": "full_market_mechanical_recall_plus_deep_review",
+  "audit": {
+    "universe_count": 3177,
+    "light_recall_count": 1329,
+    "deep_review_count": 51,
+    "active_count": 16,
+    "removed_legacy_count": 1,
+    "industry_state_modified": false,
+    "t2_recall_frozen_at": "2026-08-30T08:49:08.100552+08:00"
+  },
   "candidates": [
     {
       "code": "000338",
       "name": "潍柴动力",
       "first_added_date": "2026-08-29",
-      "last_review_date": "2026-08-29",
+      "last_review_date": "2026-08-30",
+      "status": "继续保留",
+      "earnings_direction": "up",
+      "earnings_driver": "大缸径发动机、数据中心发电与新能源动力业务继续放量。",
+      "evidence": [
+        "2026H1发电产品销售6.5万台，同比+31.3%；数据中心发电产品H1销量超过2025全年。"
+      ],
+      "key_validation_metric": "数据中心发电产品出货、M系列大缸径发动机销量、动力电池销量与利润率。",
+      "invalidation_condition": "数据中心发电产品与大缸径发动机订单连续转弱，或重卡/发动机需求显著下行。",
+      "industry_t2_tag": [
+        "weekly_only"
+      ],
+      "source_summary": "2026-08-30 full-market weekly deep review after independent T2 freeze",
+      "forward_bridge": "数据中心发电产品H1销量已超过2025全年、发电产品总销量同比+31.3% → 已切入全球顶级数据中心及头部云厂商供应链 → AI算力基建需求继续传导至发电设备与高附加值发动机 → Q3/Q4产品结构维持改善。",
+      "one_off_profit_impact": "核心判断基于主营产品销量与结构，不依赖非经常性收益。",
+      "sources": [
+        "https://paper.cnstock.com/html/2026-08/28/content_2262025.htm"
+      ]
+    },
+    {
+      "code": "001309",
+      "name": "德明利",
+      "first_added_date": "2026-08-30",
+      "last_review_date": "2026-08-30",
       "status": "新发现",
-      "earnings_direction": "向上",
-      "earnings_driver": "高附加值大缸径发动机、数据中心发电产品和新能源动力业务放量，产品结构改善使利润增速显著快于收入。",
-      "evidence": ["2026H1营收同比+8.85%，归母净利润同比+36.46%。", "M系列大缸径发动机销量同比+31.5%；发电产品销量同比+31.3%，其中数据中心发电产品上半年销售已超过2025全年；动力电池销量4.7GWh，同比+103%。"],
-      "key_validation_metric": "M系列大缸径发动机销量、数据中心发电产品出货、新能源动力销量及利润率。",
-      "invalidation_condition": "上述高附加值业务连续转弱，或重卡/发动机需求明显下行并使利润增速快速回落。",
-      "industry_t2_tag": "待低风险榜主流程校验（重卡/发动机链可能T2）",
-      "source_summary": "2026-08-28潍柴动力半年报及当日公开业绩报道；本周价格数据由GitHub行情桥验证，未写入本研究文件。"
+      "earnings_direction": "up",
+      "earnings_driver": "存储景气与企业级存储放量，战略库存可支撑未来半年以上业务需求。",
+      "evidence": [
+        "企业级存储已进入多家头部互联网及服务器厂商供应链并稳定批量出货；现有库存可支撑未来半年及以上业务需求。"
+      ],
+      "key_validation_metric": "企业级存储出货、库存周转、存储价格、毛利率。",
+      "invalidation_condition": "存储价格快速反转导致库存损失，或企业级客户放量不及预期。",
+      "industry_t2_tag": [
+        "weekly_only"
+      ],
+      "source_summary": "2026-08-30 full-market weekly deep review after independent T2 freeze",
+      "forward_bridge": "AI驱动存储行业景气，企业级存储已进入多家头部互联网/服务器厂商供应链并批量出货 → 公司按未来订单与排产增加战略备货，库存可支撑半年以上 → Q3/Q4规模继续扩张。",
+      "one_off_profit_impact": "需持续监控存储价格波动对库存价值和毛利的影响。",
+      "sources": [
+        "https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?CompanyCode=82526147&gather=1&id=12457322"
+      ]
+    },
+    {
+      "code": "002156",
+      "name": "通富微电",
+      "first_added_date": "2026-08-30",
+      "last_review_date": "2026-08-30",
+      "status": "新发现",
+      "earnings_direction": "up",
+      "earnings_driver": "AI算力、存储景气和先进封装需求提升带动产能利用率与中高端产品收入增长。",
+      "evidence": [
+        "H1扣非净利润预增66.49%-90.28%；公司称AI需求、存储景气与国产化推动产能利用率和中高端产品收入提升。"
+      ],
+      "key_validation_metric": "扣非利润、产能利用率、中高端封装收入、先进封装订单。",
+      "invalidation_condition": "半导体景气回落、先进封装需求不及预期或投资收益掩盖主营盈利转弱。",
+      "industry_t2_tag": [
+        "weekly_only"
+      ],
+      "source_summary": "2026-08-30 full-market weekly deep review after independent T2 freeze",
+      "forward_bridge": "H1扣非利润预计同比+66%-90%，中高端产品收入提升 → H2 AI算力、高带宽存储和异构集成需求继续推动先进封装 → Q3/Q4核心经营利润继续向上。",
+      "one_off_profit_impact": "H1归母利润受产业投资收益增厚；判断以扣非利润与主营封测为主。",
+      "sources": [
+        "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12444883&stockid=002156",
+        "https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?CompanyCode=80097729&gather=1&id=12568723"
+      ]
+    },
+    {
+      "code": "002475",
+      "name": "立讯精密",
+      "first_added_date": "2026-08-30",
+      "last_review_date": "2026-08-30",
+      "status": "新发现",
+      "earnings_direction": "up",
+      "earnings_driver": "消费电子、通信与数据中心、汽车电子三大业务共同增长，并有明确Q3业绩预告。",
+      "evidence": [
+        "公司预计2026年前三季度归母净利润同比+15%-25%，扣非同比+8.63%-22.79%。"
+      ],
+      "key_validation_metric": "Q3实际净利润、数据中心业务增速、汽车电子整合利润率。",
+      "invalidation_condition": "Q3实际业绩低于预告下沿，或数据中心/汽车电子增长显著弱于公司表述。",
+      "industry_t2_tag": [
+        "weekly_only"
+      ],
+      "source_summary": "2026-08-30 full-market weekly deep review after independent T2 freeze",
+      "forward_bridge": "公司预计2026年前三季度归母净利润132.46-143.98亿元、同比+15%-25% → 数据中心高速互连/热管理/电源与汽车电子协同继续落地 → Q3盈利已得到公司指引确认。",
+      "one_off_profit_impact": "扣非净利润预计同比+8.63%-22.79%，核心盈利仍为正增长。",
+      "sources": [
+        "https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?CompanyCode=80150802&gather=1&id=12529528"
+      ]
+    },
+    {
+      "code": "002709",
+      "name": "天赐材料",
+      "first_added_date": "2026-08-30",
+      "last_review_date": "2026-08-30",
+      "status": "新发现",
+      "earnings_direction": "up",
+      "earnings_driver": "电解液需求旺盛、三季度排产环增，产能利用率接近满产。",
+      "evidence": [
+        "公司称H1电解液出货同比超40%，Q2环比约+20%，预计Q3排产进一步增长，三四季度需求环增明显、订单饱和。"
+      ],
+      "key_validation_metric": "Q3电解液排产、六氟磷酸锂价格、碳酸锂成本、单吨利润。",
+      "invalidation_condition": "原材料上涨快于产品提价导致单吨利润持续下滑，或Q3/Q4订单/排产低于公司反馈。",
+      "industry_t2_tag": [
+        "weekly_only"
+      ],
+      "source_summary": "2026-08-30 full-market weekly deep review after independent T2 freeze",
+      "forward_bridge": "H1电解液出货同比+40%以上、Q2环比约+20% → 公司预计Q3排产进一步环增，三四季度需求环比改善且订单饱和 → Q3/Q4销量增长支撑盈利维持高位并温和上行。",
+      "one_off_profit_impact": "需剔除原材料价格波动对单吨利润的影响，Q2单吨利润已有环比压力。",
+      "sources": [
+        "https://yuanchuang.10jqka.com.cn/20260716/c678211548.shtml",
+        "https://finance.sina.com.cn/stock/relnews/cn/2026-07-14/doc-inihuhke5282166.shtml"
+      ]
+    },
+    {
+      "code": "002812",
+      "name": "恩捷股份",
+      "first_added_date": "2026-08-30",
+      "last_review_date": "2026-08-30",
+      "status": "新发现",
+      "earnings_direction": "inflection_up",
+      "earnings_driver": "隔膜供需紧张、价格上涨与出货增长共同推动单位盈利修复。",
+      "evidence": [
+        "2026Q2归母净利润环比+115.1%，隔膜售价与毛利率环比提升；当前行业需求旺盛、排产维持高位。"
+      ],
+      "key_validation_metric": "隔膜出货、售价、单平利润、毛利率。",
+      "invalidation_condition": "隔膜供需转松导致价格/单平利润快速回落，或排产显著下降。",
+      "industry_t2_tag": [
+        "weekly_only"
+      ],
+      "source_summary": "2026-08-30 full-market weekly deep review after independent T2 freeze",
+      "forward_bridge": "Q2隔膜出货环比近+20%、售价环比提升、毛利率继续改善 → 当前行业需求旺盛且排产高位，全年出货预计继续增长 → Q3/Q4利润从扭亏拐点继续修复。",
+      "one_off_profit_impact": "核心判断以隔膜主营销量、售价和单平利润为主。",
+      "sources": [
+        "https://basic.10jqka.com.cn/144/002812/worth.html",
+        "https://stock.stockstar.com/JC2026082600046724.shtml"
+      ]
     },
     {
       "code": "600066",
       "name": "宇通客车",
       "first_added_date": "2026-08-29",
-      "last_review_date": "2026-08-29",
-      "status": "新发现",
-      "earnings_direction": "核心盈利向上",
-      "earnings_driver": "出口占比和新能源出口提升带动产品结构改善，扣非利润增速明显快于收入，海外业务继续提供后续增长支撑。",
-      "evidence": ["2026H1营收同比+3.65%，归母净利润同比-3.52%，但扣非归母净利润同比+15.83%；Q2扣非净利润同比+30.9%。", "H1客车出口约0.69万辆、同比约+14%，其中新能源客车出口约0.17万辆、同比约+56%。"],
-      "key_validation_metric": "出口销量、新能源客车出口占比、单车收入、扣非利润率。",
-      "invalidation_condition": "海外订单/出口销量明显转弱，或产品结构改善无法继续传导到扣非利润增长。",
-      "industry_t2_tag": "待低风险榜主流程校验（客车出口/新能源）",
-      "source_summary": "2026-08-12半年报点评及公司半年报数据；8月28日TTM估值约12倍，未出现明显极端定价。"
-    },
-    {
-      "code": "603259",
-      "name": "药明康德",
-      "first_added_date": "2026-08-29",
-      "last_review_date": "2026-08-29",
-      "status": "新发现",
-      "earnings_direction": "向上且确定性较高",
-      "earnings_driver": "持续经营业务在手订单增长和CRDMO/TIDES业务放量，使未来几个季度收入与利润具备较高可见度。",
-      "evidence": ["2026H1收入同比+38.9%，持续经营业务收入同比+48.0%，归母净利润同比+29.4%。", "持续经营业务在手订单664.3亿元、同比+25.2%；公司将2026年持续经营业务收入增速指引由18%-22%上调至35%-39%，TIDES全年增速指引约45%。"],
-      "key_validation_metric": "持续经营业务在手订单、TIDES收入、经调整利润率、全年收入指引兑现度。",
-      "invalidation_condition": "在手订单增速显著下滑、重大监管/地缘政策冲击订单，或利润率明显低于公司指引。",
-      "industry_t2_tag": "待低风险榜主流程校验（CXO/CRDMO可能T2）",
-      "source_summary": "2026-08-03药明康德官网半年报业绩与指引，以及8月初公开研究资料。"
-    },
-    {
-      "code": "603659",
-      "name": "璞泰来",
-      "first_added_date": "2026-08-29",
-      "last_review_date": "2026-08-29",
-      "status": "新发现",
-      "earnings_direction": "向上但利润率需跟踪",
-      "earnings_driver": "新能源自动化设备新增订单和在手订单大幅增长，叠加材料业务产能与销量释放，为未来收入确认提供较强可见度。",
-      "evidence": ["2026H1营收同比约+42.7%，归母净利润同比约+37.6%。", "自动化装备H1新接订单超过41亿元、同比约+100%，截至6月底在手订单约88亿元；订单将随履约和验收逐步转化为收入。"],
-      "key_validation_metric": "自动化设备在手订单转收入节奏、验收进度、负极/PVDF等材料销量与综合毛利率。",
-      "invalidation_condition": "设备订单验收显著延迟或取消，或材料价格/毛利率持续下滑到抵消收入增长。",
-      "industry_t2_tag": "待低风险榜主流程校验（锂电设备/材料）",
-      "source_summary": "2026-08-20左右璞泰来半年报；设备新订单与在手订单为主要前瞻证据。"
-    },
-    {
-      "code": "600710",
-      "name": "苏美达",
-      "first_added_date": "2026-08-29",
-      "last_review_date": "2026-08-29",
-      "status": "新发现",
-      "earnings_direction": "温和向上且可见度高",
-      "earnings_driver": "造船高附加值船型与长期订单排期、出口订单增长共同支撑未来利润，供应链业务也保持正增长。",
-      "evidence": ["2026H1营收同比+19.66%，归母净利润同比+6.62%；船舶制造与航运业务利润总额同比+24%。", "H1新签船舶制造订单35艘，截至6月底在手订单105艘，生产任务覆盖至2030年；出口新签订单同比+29%。"],
-      "key_validation_metric": "船舶新签订单/交付毛利、出口订单增速、供应链业务利润率。",
-      "invalidation_condition": "船舶订单取消或新船价格/毛利明显转弱，或出口订单持续负增长。",
-      "industry_t2_tag": "待低风险榜主流程校验（造船链可能T2；供应链业务独立）",
-      "source_summary": "2026-08-28苏美达半年报；8月28日TTM市盈率约10倍，定价仍具研究价值。"
+      "last_review_date": "2026-08-30",
+      "status": "继续保留",
+      "earnings_direction": "up",
+      "earnings_driver": "出口占比提升与新能源出口增长改善产品结构，扣非盈利趋势强于收入。",
+      "evidence": [
+        "2026H1出口客车约0.69万辆，同比约+14%；新能源出口约+56%；H2行业出口预计延续增长。"
+      ],
+      "key_validation_metric": "出口销量、新能源出口占比、单车收入、扣非利润率。",
+      "invalidation_condition": "出口/新能源出口连续转弱或产品结构改善无法继续转化为扣非利润增长。",
+      "industry_t2_tag": [
+        "weekly_only"
+      ],
+      "source_summary": "2026-08-30 full-market weekly deep review after independent T2 freeze",
+      "forward_bridge": "H1出口约+14%、新能源出口约+56% → 行业大中型客车出口H2预计延续增长 → 海外高附加值产品占比继续提升 → Q3/Q4扣非利润率维持改善。",
+      "one_off_profit_impact": "核心判断以扣非利润与出口结构为主。",
+      "sources": [
+        "https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?CompanyCode=10000039&gather=1&id=12485740"
+      ]
     },
     {
       "code": "600458",
       "name": "时代新材",
       "first_added_date": "2026-08-29",
-      "last_review_date": "2026-08-29",
-      "status": "新发现",
-      "earnings_direction": "向上",
-      "earnings_driver": "风电叶片订单增长与新材料订单加速形成双重驱动，PACK封装和AIDC电容隔膜等新业务开始从验证/订单走向批量交付。",
-      "evidence": ["2026H1营收同比+13.09%，归母净利润同比+14.08%，扣非净利润同比+33.91%。", "新材料及其他市场新签订单12.95亿元、同比+102.34%；风电叶片新签订单53.36亿元、同比+13.75%，其中海外订单同比+100%；AIDC电容隔膜已获国内头部客户批量订单。"],
-      "key_validation_metric": "新材料订单转收入速度、风电叶片交付/海外订单、PACK产能利用率、经营现金流。",
-      "invalidation_condition": "订单无法按期转化为收入，风电/新材料交付放缓，或营运资金占用继续恶化且不能随交付修复。",
-      "industry_t2_tag": "待低风险榜主流程校验（风电/新材料混合）",
-      "source_summary": "2026-08-20时代新材半年报及8月28日业绩说明会信息；8月28日TTM市盈率约20倍。"
-    },
-    {
-      "code": "600685",
-      "name": "中船防务",
-      "first_added_date": "2026-08-29",
-      "last_review_date": "2026-08-29",
-      "status": "新发现",
-      "earnings_direction": "向上",
-      "earnings_driver": "高景气造船订单持续向利润兑现，手持订单量大且交付周期长，效率与船型结构改善提升盈利弹性。",
-      "evidence": ["2026H1归母净利润约8.37亿元、同比约+58.9%，扣非净利润同比约+59.3%。", "截至H1末手持订单合同总价约745亿元，其中造船订单约734亿元，包含173艘船舶及1座海工装备；订单覆盖提供多年交付可见度。"],
-      "key_validation_metric": "手持订单金额、船舶交付节奏、单船毛利率、生产效率和新增订单价格。",
-      "invalidation_condition": "新增船价明显下行、在手订单取消/延期显著增加，或交付效率下降导致毛利率逆转。",
-      "industry_t2_tag": "待低风险榜主流程校验（造船链可能T2）",
-      "source_summary": "2026-08-25中船防务半年报；8月28日TTM市盈率约28倍、低于所属行业中位水平。"
+      "last_review_date": "2026-08-30",
+      "status": "继续保留",
+      "earnings_direction": "up",
+      "earnings_driver": "风电叶片订单、新材料订单和AIDC电容隔膜批量订单共同推动交付。",
+      "evidence": [
+        "H1风电叶片新签订单53.36亿元；AIDC隔膜获批量订单；7月披露约30.34亿元风电叶片合同。"
+      ],
+      "key_validation_metric": "风电叶片交付、海外订单、新材料订单转收入、AIDC隔膜批量交付。",
+      "invalidation_condition": "主要订单延期/取消，或交付毛利率明显恶化。",
+      "industry_t2_tag": [
+        "weekly_only"
+      ],
+      "source_summary": "2026-08-30 full-market weekly deep review after independent T2 freeze",
+      "forward_bridge": "H1风电叶片新签订单53.36亿元、海外订单+100%，AIDC电容隔膜获头部客户批量订单，并另签约约30.34亿元风电叶片合同 → H2交付与新业务放量 → Q3/Q4利润继续增长。",
+      "one_off_profit_impact": "核心判断来自订单与交付。",
+      "sources": [
+        "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12505347&stockid=600458",
+        "https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12430841"
+      ]
     },
     {
       "code": "600482",
       "name": "中国动力",
       "first_added_date": "2026-08-29",
-      "last_review_date": "2026-08-29",
-      "status": "新发现",
-      "earnings_direction": "向上（中报待验证）",
-      "earnings_driver": "造船高景气向船用低速发动机传导，低速机销量、毛利率和产能利用率提升，饱满在手订单支撑未来结算。",
-      "evidence": ["2026Q1营收同比+4.45%，归母净利润同比+48.64%，扣非净利润同比+49.84%；公司称主要因船用低速发动机销量增长、毛利率提升。", "2026-07-24公司表示低速机在手订单饱满、产能利用率较高，并将继续提升生产组织和利用率；2026中报计划8月31日披露。"],
-      "key_validation_metric": "8月31日中报、低速机销量/毛利率、在手订单及产能利用率。",
-      "invalidation_condition": "中报显示盈利增速明显不及Q1且低速机订单/毛利率转弱，或船舶发动机排产显著下修。",
-      "industry_t2_tag": "待低风险榜主流程校验（船用发动机链可能T2）",
-      "source_summary": "2026-04-30一季报、2026-07-24公司互动；中报尚未披露，属于需下周立即验证的候选。"
+      "last_review_date": "2026-08-30",
+      "status": "继续保留",
+      "earnings_direction": "up",
+      "earnings_driver": "造船高景气向船用低速发动机传导，在手订单饱满且产能利用率高。",
+      "evidence": [
+        "公司7月披露船用低速机在手订单饱满、产能利用率较高。"
+      ],
+      "key_validation_metric": "低速机在手订单、产能利用率、交付量、毛利率。",
+      "invalidation_condition": "造船新增订单显著转弱、低速机排产下降或交付毛利率恶化。",
+      "industry_t2_tag": [
+        "weekly_only"
+      ],
+      "source_summary": "2026-08-30 full-market weekly deep review after independent T2 freeze",
+      "forward_bridge": "国内造船订单高景气 → 船用低速机在手订单饱满、产能利用率较高 → 加强生产组织提升交付 → Q3/Q4收入和利润继续向上。",
+      "one_off_profit_impact": "核心判断基于低速机主营订单。",
+      "sources": [
+        "https://finance.sina.com.cn/jjxw/2026-07-24/doc-iniiwvkp1600371.shtml"
+      ]
     },
     {
-      "code": "601991",
-      "name": "大唐发电",
+      "code": "600685",
+      "name": "中船防务",
       "first_added_date": "2026-08-29",
-      "last_review_date": "2026-08-29",
+      "last_review_date": "2026-08-30",
+      "status": "继续保留",
+      "earnings_direction": "up",
+      "earnings_driver": "高景气船舶订单持续进入交付与利润兑现期。",
+      "evidence": [
+        "2026H1末手持订单合同总价约745亿元，含173艘船舶及1座海工装备。"
+      ],
+      "key_validation_metric": "交付节奏、单船毛利、在手订单、新签船价。",
+      "invalidation_condition": "订单取消/延期显著增加、新船价格明显下行或交付毛利率逆转。",
+      "industry_t2_tag": [
+        "machinery::船舶制造"
+      ],
+      "source_summary": "2026-08-30 full-market weekly deep review after independent T2 freeze",
+      "forward_bridge": "6月底手持订单约745亿元、其中造船约734亿元，173艘船舶+1座海工装备 → 多年排产与交付 → Q3/Q4收入确认与毛利兑现保持增长。",
+      "one_off_profit_impact": "核心判断以主营船舶订单为主。",
+      "sources": [
+        "https://stock.stockstar.com/notice/SN2026082500045160.shtml"
+      ]
+    },
+    {
+      "code": "600710",
+      "name": "苏美达",
+      "first_added_date": "2026-08-29",
+      "last_review_date": "2026-08-30",
+      "status": "继续保留",
+      "earnings_direction": "up",
+      "earnings_driver": "船舶高附加值订单与供应链出口订单共同支撑未来盈利。",
+      "evidence": [
+        "H1新签船舶订单35艘；6月底在手105艘，生产任务覆盖至2030年；出口新签订单同比+29%。"
+      ],
+      "key_validation_metric": "船舶交付毛利、新签订单、出口订单、供应链利润率。",
+      "invalidation_condition": "船舶订单取消/延期、船价或交付毛利明显下降、出口订单转负。",
+      "industry_t2_tag": [
+        "machinery::船舶制造"
+      ],
+      "source_summary": "2026-08-30 full-market weekly deep review after independent T2 freeze",
+      "forward_bridge": "H1新签船舶35艘、在手105艘、排期至2030年，同时出口新签订单+29% → 船舶与供应链持续交付 → Q3/Q4盈利温和向上。",
+      "one_off_profit_impact": "蓝科高新并表会影响口径，判断主要依赖船舶与供应链内生订单。",
+      "sources": [
+        "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12559545&stockid=600710"
+      ]
+    },
+    {
+      "code": "601869",
+      "name": "长飞光纤",
+      "first_added_date": "2026-08-30",
+      "last_review_date": "2026-08-30",
       "status": "新发现",
-      "earnings_direction": "向上但斜率放缓",
-      "earnings_driver": "上网电量增长、清洁能源和水电/燃机增量以及融资成本下降共同支撑利润，估值仍处低位区间。",
-      "evidence": ["2026H1营收同比+2.14%，归母净利润同比+20.31%，扣非净利润同比+21.21%。", "H1上网电量同比+4.42%，其中燃机+16.79%、水电+17.05%；综合融资成本2.28%，同比下降15个基点。"],
-      "key_validation_metric": "上网电量、煤电燃料成本、市场化电价、融资成本及Q3利润增速。",
-      "invalidation_condition": "煤价/燃料成本快速上行且电价无法传导，或发电量转负并使利润增速继续快速下滑。",
-      "industry_t2_tag": "待低风险榜主流程校验（电力公用事业）",
-      "source_summary": "2026-08-28半年报、2026-07-21上网电量公告；8月28日TTM市盈率约13.1倍。"
+      "earnings_direction": "up",
+      "earnings_driver": "AI数据中心拉动新型光纤需求，核心客户拓展与高毛利产品结构改善。",
+      "evidence": [
+        "H1光传输产品收入约61.26亿元，同比约+59.2%，毛利率63.11%；公司称数据中心相关光纤需求同比增速约69%。"
+      ],
+      "key_validation_metric": "AI新型光纤出货、光传输收入、毛利率、核心客户拓展。",
+      "invalidation_condition": "数据中心光纤需求显著降速、产品价格/毛利快速回落或客户拓展不及预期。",
+      "industry_t2_tag": [
+        "weekly_only"
+      ],
+      "source_summary": "2026-08-30 full-market weekly deep review after independent T2 freeze",
+      "forward_bridge": "公司披露2026年数据中心相关光纤需求同比约+69%，H1光传输产品收入同比约+59.2%、毛利率63.11% → AI新型光纤需求与客户认证壁垒延续 → Q3/Q4收入与利润保持较快增长。",
+      "one_off_profit_impact": "核心判断基于光传输主营业务。",
+      "sources": [
+        "https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12518986"
+      ]
     },
     {
       "code": "603088",
       "name": "宁波精达",
       "first_added_date": "2026-08-29",
-      "last_review_date": "2026-08-29",
+      "last_review_date": "2026-08-30",
+      "status": "继续保留",
+      "earnings_direction": "inflection_up",
+      "earnings_driver": "海外订单快速增长与北美数据中心相关装备需求推动Q2后利润修复。",
+      "evidence": [
+        "H1海外订单同比+118.65%；北美业务上半年订单已与去年全年持平；Q2归母净利润环比+422.73%。"
+      ],
+      "key_validation_metric": "海外订单转收入、北美订单、Q3毛利率与汇率影响。",
+      "invalidation_condition": "海外项目验收持续延迟、订单取消或汇率/费用拖累超过收入增长。",
+      "industry_t2_tag": [
+        "weekly_only"
+      ],
+      "source_summary": "2026-08-30 full-market weekly deep review after independent T2 freeze",
+      "forward_bridge": "H1海外订单同比+118.65%、北美上半年订单已与去年全年持平，Q2利润环比+422.7% → 海外订单进入验收/确认 → Q3/Q4利润从H1低点继续修复。",
+      "one_off_profit_impact": "H1利润受汇率与费用影响，未来需观察订单兑现而非一次性收益。",
+      "sources": [
+        "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12561314&stockid=603088"
+      ]
+    },
+    {
+      "code": "603259",
+      "name": "药明康德",
+      "first_added_date": "2026-08-29",
+      "last_review_date": "2026-08-30",
+      "status": "继续保留",
+      "earnings_direction": "up",
+      "earnings_driver": "持续经营业务在手订单增长与TIDES放量，公司显著上调全年指引。",
+      "evidence": [
+        "H1末持续经营业务在手订单664.3亿元，同比+25.2%；全年持续经营收入增速指引上调至35%-39%。"
+      ],
+      "key_validation_metric": "在手订单、TIDES收入、持续经营收入增速、经调整利润率。",
+      "invalidation_condition": "订单增速显著下滑、监管/地缘政策冲击订单或经调整利润率明显低于指引。",
+      "industry_t2_tag": [
+        "pharma::CXO/CDMO/CRDMO"
+      ],
+      "source_summary": "2026-08-30 full-market weekly deep review after independent T2 freeze",
+      "forward_bridge": "持续经营业务在手订单664.3亿元、同比+25.2% → 公司将2026持续经营收入增速指引上调至35%-39%，TIDES约+45% → Q3/Q4收入与经调整利润保持高增长。",
+      "one_off_profit_impact": "应使用持续经营/经调整口径评估核心盈利。",
+      "sources": [
+        "https://stock.finance.sina.com.cn/stock/go.php/vReport_Show/kind/lastest/rptid/839230520311/index.phtml"
+      ]
+    },
+    {
+      "code": "603659",
+      "name": "璞泰来",
+      "first_added_date": "2026-08-29",
+      "last_review_date": "2026-08-30",
+      "status": "继续保留",
+      "earnings_direction": "up",
+      "earnings_driver": "新能源自动化装备新接订单与在手订单大幅增长，后续验收逐步转收入。",
+      "evidence": [
+        "2026H1设备新接订单超41亿元，同比约+100%；6月底设备类在手订单约88亿元。"
+      ],
+      "key_validation_metric": "设备在手订单转收入、验收节奏、材料业务毛利率。",
+      "invalidation_condition": "设备验收显著延迟/取消，或材料业务毛利率下降抵消设备增长。",
+      "industry_t2_tag": [
+        "weekly_only"
+      ],
+      "source_summary": "2026-08-30 full-market weekly deep review after independent T2 freeze",
+      "forward_bridge": "H1设备新接订单超41亿元、同比约+100% → 6月底设备在手订单约88亿元 → 下游电芯厂扩产与设备履约验收 → Q3/Q4收入确认与利润保持增长。",
+      "one_off_profit_impact": "未发现足以主导核心盈利判断的一次性因素。",
+      "sources": [
+        "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12505314&stockid=603659"
+      ]
+    },
+    {
+      "code": "603986",
+      "name": "兆易创新",
+      "first_added_date": "2026-08-30",
+      "last_review_date": "2026-08-30",
       "status": "新发现",
-      "earnings_direction": "盈利拐点初现（需Q3确认）",
-      "earnings_driver": "海外订单加速和项目验收节奏恢复推动Q2利润环比显著修复，北美及模具国际业务提供后续订单可见度。",
-      "evidence": ["2026H1营收同比+12.14%，归母净利润同比-23.19%，但Q2归母净利润环比+422.73%，显示阶段性费用/验收扰动后的修复。", "H1境外销售同比+47.20%，无锡微研模具国际业务同比+122%，北美市场上半年订单已与2025全年持平；经营现金流同比+55.51%。"],
-      "key_validation_metric": "海外订单转收入、Q3净利润同比/环比、项目验收节奏、经营现金流。",
-      "invalidation_condition": "Q3利润修复失败、海外订单不能转化为收入，或订单增长伴随毛利率显著恶化。",
-      "industry_t2_tag": "待低风险榜主流程校验（专用设备/出口订单）",
-      "source_summary": "2026-08-27/28宁波精达半年报及证券时报公开报道；当前仍按‘拐点候选’而非已确认高增长处理。"
+      "earnings_direction": "up",
+      "earnings_driver": "利基DRAM、SLC NAND、NOR Flash供给紧张与价格上行，叠加下半年新产品量产。",
+      "evidence": [
+        "公司预计DRAM价格下半年延续温和上涨，SLC NAND景气至少延续2027年；H1扣非净利润同比约+797%。"
+      ],
+      "key_validation_metric": "利基DRAM/SLC NAND价格、扣非利润、晶圆供给、H2新项目量产。",
+      "invalidation_condition": "利基存储价格快速回落、下游需求明显被高价抑制或晶圆供给约束出货。",
+      "industry_t2_tag": [
+        "weekly_only"
+      ],
+      "source_summary": "2026-08-30 full-market weekly deep review after independent T2 freeze",
+      "forward_bridge": "H1存储业务量价齐升 → 公司8月判断DRAM下半年仍温和上涨、SLC NAND景气至少延续至2027年，部分定制存储项目H2量产 → Q3/Q4核心经营利润继续增长。",
+      "one_off_profit_impact": "H1归母利润包含较大证券投资公允价值收益；估值与盈利判断必须以扣非/核心经营利润为主。",
+      "sources": [
+        "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12502918&stockid=603986",
+        "https://finance.sina.com.cn/jjxw/2026-08-24/doc-inipmsvq2756565.shtml"
+      ]
+    },
+    {
+      "code": "601991",
+      "name": "大唐发电",
+      "first_added_date": "2026-08-29",
+      "last_review_date": "2026-08-30",
+      "status": "移除",
+      "earnings_direction": "向上但斜率放缓",
+      "earnings_driver": "上网电量增长、清洁能源和水电/燃机增量以及融资成本下降共同支撑利润，估值仍处低位区间。",
+      "evidence": [
+        "2026H1营收同比+2.14%，归母净利润同比+20.31%，扣非净利润同比+21.21%。",
+        "H1上网电量同比+4.42%，其中燃机+16.79%、水电+17.05%；综合融资成本2.28%，同比下降15个基点。"
+      ],
+      "key_validation_metric": "上网电量、煤电燃料成本、市场化电价、融资成本及Q3利润增速。",
+      "invalidation_condition": "煤价/燃料成本快速上行且电价无法传导，或发电量转负并使利润增速继续快速下滑。",
+      "industry_t2_tag": "待低风险榜主流程校验（电力公用事业）",
+      "source_summary": "2026-08-28半年报、2026-07-21上网电量公告；8月28日TTM市盈率约13.1倍。",
+      "removal_reason": "H1利润同比增长但Q2环比转弱，本轮未验证到未来1-2季度公司级盈利继续上行的独立桥接证据；按规则移出正式周度池。"
     }
-  ],
-  "removed_since_previous_scan": [],
-  "scan_audit": {
-    "method": "先按最新财报/业绩预告、订单、产销、价格/利润率、产能与客户需求等信号做全市场轻量宽召回，再对召回项验证未来1-2季度盈利链条；仅在候选形成后用GitHub行情桥做粗定价/位置检查。",
-    "representative_rejections": [
-      {"code": "002636", "name": "金安国纪", "reason": "盈利与订单很强，但股价年内涨幅极大且估值偏高，市场已高度交易该逻辑；不符合补漏池的低风险研究定位。"},
-      {"code": "000636", "name": "风华高科", "reason": "盈利加速成立，但8月28日TTM市盈率约156倍，定价明显偏高，先不纳入。"},
-      {"code": "002384", "name": "东山精密", "reason": "AI相关盈利增长强，但估值已处高位，未来改善被市场大幅交易，留给T2主流程而非周度补漏池。"},
-      {"code": "002074", "name": "国轩高科", "reason": "H1归母利润高增主要受非经常性损益影响，扣非利润规模相对较小，不满足利润质量优先原则。"},
-      {"code": "001309", "name": "德明利", "reason": "收入利润高速增长，但经营现金流大幅为负且杠杆较高，暂未通过基本面质量门槛。"},
-      {"code": "001287", "name": "中电港", "reason": "利润增长较快但经营现金流大幅流出，当前盈利质量与资金占用风险未通过初筛。"},
-      {"code": "000725", "name": "京东方A", "reason": "H1利润改善，但7月面板价格/需求领先变量已有走弱信号，未来1-2季度方向尚不足以确认。"}
-    ],
-    "note": "representative_rejections为审计样本，不代表宽召回阶段的完整淘汰名单。"
-  },
-  "notes": "2026-08-29完成首次一次性初始化扫描，使用截至2026-08-29可得公开基本面信息与截至2026-08-28收盘的GitHub行情桥数据。后续每周五18:00重扫并做状态迁移；周一至周四及每日06:00仅读取/增量验证，不做全市场重扫。",
-  "candidate_count": 10
+  ]
 }
