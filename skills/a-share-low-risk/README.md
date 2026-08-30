@@ -1,29 +1,35 @@
-# A股低风险研究 Skills
+# A股低风险研究 V2 Skills
 
-这套目录把原来的长 Prompt 拆成可版本化的研究能力。
+V2重新对齐最初Prompt的内核：**从正在改善的细分盈利驱动中，寻找未来1–2季度仍有兑现预期、但股价尚未充分定价的公司；最优机会通常是“基本面已拐、价格刚启势”。**
 
-## 核心原则
-- **Registry决定必须研究什么**：`config/industry_scan_universe.json` 防止行业/产业链因注意力漂移被漏掉。
-- **Skill决定怎么研究**：不同阶段有独立输入、输出和禁止事项。
-- **持久化Registry记住公司映射**：`data/research/company_industry_registry.json` 防止已验证公司因为下一次模型没想起来而消失。
-- **Validator决定能不能继续**：`scripts/validate_research_pipeline.py` 对覆盖与阶段顺序做硬验收，失败应停止后续正式榜单。
-- **LLM只做判断，不负责凭记忆枚举全集**。
+## V2宪法
+1. 先找盈利改善，不先找技术形态。
+2. 研究单位是细分“盈利驱动链”，不是宽泛行业，也不是T1/T2等级。
+3. 召回要宽，淘汰要晚；公司级盈利验证才是真正筛选。
+4. 估值用于判断“贵/合理/便宜”，禁止重复折价和虚假精度。
+5. 右侧价格结构必须全市场独立扫描，不能受左侧候选池限制。
+6. 最优机会优先寻找“盈利改善明确 + 预期差仍大 + 股价刚启势”。
+7. Validator首先检查经济合理性，其次才检查程序完整性。
 
-## Skills
-1. `orchestrator`：阶段编排与信息隔离。
-2. `industry-scan`：逐Registry细分链判断T0/T1/T2。
-3. `t2-company-recall`：Registry优先、逐价值链环节召回公司并持久化。
-4. `earnings-validation`：未来1–2季度盈利验证。
-5. `cycle-valuation`：商品/价差 → 盈利 → 估值。
-6. `technical-structure`：最新完整K线 → 多周期第一压力 → R:R。
+## 核心 Skills（4+1）
+1. `orchestrator`：仅负责数据版本、阶段顺序、失败隔离与发布；不参与股票判断。
+2. `earnings-driver-scan`：识别制冷剂、MDI、AI服务器、高端PCB、重卡更新等具体盈利驱动。
+3. `company-research`：驱动暴露 + 盈利异常 + 周度宽召回，并验证未来1–2季度盈利Bridge。
+4. `price-expectation-gap`：估值交叉锚 + 全市场独立价格结构 + 预期差状态。
+5. `opportunity-ranking`：输出 LEFT_WATCH / WAIT_BREAKOUT / PRIORITY_INFLECTION / RIGHT_PARTICIPATE / WAIT_PULLBACK / REJECT。
 
-## Validator
-示例：
+## 不再作为V2业务Skill的旧模块
+以下旧目录只属于V1历史实现，不再出现在V2 Manifest：
+- industry-scan
+- t2-company-recall
+- weekly-opportunity-scan
+- earnings-validation
+- fundamental-valuation
+- cycle-valuation
+- technical-structure
+- final-selection
 
-```bash
-python scripts/validate_research_pipeline.py industry-scan data/research/pipeline/industry_scan.json
-python scripts/validate_research_pipeline.py t2-recall data/research/pipeline/t2_company_recall.json --industry-scan data/research/pipeline/industry_scan.json
-python scripts/validate_research_pipeline.py stage-order data/research/pipeline/run_state.json
-```
+其中行情历史、周度全市场扫描、公司索引/Registry等**数据资产继续复用**，只是它们不再拥有独立的选股哲学。
 
-Validator返回非零退出码时，不应继续正式核心榜/Top3。
+## Shadow原则
+V2在黄金测试集和历史回放通过之前，只写 `data/research/v2/*`，不得覆盖V1正式产物。V1当前结果保留作对照，但不再作为V2规则设计依据。
