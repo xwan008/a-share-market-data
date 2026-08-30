@@ -14,6 +14,7 @@ RANK=ROOT/'data/research/v2/opportunity_ranking.json'
 
 def load(p): return json.loads(p.read_text(encoding='utf-8'))
 def vr(v): return isinstance(v,list) and len(v)==2 and all(isinstance(x,(int,float)) for x in v) and v[0]>0 and v[1]>=v[0]
+def nondeg(v): return vr(v) and v[1]>v[0] and (v[1]/v[0]-1)*100>=0.99
 
 def main():
     errors=[]; outputs=(DRIVERS,COMPANY,VALUATION,ANCHORS,PRICE,GAP,RANK)
@@ -46,13 +47,17 @@ def main():
         if row.get('status')=='available' and (n!=1 or not vr(row.get('reference_range'))): errors.append(f'invalid_first_anchor:{code}')
         if row.get('status')!='available' and n!=0: errors.append(f'review_reference_with_nonzero_anchor:{code}:{n}')
     for code,row in arows.items():
-        ready=bool(row.get('formal_buy_zone_ready')); n=int(row.get('independent_anchor_count') or 0)
+        ready=bool(row.get('formal_buy_zone_ready')); n=int(row.get('independent_anchor_count') or 0); status=row.get('status')
         if ready:
             safe=row.get('safe_buy_range'); reasonable=row.get('reasonable_buy_range')
-            if n<2: errors.append(f'formal_zone_without_two_anchors:{code}:{n}')
-            if not vr(safe) or not vr(reasonable): errors.append(f'invalid_formal_zone_range:{code}')
-            elif safe[1]>reasonable[1] or safe[0]>reasonable[0]: errors.append(f'zone_order_invalid:{code}:{safe}:{reasonable}')
-        if row.get('status')=='valuation_divergence' and ready: errors.append(f'divergence_cannot_publish_zone:{code}')
+            if n<2: errors.append(f'formal_zone_without_two_confirming_anchors:{code}:{n}')
+            if not nondeg(safe) or not nondeg(reasonable): errors.append(f'formal_zone_degenerate_or_invalid:{code}:{safe}:{reasonable}')
+            elif safe[1]>reasonable[0]+1e-9: errors.append(f'zone_overlap_order_invalid:{code}:{safe}:{reasonable}')
+            if status!='valid': errors.append(f'formal_zone_with_nonvalid_status:{code}:{status}')
+        if status in {'valuation_divergence','fundamental_history_divergence','insufficient_confirming_anchors','nondegenerate_buy_zone_required'} and ready:
+            errors.append(f'blocked_anchor_state_cannot_publish_zone:{code}:{status}')
+        if row.get('peer_confirmed') and not row.get('peer_anchor'): errors.append(f'peer_confirmed_without_peer_anchor:{code}')
+        if row.get('history_confirmed') and not row.get('history_cost_anchor'): errors.append(f'history_confirmed_without_history:{code}')
     for code,row in grows.items():
         ar=arows.get(code) or {}; n=int(row.get('independent_v2_anchor_count') or 0); expected=int(ar.get('independent_anchor_count') or 0)
         if n!=expected: errors.append(f'gap_anchor_count_mismatch:{code}:{n}!={expected}')
@@ -70,7 +75,7 @@ def main():
         if cr.get('risk_warning'): errors.append(f'risk_warning_in_shadow_top3:{code}')
     for x in r.get('production_top3') or []:
         if not x.get('production_publish_eligible') or not x.get('formal_buy_zone'): errors.append(f'production_top3_without_complete_gate:{x.get("code")}')
-    status='PASS' if not errors else 'FAIL'
-    print(json.dumps({'status':status,'errors':errors,'counts':{'active_drivers':len(active),'company_recall':len(cmap),'research_pass':len(c.get('research_pass_codes') or []),'valuation_queue':len(selected),'first_anchor_available':v.get('available_count'),'formal_buy_zone_ready':(a.get('counts') or {}).get('formal_zone_ready'),'valuation_divergence':(a.get('counts') or {}).get('valuation_divergence'),'ranked':len(ranked),'shadow_top3':len(r.get('shadow_top3') or []),'production_top3':len(r.get('production_top3') or [])}},ensure_ascii=False,indent=2)); return 0 if not errors else 2
+    status='PASS' if not errors else 'FAIL'; ac=a.get('counts') or {}
+    print(json.dumps({'status':status,'errors':errors,'counts':{'active_drivers':len(active),'company_recall':len(cmap),'research_pass':len(c.get('research_pass_codes') or []),'valuation_queue':len(selected),'first_anchor_available':v.get('available_count'),'financial_pb_fallback_repaired':v.get('financial_pb_fallback_repaired_count',0),'formal_buy_zone_ready':ac.get('formal_zone_ready'),'valuation_divergence':ac.get('valuation_divergence'),'fundamental_history_divergence':ac.get('fundamental_history_divergence'),'insufficient_confirming_anchors':ac.get('insufficient_confirming_anchors'),'ranked':len(ranked),'shadow_top3':len(r.get('shadow_top3') or []),'production_top3':len(r.get('production_top3') or [])}},ensure_ascii=False,indent=2)); return 0 if not errors else 2
 
 if __name__=='__main__': raise SystemExit(main())
