@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 
 MAIN_BOARD_PREFIXES = ("600", "601", "603", "605", "000", "001", "002", "003")
@@ -44,6 +44,15 @@ def parse_iso(value: object) -> datetime | None:
         return None
     try:
         return datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+
+def parse_day(value: object) -> date | None:
+    if not value:
+        return None
+    try:
+        return date.fromisoformat(str(value)[:10])
     except ValueError:
         return None
 
@@ -141,11 +150,23 @@ def validate_cycle_valuation(output: dict) -> list[str]:
     declared = {normalize_code(x) for x in output.get("cycle_codes", [])}
     require(seen == declared, f"cycle_declared_codes_mismatch:seen={sorted(seen)}:declared={sorted(declared)}", errors)
     anchor_errors = output.get("anchor_errors", {}) if isinstance(output.get("anchor_errors"), dict) else {}
+    reference_day = parse_day(output.get("reference_trade_date"))
+    max_age = output.get("max_anchor_age_days")
+    require(reference_day is not None, "cycle_missing_reference_trade_date", errors)
+    require(isinstance(max_age, int) and 0 <= max_age <= 14, f"cycle_invalid_max_anchor_age_days:{max_age}", errors)
     for row in output.get("companies", []) if isinstance(output.get("companies"), list) else []:
         code = normalize_code(row.get("code"))
         tag = row.get("cycle_tag")
         if row.get("valuation_status") == "valid":
-            require(bool(row.get("commodity_anchors")), f"cycle_valid_without_anchors:{code}", errors)
+            anchors = row.get("commodity_anchors")
+            require(bool(anchors), f"cycle_valid_without_anchors:{code}", errors)
+            if isinstance(anchors, list) and reference_day is not None and isinstance(max_age, int):
+                for anchor in anchors:
+                    anchor_day = parse_day(anchor.get("last_date")) if isinstance(anchor, dict) else None
+                    require(anchor_day is not None, f"cycle_anchor_missing_date:{code}:{anchor}", errors)
+                    if anchor_day is not None:
+                        age = (reference_day - anchor_day).days
+                        require(-1 <= age <= max_age, f"cycle_stale_anchor:{code}:{anchor.get('symbol')}:{anchor_day}:age={age}", errors)
             factors = row.get("bear_base_bull_anchor_factor")
             earnings = row.get("bear_base_bull_forward_eps")
             require(isinstance(factors, list) and len(factors) == 3, f"cycle_missing_scenarios:{code}", errors)
