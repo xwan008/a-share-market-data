@@ -66,6 +66,10 @@ def validate_conditional_t1_rows(recall: dict, scan: dict, registry: dict, compa
     errors: list[str] = []
     statuses = status_map(scan)
     rows = recall.get("t2_subchains", [])
+    all_rows = {
+        (row.get("broad_industry_id"), row.get("subchain")): row
+        for row in rows
+    }
     actual_t1: dict[tuple[str, str], dict] = {}
 
     for row in rows:
@@ -81,6 +85,32 @@ def validate_conditional_t1_rows(recall: dict, scan: dict, registry: dict, compa
             errors.append(f"conditional_t1_bad_recall_mode:{key}:{row.get('recall_mode')}")
 
     expected_t1 = {key for key, status in statuses.items() if status == "T1"}
+
+    raw_delegated = recall.get("t1_delegated_coverage", [])
+    if not isinstance(raw_delegated, list):
+        errors.append("t1_delegated_coverage_not_list")
+        raw_delegated = []
+    delegated: set[tuple[str, str]] = set()
+    for item in raw_delegated:
+        if not isinstance(item, dict):
+            errors.append(f"invalid_t1_delegated_coverage:{item}")
+            continue
+        key = (item.get("broad_industry_id"), item.get("subchain"))
+        target = (item.get("delegate_broad_industry_id"), item.get("delegate_subchain"))
+        if key in delegated:
+            errors.append(f"duplicate_t1_delegated_coverage:{key}")
+        delegated.add(key)
+        if statuses.get(key) != "T1":
+            errors.append(f"t1_delegation_not_current_t1:{key}:{statuses.get(key)}")
+        if item.get("coverage_mode") != "delegated_to_more_specific_chain":
+            errors.append(f"t1_delegation_bad_mode:{key}:{item.get('coverage_mode')}")
+        if statuses.get(target) not in {"T1", "T2"}:
+            errors.append(f"t1_delegation_target_not_active:{key}->{target}:{statuses.get(target)}")
+        if target not in all_rows:
+            errors.append(f"t1_delegation_target_not_recalled:{key}->{target}")
+        if not item.get("reason") or not item.get("residual_policy"):
+            errors.append(f"t1_delegation_missing_rationale:{key}")
+
     raw_gaps = recall.get("t1_rule_coverage_gaps", [])
     if not isinstance(raw_gaps, list):
         errors.append("t1_rule_coverage_gaps_not_list")
@@ -97,11 +127,20 @@ def validate_conditional_t1_rows(recall: dict, scan: dict, registry: dict, compa
         if statuses.get(key) != "T1":
             errors.append(f"t1_rule_gap_not_current_t1:{key}:{statuses.get(key)}")
 
-    if set(actual_t1) & gaps:
-        errors.append(f"t1_chain_both_recalled_and_gap:{sorted(set(actual_t1) & gaps)}")
-    if set(actual_t1) | gaps != expected_t1:
+    if gaps:
+        errors.append(f"t1_recall_rule_coverage_incomplete:{sorted(gaps)}")
+
+    actual_keys = set(actual_t1)
+    if actual_keys & delegated:
+        errors.append(f"t1_chain_both_recalled_and_delegated:{sorted(actual_keys & delegated)}")
+    if actual_keys & gaps:
+        errors.append(f"t1_chain_both_recalled_and_gap:{sorted(actual_keys & gaps)}")
+    if delegated & gaps:
+        errors.append(f"t1_chain_both_delegated_and_gap:{sorted(delegated & gaps)}")
+    covered = actual_keys | delegated | gaps
+    if covered != expected_t1:
         errors.append(
-            f"t1_recall_audit_not_closed:missing={sorted(expected_t1-(set(actual_t1)|gaps))}:extra={sorted((set(actual_t1)|gaps)-expected_t1)}"
+            f"t1_recall_audit_not_closed:missing={sorted(expected_t1-covered)}:extra={sorted(covered-expected_t1)}"
         )
 
     for key, row in actual_t1.items():
@@ -201,8 +240,6 @@ def main() -> int:
         if invalid_rows:
             errors.append(f"recall_contains_non_t1_t2_subchains:{invalid_rows}")
 
-        # Preserve the legacy strict T2 validator by projecting the broadened recall
-        # back to its mandatory T2 subset. T1 rows are validated separately below.
         t2_only = copy.deepcopy(recall)
         t2_only["t2_subchains"] = [
             row for row in recall.get("t2_subchains", [])
@@ -217,9 +254,9 @@ def main() -> int:
             load_json(args.universe),
         ))
         errors.extend(validate_conditional_t1_rows(recall, scan, registry, company_index))
-        return print_result("t2-recall-v3", errors)
+        return print_result("t2-recall-v4", errors)
     except ValidationError as exc:
-        return print_result("t2-recall-v3", [str(exc)])
+        return print_result("t2-recall-v4", [str(exc)])
 
 
 if __name__ == "__main__":
