@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "as_of": "2026-08-30",
-  "principle": "Rules classify mechanically enumerated company universes. T2 chains are direct recall; T1 chains are conditional recall and require stricter company-level earnings confirmation. Rules never promote industry status.",
+  "principle": "Rules classify mechanically enumerated company universes. T2 chains are direct recall; T1 chains are conditional recall and require stricter company-level earnings confirmation. Rules never promote industry status. unconfirmed chains are reviewed through a reverse-trigger audit when company-level earnings are unusually strong.",
   "chains": [
     {"broad_industry_id":"chemicals","subchain":"氟化工","value_chain_link":"制冷剂/含氟材料","hierarchy_keywords":["氟化工","氟化物","制冷剂"],"explicit_exposed":["600160","603379","605020","600378","600673","002407","002915"],"search_queries":["氟制冷剂 A股 上市公司 HFC 配额 2026"],"evidence_sources":["https://finance.sina.com.cn/wm/2026-07-16/doc-inihzfcy1392041.shtml"]},
     {"broad_industry_id":"chemicals","subchain":"氨纶","value_chain_link":"氨纶纤维","hierarchy_keywords":["氨纶"],"explicit_exposed":["002064","000949"],"search_queries":["氨纶 A股 上市公司 华峰化学 新乡化纤 2026"],"evidence_sources":["https://www.huafeng.com/investor.html","2026H1 company public earnings disclosures"]},
@@ -20,5 +20,9 @@
     {"broad_industry_id":"coal","subchain":"焦煤","value_chain_link":"焦煤开采/洗选","hierarchy_keywords":["焦煤"],"explicit_exposed":[],"search_queries":["焦煤 A股 上市公司 2026"],"evidence_sources":["CNINFO SW industry classification: 焦煤"]},
     {"broad_industry_id":"nonbank_finance","subchain":"证券","value_chain_link":"证券经纪/信用/投行/自营","hierarchy_keywords":["证券"],"explicit_exposed":[],"search_queries":["证券 A股 上市券商 2026"],"evidence_sources":["CNINFO SW industry classification: 证券"]},
     {"broad_industry_id":"nonbank_finance","subchain":"保险","value_chain_link":"寿险/财险","hierarchy_keywords":["保险"],"explicit_exposed":["000627"],"search_queries":["保险 A股 上市保险公司 2026"],"evidence_sources":["CNINFO SW/company insurance business disclosures"]}
+  ],
+  "unconfirmed_reverse_trigger_rules": [
+    {"broad_industry_id":"chemicals","subchain":"C2/C3轻烃","value_chain_link":"乙烷裂解/乙烯/丙烯酸及下游材料","hierarchy_keywords":["其他化学原料"],"explicit_exposed":["002648"],"trigger_company_codes":["002648"],"review_variables":["乙烷/原油相对成本","乙烯-乙烷价差","丙烯酸及酯价差","聚乙烯价差","装置开工率","库存和下游需求"],"evidence_sources":["CNINFO/company annual and interim reports: C2/C3 integrated light-hydrocarbon chain exposure"]},
+    {"broad_industry_id":"chemicals","subchain":"煤化工","value_chain_link":"煤制甲醇/醋酸/烯烃等煤化工产品","hierarchy_keywords":["煤化工"],"explicit_exposed":["000830","000990","002274","600623","600722","600746","600844","600989"],"trigger_company_codes":["600722"],"review_variables":["煤炭成本","甲醇/醋酸/烯烃价格与价差","装置开工率","库存","下游需求"],"evidence_sources":["CNINFO SW/company business classification: 煤化工"]}
   ]
 }
