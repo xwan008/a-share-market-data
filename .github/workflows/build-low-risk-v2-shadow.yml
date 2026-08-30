@@ -7,15 +7,13 @@ on:
     paths:
       - 'skills/a-share-low-risk/**'
       - 'config/research_pipeline_manifest.json'
-      - 'config/low_risk_v2_golden_tests.json'
       - 'scripts/build_v2_earnings_anomaly_recall.py'
       - 'scripts/build_v2_full_market_price_structure.py'
       - 'scripts/validate_v2_blueprint.py'
       - '.github/workflows/build-low-risk-v2-shadow.yml'
   schedule:
     # update-market runs at 16:10 and 16:30 Beijing time. Run V2 mechanical
-    # shadow scans after those closed-session refreshes; bot data commits do
-    # not reliably trigger downstream GitHub Actions workflows.
+    # shadow scans after those closed-session refreshes.
     - cron: '50 16 * * 1-5'
       timezone: 'Asia/Shanghai'
 
@@ -50,15 +48,13 @@ jobs:
         run: python scripts/build_v2_earnings_anomaly_recall.py
       - name: Build independent full-market price structure
         run: python scripts/build_v2_full_market_price_structure.py
-      - name: Validate V2 blueprint and golden invariants
+      - name: Validate V2 case-free invariants
         run: python scripts/validate_v2_blueprint.py
-      - name: Print golden right-side diagnostic
+      - name: Print market-wide structure summary
         run: |
           python - <<'PY'
           import json
           p=json.load(open('data/research/v2/full_market_price_structure.json',encoding='utf-8'))
-          for code in ['601138']:
-              print(json.dumps(p.get('companies',{}).get(code),ensure_ascii=False,indent=2))
           print(json.dumps({
             'universe_count':p.get('universe_count'),
             'verified_count':p.get('verified_count'),
