@@ -1,5 +1,5 @@
 {
-  "schema_version": 5,
+  "schema_version": 6,
   "pipeline": "a_share_low_risk",
   "authoritative_files": {
     "orchestrator_skill": "skills/a-share-low-risk/orchestrator/SKILL.md",
@@ -11,13 +11,18 @@
     "cycle_regime_registry": "config/cycle_regime_registry.json",
     "weekly_pool": "data/research/weekly_fundamental_opportunity_pool.json",
     "market_health": "data/health.json",
-    "backfill_status": "data/backfill_status.json"
+    "backfill_status": "data/backfill_status.json",
+    "bounded_history_store": "data/history_shards/*.json"
   },
   "maintenance": {
     "company_index_builder": "scripts/build_company_industry_index.py",
     "company_index_workflow": ".github/workflows/build-company-industry-index.yml",
     "valuation_workflow": ".github/workflows/build-forward-valuation.yml",
-    "company_index_dependency_file": "requirements-research.txt"
+    "company_index_dependency_file": "requirements-research.txt",
+    "history_store": "scripts/history_store.py",
+    "history_backfill": "scripts/backfill_history.py",
+    "history_backfill_workflow": ".github/workflows/backfill-history.yml",
+    "history_policy": "full-market OHLCV is bounded to 180 completed sessions per stock; weekly refresh may fetch ~252 sessions only to rebuild compact 52-week summary and then discards those extra rows"
   },
   "stages": [
     {"id":"company_index_health","input":"data/research/company_industry_index.json","validator":"python scripts/validate_research_pipeline.py company-index data/research/company_industry_index.json","failure_policy":"do_not_silently_drop_missing_or_unmapped_codes; pass them into every T2 chain as unknown candidates"},
@@ -30,12 +35,13 @@
     {"id":"left_value_cycle","requires":["earnings_validation"],"skill":"skills/a-share-low-risk/cycle-valuation/SKILL.md","policy":"config/cycle_valuation_policy.json","cycle_regime":"config/cycle_regime_registry.json","runner":"python scripts/build_cycle_valuation.py","output":"data/research/pipeline/cycle_valuation.json","validator":"python scripts/validate_research_outputs.py cycle-valuation data/research/pipeline/cycle_valuation.json"},
     {"id":"valuation_policy_audit","requires":["left_value_fundamental","left_value_cycle"],"runner":"python scripts/build_valuation_policy_audit.py","output":"data/research/pipeline/valuation_policy_audit.json","validator":"python scripts/validate_research_outputs.py valuation-policy-audit data/research/pipeline/valuation_policy_audit.json","failure_policy":"unsupported_policy_count_must_equal_zero; common_pool_coverage_must_equal_100_percent"},
     {"id":"left_value_merge","requires":["left_value_fundamental","left_value_cycle","valuation_policy_audit"],"runner":"python scripts/merge_left_valuation.py","output":"data/research/pipeline/left_valuation_scan.json","validator":"python scripts/validate_research_outputs.py left-valuation data/research/pipeline/left_valuation_scan.json"},
-    {"id":"right_structure","requires":["earnings_validation"],"skill":"skills/a-share-low-risk/technical-structure/SKILL.md","output":"data/research/pipeline/right_structure_scan.json"},
+    {"id":"right_structure","requires":["earnings_validation"],"skill":"skills/a-share-low-risk/technical-structure/SKILL.md","runner":"python scripts/build_candidate_structure_260d.py","history":"data/history_shards/*.json","output":"data/research/pipeline/right_structure_scan.json","data_policy":"read local bounded 180-session history; use last 120 sessions as core structure window and compact fresh 52-week summary for older pressure; do not make per-candidate live 300-day fetches"},
     {"id":"final_selection","requires":["left_value_merge","right_structure"],"skill":"skills/a-share-low-risk/final-selection/SKILL.md","output":"data/research/pipeline/final_selection.json","validator":"python scripts/validate_research_outputs.py final-selection data/research/pipeline/final_selection.json"}
   ],
   "hard_stop_on_validator_failure": true,
   "weekly_pool_forbidden_before_stage": "weekly_opportunity_scan",
   "recall_principle": "LLM classifies mechanically enumerated industries and companies; it does not recall the research universe from memory",
   "valuation_principle": "Every non-cycle candidate must map to a versioned PE/PB/other valuation policy; unsupported_policy=0 is a hard gate. Financial PB-ROE uses reported BVPS from financial statements rather than requiring a fragile real-time PB feed. Resource cycle valuation must use current+next-year earnings, a reviewed 6-18m cycle regime and fresh commodity/cost anchors. Peak earnings and short-term commodity strength cannot be capitalized alone.",
+  "right_structure_principle": "Broad market structure and final candidate structure share one bounded local data store. Keep 180 full sessions per stock, derive 5/20/60 breadth views from it, use 120 sessions as the core candidate structure window, and retain only compact 52-week summary fields beyond 180 sessions. History storage rolls forward daily and never grows without bound.",
   "selection_principle": "final selection only selects validated upstream outputs; it never repairs upstream calculations"
 }
