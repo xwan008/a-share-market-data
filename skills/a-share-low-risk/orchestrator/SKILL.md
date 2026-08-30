@@ -1,80 +1,93 @@
-# A股低风险研究编排 Skill
+# A股低风险研究 V2 编排 Skill
 
 ## 目标
-把低风险榜从“一个长提示词自由展开”改为有固定输入、阶段产物和硬验收的研究流水线。模型只判断由 Registry/公司全集机械枚举出的对象，不负责凭注意力想起行业、产业链或公司；最终选择也不得绕过上游产物自行拍板。
+V2只做一件事：从正在改善的细分盈利驱动中，找到未来1–2季度仍有兑现逻辑、但股价尚未充分定价的公司，并识别“未启动 / 初启 / 趋势确认 / 过热”状态。
+
+核心内核：
+1. 先找盈利改善，而不是先找形态。
+2. 研究单位是“盈利驱动链”，不是宽泛行业，也不是T1/T2等级。
+3. 找盈利改善速度与股价定价速度之间的预期差。
+4. 最好的机会通常是“基本面已拐、价格刚启势”，而不是极端便宜或已经大涨。
 
 ## 唯一编排入口
-先读取 `config/research_pipeline_manifest.json`。Manifest列出的 Registry、Skill、Validator 和阶段顺序是权威流程；不得根据聊天上下文临时改写召回范围、估值方法或最终选择标准。
+先读取 `config/research_pipeline_manifest.json`。V2业务Skill只保留：
+- `earnings-driver-scan`
+- `company-research`
+- `price-expectation-gap`
+- `opportunity-ranking`
 
-## 固定输入
-- `config/industry_scan_universe.json`：产业最小覆盖全集。
-- `data/research/company_industry_index.json`：全主板公司机械行业索引；缺失/未映射代码不能静默排除。
-- `data/research/company_industry_registry.json`：已验证公司-细分链持久映射。
-- `data/health.json`、`data/backfill_status.json`：行情/历史数据健康。
-- `data/research/weekly_fundamental_opportunity_pool.json`：只有主产业流程冻结后才能读取/更新。
-- 各阶段 Skill：`industry-scan`、`t2-company-recall`、`weekly-opportunity-scan`、`earnings-validation`、`fundamental-valuation`、`cycle-valuation`、`technical-structure`、`final-selection`。
+Orchestrator只负责数据版本、阶段顺序、失败隔离和产物发布，不参与股票价值判断。
 
 ## 固定阶段
-0. `COMPANY_INDEX_HEALTH`
-   - 读取公司行业索引并校验完整性。
-   - 索引缺失/未映射主板代码不直接淘汰；在每条T2链分类时作为未知候选强制评估。
-1. `INDUSTRY_SCAN`
-   - 严禁读取周度盈利池。
-   - Registry机械枚举全部大行业和 minimum_subchain；逐项输出T0/T1/T2/unconfirmed/not_applicable。
-   - 输出 `industry_scan.json`，Validator FAIL 则停止正式主流程。
-2. `T2_RECALL`
-   - 仅对已验证T2链执行。
-   - company index + active registry + index未知代码机械生成候选全集；逐公司 exposed/not_exposed/uncertain，并执行跨行业第二业务检索。
-   - 输出 `t2_company_recall.json`；候选未100%分类或覆盖不闭合则停止。
-3. `WEEKLY_OPPORTUNITY_SCAN`
-   - 只有前两阶段 PASS 后才允许读取旧周度池。
-   - 周五18:00：从主板全集机械枚举，做轻量宽召回，再对 pass/uncertain 深验未来1–2季度盈利，状态迁移后更新周度池。
-   - 非周五18:00：只读取最近已验证周度池，不重建。
-   - 周度池只补公司，永不修改产业状态。
-4. `STAGE_ORDER`
-   - 记录并验证 industry freeze、T2 recall freeze、weekly read 的时间顺序；提前读取周度池使本次运行 INVALID。
-5. `EARNINGS_VALIDATION`
-   - 合并 T2召回池 ∪ 周度池并数量闭合后，对每家公司逐只验证未来1–2季度盈利链。
-   - 对同一T2直接盈利驱动做代表性压缩，避免证券、电解铝等整条链批量灌入正式共同池。
-   - 禁止用估值/股价/技术条件提前淘汰。
-6. `LEFT_VALUE`
-   - 非周期公司调用 `fundamental-valuation`：2026前瞻盈利主锚 → 公司级低风险PE/PB → 价值锚 → 当前价格位置。
-   - 周期/资源公司调用 `cycle-valuation`：可靠商品序列存在时做中性商品/成本正常化；缺稳定机器商品序列时使用“2026 EPS主锚 + 2027下行约束 + 周期结构折价”的保守模式；两种模式都必须经过6–18个月周期Registry和180日价格校准。
-   - 两类输出都必须可追溯；单股数据确实不可得就显式 unavailable，不能猜。
-7. `VALUATION_COVERAGE_HEALTH`
-   - 生成 `t2_valuation_coverage_audit.json`，逐条T2链统计正式估值覆盖率和不可用原因。
-   - 如果某条进入共同池的T2链因为模型缺失、机器锚失效或周期Registry缺失而**0家可正式估值**，本次正式左侧流程硬失败。
-   - 一致预期覆盖不足属于数据覆盖警告，不允许用TTM PE或H1简单年化补数，也不允许解释成“该板块没有机会”。
-8. `RIGHT_STRUCTURE`
-   - 使用覆盖最近完整交易日的数据。
-   - 结构 → 多周期压力地图 → 第一有效压力 → 上行空间 → 失效点 → R:R。
-   - 单股数据缺失只隔离该股。
-9. `FINAL_SELECTION`
-   - 调用 `final-selection`。
-   - 初始交集严格等于 LEFT_SET ∩ RIGHT_SET。
-   - 终审只能从交集中做 core/watch/reject，不能把交集外股票补进核心榜。
-   - Top3只来自core，第一目标原则上>=15%、R:R>=2；允许少于3只或空榜。
-   - 上游 Validator FAIL 时不得生成正式core/Top3。
+### 0. DATA_HEALTH
+- 检查主板股票全集、最新交易日、180日有界OHLCV、财务数据源和公司索引。
+- 数据缺失要显式披露，但不能被解释为“没有机会”。
 
-## 信息隔离
-- `INDUSTRY_SCAN` 与 `T2_RECALL` 冻结前不得读取周度池。
-- 周度池只能补公司，不能新增/升级产业状态。
-- company index/registry只能用于公司召回，不能影响产业T0/T1/T2。
-- 左侧与右侧必须基于同一共同资格池独立计算，不能互相提前过滤。
-- FINAL_SELECTION只选择，不修复上游计算；发现问题必须 `return_to_stage`。
+### 1. EARNINGS_DRIVER_SCAN
+- 从商品价格/价差、订单、出货、库存、开工率、利用率、审批、终端销售、财报等证据中识别正在改善的细分盈利驱动链。
+- 大行业仅用于导航；例如“化工”不能直接成为机会判断单位，必须落到制冷剂、MDI/TDI、氨纶、磷化工等可解释盈利驱动。
+- 输出方向、核心变量、证据、未来1–2季度传导、置信度和失效条件。
+- 置信度只是研究信息，不得直接乘进EPS、PE/PB或买入区。
 
-## 失败原则
-- Registry产业覆盖不完整：停止，不允许宣称全行业扫描完成。
-- T2候选全集未100%分类：对应链 incomplete。
-- 周度主板全集未完成轻量筛选：周度池更新无效，继续使用最近有效版本并报告失败。
-- 非周期正式价值锚缺少前瞻盈利/合理估值桥：单股 valuation unavailable。
-- 周期股缺正式盈利输入：单股 valuation unavailable；禁止TTM PE/H1简单年化替代。
-- 某条T2链因估值引擎结构缺陷整体不可估：全流程硬失败，不能让该板块静默消失。
-- 整体正式估值覆盖率过低或某T2链大量因一致预期缺失不可估：执行健康必须显式警告，最终榜不得被描述为“全市场没有这些机会”。
-- 单股K线不完整：只隔离该股右侧。
-- Final Validator不通过：不发布正式core/Top3。
-- 无合格Top3允许空榜。
+### 2. COMPANY_RESEARCH
+召回来源取并集：
+- 盈利驱动链直接暴露公司；
+- 全市场盈利异常公司；
+- 周度全市场盈利宽召回池。
 
-## 最终产物必须可追溯
-任何公司都必须能回答：
-`它为什么进入机械候选全集/从哪条周度补漏进入 → 为什么判定有/无产业暴露 → 为什么未来盈利成立 → 是否因同链代表性被延期 → 走哪一种估值Skill和估值模式、E和估值怎么得到/为什么暂时不可得 → 所属T2链估值覆盖是否健康 → 右侧第一压力来自哪个周期 → 是否进入严格交集 → 终审在哪一步保留/淘汰`。
+召回宁可稍宽，淘汰必须发生在公司级验证后。每家公司必须回答：
+- 为什么盈利改善；
+- 当前改善是不是主营、扣非、现金流支持，而非一次性收益；
+- 未来1–2季度为什么可能继续；
+- 什么条件会使逻辑失效。
+
+估值前只做轻度代表性压缩：每条盈利驱动链保留约3–5家研究候选，禁止在估值前只留1家。
+
+### 3. PRICE_EXPECTATION_GAP
+同一阶段同时处理“价值是否已透支”和“价格是否开始确认”，但保持两个子判断独立：
+
+A. 价值/预期差：
+- 稳定成长/制造：Forward PE为主，历史PE分位交叉检查；
+- 银行/保险/券商：PB + Forward ROE；
+- 标准商品周期：中性商品价格 → 正常化EPS → PE；
+- 复杂周期制造：PE + PB/历史估值至少两把尺子交叉。
+- 禁止 `EPS haircut × regime haircut × PE haircut × buy-zone haircut` 这类重复折价。
+- 安全区来自多个独立估值锚重叠，不来自统一乘0.8。
+- 输出合理精度即可，禁止制造虚假的小数精度。
+
+B. 价格状态：
+- 对全主板独立扫描，不能只扫描左侧基本面候选。
+- 至少识别 `trend_continuation / breakout / pullback / base_not_started / overheated / damaged`。
+- 创新高或上方无历史压力可以是强结构，不能自动判为缺少压力地图。
+- 第一压力不足10%不能一刀切淘汰突破型机会。
+- 必须单独计算追高风险/乖离风险；趋势强和买点好是两个不同判断。
+
+### 4. OPPORTUNITY_RANKING
+对通过公司盈利研究的候选统一回答：
+- 盈利确定性如何；
+- 预期差还有多少；
+- 股价处于未启动、初启、趋势确认还是过热；
+- 当前动作：左侧关注 / 等突破 / 可参与 / 等回踩 / 放弃。
+
+最终重点机会优先寻找：
+`盈利改善明确 + 未来1–2季度Bridge成立 + 市场尚未充分定价 + 价格刚启势或处于低风险回踩`。
+
+Top3允许少于3只或为空，禁止为了数量降低标准。
+
+## 右侧独立性硬规则
+- 右侧候选宇宙 = 全部主板可用180日历史股票。
+- 左侧公司研究池不能限制右侧扫描。
+- 工业富联这类股票即使不在价值候选里，只要结构满足趋势延续/突破且追高风险可接受，就必须能进入右侧观察/参与集合。
+
+## 经济常识 Validator
+程序完整性通过不代表研究结论合理。V2至少必须拦截：
+- 合理买入区反推PE/PB显著低于公司/行业历史底部，但没有极端盈利恶化证据；
+- 周期股在没有中性盈利证据时被多层折价到极端个位数Forward PE；
+- 多种独立估值方法严重冲突却仍输出正式买点；
+- 右侧因“无上方压力”淘汰创新高强趋势；
+- 右侧因不在左侧共同池而未被扫描。
+
+触发时标记 `sanity_check_failed` 或 `valuation_divergence`，不得发布正式买点。
+
+## 影子运行原则
+V2在黄金测试集与历史回放通过前只输出 shadow 结果，不覆盖V1正式文件。当前V1数据资产保留用于对照，但其T1/T2、anchorless repair、多层折价和共同池限定右侧的决策逻辑不再作为V2权威规则。
