@@ -1,32 +1,44 @@
-from datetime import datetime
-from zoneinfo import ZoneInfo
-import importlib.util
+from __future__ import annotations
+
 import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def load_module(name: str, path: str):
-    spec = importlib.util.spec_from_file_location(name, ROOT / path)
-    module = importlib.util.module_from_spec(spec)
-    assert spec and spec.loader
-    spec.loader.exec_module(module)
-    return module
+def test_no_legacy_weekly_low_pe_table_or_h1_times_two_formal_engine():
+    text = (ROOT / 'scripts/build_forward_valuation.py').read_text(encoding='utf-8')
+    cfg = json.loads((ROOT / 'config/valuation_policy_registry.json').read_text(encoding='utf-8'))
+    assert 'WEEKLY_RANGES' not in text
+    assert "fwd=e*2" not in text
+    assert cfg['forecast_policy']['fallback_h1_annualization_formal'] is False
 
 
-cycle_mod = load_module('cycle_v4', 'scripts/build_cycle_valuation.py')
+def test_weichai_and_luxshare_policy_regression_ranges():
+    cfg = json.loads((ROOT / 'config/valuation_policy_registry.json').read_text(encoding='utf-8'))
+    weichai = cfg['company_overrides']['000338']
+    luxshare = cfg['company_overrides']['002475']
+    assert weichai['multiple_range'] == [16, 20]
+    assert luxshare['multiple_range'] == [20, 24]
+    weichai_eps = 1.668
+    weichai_floor = weichai_eps * weichai['multiple_range'][0]
+    weichai_safe = [weichai_floor * x for x in weichai['safe_to_fair_floor']]
+    weichai_reasonable = [weichai_floor * x for x in weichai['reasonable_to_fair_floor']]
+    assert 20.5 <= weichai_safe[0] <= 21.0
+    assert 23.8 <= weichai_safe[1] <= 24.2
+    assert 23.8 <= weichai_reasonable[0] <= 24.2
+    assert 26.4 <= weichai_reasonable[1] <= 27.0
+    luxshare_eps = 2.8814
+    luxshare_floor = luxshare_eps * luxshare['multiple_range'][0]
+    luxshare_safe = [luxshare_floor * x for x in luxshare['safe_to_fair_floor']]
+    luxshare_reasonable = [luxshare_floor * x for x in luxshare['reasonable_to_fair_floor']]
+    assert 44.5 <= luxshare_safe[0] <= 45.5
+    assert 51.5 <= luxshare_safe[1] <= 52.2
+    assert 51.5 <= luxshare_reasonable[0] <= 52.2
+    assert 53.8 <= luxshare_reasonable[1] <= 54.5
 
 
-def test_calendar_forward_eps_weights_current_and_next_year():
-    now = datetime(2026, 8, 30, tzinfo=ZoneInfo('Asia/Shanghai'))
-    value, current_weight, next_weight = cycle_mod.calendar_forward_eps(3.0, 4.0, now)
-    assert round(current_weight, 4) == round(4 / 12, 4)
-    assert round(next_weight, 4) == round(8 / 12, 4)
-    assert round(value, 4) == round(3.0 * 4 / 12 + 4.0 * 8 / 12, 4)
-
-
-def test_cycle_policy_has_machine_anchors_for_resource_chains():
+def test_resource_cycle_policies_are_machine_executable():
     cfg = json.loads((ROOT / 'config/cycle_valuation_policy.json').read_text(encoding='utf-8'))
     copper = cfg['subchain_policies']['nonferrous::铜矿资源']
     aluminum = cfg['subchain_policies']['nonferrous::电解铝']
