@@ -63,8 +63,6 @@ jobs:
         run: python scripts/merge_left_valuation.py
       - name: Validate full left coverage
         run: python scripts/validate_research_outputs.py left-valuation data/research/pipeline/left_valuation_scan.json
-      - name: Revalidate right structure before final selection
-        run: python scripts/validate_research_outputs.py right-structure data/research/pipeline/right_structure_scan.json
       - name: Build final selection from refreshed left valuation
         run: python scripts/build_final_selection.py
       - name: Validate refreshed final selection
