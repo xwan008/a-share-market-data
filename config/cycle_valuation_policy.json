@@ -1,5 +1,5 @@
 {
-  "schema_version": 5,
+  "schema_version": 6,
   "reviewed_at": "2026-08-30",
   "anchor_series": {
     "CU0": {"name": "沪铜连续", "role": "revenue_price"},
@@ -41,114 +41,74 @@
   },
   "subchain_policies": {
     "nonferrous::铜矿资源": {
-      "valuation_mode": "commodity_anchor_normalized",
-      "requires_regime": true,
-      "requires_next_year_eps": true,
-      "market_price_calibration": true,
-      "anchors": [{"symbol": "CU0", "weight": 1.0, "direction": 1}],
-      "earnings_sensitivity": 0.75,
-      "fallback_multiple_range": [11, 15],
-      "safe_to_fair_floor": [0.75, 0.88],
-      "reasonable_to_fair_floor": [0.88, 1.0]
+      "valuation_mode": "commodity_anchor_normalized", "requires_regime": true, "requires_next_year_eps": true, "market_price_calibration": true,
+      "anchors": [{"symbol": "CU0", "weight": 1.0, "direction": 1}], "earnings_sensitivity": 0.75,
+      "fallback_multiple_range": [11,15], "safe_to_fair_floor": [0.75,0.88], "reasonable_to_fair_floor": [0.88,1.0]
     },
     "nonferrous::电解铝": {
-      "valuation_mode": "commodity_anchor_normalized",
-      "requires_regime": true,
-      "requires_next_year_eps": true,
-      "market_price_calibration": true,
-      "anchors": [
-        {"symbol": "AL0", "weight": 0.7, "direction": 1},
-        {"symbol": "AO0", "weight": 0.3, "direction": -1}
-      ],
-      "earnings_sensitivity": 0.9,
-      "fallback_multiple_range": [8, 11],
-      "safe_to_fair_floor": [0.75, 0.88],
-      "reasonable_to_fair_floor": [0.88, 1.0]
+      "valuation_mode": "commodity_anchor_normalized", "requires_regime": true, "requires_next_year_eps": true, "market_price_calibration": true,
+      "anchors": [{"symbol":"AL0","weight":0.7,"direction":1},{"symbol":"AO0","weight":0.3,"direction":-1}],
+      "earnings_sensitivity":0.9, "fallback_multiple_range":[8,11], "safe_to_fair_floor":[0.75,0.88], "reasonable_to_fair_floor":[0.88,1.0]
+    },
+    "nonferrous::黄金": {
+      "valuation_mode":"commodity_anchor_normalized", "requires_regime":true, "requires_next_year_eps":true, "market_price_calibration":true,
+      "anchors":[{"symbol":"AU0","weight":1.0,"direction":1}], "earnings_sensitivity":0.65,
+      "fallback_multiple_range":[10,14], "safe_to_fair_floor":[0.72,0.85], "reasonable_to_fair_floor":[0.85,0.98],
+      "rationale":"黄金矿企当前盈利高度受金价中枢影响。低风险买点必须先用约两年中性金价归一化一致预期，再叠加6-18个月情景和180日价格校准；金价短期走强不能抬高买点。"
+    },
+    "nonferrous::锂资源/锂盐": {
+      "valuation_mode":"conservative_consensus_cycle", "requires_regime":true, "requires_next_year_eps":true, "market_price_calibration":true,
+      "anchorless_normalization_haircut":0.80, "fallback_multiple_range":[8,12], "safe_to_fair_floor":[0.68,0.82], "reasonable_to_fair_floor":[0.82,0.95],
+      "rationale":"锂资源/锂盐利润对锂价、库存和供给投放高度敏感，且不同矿源成本差异大。缺少统一可靠公司级价差锚时，以2026 EPS主锚、2027下行约束、深度周期折价和180日价格校准处理。"
     },
     "coal::动力煤": {
-      "valuation_mode": "conservative_consensus_cycle",
-      "requires_regime": true,
-      "requires_next_year_eps": true,
-      "market_price_calibration": true,
-      "anchorless_normalization_haircut": 0.90,
-      "fallback_multiple_range": [7, 10],
-      "safe_to_fair_floor": [0.72, 0.85],
-      "reasonable_to_fair_floor": [0.85, 0.98],
-      "rationale": "动力煤连续期货已不能作为可靠低风险机器锚。正式估值改用2026一致预期为主锚、2027只做下行约束，再做周期折价与180日价格校准；不因煤价短期上涨抬高买点。"
+      "valuation_mode":"conservative_consensus_cycle", "requires_regime":true, "requires_next_year_eps":true, "market_price_calibration":true,
+      "anchorless_normalization_haircut":0.90, "fallback_multiple_range":[7,10], "safe_to_fair_floor":[0.72,0.85], "reasonable_to_fair_floor":[0.85,0.98],
+      "rationale":"动力煤连续期货已不能作为可靠低风险机器锚。正式估值改用2026一致预期为主锚、2027只做下行约束，再做周期折价与180日价格校准；不因煤价短期上涨抬高买点。"
     },
     "coal::焦煤": {
-      "valuation_mode": "conservative_consensus_cycle",
-      "requires_regime": true,
-      "requires_next_year_eps": true,
-      "market_price_calibration": true,
-      "anchorless_normalization_haircut": 0.88,
-      "fallback_multiple_range": [6, 9],
-      "safe_to_fair_floor": [0.70, 0.84],
-      "reasonable_to_fair_floor": [0.84, 0.96],
-      "rationale": "焦煤价格虽偏强，但盈利仍高度依赖钢铁需求、焦化开工与库存传导；T1条件召回不允许把阶段性价格强势直接资本化。采用2026 EPS主锚、2027下行约束、额外周期折价和180日价格校准。"
+      "valuation_mode":"conservative_consensus_cycle", "requires_regime":true, "requires_next_year_eps":true, "market_price_calibration":true,
+      "anchorless_normalization_haircut":0.88, "fallback_multiple_range":[6,9], "safe_to_fair_floor":[0.70,0.84], "reasonable_to_fair_floor":[0.84,0.96],
+      "rationale":"焦煤价格虽偏强，但盈利仍高度依赖钢铁需求、焦化开工与库存传导；T1条件召回不允许把阶段性价格强势直接资本化。采用2026 EPS主锚、2027下行约束、额外周期折价和180日价格校准。"
     },
     "chemicals::氟化工": {
-      "valuation_mode": "conservative_consensus_cycle",
-      "requires_regime": true,
-      "requires_next_year_eps": true,
-      "market_price_calibration": true,
-      "anchorless_normalization_haircut": 0.85,
-      "fallback_multiple_range": [12, 16],
-      "safe_to_fair_floor": [0.72, 0.85],
-      "reasonable_to_fair_floor": [0.85, 0.98],
-      "rationale": "制冷剂配额约束使行业具备较强景气，但R32/R134a/R125产品结构和萤石/氢氟酸等成本难以用单一稳定公开序列机器化。低风险估值以2026 EPS主锚、2027下行约束、额外周期折价和180日价格校准为主，不把当前高价差永久资本化。"
+      "valuation_mode":"conservative_consensus_cycle", "requires_regime":true, "requires_next_year_eps":true, "market_price_calibration":true,
+      "anchorless_normalization_haircut":0.85, "fallback_multiple_range":[12,16], "safe_to_fair_floor":[0.72,0.85], "reasonable_to_fair_floor":[0.85,0.98],
+      "rationale":"制冷剂配额约束使行业具备较强景气，但R32/R134a/R125产品结构和萤石/氢氟酸等成本难以用单一稳定公开序列机器化。低风险估值以2026 EPS主锚、2027下行约束、额外周期折价和180日价格校准为主，不把当前高价差永久资本化。"
     },
     "chemicals::氨纶": {
-      "valuation_mode": "conservative_consensus_cycle",
-      "requires_regime": true,
-      "requires_next_year_eps": true,
-      "market_price_calibration": true,
-      "anchorless_normalization_haircut": 0.85,
-      "fallback_multiple_range": [10, 14],
-      "safe_to_fair_floor": [0.72, 0.85],
-      "reasonable_to_fair_floor": [0.85, 0.98],
-      "rationale": "氨纶盈利取决于售价与PTMEG/MDI等原料价差，公开机器序列覆盖不足且行业处于修复早期。正式低风险估值以2026 EPS主锚、2027下行约束、结构折价和180日价格校准，避免低基数盈利反弹被高倍资本化。"
+      "valuation_mode":"conservative_consensus_cycle", "requires_regime":true, "requires_next_year_eps":true, "market_price_calibration":true,
+      "anchorless_normalization_haircut":0.85, "fallback_multiple_range":[10,14], "safe_to_fair_floor":[0.72,0.85], "reasonable_to_fair_floor":[0.85,0.98],
+      "rationale":"氨纶盈利取决于售价与PTMEG/MDI等原料价差，公开机器序列覆盖不足且行业处于修复早期。正式低风险估值以2026 EPS主锚、2027下行约束、结构折价和180日价格校准，避免低基数盈利反弹被高倍资本化。"
     },
     "chemicals::聚氨酯/MDI/TDI": {
-      "valuation_mode": "conservative_consensus_cycle",
-      "requires_regime": true,
-      "requires_next_year_eps": true,
-      "market_price_calibration": true,
-      "anchorless_normalization_haircut": 0.88,
-      "fallback_multiple_range": [11, 15],
-      "safe_to_fair_floor": [0.72, 0.85],
-      "reasonable_to_fair_floor": [0.85, 0.98],
-      "rationale": "MDI/TDI盈利由产品价格、原料成本、装置开工和下游需求共同决定，当前产业链仅为T1且价格中枢持续性尚未完全确认。低风险估值以2026 EPS为主锚、2027只做下行约束，并通过周期折价和180日价格分布限制买点。"
+      "valuation_mode":"conservative_consensus_cycle", "requires_regime":true, "requires_next_year_eps":true, "market_price_calibration":true,
+      "anchorless_normalization_haircut":0.88, "fallback_multiple_range":[11,15], "safe_to_fair_floor":[0.72,0.85], "reasonable_to_fair_floor":[0.85,0.98],
+      "rationale":"MDI/TDI盈利由产品价格、原料成本、装置开工和下游需求共同决定，当前产业链仅为T1且价格中枢持续性尚未完全确认。低风险估值以2026 EPS为主锚、2027只做下行约束，并通过周期折价和180日价格分布限制买点。"
+    },
+    "chemicals::磷化工": {
+      "valuation_mode":"conservative_consensus_cycle", "requires_regime":true, "requires_next_year_eps":true, "market_price_calibration":true,
+      "anchorless_normalization_haircut":0.84, "fallback_multiple_range":[8,12], "safe_to_fair_floor":[0.68,0.82], "reasonable_to_fair_floor":[0.82,0.95],
+      "rationale":"磷化工利润取决于磷矿、黄磷、磷肥/磷酸盐售价与能源成本价差，产品结构差异大。T1阶段以2026 EPS主锚、2027仅下行约束并施加周期折价。"
+    },
+    "building_materials::玻纤": {
+      "valuation_mode":"conservative_consensus_cycle", "requires_regime":true, "requires_next_year_eps":true, "market_price_calibration":true,
+      "anchorless_normalization_haircut":0.85, "fallback_multiple_range":[10,14], "safe_to_fair_floor":[0.70,0.84], "reasonable_to_fair_floor":[0.84,0.96],
+      "rationale":"玻纤盈利受价格、能源成本、库存和产能利用率影响，行业H1修复仍有品种分化。低风险估值使用当年盈利主锚和额外周期折价。"
+    },
+    "oil_gas::油气开采": {
+      "valuation_mode":"conservative_consensus_cycle", "requires_regime":true, "requires_next_year_eps":true, "market_price_calibration":true,
+      "anchorless_normalization_haircut":0.88, "fallback_multiple_range":[7,11], "safe_to_fair_floor":[0.70,0.84], "reasonable_to_fair_floor":[0.84,0.96],
+      "rationale":"油气上游利润同时受国际油气价格、产量、成本和汇率影响；在没有稳定统一公司实现价锚时，采用2026盈利主锚、2027下行约束、周期折价与180日校准。"
     }
   },
   "company_overrides": {
-    "601899": {
-      "name": "紫金矿业",
-      "anchors": [
-        {"symbol": "AU0", "weight": 0.55, "direction": 1},
-        {"symbol": "CU0", "weight": 0.45, "direction": 1}
-      ],
-      "earnings_sensitivity": 0.7,
-      "fallback_multiple_range": [12, 16],
-      "safe_to_fair_floor": [0.76, 0.88],
-      "reasonable_to_fair_floor": [0.88, 1.0],
-      "rationale": "Gold and copper diversification supports earnings quality, but low-risk pricing must normalize current gold/copper windfall first and then be checked against the stock's own 180-session market-cost distribution."
-    },
-    "601600": {
-      "name": "中国铝业",
-      "earnings_sensitivity": 0.9,
-      "fallback_multiple_range": [8, 11],
-      "rationale": "原铝板块为主要利润弹性来源，氧化铝同时是业务与成本变量；高利润阶段必须先还原中性铝价/氧化铝成本下的盈利，再用2027供给恢复风险与180日价格分布约束低风险买入区。"
-    },
-    "000807": {
-      "name": "云铝股份",
-      "earnings_sensitivity": 0.95,
-      "fallback_multiple_range": [9, 12],
-      "rationale": "低成本水电铝与一体化优势支持相对溢价，但中东复产、库存重建和需求正常化风险意味着不能把当前高吨铝利润永久资本化；低风险买点还必须接受180日价格中枢校准。"
-    }
+    "601899": {"name":"紫金矿业","anchors":[{"symbol":"AU0","weight":0.55,"direction":1},{"symbol":"CU0","weight":0.45,"direction":1}],"earnings_sensitivity":0.7,"fallback_multiple_range":[12,16],"safe_to_fair_floor":[0.76,0.88],"reasonable_to_fair_floor":[0.88,1.0],"rationale":"Gold and copper diversification supports earnings quality, but low-risk pricing must normalize current gold/copper windfall first and then be checked against the stock's own 180-session market-cost distribution."},
+    "601600": {"name":"中国铝业","earnings_sensitivity":0.9,"fallback_multiple_range":[8,11],"rationale":"原铝板块为主要利润弹性来源，氧化铝同时是业务与成本变量；高利润阶段必须先还原中性铝价/氧化铝成本下的盈利，再用2027供给恢复风险与180日价格分布约束低风险买入区。"},
+    "000807": {"name":"云铝股份","earnings_sensitivity":0.95,"fallback_multiple_range":[9,12],"rationale":"低成本水电铝与一体化优势支持相对溢价，但中东复产、库存重建和需求正常化风险意味着不能把当前高吨铝利润永久资本化；低风险买点还必须接受180日价格中枢校准。"}
   },
   "scenario_rules": {
-    "short_term_anchor_ratio_clip": [0.95, 1.05],
-    "rule": "Machine-anchor cycles normalize consensus against neutral commodity/cost conditions. Anchorless cycles use current-year consensus with next-year downside guard plus a structural haircut. Both then apply a reviewed 6-18m regime and 180-day price calibration; positive short-term cycle strength cannot raise low-risk buy zones."
+    "short_term_anchor_ratio_clip":[0.95,1.05],
+    "rule":"Machine-anchor cycles normalize consensus against neutral commodity/cost conditions. Anchorless cycles use current-year consensus with next-year downside guard plus a structural haircut. Both then apply a reviewed 6-18m regime and 180-day price calibration; positive short-term cycle strength cannot raise low-risk buy zones."
   }
 }
