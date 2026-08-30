@@ -5,6 +5,8 @@ from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
+from company_index_fingerprint import company_index_fingerprint
+
 ROOT = Path(__file__).resolve().parents[1]
 SCAN = ROOT / "data" / "research" / "pipeline" / "industry_scan.json"
 INDEX = ROOT / "data" / "research" / "company_industry_index.json"
@@ -131,9 +133,10 @@ def main() -> int:
         })
 
     payload = {
-        "schema_version": 1,
+        "schema_version": 2,
         "industry_scan_frozen_at": scan.get("industry_frozen_at"),
         "company_index_generated_at": index.get("generated_at"),
+        "company_index_fingerprint": company_index_fingerprint(index),
         "weekly_pool_read": False,
         "t2_recall_frozen_at": now,
         "t2_subchains": rows,
@@ -142,6 +145,8 @@ def main() -> int:
     OUTPUT.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps({
         "status":"ok",
+        "schema_version": payload["schema_version"],
+        "company_index_fingerprint": payload["company_index_fingerprint"],
         "t2_subchains":len(rows),
         "candidate_classifications":sum(r["candidate_universe_count"] for r in rows),
         "exposed_company_rows":sum(r["classification_counts"]["exposed"] for r in rows),
