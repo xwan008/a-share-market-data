@@ -1,5 +1,5 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "reviewed_at": "2026-08-30",
   "purpose": "Keep T2 recall broad, but prevent one hot subchain from flooding the formal common qualification pool with near-duplicate companies.",
   "cap_rules": [
@@ -8,12 +8,13 @@
     {"max_earnings_gate_passers": 1000000, "max_companies_in_common_pool": 3}
   ],
   "weekly_deep_review": {
-    "always_keep_if_active": true,
+    "priority_within_t2_subchain": true,
+    "unmapped_weekly_names_remain_independently_eligible": true,
     "counts_toward_subchain_cap": true,
-    "rule": "A company independently validated by the weekly deep review remains eligible. It consumes a representative slot for any T2 subchain it belongs to, so the T2-only path cannot refill the same chain with duplicates."
+    "rule": "Weekly deep review is an independent positive signal, so a weekly-validated company receives priority when competing inside a T2 subchain. But it does not create unlimited slots: every company carrying that T2 tag remains subject to the same representative cap. Weekly-only names with no active T2 tag remain independently eligible."
   },
   "ranking": {
-    "method": "earnings_transmission_plus_profit_scale",
+    "method": "weekly_priority_then_earnings_transmission_plus_profit_scale",
     "weights": {
       "net_profit_scale": 0.50,
       "net_profit_yoy_pct": 0.25,
@@ -29,12 +30,13 @@
     },
     "net_profit_scale_method": "log10_clipped",
     "tie_breakers": [
+      "weekly_deep_review_first",
       "higher_net_profit",
       "higher_net_profit_yoy_pct",
       "higher_revenue_yoy_pct",
       "lower_code"
     ],
-    "rule": "Representative selection balances absolute profit scale with current earnings transmission. Profit scale is deliberately weighted heavily so low-base percentage growth cannot crowd out established industry representatives. The step ranks only companies that already passed the company-level future-earnings gate and never uses valuation or right-side technical structure, preserving stage independence."
+    "rule": "Representative selection balances absolute profit scale with current earnings transmission. Profit scale is deliberately weighted heavily so low-base percentage growth cannot crowd out established industry representatives. Weekly deep-review evidence gets priority only inside the same T2 cap. Valuation and right-side technical structure are never used here, preserving stage independence."
   },
   "output_policy": {
     "keep_deferred_companies_in_audit": true,
