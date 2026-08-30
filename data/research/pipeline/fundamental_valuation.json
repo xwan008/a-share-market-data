@@ -1,20 +1,24 @@
 {
   "schema_version": 5,
-  "generated_at": "2026-08-30T19:12:26.297086+08:00",
+  "generated_at": "2026-08-30T19:14:20.742847+08:00",
   "reference_trade_date": "2026-08-28",
-  "common_pool_count": 42,
-  "fundamental_company_count": 31,
-  "deferred_to_cycle_valuation_count": 11,
+  "common_pool_count": 52,
+  "fundamental_company_count": 37,
+  "deferred_to_cycle_valuation_count": 15,
   "deferred_to_cycle_valuation_codes": [
     "000807",
     "000933",
     "002064",
+    "002237",
     "002326",
+    "002460",
+    "600078",
     "600309",
     "600362",
     "601088",
     "601225",
     "601699",
+    "603256",
     "603993",
     "605020"
   ],
@@ -57,13 +61,14 @@
     "rule": "Business multiple_range is a theoretical fair-value reference, not automatically a low-risk entry multiple. Unless a company has an explicit low_risk_multiple_range, cap the theoretical PE floor by next-year earnings durability. Positive future growth does not lift the current-year entry PE; weak or negative future growth can compress it. The derived low-risk upper multiple is capped near the adjusted floor plus a small width and never exceeds the theoretical business upper multiple."
   },
   "policy_coverage": {
-    "supported_count": 31,
+    "supported_count": 37,
     "unsupported_count": 0,
     "unsupported_codes": [],
-    "noncycle_count": 31,
-    "supported_policy_count": 31,
+    "noncycle_count": 37,
+    "supported_policy_count": 37,
     "unsupported_policy_count": 0,
     "supported_policy_codes": [
+      "000157",
       "000338",
       "000776",
       "000800",
@@ -71,35 +76,40 @@
       "000951",
       "001309",
       "002028",
+      "002074",
       "002156",
       "002384",
       "002452",
       "002475",
       "002636",
+      "002653",
       "002709",
       "002812",
       "600030",
       "600066",
       "600183",
+      "600316",
       "600406",
       "600458",
-      "600482",
       "600487",
+      "600641",
       "600685",
       "600999",
       "601138",
       "601336",
       "601628",
+      "601633",
       "601869",
       "603088",
       "603259",
       "603659",
-      "603986"
+      "603986",
+      "605189"
     ],
     "unsupported_policy_codes": []
   },
   "execution_state_counts": {
-    "valid": 26,
+    "valid": 32,
     "consensus_insufficient": 4,
     "market_data_missing": 0,
     "normalization_required": 1,
@@ -107,31 +117,92 @@
   },
   "market_indicator_errors": [],
   "model_counts": {
+    "construction_machinery_forward_pe": 1,
     "diversified_powertrain_data_center_forward_pe": 1,
     "broker_forward_pb_roe": 3,
     "heavy_truck_forward_pe": 2,
     "ai_server_forward_pe": 2,
     "memory_growth_forward_pe": 1,
     "grid_equipment_forward_pe": 2,
+    "lithium_battery_forward_pe": 1,
     "advanced_packaging_normalized_forward_pe": 1,
     "pcb_ccl_forward_pe": 3,
     "grid_equipment_company_low_risk_forward_pe": 1,
     "multi_engine_precision_manufacturing_forward_pe": 1,
+    "innovative_drug_forward_pe": 1,
     "battery_material_forward_pe": 1,
     "separator_forward_pe": 1,
     "bus_export_forward_pe": 1,
+    "aviation_oem_forward_pe": 1,
     "wind_new_material_forward_pe": 1,
-    "marine_power_forward_pe": 1,
     "optical_forward_pe": 1,
+    "semiconductor_materials_forward_pe": 1,
     "shipbuilding_forward_pe": 1,
     "insurance_forward_pb_roe_proxy": 2,
+    "passenger_car_forward_pe": 1,
     "optical_infrastructure_forward_pe": 1,
     "equipment_forward_pe": 1,
     "cxo_forward_pe": 1,
     "battery_equipment_material_forward_pe": 1,
-    "semiconductor_forward_pe": 1
+    "semiconductor_forward_pe": 1,
+    "textile_manufacturing_forward_pe": 1
   },
   "companies": [
+    {
+      "code": "000157",
+      "name": "中联重科",
+      "current_price": 6.82,
+      "valuation_status": "valid",
+      "execution_state": "valid",
+      "policy_status": "supported",
+      "valuation_model": "construction_machinery_forward_pe",
+      "valuation_basis_unit": "PE",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 28,
+      "consensus_eps_current_year": 0.6833,
+      "consensus_eps_next_year": 0.8231,
+      "next_year_eps_growth_pct": 20.47,
+      "market_forward_pe_current_year": 9.98,
+      "market_forward_pe_next_year": 8.29,
+      "market_pe_dynamic": null,
+      "market_indicator_source": null,
+      "forward_earnings_basis": "2026 consensus EPS is primary low-risk anchor; 2027 EPS is a durability guard and positive growth cannot lift the 2026 entry PE.",
+      "theoretical_business_multiple_range": [
+        12.0,
+        18.0
+      ],
+      "growth_pe_floor_cap": 20.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        12.0,
+        16.0
+      ],
+      "multiple_rationale": "工程机械受国内更新、出口和地产基建周期共同影响，低风险估值采用周期折价后的中低双位数PE。",
+      "business_fair_value_range": [
+        8.2,
+        12.3
+      ],
+      "value_anchor_range": [
+        8.2,
+        10.93
+      ],
+      "safe_buy_range": [
+        6.4,
+        7.38
+      ],
+      "reasonable_buy_range": [
+        7.38,
+        8.2
+      ],
+      "key_sensitivities": [
+        "current-year EPS",
+        "next-year downside durability",
+        "company/industry low-risk PE",
+        "orders/volume/margin"
+      ],
+      "invalidation_condition": "公司盈利传导减弱，或对应T1链进一步恶化/降级，则条件资格立即失效。",
+      "left_conclusion": "safe_buy_zone"
+    },
     {
       "code": "000338",
       "name": "潍柴动力",
@@ -463,6 +534,61 @@
       "left_conclusion": "above_buy_zone"
     },
     {
+      "code": "002074",
+      "name": "国轩高科",
+      "current_price": 27.24,
+      "valuation_status": "valid",
+      "execution_state": "valid",
+      "policy_status": "supported",
+      "valuation_model": "lithium_battery_forward_pe",
+      "valuation_basis_unit": "PE",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 13,
+      "consensus_eps_current_year": 1.0909,
+      "consensus_eps_next_year": 1.6246,
+      "next_year_eps_growth_pct": 48.92,
+      "market_forward_pe_current_year": 24.97,
+      "market_forward_pe_next_year": 16.77,
+      "market_pe_dynamic": null,
+      "market_indicator_source": null,
+      "forward_earnings_basis": "2026 consensus EPS is primary low-risk anchor; 2027 EPS is a durability guard and positive growth cannot lift the 2026 entry PE.",
+      "theoretical_business_multiple_range": [
+        16.0,
+        22.0
+      ],
+      "growth_pe_floor_cap": 22.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        16.0,
+        20.0
+      ],
+      "multiple_rationale": "动力与储能电池需求仍有成长，但价格竞争、产能利用率和材料成本决定利润率，低风险倍数保留明显折价。",
+      "business_fair_value_range": [
+        17.45,
+        24.0
+      ],
+      "value_anchor_range": [
+        17.45,
+        21.82
+      ],
+      "safe_buy_range": [
+        13.61,
+        15.71
+      ],
+      "reasonable_buy_range": [
+        15.71,
+        17.45
+      ],
+      "key_sensitivities": [
+        "current-year EPS",
+        "next-year downside durability",
+        "company/industry low-risk PE",
+        "orders/volume/margin"
+      ],
+      "invalidation_condition": "公司盈利传导减弱，或对应T1链进一步恶化/降级，则条件资格立即失效。",
+      "left_conclusion": "above_buy_zone"
+    },
+    {
       "code": "002156",
       "name": "通富微电",
       "current_price": 63.75,
@@ -686,6 +812,61 @@
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "unavailable",
       "reason": "Consensus insufficient:reports=0,eps_2026=None; H1 annualization cannot form formal anchor."
+    },
+    {
+      "code": "002653",
+      "name": "海思科",
+      "current_price": 67.18,
+      "valuation_status": "valid",
+      "execution_state": "valid",
+      "policy_status": "supported",
+      "valuation_model": "innovative_drug_forward_pe",
+      "valuation_basis_unit": "PE",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 13,
+      "consensus_eps_current_year": 0.8885,
+      "consensus_eps_next_year": 0.7538,
+      "next_year_eps_growth_pct": -15.15,
+      "market_forward_pe_current_year": 75.61,
+      "market_forward_pe_next_year": 89.12,
+      "market_pe_dynamic": null,
+      "market_indicator_source": null,
+      "forward_earnings_basis": "2026 consensus EPS is primary low-risk anchor; 2027 EPS is a durability guard and positive growth cannot lift the 2026 entry PE.",
+      "theoretical_business_multiple_range": [
+        20.0,
+        28.0
+      ],
+      "growth_pe_floor_cap": 13.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        13.0,
+        17.0
+      ],
+      "multiple_rationale": "创新药应以已商业化产品、临床管线与授权兑现支撑估值；不把未兑现远期峰值销售直接资本化到低风险买点。",
+      "business_fair_value_range": [
+        17.77,
+        24.88
+      ],
+      "value_anchor_range": [
+        11.55,
+        15.1
+      ],
+      "safe_buy_range": [
+        9.01,
+        10.4
+      ],
+      "reasonable_buy_range": [
+        10.4,
+        11.55
+      ],
+      "key_sensitivities": [
+        "current-year EPS",
+        "next-year downside durability",
+        "company/industry low-risk PE",
+        "orders/volume/margin"
+      ],
+      "invalidation_condition": "公司盈利传导减弱，或对应T1链进一步恶化/降级，则条件资格立即失效。",
+      "left_conclusion": "above_buy_zone"
     },
     {
       "code": "002709",
@@ -958,6 +1139,61 @@
       "left_conclusion": "above_buy_zone"
     },
     {
+      "code": "600316",
+      "name": "洪都航空",
+      "current_price": 30.78,
+      "valuation_status": "valid",
+      "execution_state": "valid",
+      "policy_status": "supported",
+      "valuation_model": "aviation_oem_forward_pe",
+      "valuation_basis_unit": "PE",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 4,
+      "consensus_eps_current_year": 0.2193,
+      "consensus_eps_next_year": 0.3603,
+      "next_year_eps_growth_pct": 64.31,
+      "market_forward_pe_current_year": 140.39,
+      "market_forward_pe_next_year": 85.44,
+      "market_pe_dynamic": null,
+      "market_indicator_source": null,
+      "forward_earnings_basis": "2026 consensus EPS is primary low-risk anchor; 2027 EPS is a durability guard and positive growth cannot lift the 2026 entry PE.",
+      "theoretical_business_multiple_range": [
+        20.0,
+        28.0
+      ],
+      "growth_pe_floor_cap": 24.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        20.0,
+        24.0
+      ],
+      "multiple_rationale": "航空主机订单与交付周期较长、壁垒较高，但军品节奏、交付和应收现金流要求低风险估值折价。",
+      "business_fair_value_range": [
+        4.38,
+        6.14
+      ],
+      "value_anchor_range": [
+        4.38,
+        5.26
+      ],
+      "safe_buy_range": [
+        3.42,
+        3.95
+      ],
+      "reasonable_buy_range": [
+        3.95,
+        4.38
+      ],
+      "key_sensitivities": [
+        "current-year EPS",
+        "next-year downside durability",
+        "company/industry low-risk PE",
+        "orders/volume/margin"
+      ],
+      "invalidation_condition": "公司盈利传导减弱，或对应T1链进一步恶化/降级，则条件资格立即失效。",
+      "left_conclusion": "above_buy_zone"
+    },
+    {
       "code": "600406",
       "name": "国电南瑞",
       "current_price": 23.01,
@@ -1041,7 +1277,7 @@
         16.0,
         20.0
       ],
-      "multiple_rationale": "Versioned low-risk valuation policy: current-year consensus is the primary earnings anchor; next-year upside cannot raise the entry multiple, while downside durability can compress it.",
+      "multiple_rationale": "风电招标、装机与出口改善支持订单，但整机价格竞争、原材料和交付节奏使估值保持中等。",
       "business_fair_value_range": [
         11.07,
         15.22
@@ -1065,61 +1301,6 @@
         "orders/volume/margin"
       ],
       "invalidation_condition": "主要订单延期/取消，或交付毛利率明显恶化。",
-      "left_conclusion": "above_buy_zone"
-    },
-    {
-      "code": "600482",
-      "name": "中国动力",
-      "current_price": 31.81,
-      "valuation_status": "valid",
-      "execution_state": "valid",
-      "policy_status": "supported",
-      "valuation_model": "marine_power_forward_pe",
-      "valuation_basis_unit": "PE",
-      "forecast_source": "akshare.stock_profit_forecast_em",
-      "forecast_report_count": 11,
-      "consensus_eps_current_year": 1.3343,
-      "consensus_eps_next_year": 1.9261,
-      "next_year_eps_growth_pct": 44.36,
-      "market_forward_pe_current_year": 23.84,
-      "market_forward_pe_next_year": 16.52,
-      "market_pe_dynamic": null,
-      "market_indicator_source": null,
-      "forward_earnings_basis": "2026 consensus EPS is primary low-risk anchor; 2027 EPS is a durability guard and positive growth cannot lift the 2026 entry PE.",
-      "theoretical_business_multiple_range": [
-        18.0,
-        24.0
-      ],
-      "growth_pe_floor_cap": 22.0,
-      "low_risk_pe_method": "growth_guarded_low_risk_pe",
-      "reasonable_multiple_range": [
-        18.0,
-        22.0
-      ],
-      "multiple_rationale": "Versioned low-risk valuation policy: current-year consensus is the primary earnings anchor; next-year upside cannot raise the entry multiple, while downside durability can compress it.",
-      "business_fair_value_range": [
-        24.02,
-        32.02
-      ],
-      "value_anchor_range": [
-        24.02,
-        29.35
-      ],
-      "safe_buy_range": [
-        18.73,
-        21.62
-      ],
-      "reasonable_buy_range": [
-        21.62,
-        24.02
-      ],
-      "key_sensitivities": [
-        "current-year EPS",
-        "next-year downside durability",
-        "company/industry low-risk PE",
-        "orders/volume/margin"
-      ],
-      "invalidation_condition": "造船新增订单显著转弱、低速机排产下降或交付毛利率恶化。",
       "left_conclusion": "above_buy_zone"
     },
     {
@@ -1175,6 +1356,61 @@
         "orders/volume/margin"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "left_conclusion": "above_buy_zone"
+    },
+    {
+      "code": "600641",
+      "name": "先导基电",
+      "current_price": 34.8,
+      "valuation_status": "valid",
+      "execution_state": "valid",
+      "policy_status": "supported",
+      "valuation_model": "semiconductor_materials_forward_pe",
+      "valuation_basis_unit": "PE",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 3,
+      "consensus_eps_current_year": 0.1867,
+      "consensus_eps_next_year": 0.3133,
+      "next_year_eps_growth_pct": 67.86,
+      "market_forward_pe_current_year": 186.43,
+      "market_forward_pe_next_year": 111.06,
+      "market_pe_dynamic": null,
+      "market_indicator_source": null,
+      "forward_earnings_basis": "2026 consensus EPS is primary low-risk anchor; 2027 EPS is a durability guard and positive growth cannot lift the 2026 entry PE.",
+      "theoretical_business_multiple_range": [
+        20.0,
+        28.0
+      ],
+      "growth_pe_floor_cap": 24.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        20.0,
+        24.0
+      ],
+      "multiple_rationale": "国产替代和晶圆扩产支持半导体材料成长，但验证周期、客户导入和周期波动要求以当年可验证盈利为主锚。",
+      "business_fair_value_range": [
+        3.73,
+        5.23
+      ],
+      "value_anchor_range": [
+        3.73,
+        4.48
+      ],
+      "safe_buy_range": [
+        2.91,
+        3.36
+      ],
+      "reasonable_buy_range": [
+        3.36,
+        3.73
+      ],
+      "key_sensitivities": [
+        "current-year EPS",
+        "next-year downside durability",
+        "company/industry low-risk PE",
+        "orders/volume/margin"
+      ],
+      "invalidation_condition": "公司盈利传导减弱，或对应T1链进一步恶化/降级，则条件资格立即失效。",
       "left_conclusion": "above_buy_zone"
     },
     {
@@ -1410,6 +1646,61 @@
         "market activity/investment return"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "left_conclusion": "above_buy_zone"
+    },
+    {
+      "code": "601633",
+      "name": "长城汽车",
+      "current_price": 15.32,
+      "valuation_status": "valid",
+      "execution_state": "valid",
+      "policy_status": "supported",
+      "valuation_model": "passenger_car_forward_pe",
+      "valuation_basis_unit": "PE",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 19,
+      "consensus_eps_current_year": 1.2115,
+      "consensus_eps_next_year": 1.5518,
+      "next_year_eps_growth_pct": 28.09,
+      "market_forward_pe_current_year": 12.65,
+      "market_forward_pe_next_year": 9.87,
+      "market_pe_dynamic": null,
+      "market_indicator_source": null,
+      "forward_earnings_basis": "2026 consensus EPS is primary low-risk anchor; 2027 EPS is a durability guard and positive growth cannot lift the 2026 entry PE.",
+      "theoretical_business_multiple_range": [
+        12.0,
+        18.0
+      ],
+      "growth_pe_floor_cap": 20.0,
+      "low_risk_pe_method": "growth_guarded_low_risk_pe",
+      "reasonable_multiple_range": [
+        12.0,
+        16.0
+      ],
+      "multiple_rationale": "乘用车整车盈利受价格竞争、产品周期与新能源渗透影响，理论估值采用中低双位数PE；正向次年增长不能抬高当年低风险买点。",
+      "business_fair_value_range": [
+        14.54,
+        21.81
+      ],
+      "value_anchor_range": [
+        14.54,
+        19.38
+      ],
+      "safe_buy_range": [
+        11.34,
+        13.08
+      ],
+      "reasonable_buy_range": [
+        13.08,
+        14.54
+      ],
+      "key_sensitivities": [
+        "current-year EPS",
+        "next-year downside durability",
+        "company/industry low-risk PE",
+        "orders/volume/margin"
+      ],
+      "invalidation_condition": "公司盈利传导减弱，或对应T1链进一步恶化/降级，则条件资格立即失效。",
       "left_conclusion": "above_buy_zone"
     },
     {
@@ -1686,9 +1977,65 @@
       ],
       "invalidation_condition": "利基存储价格快速回落、下游需求明显被高价抑制或晶圆供给约束出货。",
       "left_conclusion": "above_buy_zone"
+    },
+    {
+      "code": "605189",
+      "name": "富春染织",
+      "current_price": 14.93,
+      "valuation_status": "valid",
+      "execution_state": "valid",
+      "policy_status": "supported",
+      "valuation_model": "textile_manufacturing_forward_pe",
+      "valuation_basis_unit": "PE",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 5,
+      "consensus_eps_current_year": 1.146,
+      "consensus_eps_next_year": 1.16,
+      "next_year_eps_growth_pct": 1.22,
+      "market_forward_pe_current_year": 13.03,
+      "market_forward_pe_next_year": 12.87,
+      "market_pe_dynamic": null,
+      "market_indicator_source": null,
+      "forward_earnings_basis": "2026 consensus EPS is primary low-risk anchor; 2027 EPS is a durability guard and positive growth cannot lift the 2026 entry PE.",
+      "theoretical_business_multiple_range": [
+        8.0,
+        12.0
+      ],
+      "growth_pe_floor_cap": 15.0,
+      "low_risk_pe_method": "theoretical_pe_unchanged",
+      "reasonable_multiple_range": [
+        8.0,
+        12.0
+      ],
+      "multiple_rationale": "纺织制造受原料、汇率、订单和利用率影响，属于低倍数制造业，低风险买点不因单季利润弹性给予成长溢价。",
+      "business_fair_value_range": [
+        9.17,
+        13.75
+      ],
+      "value_anchor_range": [
+        9.17,
+        13.75
+      ],
+      "safe_buy_range": [
+        7.15,
+        8.25
+      ],
+      "reasonable_buy_range": [
+        8.25,
+        9.17
+      ],
+      "key_sensitivities": [
+        "current-year EPS",
+        "next-year downside durability",
+        "company/industry low-risk PE",
+        "orders/volume/margin"
+      ],
+      "invalidation_condition": "公司盈利传导减弱，或对应T1链进一步恶化/降级，则条件资格立即失效。",
+      "left_conclusion": "above_buy_zone"
     }
   ],
   "left_set_codes": [
+    "000157",
     "000776",
     "000951",
     "002452",
@@ -1700,12 +2047,16 @@
     "000807",
     "000933",
     "002064",
+    "002237",
     "002326",
+    "002460",
+    "600078",
     "600309",
     "600362",
     "601088",
     "601225",
     "601699",
+    "603256",
     "603993",
     "605020"
   ]

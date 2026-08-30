@@ -1,23 +1,27 @@
 {
   "schema_version": 5,
-  "generated_at": "2026-08-30T19:13:07.408411+08:00",
+  "generated_at": "2026-08-30T19:15:08.158019+08:00",
   "reference_trade_date": "2026-08-28",
   "max_anchor_age_days": 7,
   "cycle_regime_registry_reviewed_at": "2026-08-30",
   "cycle_regime_age_days": -2,
   "max_cycle_regime_age_days": 45,
-  "common_pool_count": 42,
-  "cycle_company_count": 11,
+  "common_pool_count": 52,
+  "cycle_company_count": 15,
   "cycle_codes": [
     "000807",
     "000933",
     "002064",
+    "002237",
     "002326",
+    "002460",
+    "600078",
     "600309",
     "600362",
     "601088",
     "601225",
     "601699",
+    "603256",
     "603993",
     "605020"
   ],
@@ -499,6 +503,46 @@
       ]
     },
     {
+      "code": "002237",
+      "name": "恒邦股份",
+      "cycle_tag": "nonferrous::黄金",
+      "current_price": 15.61,
+      "valuation_status": "unavailable",
+      "valuation_model": "normalized_forward_cycle_low_risk",
+      "execution_state": "input_data_insufficient",
+      "forward_earnings_basis": "2026/2027 consensus plus neutral commodity anchor, 6-18m regime and price-history calibration are mandatory for resource valuation.",
+      "commodity_anchors": [
+        {
+          "symbol": "AU0",
+          "last_date": "2026-08-28",
+          "age_days": 0,
+          "current": 999.28,
+          "ma20": 956.333,
+          "ma60": 919.8233333333334,
+          "current_to_ma20": 1.0449079975280577,
+          "current_to_ma60": 1.0863825299785828,
+          "drawdown_from_60d_high_pct": -0.7488925527899815,
+          "trend_20_vs_60_pct": 3.969204231247292,
+          "neutral_window_sessions": 504,
+          "neutral_price_median": 788.8199999999999,
+          "neutral_price_p40": 776.04,
+          "neutral_price_p60": 888.636,
+          "current_to_neutral": 1.2668035800309323,
+          "weight": 1.0,
+          "direction": 1.0
+        }
+      ],
+      "reasonable_multiple_range": null,
+      "value_anchor_range": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "left_conclusion": "unavailable",
+      "reason": "forward_consensus_insufficient:reports=1,eps_2026=1.02,eps_2027=1.37",
+      "cycle_regime": null,
+      "invalidation_condition": "公司盈利传导减弱，或对应T1链进一步恶化/降级，则条件资格立即失效。",
+      "valuation_mode": "commodity_anchor_normalized"
+    },
+    {
       "code": "002326",
       "name": "永太科技",
       "cycle_tag": "chemicals::氟化工",
@@ -515,6 +559,145 @@
       "left_conclusion": "unavailable",
       "reason": "forward_consensus_insufficient:reports=0,eps_2026=None,eps_2027=None",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "valuation_mode": "conservative_consensus_cycle"
+    },
+    {
+      "code": "002460",
+      "name": "赣锋锂业",
+      "cycle_tag": "nonferrous::锂资源/锂盐",
+      "current_price": 55.0,
+      "valuation_status": "valid",
+      "valuation_model": "conservative_consensus_cycle_low_risk",
+      "execution_state": "valid",
+      "forward_earnings_basis": "2026 EPS 3.5100 primary; 2027 EPS 4.2309 only downside guard -> haircut 0.80 -> reviewed regime -> 180d calibration.",
+      "commodity_anchors": [],
+      "reasonable_multiple_range": [
+        8.0,
+        12.0
+      ],
+      "value_anchor_range": [
+        12.53,
+        17.5
+      ],
+      "safe_buy_range": [
+        12.53,
+        15.1
+      ],
+      "reasonable_buy_range": [
+        15.1,
+        17.5
+      ],
+      "left_conclusion": "above_buy_zone",
+      "reason": null,
+      "invalidation_condition": "公司盈利传导减弱，或对应T1链进一步恶化/降级，则条件资格立即失效。",
+      "valuation_mode": "conservative_consensus_cycle",
+      "valuation_basis_unit": "PE",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 11,
+      "consensus_eps_current_year": 3.51,
+      "consensus_eps_next_year": 4.2309,
+      "next_year_eps_growth_pct": 20.54,
+      "forward_12m_eps_proxy": 3.9906,
+      "forward_eps_weights": {
+        "current_year": 0.3333,
+        "next_year": 0.6667
+      },
+      "low_risk_eps_pre_haircut": 3.51,
+      "low_risk_eps_guard_method": "current_year_primary_no_positive_next_year_uplift",
+      "anchorless_cycle_haircut": 0.8,
+      "normalized_forward_eps": 2.808,
+      "neutralization_factor": 0.8,
+      "weighted_neutral_commodity_delta": null,
+      "market_forward_pe_current_year": 15.67,
+      "market_forward_pe_next_year": 13.0,
+      "market_forward_pe_12m_proxy": 13.78,
+      "short_term_anchor_effect_on_eps": null,
+      "low_risk_short_term_effect_on_eps": 0.0,
+      "profit_sensitivity": null,
+      "cycle_regime": "demand_recovery_with_supply_overhang",
+      "cycle_regime_reviewed_at": "2026-08-30",
+      "cycle_regime_age_days": -2,
+      "cycle_regime_summary": "储能和锂电出口需求较强，但锂资源供给弹性、库存和价格中枢持续性仍未完全确认。T1阶段仅允许公司强盈利作为研究信号，估值基准对当前盈利施加较深周期折价。",
+      "cycle_regime_scores": {
+        "supply": -0.75,
+        "demand": 0.5,
+        "inventory": 0.0
+      },
+      "cycle_regime_evidence": [
+        {
+          "date": "2026-08-30",
+          "source": "data/research/pipeline/industry_scan.json",
+          "effect": "mixed",
+          "note": "锂资源/锂盐为T1：储能与锂电出口需求较强，但价格与供给持续性仍需验证。"
+        }
+      ],
+      "bear_base_bull_regime_factor": [
+        0.65,
+        0.82,
+        1.05
+      ],
+      "bear_base_bull_forward_eps": [
+        1.8252,
+        2.3026,
+        2.9484
+      ],
+      "multiple_rationale": "锂资源/锂盐利润对锂价、库存和供给投放高度敏感，且不同矿源成本差异大。缺少统一可靠公司级价差锚时，以2026 EPS主锚、2027下行约束、深度周期折价和180日价格校准处理。",
+      "scenario_fair_value_range": [
+        14.6,
+        35.38
+      ],
+      "normalized_base_fair_value_floor": 18.42,
+      "base_fair_value_floor": 18.42,
+      "market_price_anchor_180d": {
+        "history_points": 180,
+        "history_basis": "tencent_qfq_plus_live_tail",
+        "last_history_date": "2026-08-28",
+        "low_180d": 46.11,
+        "high_180d": 91.3,
+        "median_180d": 67.355,
+        "ma60": 57.482,
+        "safe_percentile_band": [
+          46.11,
+          52.188
+        ],
+        "reasonable_percentile_band": [
+          52.188,
+          69.054
+        ],
+        "percentiles": {
+          "p15": 53.5765,
+          "p25": 62.0775,
+          "p35": 64.46,
+          "p50": 67.355,
+          "p60": 69.054
+        }
+      },
+      "price_calibration_method": "valuation_dominant_below_market_p35",
+      "key_sensitivities": [
+        "2026 consensus EPS",
+        "2027 downside durability",
+        "cycle regime",
+        "structural haircut",
+        "180d market price distribution"
+      ]
+    },
+    {
+      "code": "600078",
+      "name": "澄星股份",
+      "cycle_tag": "chemicals::磷化工",
+      "current_price": 11.28,
+      "valuation_status": "unavailable",
+      "valuation_model": "conservative_consensus_cycle_low_risk",
+      "execution_state": "input_data_insufficient",
+      "forward_earnings_basis": "2026 EPS primary; 2027 only downside guard; no TTM/H1 annualization substitute.",
+      "commodity_anchors": [],
+      "reasonable_multiple_range": null,
+      "value_anchor_range": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "left_conclusion": "unavailable",
+      "reason": "forward_consensus_insufficient:reports=0,eps_2026=None,eps_2027=None",
+      "invalidation_condition": "公司盈利传导减弱，或对应T1链进一步恶化/降级，则条件资格立即失效。",
       "valuation_mode": "conservative_consensus_cycle"
     },
     {
@@ -1052,6 +1235,126 @@
       ]
     },
     {
+      "code": "603256",
+      "name": "宏和科技",
+      "cycle_tag": "building_materials::玻纤",
+      "current_price": 139.17,
+      "valuation_status": "valid",
+      "valuation_model": "conservative_consensus_cycle_low_risk",
+      "execution_state": "valid",
+      "forward_earnings_basis": "2026 EPS 1.0150 primary; 2027 EPS 1.8775 only downside guard -> haircut 0.85 -> reviewed regime -> 180d calibration.",
+      "commodity_anchors": [],
+      "reasonable_multiple_range": [
+        10.0,
+        14.0
+      ],
+      "value_anchor_range": [
+        5.44,
+        7.45
+      ],
+      "safe_buy_range": [
+        5.44,
+        6.52
+      ],
+      "reasonable_buy_range": [
+        6.52,
+        7.45
+      ],
+      "left_conclusion": "above_buy_zone",
+      "reason": null,
+      "invalidation_condition": "公司盈利传导减弱，或对应T1链进一步恶化/降级，则条件资格立即失效。",
+      "valuation_mode": "conservative_consensus_cycle",
+      "valuation_basis_unit": "PE",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 8,
+      "consensus_eps_current_year": 1.015,
+      "consensus_eps_next_year": 1.8775,
+      "next_year_eps_growth_pct": 84.98,
+      "forward_12m_eps_proxy": 1.59,
+      "forward_eps_weights": {
+        "current_year": 0.3333,
+        "next_year": 0.6667
+      },
+      "low_risk_eps_pre_haircut": 1.015,
+      "low_risk_eps_guard_method": "current_year_primary_no_positive_next_year_uplift",
+      "anchorless_cycle_haircut": 0.85,
+      "normalized_forward_eps": 0.8627,
+      "neutralization_factor": 0.85,
+      "weighted_neutral_commodity_delta": null,
+      "market_forward_pe_current_year": 137.11,
+      "market_forward_pe_next_year": 74.13,
+      "market_forward_pe_12m_proxy": 87.53,
+      "short_term_anchor_effect_on_eps": null,
+      "low_risk_short_term_effect_on_eps": 0.0,
+      "profit_sensitivity": null,
+      "cycle_regime": "profit_recovery_with_product_divergence",
+      "cycle_regime_reviewed_at": "2026-08-30",
+      "cycle_regime_age_days": -2,
+      "cycle_regime_summary": "玻纤价格和行业利润有修复迹象，但电子纱、粗纱等品种分化且新增供给仍需观察。T1阶段不把单季度利润修复直接视为新一轮高景气中枢。",
+      "cycle_regime_scores": {
+        "supply": 0.0,
+        "demand": 0.25,
+        "inventory": 0.25
+      },
+      "cycle_regime_evidence": [
+        {
+          "date": "2026-08-30",
+          "source": "data/research/pipeline/industry_scan.json",
+          "effect": "constructive_but_unconfirmed",
+          "note": "玻纤为T1：价格/利润改善需要继续验证持续性。"
+        }
+      ],
+      "bear_base_bull_regime_factor": [
+        0.75,
+        0.9,
+        1.05
+      ],
+      "bear_base_bull_forward_eps": [
+        0.6471,
+        0.7765,
+        0.9059
+      ],
+      "multiple_rationale": "玻纤盈利受价格、能源成本、库存和产能利用率影响，行业H1修复仍有品种分化。低风险估值使用当年盈利主锚和额外周期折价。",
+      "scenario_fair_value_range": [
+        6.47,
+        12.68
+      ],
+      "normalized_base_fair_value_floor": 7.76,
+      "base_fair_value_floor": 7.76,
+      "market_price_anchor_180d": {
+        "history_points": 180,
+        "history_basis": "tencent_qfq_plus_live_tail",
+        "last_history_date": "2026-08-28",
+        "low_180d": 31.532,
+        "high_180d": 297.0,
+        "median_180d": 105.527,
+        "ma60": 185.6234,
+        "safe_percentile_band": [
+          31.532,
+          37.196999999999996
+        ],
+        "reasonable_percentile_band": [
+          37.196999999999996,
+          135.27599999999998
+        ],
+        "percentiles": {
+          "p15": 38.071,
+          "p25": 56.277,
+          "p35": 69.7195,
+          "p50": 105.527,
+          "p60": 135.27599999999998
+        }
+      },
+      "price_calibration_method": "valuation_dominant_below_market_p35",
+      "key_sensitivities": [
+        "2026 consensus EPS",
+        "2027 downside durability",
+        "cycle regime",
+        "structural haircut",
+        "180d market price distribution"
+      ]
+    },
+    {
       "code": "603993",
       "name": "洛阳钼业",
       "cycle_tag": "nonferrous::铜矿资源",
@@ -1321,13 +1624,16 @@
   "method_note": "Machine-anchor cycles use long-window commodity normalization. Anchorless cycles use current-year EPS primary, next-year downside guard, structural haircut, reviewed regime and 180d price calibration.",
   "anchorless_cycle_repaired_codes": [
     "002064",
+    "002460",
     "600309",
     "601088",
     "601225",
     "601699",
+    "603256",
     "605020"
   ],
   "anchorless_cycle_still_unavailable_codes": [
-    "002326"
+    "002326",
+    "600078"
   ]
 }
