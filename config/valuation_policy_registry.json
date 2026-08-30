@@ -1,19 +1,33 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "reviewed_at": "2026-08-30",
   "forecast_policy": {
     "primary_source": "akshare.stock_profit_forecast_em consensus EPS",
     "minimum_report_count": 3,
     "fallback_h1_annualization_formal": false,
-    "rule": "Formal valuation should use externally formed forward earnings consensus or an explicit company-level forecast model. H1 EPS times two is diagnostic fallback only and cannot by itself create a formal value anchor."
+    "rule": "Formal PE valuation uses current-year consensus EPS as the primary low-risk earnings anchor. Next-year EPS is a durability check: positive next-year growth cannot automatically raise the current-year low-risk entry price, while weak/negative next-year growth may lower the permitted PE floor. H1 EPS times two is diagnostic fallback only and cannot by itself create a formal value anchor."
   },
   "coverage_policy": {
     "unsupported_policy_allowed": false,
     "rule": "Every non-cycle company entering valuation must map to a versioned PE policy, a versioned financial PB/ROE policy, or an explicit normalization/data-insufficiency execution state. Missing valuation policy is a validator failure, not an unavailable shortcut."
   },
   "default_buy_band": {
-    "safe_to_fair_floor": [0.75, 0.88],
-    "reasonable_to_fair_floor": [0.88, 1.0]
+    "safe_to_fair_floor": [0.78, 0.90],
+    "reasonable_to_fair_floor": [0.90, 1.0]
+  },
+  "low_risk_pe_policy": {
+    "primary_eps_year": "current_year",
+    "positive_next_year_growth_can_raise_entry_pe": false,
+    "growth_floor_caps": [
+      {"growth_max_pct": 0, "pe_floor_cap": 13},
+      {"growth_max_pct": 10, "pe_floor_cap": 15},
+      {"growth_max_pct": 20, "pe_floor_cap": 18},
+      {"growth_max_pct": 35, "pe_floor_cap": 20},
+      {"growth_max_pct": 50, "pe_floor_cap": 22},
+      {"growth_max_pct": 1000000, "pe_floor_cap": 24}
+    ],
+    "derived_range_width": 4,
+    "rule": "Business multiple_range is a theoretical fair-value reference, not automatically a low-risk entry multiple. Unless a company has an explicit low_risk_multiple_range, cap the theoretical PE floor by next-year earnings durability. Positive future growth does not lift the current-year entry PE; weak or negative future growth can compress it. The derived low-risk upper multiple is capped near the adjusted floor plus a small width and never exceeds the theoretical business upper multiple."
   },
   "business_policies": {
     "shipbuilding": {"multiple_range": [16, 22]},
@@ -64,10 +78,19 @@
       "rationale": "2026盈利增长由高端大缸径发动机、数据中心发电与新能源动力共同驱动；周期属性仍要求折价，但不应按传统重卡纯周期12-16倍机械定价。",
       "review_triggers": ["2026/2027一致预期EPS变化超过10%", "数据中心发电订单趋势反转", "重卡/发动机需求趋势明显反转"]
     },
+    "002452": {
+      "name": "长高电气",
+      "valuation_model": "grid_equipment_company_low_risk_forward_pe",
+      "multiple_range": [18, 25],
+      "low_risk_multiple_range": [13, 16],
+      "rationale": "行业景气可支持理论估值，但2027一致预期EPS低于2026，且2026利润含显著非经常性收益风险；低风险买点必须以2026 EPS为主锚并压低PE，不能直接套用18-25倍行业模板。",
+      "review_triggers": ["2027一致预期EPS重新高于2026且主营增长得到验证", "扣非盈利/订单兑现显著改善", "非经常性收益影响消退"]
+    },
     "002475": {
       "name": "立讯精密",
       "valuation_model": "multi_engine_precision_manufacturing_forward_pe",
       "multiple_range": [20, 24],
+      "low_risk_multiple_range": [20, 24],
       "safe_to_fair_floor": [0.78, 0.90],
       "reasonable_to_fair_floor": [0.90, 0.94],
       "rationale": "消费电子基本盘叠加AI数据中心互连/热管理/电源与汽车电子，多业务增长结构和明确前三季度指引支持高于传统消费电子代工的估值；同时保留整合与利润率风险折价。",
@@ -77,14 +100,33 @@
     "600458": {"name": "时代新材", "valuation_model": "wind_new_material_forward_pe", "multiple_range": [16, 22]},
     "600482": {"name": "中国动力", "valuation_model": "marine_power_forward_pe", "multiple_range": [18, 24]},
     "600685": {"name": "中船防务", "valuation_model": "shipbuilding_forward_pe", "multiple_range": [18, 24]},
-    "600710": {"name": "苏美达", "valuation_model": "ship_supply_chain_forward_pe", "multiple_range": [10, 14]},
+    "600710": {
+      "name": "苏美达",
+      "valuation_model": "ship_supply_chain_forward_pe",
+      "multiple_range": [10, 14],
+      "low_risk_multiple_range": [10, 12],
+      "rationale": "船舶订单和供应链业务提供盈利支撑，但低风险买点按2026 EPS约10-12倍PE定价，不把2030年前订单能见度直接资本化成更高买入倍数。"
+    },
     "603088": {"name": "宁波精达", "valuation_model": "equipment_forward_pe", "multiple_range": [18, 24]},
     "603259": {"name": "药明康德", "valuation_model": "cxo_forward_pe", "multiple_range": [20, 28]},
-    "603659": {"name": "璞泰来", "valuation_model": "battery_equipment_material_forward_pe", "multiple_range": [18, 25]},
+    "603659": {
+      "name": "璞泰来",
+      "valuation_model": "battery_equipment_material_forward_pe",
+      "multiple_range": [18, 25],
+      "low_risk_multiple_range": [17, 21],
+      "rationale": "设备在手订单和材料放量支持成长，但负极/隔膜/PVDF仍具有材料价格与产能周期属性；低风险买点按2026 EPS约17-21倍PE，理论成长估值与实际买点分离。"
+    },
     "603986": {"name": "兆易创新", "valuation_model": "semiconductor_forward_pe", "multiple_range": [25, 32]},
     "601869": {"name": "长飞光纤", "valuation_model": "optical_infrastructure_forward_pe", "multiple_range": [22, 30]},
     "001309": {"name": "德明利", "valuation_model": "memory_growth_forward_pe", "multiple_range": [22, 30]},
-    "002709": {"name": "天赐材料", "valuation_model": "battery_material_forward_pe", "multiple_range": [20, 28]},
+    "002709": {
+      "name": "天赐材料",
+      "valuation_model": "battery_material_forward_pe",
+      "multiple_range": [20, 28],
+      "low_risk_multiple_range": [12, 16],
+      "rationale": "2026电解液/六氟景气和盈利显著修复，但利润仍高度受产品价格、原料成本、供需与产能利用率影响；理论成长估值不能直接作为低风险买点，按2026 EPS约12-16倍PE形成低风险价值锚。",
+      "review_triggers": ["电解液单吨利润连续两个季度显著高于中枢且供给未扩张", "2027盈利增长与现金流同步上修", "原料/产品价差结构发生长期改善"]
+    },
     "002812": {"name": "恩捷股份", "valuation_model": "separator_forward_pe", "multiple_range": [18, 25]},
     "002156": {
       "name": "通富微电",
