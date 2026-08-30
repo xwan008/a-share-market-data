@@ -1,17 +1,288 @@
 {
-  "schema_version": 3,
-  "source": "tencent_qfq_day",
+  "schema_version": 7,
+  "mode": "sharded_full_market",
+  "generated_at": "2026-08-30T12:47:16.720417+08:00",
+  "partition_count": 16,
+  "completed_partitions": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
   "requested_stocks": 3177,
-  "successful_stocks": 3177,
-  "failed_stocks": 0,
-  "success_ratio": 1.0,
-  "rolling_days": 65,
-  "request_bars": 80,
-  "volume_unit": "shares",
-  "tencent_source_volume_unit": "lots_100_shares",
-  "history_shards_written": 62,
-  "latest_trade_date": "2026-08-21",
-  "latest_generated_at": "2026-08-21T21:47:34.182946+08:00",
-  "history_refreshed_at": "2026-08-22T11:10:56.896222+08:00",
-  "sample_failures": {}
+  "successful_fetch_stocks": 3177,
+  "failed_fetch_stocks": 0,
+  "fetch_success_ratio": 1.0,
+  "rolling_days": 180,
+  "long_term_summary_window": 252,
+  "latest_trade_date": "2026-08-28",
+  "local_history_ge_120": 3177,
+  "local_history_ge_180": 3177,
+  "long_term_summary_present": 3177,
+  "latest_history_date_count": 3140,
+  "right_structure_ready_count": 3140,
+  "right_structure_ready_ratio": 0.9883537928863708,
+  "incomplete_count": 37,
+  "incomplete_codes": [
+    "000004",
+    "000040",
+    "000584",
+    "000622",
+    "000627",
+    "000635",
+    "000638",
+    "000711",
+    "000851",
+    "002231",
+    "002274",
+    "002336",
+    "002586",
+    "002750",
+    "002808",
+    "002898",
+    "600070",
+    "600190",
+    "600193",
+    "600200",
+    "600355",
+    "600387",
+    "600421",
+    "600462",
+    "600599",
+    "600608",
+    "600636",
+    "600696",
+    "600705",
+    "600804",
+    "600811",
+    "601028",
+    "601989",
+    "603003",
+    "603056",
+    "603388",
+    "605081"
+  ],
+  "failed_fetches": {},
+  "partitions": [
+    {
+      "partition_index": 0,
+      "requested": 298,
+      "successful": 298,
+      "failed": 0,
+      "success_ratio": 1.0,
+      "owned_shard_keys": [
+        "0000",
+        "0022",
+        "6006",
+        "6032"
+      ]
+    },
+    {
+      "partition_index": 1,
+      "requested": 267,
+      "successful": 267,
+      "failed": 0,
+      "success_ratio": 1.0,
+      "owned_shard_keys": [
+        "0001",
+        "0023",
+        "6007",
+        "6033"
+      ]
+    },
+    {
+      "partition_index": 2,
+      "requested": 191,
+      "successful": 191,
+      "failed": 0,
+      "success_ratio": 1.0,
+      "owned_shard_keys": [
+        "0003",
+        "0024",
+        "6008",
+        "6034"
+      ]
+    },
+    {
+      "partition_index": 3,
+      "requested": 224,
+      "successful": 224,
+      "failed": 0,
+      "success_ratio": 1.0,
+      "owned_shard_keys": [
+        "0004",
+        "0025",
+        "6009",
+        "6035"
+      ]
+    },
+    {
+      "partition_index": 4,
+      "requested": 263,
+      "successful": 263,
+      "failed": 0,
+      "success_ratio": 1.0,
+      "owned_shard_keys": [
+        "0005",
+        "0026",
+        "6010",
+        "6036"
+      ]
+    },
+    {
+      "partition_index": 5,
+      "requested": 226,
+      "successful": 226,
+      "failed": 0,
+      "success_ratio": 1.0,
+      "owned_shard_keys": [
+        "0006",
+        "0027",
+        "6011",
+        "6037"
+      ]
+    },
+    {
+      "partition_index": 6,
+      "requested": 235,
+      "successful": 235,
+      "failed": 0,
+      "success_ratio": 1.0,
+      "owned_shard_keys": [
+        "0007",
+        "0028",
+        "6012",
+        "6038"
+      ]
+    },
+    {
+      "partition_index": 7,
+      "requested": 227,
+      "successful": 227,
+      "failed": 0,
+      "success_ratio": 1.0,
+      "owned_shard_keys": [
+        "0008",
+        "0029",
+        "6013",
+        "6039"
+      ]
+    },
+    {
+      "partition_index": 8,
+      "requested": 141,
+      "successful": 141,
+      "failed": 0,
+      "success_ratio": 1.0,
+      "owned_shard_keys": [
+        "0009",
+        "0030",
+        "6014",
+        "6050"
+      ]
+    },
+    {
+      "partition_index": 9,
+      "requested": 100,
+      "successful": 100,
+      "failed": 0,
+      "success_ratio": 1.0,
+      "owned_shard_keys": [
+        "0012",
+        "0038",
+        "6015",
+        "6051"
+      ]
+    },
+    {
+      "partition_index": 10,
+      "requested": 157,
+      "successful": 157,
+      "failed": 0,
+      "success_ratio": 1.0,
+      "owned_shard_keys": [
+        "0013",
+        "6000",
+        "6016",
+        "6052"
+      ]
+    },
+    {
+      "partition_index": 11,
+      "requested": 118,
+      "successful": 118,
+      "failed": 0,
+      "success_ratio": 1.0,
+      "owned_shard_keys": [
+        "0016",
+        "6001",
+        "6017",
+        "6053"
+      ]
+    },
+    {
+      "partition_index": 12,
+      "requested": 104,
+      "successful": 104,
+      "failed": 0,
+      "success_ratio": 1.0,
+      "owned_shard_keys": [
+        "0018",
+        "6002",
+        "6018",
+        "6054"
+      ]
+    },
+    {
+      "partition_index": 13,
+      "requested": 126,
+      "successful": 126,
+      "failed": 0,
+      "success_ratio": 1.0,
+      "owned_shard_keys": [
+        "0019",
+        "6003",
+        "6019",
+        "6055"
+      ]
+    },
+    {
+      "partition_index": 14,
+      "requested": 241,
+      "successful": 241,
+      "failed": 0,
+      "success_ratio": 1.0,
+      "owned_shard_keys": [
+        "0020",
+        "6004",
+        "6030"
+      ]
+    },
+    {
+      "partition_index": 15,
+      "requested": 259,
+      "successful": 259,
+      "failed": 0,
+      "success_ratio": 1.0,
+      "owned_shard_keys": [
+        "0021",
+        "6005",
+        "6031"
+      ]
+    }
+  ],
+  "status": "PASS",
+  "errors": []
 }
