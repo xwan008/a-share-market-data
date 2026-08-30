@@ -1,0 +1,51 @@
+name: Build common qualification pool
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/build_common_qualification_pool.py'
+      - '.github/workflows/build-common-qualification-pool.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: a-share-common-qualification-pool
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Revalidate frozen T2 recall
+        run: python scripts/validate_t2_recall_v2.py data/research/pipeline/t2_company_recall.json --industry-scan data/research/pipeline/industry_scan.json
+      - name: Revalidate weekly scan
+        run: python scripts/validate_research_outputs.py weekly-scan data/research/pipeline/weekly_opportunity_scan.json
+      - name: Build common qualification pool
+        run: python scripts/build_common_qualification_pool.py
+      - name: Commit common qualification pool
+        shell: bash
+        run: |
+          if git status --porcelain -- data/research/pipeline/common_qualification_pool.json | grep -q .; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add data/research/pipeline/common_qualification_pool.json
+            git commit -m "research: freeze common qualification pool"
+            for attempt in 1 2 3; do
+              git pull --rebase origin main
+              if git push; then exit 0; fi
+              sleep $((attempt * 2))
+            done
+            exit 1
+          else
+            echo "No common pool changes."
+          fi
