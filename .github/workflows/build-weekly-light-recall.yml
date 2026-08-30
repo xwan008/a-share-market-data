@@ -1,6 +1,6 @@
 name: Build weekly light recall
 
-# trigger-version: 3 (migration guard)
+# trigger-version: 4 (migration guard + review queue)
 on:
   workflow_dispatch:
   push:
@@ -9,6 +9,7 @@ on:
       - 'data/research/pipeline/t2_company_recall.json'
       - 'scripts/build_weekly_light_recall.py'
       - 'scripts/apply_weekly_migration_guard.py'
+      - 'scripts/build_weekly_manual_review_queue.py'
       - '.github/workflows/build-weekly-light-recall.yml'
 
 permissions:
@@ -38,13 +39,15 @@ jobs:
         run: python scripts/build_weekly_light_recall.py
       - name: Force legacy active names into explicit migration review
         run: python scripts/apply_weekly_migration_guard.py
+      - name: Build compact deep-review queue
+        run: python scripts/build_weekly_manual_review_queue.py
       - name: Commit light recall for deep verification
         shell: bash
         run: |
-          if git status --porcelain -- data/research/pipeline/weekly_light_recall.json data/research/pipeline/weekly_light_candidates.json | grep -q .; then
+          if git status --porcelain -- data/research/pipeline/weekly_light_recall.json data/research/pipeline/weekly_light_candidates.json data/research/pipeline/weekly_manual_review_queue.json | grep -q .; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add data/research/pipeline/weekly_light_recall.json data/research/pipeline/weekly_light_candidates.json
+            git add data/research/pipeline/weekly_light_recall.json data/research/pipeline/weekly_light_candidates.json data/research/pipeline/weekly_manual_review_queue.json
             git commit -m "research: refresh weekly full-market light recall"
             for attempt in 1 2 3; do
               git pull --rebase origin main
