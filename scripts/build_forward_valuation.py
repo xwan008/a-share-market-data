@@ -103,9 +103,34 @@ def choose_pb_band(policy,forward_roe):
     return None
 
 
+def growth_pe_floor_cap(growth_pct, policies):
+    if growth_pct is None: return None
+    cfg=policies.get('low_risk_pe_policy',{})
+    for band in cfg.get('growth_floor_caps',[]):
+        mx=num(band.get('growth_max_pct')); cap=num(band.get('pe_floor_cap'))
+        if mx is not None and cap is not None and growth_pct<=mx: return float(cap)
+    return None
+
+
+def choose_low_risk_pe_range(policy, growth_pct, policies):
+    theoretical=policy.get('multiple_range')
+    if not isinstance(theoretical,list) or len(theoretical)!=2: return None,None,None,None
+    theo_lo,theo_hi=map(float,theoretical)
+    explicit=policy.get('low_risk_multiple_range')
+    cap=growth_pe_floor_cap(growth_pct,policies)
+    if isinstance(explicit,list) and len(explicit)==2:
+        lo,hi=map(float,explicit)
+        return [lo,hi],[theo_lo,theo_hi],cap,'company_explicit_low_risk_pe'
+    lo=theo_lo if cap is None else min(theo_lo,cap)
+    width=float(policies.get('low_risk_pe_policy',{}).get('derived_range_width',4))
+    hi=min(theo_hi,max(lo,lo+width))
+    method='theoretical_pe_unchanged' if lo==theo_lo and hi==theo_hi else 'growth_guarded_low_risk_pe'
+    return [lo,hi],[theo_lo,theo_hi],cap,method
+
+
 def zone(price,fair_floor,policy,default_band):
-    sb=policy.get('safe_to_fair_floor') or default_band.get('safe_to_fair_floor') or [0.75,0.88]
-    rb=policy.get('reasonable_to_fair_floor') or default_band.get('reasonable_to_fair_floor') or [0.88,1.0]
+    sb=policy.get('safe_to_fair_floor') or default_band.get('safe_to_fair_floor') or [0.78,0.90]
+    rb=policy.get('reasonable_to_fair_floor') or default_band.get('reasonable_to_fair_floor') or [0.90,1.0]
     safe=[fair_floor*sb[0],fair_floor*sb[1]]; reasonable=[fair_floor*rb[0],fair_floor*rb[1]]
     conclusion='safe_buy_zone' if price<=safe[1] else ('reasonable_buy_zone' if price<=reasonable[1] else 'above_buy_zone')
     return safe,reasonable,conclusion
@@ -152,16 +177,19 @@ def main():
             lo,hi=mult; fair_lo,fair_hi=bvps*lo,bvps*hi; safe,reasonable,conclusion=zone(price,fair_lo,policy,default_band)
             row={'code':code,'name':name,'current_price':round(price,3),'valuation_status':'valid','execution_state':'valid','policy_status':'supported','valuation_model':model,'valuation_basis_unit':'PB','forecast_source':'akshare.stock_profit_forecast_em+Eastmoney_A_share_spot','forecast_report_count':reports,'consensus_eps_current_year':round(eps_now,4),'consensus_eps_next_year':round(eps_next,4) if eps_next else None,'book_value_per_share_proxy':round(bvps,4),'market_pb':round(pb,4),'market_indicator_source':market_source,'forward_roe_current_year':round(roe_now,4),'forward_roe_next_year':round(roe_next,4) if roe_next is not None else None,'market_pe_dynamic':round(pe_dyn,4) if pe_dyn else None,'market_forward_pe_current_year':round(price/eps_now,2),'market_forward_pe_next_year':round(price/eps_next,2) if eps_next else None,'forward_earnings_basis':f'BVPS proxy={bvps:.4f} from market PB ({market_source}); {year}/{year+1} consensus maps to Forward ROE then versioned PB band.','reasonable_multiple_range':[lo,hi],'multiple_rationale':policy.get('rationale'),'value_anchor_range':[round(fair_lo,2),round(fair_hi,2)],'safe_buy_range':[round(safe[0],2),round(safe[1],2)],'reasonable_buy_range':[round(reasonable[0],2),round(reasonable[1],2)],'key_sensitivities':['forward ROE','book value quality','market activity/investment return'],'invalidation_condition':gate.get('invalidation_condition') or 'forward ROE or book-value bridge deteriorates','left_conclusion':conclusion}
         else:
-            mult=policy.get('multiple_range')
-            if not isinstance(mult,list) or len(mult)!=2:
+            low_risk_mult,theoretical_mult,growth_cap,pe_method=choose_low_risk_pe_range(policy,growth,policies)
+            if not low_risk_mult or not theoretical_mult:
                 unsupported.append(code); execution['unsupported_policy']+=1; companies.append({'code':code,'name':name,'current_price':price,'valuation_status':'unavailable','execution_state':'unsupported_policy','policy_status':'unsupported','valuation_model':model or 'unsupported_business_model','valuation_basis_unit':'PE','forecast_source':'akshare.stock_profit_forecast_em','forecast_report_count':reports,'forward_earnings_basis':'Versioned multiple_range missing.','reasonable_multiple_range':None,'value_anchor_range':None,'safe_buy_range':None,'reasonable_buy_range':None,'key_sensitivities':['valuation policy'],'invalidation_condition':'policy coverage repaired','left_conclusion':'unavailable','reason':'versioned_multiple_missing'}); continue
-            lo,hi=map(float,mult); fair_lo,fair_hi=eps_now*lo,eps_now*hi; safe,reasonable,conclusion=zone(price,fair_lo,policy,default_band)
-            row={'code':code,'name':name,'current_price':round(price,3),'valuation_status':'valid','execution_state':'valid','policy_status':'supported','valuation_model':model,'valuation_basis_unit':'PE','forecast_source':'akshare.stock_profit_forecast_em','forecast_report_count':reports,'consensus_eps_current_year':round(eps_now,4),'consensus_eps_next_year':round(eps_next,4) if eps_next else None,'next_year_eps_growth_pct':round(growth,2) if growth is not None else None,'market_pe_dynamic':round(pe_dyn,4) if pe_dyn else None,'market_forward_pe_current_year':round(price/eps_now,2),'market_forward_pe_next_year':round(price/eps_next,2) if eps_next else None,'forward_earnings_basis':f'{year} consensus EPS={eps_now:.4f}; {year+1} EPS={eps_next:.4f}' if eps_next else f'{year} consensus EPS={eps_now:.4f}; next-year EPS unavailable.','reasonable_multiple_range':[lo,hi],'multiple_rationale':policy.get('rationale') or 'Versioned business valuation policy.','value_anchor_range':[round(fair_lo,2),round(fair_hi,2)],'safe_buy_range':[round(safe[0],2),round(safe[1],2)],'reasonable_buy_range':[round(reasonable[0],2),round(reasonable[1],2)],'key_sensitivities':['future earnings','consensus revisions','reasonable multiple'],'invalidation_condition':gate.get('invalidation_condition') or 'future earnings bridge invalidated','left_conclusion':conclusion}
+            lo,hi=low_risk_mult; theo_lo,theo_hi=theoretical_mult
+            fair_lo,fair_hi=eps_now*lo,eps_now*hi; business_fair_lo,business_fair_hi=eps_now*theo_lo,eps_now*theo_hi
+            safe,reasonable,conclusion=zone(price,fair_lo,policy,default_band)
+            rationale=policy.get('rationale') or 'Versioned business valuation policy.'
+            row={'code':code,'name':name,'current_price':round(price,3),'valuation_status':'valid','execution_state':'valid','policy_status':'supported','valuation_model':model,'valuation_basis_unit':'PE','forecast_source':'akshare.stock_profit_forecast_em','forecast_report_count':reports,'consensus_eps_current_year':round(eps_now,4),'consensus_eps_next_year':round(eps_next,4) if eps_next else None,'next_year_eps_growth_pct':round(growth,2) if growth is not None else None,'market_pe_dynamic':round(pe_dyn,4) if pe_dyn else None,'market_forward_pe_current_year':round(price/eps_now,2),'market_forward_pe_next_year':round(price/eps_next,2) if eps_next else None,'forward_earnings_basis':f'{year} consensus EPS={eps_now:.4f} is the low-risk earnings anchor; {year+1} EPS={eps_next:.4f} is used only as durability/growth guardrail.' if eps_next else f'{year} consensus EPS={eps_now:.4f}; next-year EPS unavailable, so no positive future-growth uplift is applied.','theoretical_business_multiple_range':[theo_lo,theo_hi],'growth_pe_floor_cap':growth_cap,'low_risk_pe_method':pe_method,'reasonable_multiple_range':[lo,hi],'multiple_rationale':rationale,'business_fair_value_range':[round(business_fair_lo,2),round(business_fair_hi,2)],'value_anchor_range':[round(fair_lo,2),round(fair_hi,2)],'safe_buy_range':[round(safe[0],2),round(safe[1],2)],'reasonable_buy_range':[round(reasonable[0],2),round(reasonable[1],2)],'key_sensitivities':['2026 earnings','2027 earnings durability','company-level low-risk PE','consensus revisions'],'invalidation_condition':gate.get('invalidation_condition') or 'future earnings bridge invalidated','left_conclusion':conclusion}
         execution['valid']+=1; model_counts[row['valuation_model']]=model_counts.get(row['valuation_model'],0)+1
         if row['left_conclusion'] in {'safe_buy_zone','reasonable_buy_zone'}: left.append(code)
         companies.append(row)
 
-    payload={'schema_version':4,'generated_at':datetime.now(TZ).isoformat(),'common_pool_count':len(common.get('common_pool_codes',[])),'fundamental_company_count':len(companies),'deferred_cycle_codes':sorted(cycle_codes),'market_indicator_errors':spot_errors,'policy_coverage':{'noncycle_count':len(companies),'supported_policy_count':len(set(supported)),'unsupported_policy_count':len(set(unsupported)),'supported_policy_codes':sorted(set(supported)),'unsupported_policy_codes':sorted(set(unsupported)),'execution_counts':execution,'model_counts':dict(sorted(model_counts.items()))},'companies':companies,'left_set_codes':sorted(left),'method_note':'All non-cycle candidates require versioned policy. PE uses consensus Forward EPS. Brokers/insurers execute Forward ROE-PB; PB is loaded from all-A Eastmoney data with SH-A/SZ-A fallback. Data insufficiency remains explicit.'}
+    payload={'schema_version':5,'generated_at':datetime.now(TZ).isoformat(),'common_pool_count':len(common.get('common_pool_codes',[])),'fundamental_company_count':len(companies),'deferred_cycle_codes':sorted(cycle_codes),'market_indicator_errors':spot_errors,'policy_coverage':{'noncycle_count':len(companies),'supported_policy_count':len(set(supported)),'unsupported_policy_count':len(set(unsupported)),'supported_policy_codes':sorted(set(supported)),'unsupported_policy_codes':sorted(set(unsupported)),'execution_counts':execution,'model_counts':dict(sorted(model_counts.items()))},'companies':companies,'left_set_codes':sorted(left),'method_note':'Non-cycle PE valuation uses current-year consensus EPS as the low-risk earnings anchor. Industry/business PE ranges are theoretical fair-value references; low-risk entry PE is separately company-explicit or growth-guarded. Positive next-year growth cannot mechanically raise the current-year entry multiple. Brokers/insurers remain Forward ROE-PB.'}
     OUT.write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
     print(json.dumps({'status':'ok','fundamental':len(companies),'cycle_deferred':len(cycle_codes),'left':len(left),'unsupported_policy':len(set(unsupported)),'execution':execution,'market_indicator_errors':spot_errors},ensure_ascii=False))
     return 0
