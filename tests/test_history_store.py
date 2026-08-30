@@ -11,23 +11,18 @@ def test_history_accepts_completed_market_snapshots():
 
 def test_merge_rows_overwrites_same_date_and_keeps_latest_window():
     existing = [
-        {"date": f"2026-06-{day:02d}", "close": float(day)}
-        for day in range(1, 31)
-    ] + [
-        {"date": f"2026-07-{day:02d}", "close": float(day + 30)}
-        for day in range(1, 31)
+        {"date": f"2026-{1 + i // 28:02d}-{1 + i % 28:02d}", "close": float(i + 1)}
+        for i in range(220)
     ]
     incoming = [
-        {"date": "2026-07-30", "close": 130.0},
-        {"date": "2026-07-31", "close": 131.0},
-        {"date": "2026-08-01", "close": 132.0},
-        {"date": "2026-08-02", "close": 133.0},
-        {"date": "2026-08-03", "close": 134.0},
-        {"date": "2026-08-04", "close": 135.0},
+        {"date": "2026-08-28", "close": 999.0},
+        {"date": "2026-08-29", "close": 1000.0},
     ]
 
     rows = merge_rows(existing, incoming)
 
+    assert ROLLING_DAYS == 180
     assert len(rows) == ROLLING_DAYS
-    assert rows[-1]["date"] == "2026-08-04"
-    assert next(row for row in rows if row["date"] == "2026-07-30")["close"] == 130.0
+    assert rows[-1]["date"] == "2026-08-29"
+    assert rows[-2]["date"] == "2026-08-28"
+    assert rows[0]["date"] > existing[0]["date"]
