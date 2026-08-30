@@ -6,6 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DRIVERS = ROOT / "data/research/v2/earnings_driver_scan.json"
 COMPANY = ROOT / "data/research/v2/company_research.json"
+VALUATION = ROOT / "data/research/v2/valuation_reference.json"
 PRICE = ROOT / "data/research/v2/full_market_price_structure.json"
 GAP = ROOT / "data/research/v2/price_expectation_gap.json"
 RANK = ROOT / "data/research/v2/opportunity_ranking.json"
@@ -17,19 +18,20 @@ def load(path: Path):
 
 def main() -> int:
     errors = []
-    for path in (DRIVERS, COMPANY, PRICE, GAP, RANK):
+    outputs = (DRIVERS, COMPANY, VALUATION, PRICE, GAP, RANK)
+    for path in outputs:
         if not path.exists():
             errors.append(f"missing_output:{path.name}")
     if errors:
         print(json.dumps({"status": "FAIL", "errors": errors}, ensure_ascii=False, indent=2))
         return 2
 
-    d, c, p, g, r = map(load, (DRIVERS, COMPANY, PRICE, GAP, RANK))
-    if any(x.get("mode") != "shadow" for x in (d, c, p, g, r)):
+    d, c, v, p, g, r = map(load, outputs)
+    if any(x.get("mode") != "shadow" for x in (d, c, v, p, g, r)):
         errors.append("non_shadow_output_detected")
 
     ref = p.get("reference_trade_date")
-    for name, x in (("company", c), ("gap", g), ("ranking", r)):
+    for name, x in (("company", c), ("valuation", v), ("gap", g), ("ranking", r)):
         if x.get("reference_trade_date") != ref:
             errors.append(f"reference_trade_date_mismatch:{name}:{x.get('reference_trade_date')}!={ref}")
 
@@ -51,11 +53,26 @@ def main() -> int:
     if not selected.issubset(set(cmap)):
         errors.append("valuation_queue_not_subset_of_company_research")
 
+    vrows = v.get("companies") or {}
+    if set(vrows) != selected:
+        errors.append(f"valuation_reference_company_set_mismatch:{len(vrows)}!={len(selected)}")
+    for code, row in vrows.items():
+        anchors = int(row.get("independent_anchor_count") or 0)
+        if anchors < 0 or anchors > 1:
+            errors.append(f"unexpected_valuation_reference_anchor_count:{code}:{anchors}")
+        if row.get("status") == "available" and anchors != 1:
+            errors.append(f"available_reference_without_one_anchor:{code}:{anchors}")
+        if row.get("status") != "available" and anchors != 0:
+            errors.append(f"review_reference_with_nonzero_anchor:{code}:{anchors}")
+
     grows = g.get("companies") or {}
     if set(grows) != selected:
         errors.append(f"gap_company_set_mismatch:{len(grows)}!={len(selected)}")
     for code, row in grows.items():
         anchors = int(row.get("independent_v2_anchor_count") or 0)
+        expected = int((vrows.get(code) or {}).get("independent_anchor_count") or 0)
+        if anchors != expected:
+            errors.append(f"gap_anchor_count_mismatch:{code}:{anchors}!={expected}")
         if anchors < 2 and row.get("formal_buy_zone") is not None:
             errors.append(f"formal_buy_zone_without_two_independent_anchors:{code}")
         if row.get("legacy_safe_buy_range_ignored") and row.get("formal_buy_zone") == row.get("legacy_safe_buy_range_ignored"):
@@ -88,6 +105,8 @@ def main() -> int:
             "company_recall": len(cmap),
             "research_pass": len(c.get("research_pass_codes") or []),
             "valuation_queue": len(selected),
+            "valuation_reference_available": v.get("available_count"),
+            "valuation_reference_review_required": v.get("review_required_count"),
             "valuation_covered": g.get("valuation_reference_covered_count"),
             "ranked": len(ranked),
             "shadow_top3": len(r.get("shadow_top3") or []),
