@@ -46,6 +46,15 @@ jobs:
         run: python scripts/merge_left_valuation.py
       - name: Validate full left coverage
         run: python scripts/validate_research_outputs.py left-valuation data/research/pipeline/left_valuation_scan.json
+      - name: Print focus valuation diagnostics
+        run: |
+          python - <<'PY'
+          import json
+          p=json.load(open('data/research/pipeline/left_valuation_scan.json',encoding='utf-8'))
+          focus={'000338','002475','000807','601600','601899'}
+          rows=[r for r in p['companies'] if r['code'] in focus]
+          print(json.dumps(rows,ensure_ascii=False,indent=2))
+          PY
       - name: Commit valuation scans
         shell: bash
         run: |
