@@ -66,36 +66,46 @@ def main() -> int:
             if isinstance(roe_next, (int, float)) and isinstance(low_risk_roe, (int, float)) and low_risk_roe > roe_next + 1e-4:
                 errors.append(f'{code}:low_risk_roe_ignores_next_year_downside:{low_risk_roe}>{roe_next}')
 
-    # Regression locks: ranges are intentionally broad enough to allow small consensus EPS revisions,
-    # but narrow enough to catch a return to the old industry-PE inflation bug.
+    # Production hard-gate checks the calibration bounds whenever a focus company has
+    # a valid valuation in this run. It must not require a focus company to remain in
+    # every diversified candidate pool or to have analyst consensus on every run.
+    # Formula-level regression locks live in tests/test_valuation_v5.py and therefore
+    # remain enforced independently of the current candidate composition/data coverage.
     focus = {
         '002452': {'safe_upper_max': 11.2, 'reasonable_upper_max': 12.3},
         '002709': {'safe_upper_max': 36.0, 'reasonable_upper_max': 40.0},
         '600710': {'safe_upper_max': 10.8, 'reasonable_upper_max': 12.0},
         '603659': {'safe_upper_max': 24.5, 'reasonable_upper_max': 27.5},
     }
+    checked_focus: list[str] = []
+    skipped_focus: dict[str, str] = {}
     for code, limits in focus.items():
         row = rows.get(code)
-        if not row or row.get('valuation_status') != 'valid':
-            errors.append(f'{code}:focus_company_not_valid')
+        if not row:
+            skipped_focus[code] = 'not_in_current_fundamental_scope'
+            continue
+        if row.get('valuation_status') != 'valid':
+            skipped_focus[code] = str(row.get('execution_state') or row.get('valuation_status') or 'not_valid')
             continue
         safe = row.get('safe_buy_range'); reasonable = row.get('reasonable_buy_range')
         if not valid_range(safe) or not valid_range(reasonable):
             errors.append(f'{code}:focus_ranges_missing')
             continue
+        checked_focus.append(code)
         if safe[1] > limits['safe_upper_max']:
             errors.append(f"{code}:safe_upper_regressed:{safe[1]}>{limits['safe_upper_max']}")
         if reasonable[1] > limits['reasonable_upper_max']:
             errors.append(f"{code}:reasonable_upper_regressed:{reasonable[1]}>{limits['reasonable_upper_max']}")
 
     if errors:
-        print(json.dumps({'status': 'FAIL', 'errors': errors}, ensure_ascii=False, indent=2))
+        print(json.dumps({'status': 'FAIL', 'errors': errors, 'checked_focus': checked_focus, 'skipped_focus': skipped_focus}, ensure_ascii=False, indent=2))
         return 1
     print(json.dumps({
         'status': 'PASS',
         'valid_pe_rows': sum(1 for r in rows.values() if r.get('valuation_status') == 'valid' and r.get('valuation_basis_unit') == 'PE'),
         'valid_pb_rows': sum(1 for r in rows.values() if r.get('valuation_status') == 'valid' and r.get('valuation_basis_unit') == 'PB'),
-        'focus_codes': sorted(focus),
+        'checked_focus': checked_focus,
+        'skipped_focus': skipped_focus,
     }, ensure_ascii=False))
     return 0
 
