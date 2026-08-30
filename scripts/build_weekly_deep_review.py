@@ -6,7 +6,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[1]
-QUEUE = ROOT / "data/research/pipeline/weekly_deep_review_queue.json"
+QUEUE = ROOT / "data/research/pipeline/weekly_manual_review_queue.json"
 LIGHT = ROOT / "data/research/pipeline/weekly_light_recall.json"
 OLD_POOL = ROOT / "data/research/weekly_fundamental_opportunity_pool.json"
 OVERRIDES = ROOT / "config/weekly_deep_review_overrides_20260830.json"
