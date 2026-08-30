@@ -1,0 +1,66 @@
+name: Build low-risk V2 shadow
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [refactor/low-risk-v2-blueprint]
+    paths:
+      - 'skills/a-share-low-risk/**'
+      - 'config/research_pipeline_manifest.json'
+      - 'config/low_risk_v2_golden_tests.json'
+      - 'scripts/build_v2_earnings_anomaly_recall.py'
+      - 'scripts/build_v2_full_market_price_structure.py'
+      - 'scripts/validate_v2_blueprint.py'
+      - '.github/workflows/build-low-risk-v2-shadow.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: a-share-low-risk-v2-shadow-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  shadow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - name: Install research dependencies
+        run: pip install -r requirements-research.txt
+      - name: Build full-market earnings anomaly recall
+        run: python scripts/build_v2_earnings_anomaly_recall.py
+      - name: Build independent full-market price structure
+        run: python scripts/build_v2_full_market_price_structure.py
+      - name: Validate V2 blueprint and golden invariants
+        run: python scripts/validate_v2_blueprint.py
+      - name: Print golden right-side diagnostic
+        run: |
+          python - <<'PY'
+          import json
+          p=json.load(open('data/research/v2/full_market_price_structure.json',encoding='utf-8'))
+          for code in ['601138']:
+              print(json.dumps(p.get('companies',{}).get(code),ensure_ascii=False,indent=2))
+          print(json.dumps({
+            'universe_count':p.get('universe_count'),
+            'verified_count':p.get('verified_count'),
+            'structure_type_counts':p.get('structure_type_counts'),
+            'right_candidate_count':len(p.get('right_candidate_codes',[]))
+          },ensure_ascii=False,indent=2))
+          PY
+      - name: Commit shadow mechanical outputs
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/research/v2/earnings_anomaly_recall.json data/research/v2/full_market_price_structure.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "research-v2: refresh shadow mechanical scans"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
