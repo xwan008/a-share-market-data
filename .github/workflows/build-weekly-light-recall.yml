@@ -1,0 +1,53 @@
+name: Build weekly light recall
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'data/research/pipeline/t2_company_recall.json'
+      - 'scripts/build_weekly_light_recall.py'
+      - '.github/workflows/build-weekly-light-recall.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: a-share-weekly-light-recall
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - name: Install research dependencies
+        run: pip install -r requirements-research.txt
+      - name: Revalidate frozen T2 stage
+        run: python scripts/validate_t2_recall_v2.py data/research/pipeline/t2_company_recall.json --industry-scan data/research/pipeline/industry_scan.json
+      - name: Mechanically screen full main-board universe
+        run: python scripts/build_weekly_light_recall.py
+      - name: Commit light recall for deep verification
+        shell: bash
+        run: |
+          if git status --porcelain -- data/research/pipeline/weekly_light_recall.json data/research/pipeline/weekly_light_candidates.json | grep -q .; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add data/research/pipeline/weekly_light_recall.json data/research/pipeline/weekly_light_candidates.json
+            git commit -m "research: refresh weekly full-market light recall"
+            for attempt in 1 2 3; do
+              git pull --rebase origin main
+              if git push; then exit 0; fi
+              sleep $((attempt * 2))
+            done
+            exit 1
+          else
+            echo "No weekly light recall changes."
+          fi
