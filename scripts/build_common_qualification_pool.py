@@ -145,9 +145,14 @@ def build_reverse_trigger_audit(light: dict, scan: dict, exposure_rules: dict, p
         key = (rule.get("broad_industry_id"), rule.get("subchain"))
         if statuses.get(key) != "unconfirmed":
             continue
+        trigger_universe_policy = rule.get("trigger_universe_policy") or "configured_trigger_company_codes"
+        if trigger_universe_policy == "all_currently_verified_explicit_exposed":
+            raw_codes = rule.get("explicit_exposed", [])
+        else:
+            raw_codes = rule.get("trigger_company_codes", [])
+        trigger_codes = sorted({str(code).zfill(6) for code in raw_codes if code})
         triggers = []
-        for raw_code in rule.get("trigger_company_codes", []):
-            code = str(raw_code).zfill(6)
+        for code in trigger_codes:
             screen_row = screen.get(code) or {}
             metrics = screen_row.get("metrics") or {}
             name = screen_row.get("name") or (stocks.get(code) or {}).get("name") or code
@@ -185,8 +190,10 @@ def build_reverse_trigger_audit(light: dict, scan: dict, exposure_rules: dict, p
             "review_status": "review_required" if review_required else "no_trigger",
             "value_chain_link": rule.get("value_chain_link"),
             "review_variables": rule.get("review_variables", []),
+            "trigger_universe_policy": trigger_universe_policy,
+            "trigger_universe_count": len(trigger_codes),
             "trigger_companies": triggers,
-            "rule": "A strong company signal reopens industry evidence review; it does not auto-promote the subchain or auto-admit the company to the common pool.",
+            "rule": "All currently verified exposed companies for this configured unconfirmed chain are screened for strong earnings anomalies. A trigger only reopens industry evidence review; it does not auto-promote the subchain or auto-admit any company to the common pool.",
         }
     return rows
 
