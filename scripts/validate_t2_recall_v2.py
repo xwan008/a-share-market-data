@@ -4,7 +4,7 @@ import argparse
 import copy
 import sys
 
-from scripts.validate_research_pipeline import (
+from validate_research_pipeline import (
     ValidationError,
     load_json,
     normalize_code,
