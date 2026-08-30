@@ -1,5 +1,5 @@
 {
-  "schema_version": 10,
+  "schema_version": 11,
   "pipeline": "a_share_low_risk_v2",
   "mode": "shadow",
   "purpose": "从正在改善的细分盈利驱动中，寻找未来1-2季度仍有兑现预期、但股价尚未充分定价的公司；优先寻找基本面已拐、价格刚启势的机会。",
@@ -9,7 +9,7 @@
     "召回要宽，淘汰要晚，公司级盈利验证才是真正筛选",
     "估值使用独立交叉锚，禁止重复折价和虚假精度",
     "价格结构必须全市场独立扫描，不能受左侧/基本面候选池限制",
-    "Validator首先检查经济合理性，其次才检查程序完整性"
+    "Validator只验证通用经济与结构不变量，不使用任何固定个股作为正确答案"
   ],
   "authoritative_skills": {
     "orchestrator": "skills/a-share-low-risk/orchestrator/SKILL.md",
@@ -97,19 +97,19 @@
   "economic_sanity": {
     "mandatory": true,
     "checks": [
-      "合理区反推PE/PB是否落入可解释范围",
-      "周期风险是否被重复折价",
-      "独立估值方法是否严重冲突",
-      "创新高强趋势是否因无历史压力被误杀",
-      "工业富联等非基本面候选是否仍能被全市场价格结构扫描覆盖"
+      "所有正式估值区间必须反推隐含PE/PB或等价估值量纲并检查是否可解释",
+      "同一周期风险不得在盈利、周期因子、估值倍数、买入区多层重复折价",
+      "独立估值方法严重冲突时必须输出valuation_divergence而不是强行给正式买点",
+      "创新高或进入价格发现阶段不得因为缺少历史压力位自动判弱",
+      "价格结构扫描的股票全集不得由company_research、估值结果或任何基本面候选池定义",
+      "Validator不得包含固定股票代码、固定股票名称、固定买入价或固定估值区间作为PASS条件"
     ],
     "failure_states": ["sanity_check_failed", "valuation_divergence"]
   },
-  "golden_test_policy": {
-    "required_before_production": true,
-    "config": "config/low_risk_v2_golden_tests.json",
-    "historical_replay_required": true,
-    "shadow_trading_days_required_before_replacing_v1": 3
+  "validation_policy": {
+    "case_free": true,
+    "principle": "只验证流程覆盖、数据完整性、公式不变量和经济一致性；任何个股历史案例只能用于人工复盘，不能成为机器筛选或Validator的先验答案。",
+    "shadow_trading_days_required_before_production": 3
   },
   "legacy_v1": {
     "status": "frozen_for_comparison_only",
