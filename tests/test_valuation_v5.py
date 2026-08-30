@@ -110,6 +110,57 @@ def test_financial_pb_band_is_forward_roe_driven():
     assert fund_mod.choose_pb_band(policy, 0.18) == [1.2, 1.6]
 
 
+def test_low_risk_pe_growth_guardrail_cuts_high_industry_floor_when_growth_is_weak():
+    policies = {
+        'low_risk_pe_policy': {
+            'growth_floor_caps': [
+                {'growth_max_pct': 0, 'pe_floor_cap': 13},
+                {'growth_max_pct': 20, 'pe_floor_cap': 18},
+                {'growth_max_pct': 1000000, 'pe_floor_cap': 24},
+            ],
+            'derived_range_width': 4,
+        }
+    }
+    low_risk, theoretical, cap, method = fund_mod.choose_low_risk_pe_range(
+        {'multiple_range': [18, 25]}, -12.76, policies
+    )
+    assert theoretical == [18.0, 25.0]
+    assert cap == 13.0
+    assert low_risk == [13.0, 17.0]
+    assert method == 'growth_guarded_low_risk_pe'
+
+
+def test_company_explicit_low_risk_pe_overrides_theoretical_industry_pe():
+    policies = {'low_risk_pe_policy': {'growth_floor_caps': [], 'derived_range_width': 4}}
+    low_risk, theoretical, cap, method = fund_mod.choose_low_risk_pe_range(
+        {'multiple_range': [20, 28], 'low_risk_multiple_range': [12, 16]}, 14.9, policies
+    )
+    assert theoretical == [20.0, 28.0]
+    assert low_risk == [12.0, 16.0]
+    assert cap is None
+    assert method == 'company_explicit_low_risk_pe'
+
+
+def test_focus_company_low_risk_ranges_match_2026_eps_framework():
+    cfg = json.loads((ROOT / 'config/valuation_policy_registry.json').read_text(encoding='utf-8'))
+    default_band = cfg['default_buy_band']
+    cases = {
+        '002452': (0.8975, [9.0, 10.6], [10.4, 11.8]),
+        '002709': (3.2101, [29.8, 34.9], [34.4, 38.8]),
+        '600710': (1.1222, [8.6, 10.3], [9.9, 11.4]),
+        '603659': (1.5192, [19.9, 23.5], [23.0, 26.1]),
+    }
+    for code, (eps_2026, safe_expected, reasonable_expected) in cases.items():
+        policy = cfg['company_overrides'][code]
+        low_risk, _, _, _ = fund_mod.choose_low_risk_pe_range(policy, None, cfg)
+        fair_floor = eps_2026 * low_risk[0]
+        safe, reasonable, _ = fund_mod.zone(9999.0, fair_floor, policy, default_band)
+        assert safe_expected[0] <= safe[0] <= safe_expected[1]
+        assert safe_expected[0] <= safe[1] <= safe_expected[1]
+        assert reasonable_expected[0] <= reasonable[0] <= reasonable_expected[1]
+        assert reasonable_expected[0] <= reasonable[1] <= reasonable_expected[1]
+
+
 def test_policy_audit_rejects_unsupported_policy():
     payload = {
         'common_pool_count': 2,
