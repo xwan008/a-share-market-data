@@ -11,6 +11,7 @@ ANCHORS=ROOT/'data/research/v2/valuation_anchors.json'
 PRICE=ROOT/'data/research/v2/full_market_price_structure.json'
 GAP=ROOT/'data/research/v2/price_expectation_gap.json'
 RANK=ROOT/'data/research/v2/opportunity_ranking.json'
+ENTRY_VALUE_STATES={'safe_buy_zone','reasonable_buy_zone'}
 
 def load(p): return json.loads(p.read_text(encoding='utf-8'))
 def vr(v): return isinstance(v,list) and len(v)==2 and all(isinstance(x,(int,float)) for x in v) and v[0]>0 and v[1]>=v[0]
@@ -36,6 +37,12 @@ def main():
         row=cmap.get(code) or {}
         if row.get('risk_warning') or not row.get('low_risk_eligible'): errors.append(f'risk_warning_in_research_pass:{code}')
         if not row.get('forward_bridge_valid'): errors.append(f'research_pass_without_forward_bridge:{code}')
+    for code in c.get('production_evidence_ready_codes') or []:
+        row=cmap.get(code) or {}; ev=row.get('financial_evidence') or {}
+        if not ev.get('recurring_profit_verified'): errors.append(f'production_evidence_without_recurring_profit:{code}')
+        if not ev.get('cashflow_quality_verified'): errors.append(f'production_evidence_without_cashflow_quality:{code}')
+        if row.get('deducted_profit_verification_required'): errors.append(f'production_evidence_still_requires_deducted_profit:{code}')
+        if not row.get('forward_bridge_valid'): errors.append(f'production_evidence_without_forward_bridge:{code}')
     selected=set(c.get('selected_for_valuation_codes') or [])
     if not selected.issubset(set(cmap)): errors.append('valuation_queue_not_subset_of_company_research')
     vrows=v.get('companies') or {}; arows=a.get('companies') or {}; grows=g.get('companies') or {}
@@ -66,16 +73,20 @@ def main():
     ranked=r.get('ranked_opportunities') or []; by={x.get('code'):x for x in ranked}
     if set(by)!=selected: errors.append(f'ranking_company_set_mismatch:{len(by)}!={len(selected)}')
     for code,row in by.items():
-        gr=grows.get(code) or {}
+        gr=grows.get(code) or {}; cr=cmap.get(code) or {}
         if bool(row.get('formal_buy_zone'))!=bool(gr.get('formal_buy_zone')): errors.append(f'ranking_zone_mismatch:{code}')
-        if row.get('production_publish_eligible') and not gr.get('production_valuation_ready'): errors.append(f'production_without_formal_zone:{code}')
+        if row.get('production_publish_eligible'):
+            if not gr.get('production_valuation_ready'): errors.append(f'production_without_formal_zone:{code}')
+            if row.get('value_gap_state') not in ENTRY_VALUE_STATES: errors.append(f'production_price_not_inside_entry_zone:{code}:{row.get("value_gap_state")}')
+            if not row.get('entry_price_eligible'): errors.append(f'production_without_entry_price_flag:{code}')
+            if not cr.get('production_evidence_ready'): errors.append(f'production_without_statement_evidence:{code}')
     for x in r.get('shadow_top3') or []:
         code=x.get('code'); row=by.get(code) or {}; cr=cmap.get(code) or {}
         if not row.get('shadow_priority_eligible'): errors.append(f'shadow_top3_not_eligible:{code}')
         if cr.get('risk_warning'): errors.append(f'risk_warning_in_shadow_top3:{code}')
     for x in r.get('production_top3') or []:
-        if not x.get('production_publish_eligible') or not x.get('formal_buy_zone'): errors.append(f'production_top3_without_complete_gate:{x.get("code")}')
-    status='PASS' if not errors else 'FAIL'; ac=a.get('counts') or {}
-    print(json.dumps({'status':status,'errors':errors,'counts':{'active_drivers':len(active),'company_recall':len(cmap),'research_pass':len(c.get('research_pass_codes') or []),'valuation_queue':len(selected),'first_anchor_available':v.get('available_count'),'financial_pb_fallback_repaired':v.get('financial_pb_fallback_repaired_count',0),'formal_buy_zone_ready':ac.get('formal_zone_ready'),'valuation_divergence':ac.get('valuation_divergence'),'fundamental_history_divergence':ac.get('fundamental_history_divergence'),'insufficient_confirming_anchors':ac.get('insufficient_confirming_anchors'),'ranked':len(ranked),'shadow_top3':len(r.get('shadow_top3') or []),'production_top3':len(r.get('production_top3') or [])}},ensure_ascii=False,indent=2)); return 0 if not errors else 2
+        if not x.get('production_publish_eligible') or not x.get('formal_buy_zone') or not x.get('entry_price_eligible'): errors.append(f'production_top3_without_complete_new_entry_gate:{x.get("code")}')
+    status='PASS' if not errors else 'FAIL'; ac=a.get('counts') or {}; fs=c.get('financial_evidence_summary') or {}
+    print(json.dumps({'status':status,'errors':errors,'counts':{'active_drivers':len(active),'company_recall':len(cmap),'research_pass':len(c.get('research_pass_codes') or []),'statement_recurring_verified':fs.get('recurring_profit_verified_count'),'statement_production_evidence_ready':fs.get('production_evidence_ready_count'),'valuation_queue':len(selected),'first_anchor_available':v.get('available_count'),'valuation_fallback_repairs':v.get('valuation_fallback_repaired_counts'),'formal_buy_zone_ready':ac.get('formal_zone_ready'),'valuation_divergence':ac.get('valuation_divergence'),'fundamental_history_divergence':ac.get('fundamental_history_divergence'),'insufficient_confirming_anchors':ac.get('insufficient_confirming_anchors'),'entry_price_eligible':r.get('entry_price_eligible_count'),'ranked':len(ranked),'shadow_top3':len(r.get('shadow_top3') or []),'production_top3':len(r.get('production_top3') or [])}},ensure_ascii=False,indent=2)); return 0 if not errors else 2
 
 if __name__=='__main__': raise SystemExit(main())
