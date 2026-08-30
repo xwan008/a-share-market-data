@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -33,11 +34,24 @@ def normalized_metric(value, bounds: list[float]) -> float:
     return (clipped - lo) / (hi - lo)
 
 
+def normalized_log_metric(value, bounds: list[float]) -> float:
+    if not isinstance(value, (int, float)) or value <= 0 or not isinstance(bounds, list) or len(bounds) != 2:
+        return 0.0
+    lo, hi = float(bounds[0]), float(bounds[1])
+    if lo <= 0 or hi <= lo:
+        return 0.0
+    clipped = max(lo, min(hi, float(value)))
+    return (math.log10(clipped) - math.log10(lo)) / (math.log10(hi) - math.log10(lo))
+
+
 def representative_score(metrics: dict, policy: dict) -> float:
     ranking = policy.get("ranking", {})
     weights = ranking.get("weights", {})
     caps = ranking.get("normalization_caps", {})
     score = 0.0
+    score += float(weights.get("net_profit_scale", 0.0)) * normalized_log_metric(
+        metrics.get("net_profit"), caps.get("net_profit_scale", [1e8, 3e10])
+    )
     for key in ("net_profit_yoy_pct", "revenue_yoy_pct", "net_profit_qoq_pct"):
         score += float(weights.get(key, 0.0)) * normalized_metric(metrics.get(key), caps.get(key, [0, 1]))
     score += float(weights.get("q3_positive_forecast", 0.0)) * (1.0 if metrics.get("q3_positive_forecast") else 0.0)
@@ -58,9 +72,9 @@ def rank_chain_candidates(codes: list[str], gate: dict, policy: dict) -> list[st
         metrics = gate[code].get("metrics") or {}
         return (
             -representative_score(metrics, policy),
+            -number(metrics.get("net_profit"), -1e18),
             -number(metrics.get("net_profit_yoy_pct"), -1e9),
             -number(metrics.get("revenue_yoy_pct"), -1e9),
-            -number(metrics.get("net_profit"), -1e18),
             code,
         )
 
@@ -157,8 +171,6 @@ def main() -> int:
         if status == "pass":
             earnings_passed.append(code)
 
-    # T2 recall remains intentionally broad. Only after the company earnings gate do we select
-    # a small number of representatives per T2 subchain for the formal common pool.
     earnings_passed_set = set(earnings_passed)
     all_tags = sorted({tag for code in earnings_passed for tag in t2_tags.get(code, [])})
     chain_passers = {
@@ -167,17 +179,12 @@ def main() -> int:
     }
     chain_caps = {tag: representative_cap(len(codes), rep_policy) for tag, codes in chain_passers.items()}
 
-    # Weekly deep-review names are independently validated and remain eligible, but they consume
-    # the same subchain capacity. If weekly review alone exceeds a cap, keep them and expose the
-    # overflow in the audit instead of silently deleting a deep-reviewed company.
     selected: set[str] = {code for code in earnings_passed if code in weekly_codes}
     counts_toward_cap = bool(rep_policy.get("weekly_deep_review", {}).get("counts_toward_subchain_cap", True))
 
     def selected_count(tag: str) -> int:
         return sum(1 for code in selected if tag in t2_tags.get(code, []))
 
-    # Process the broadest chains first so a large homogeneous chain (e.g. brokers) cannot be
-    # repopulated indirectly by multi-tag companies selected later from smaller chains.
     processing_order = sorted(all_tags, key=lambda tag: (-len(chain_passers[tag]), tag))
     for tag in processing_order:
         cap = chain_caps[tag]
@@ -194,8 +201,6 @@ def main() -> int:
         for code in ranked:
             if added >= open_slots:
                 break
-            # Global multi-tag guard: selecting this company must not overfill any T2 chain it
-            # belongs to. Weekly overflows are the only allowed cap exception.
             violates_other_chain = False
             for other_tag in t2_tags.get(code, []):
                 if other_tag not in chain_caps:
