@@ -3,7 +3,7 @@ name: Build forward valuation scan
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches: [main, fix/valuation-v4]
     paths:
       - 'scripts/build_forward_valuation.py'
       - 'scripts/build_cycle_valuation.py'
@@ -31,6 +31,8 @@ jobs:
           python-version: '3.12'
           cache: 'pip'
       - run: pip install -r requirements-research.txt
+      - name: Run valuation regression tests
+        run: pytest -q tests/test_valuation_v4.py
       - name: Build non-cycle forward valuation
         run: python scripts/build_forward_valuation.py
       - name: Validate non-cycle valuation contract
