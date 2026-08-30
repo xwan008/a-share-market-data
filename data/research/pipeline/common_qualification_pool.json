@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-30T18:01:56.421852+08:00",
+  "generated_at": "2026-08-30T18:14:47.410899+08:00",
   "t2_recall_frozen_at": "2026-08-30T17:44:18.936120+08:00",
   "weekly_pool_generated_at": "2026-08-30T09:17:13.081752+08:00",
   "representative_policy_reviewed_at": "2026-08-30",
@@ -7295,6 +7295,8 @@
         "装置开工率",
         "库存和下游需求"
       ],
+      "trigger_universe_policy": "all_currently_verified_explicit_exposed",
+      "trigger_universe_count": 1,
       "trigger_companies": [
         {
           "code": "002648",
@@ -7313,7 +7315,7 @@
           "trigger_reason": "full-market light screen already shows strong earnings transmission"
         }
       ],
-      "rule": "A strong company signal reopens industry evidence review; it does not auto-promote the subchain or auto-admit the company to the common pool."
+      "rule": "All currently verified exposed companies for this configured unconfirmed chain are screened for strong earnings anomalies. A trigger only reopens industry evidence review; it does not auto-promote the subchain or auto-admit any company to the common pool."
     },
     "chemicals::煤化工": {
       "industry_status": "unconfirmed",
@@ -7326,7 +7328,73 @@
         "库存",
         "下游需求"
       ],
+      "trigger_universe_policy": "all_currently_verified_explicit_exposed",
+      "trigger_universe_count": 8,
       "trigger_companies": [
+        {
+          "code": "000830",
+          "name": "鲁西化工",
+          "screen_status": "reject",
+          "screen_reason": "最新公开财务数据未达到宽召回阈值",
+          "metrics": {
+            "revenue_yoy_pct": 4.1565805286,
+            "net_profit_yoy_pct": 27.64,
+            "net_profit_qoq_pct": 22.5119,
+            "revenue": 15351775409.21,
+            "net_profit": 974515460.58,
+            "q3_positive_forecast": false
+          },
+          "triggered": false,
+          "trigger_reason": "company signal is not strong enough to reopen the unconfirmed subchain"
+        },
+        {
+          "code": "000990",
+          "name": "诚志股份",
+          "screen_status": "uncertain",
+          "screen_reason": "H1净利高增1416.2%，需排除低基数/一次性因素",
+          "metrics": {
+            "revenue_yoy_pct": 2.7686437089,
+            "net_profit_yoy_pct": 1416.23,
+            "net_profit_qoq_pct": -75.4473,
+            "revenue": 6146750487.49,
+            "net_profit": 289988021.14,
+            "q3_positive_forecast": false
+          },
+          "triggered": false,
+          "trigger_reason": "company signal is not strong enough to reopen the unconfirmed subchain"
+        },
+        {
+          "code": "002274",
+          "name": "华昌化工",
+          "screen_status": "pass",
+          "screen_reason": "H1收入同比24.8%且净利同比1026.9%；最新季度净利环比改善54.2%",
+          "metrics": {
+            "revenue_yoy_pct": 24.8486434092,
+            "net_profit_yoy_pct": 1026.9,
+            "net_profit_qoq_pct": 54.2225,
+            "revenue": 4015952154.0,
+            "net_profit": 123105705.32,
+            "q3_positive_forecast": false
+          },
+          "triggered": true,
+          "trigger_reason": "full-market light screen already shows strong earnings transmission"
+        },
+        {
+          "code": "600623",
+          "name": "华谊集团",
+          "screen_status": "uncertain",
+          "screen_reason": "最新季度净利环比改善92.2%",
+          "metrics": {
+            "revenue_yoy_pct": 1.7869996835,
+            "net_profit_yoy_pct": 0.55,
+            "net_profit_qoq_pct": 92.1631,
+            "revenue": 24624077801.72,
+            "net_profit": 490449608.25,
+            "q3_positive_forecast": false
+          },
+          "triggered": true,
+          "trigger_reason": "latest-quarter profit acceleration is strong enough to require subchain re-review"
+        },
         {
           "code": "600722",
           "name": "金牛化工",
@@ -7342,9 +7410,57 @@
           },
           "triggered": true,
           "trigger_reason": "latest-quarter profit acceleration is strong enough to require subchain re-review"
+        },
+        {
+          "code": "600746",
+          "name": "江苏索普",
+          "screen_status": "pass",
+          "screen_reason": "H1收入同比8.6%且净利同比148.7%；最新季度净利环比改善543.1%",
+          "metrics": {
+            "revenue_yoy_pct": 8.6099057475,
+            "net_profit_yoy_pct": 148.73,
+            "net_profit_qoq_pct": 543.0993,
+            "revenue": 3429997866.26,
+            "net_profit": 253380170.7,
+            "q3_positive_forecast": false
+          },
+          "triggered": true,
+          "trigger_reason": "full-market light screen already shows strong earnings transmission"
+        },
+        {
+          "code": "600844",
+          "name": "金煤科技",
+          "screen_status": "uncertain",
+          "screen_reason": "H1净利高增128.0%，需排除低基数/一次性因素；最新季度净利环比改善380.1%",
+          "metrics": {
+            "revenue_yoy_pct": 1.0631935262,
+            "net_profit_yoy_pct": 128.0380128553,
+            "net_profit_qoq_pct": 380.0978,
+            "revenue": 478475005.41,
+            "net_profit": 20413758.47,
+            "q3_positive_forecast": false
+          },
+          "triggered": true,
+          "trigger_reason": "latest-quarter profit acceleration is strong enough to require subchain re-review"
+        },
+        {
+          "code": "600989",
+          "name": "宝丰能源",
+          "screen_status": "pass",
+          "screen_reason": "H1收入同比32.3%且净利同比70.1%；最新季度净利环比改善65.7%",
+          "metrics": {
+            "revenue_yoy_pct": 32.3321115262,
+            "net_profit_yoy_pct": 70.14,
+            "net_profit_qoq_pct": 65.7384,
+            "revenue": 30197583541.33,
+            "net_profit": 9727818696.5,
+            "q3_positive_forecast": false
+          },
+          "triggered": true,
+          "trigger_reason": "full-market light screen already shows strong earnings transmission"
         }
       ],
-      "rule": "A strong company signal reopens industry evidence review; it does not auto-promote the subchain or auto-admit the company to the common pool."
+      "rule": "All currently verified exposed companies for this configured unconfirmed chain are screened for strong earnings anomalies. A trigger only reopens industry evidence review; it does not auto-promote the subchain or auto-admit any company to the common pool."
     }
   },
   "unconfirmed_review_required_tags": [
