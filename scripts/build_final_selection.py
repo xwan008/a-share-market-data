@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 COMMON = ROOT / 'data/research/pipeline/common_qualification_pool.json'
 LEFT = ROOT / 'data/research/pipeline/left_valuation_scan.json'
 RIGHT = ROOT / 'data/research/pipeline/right_structure_scan.json'
+LATEST = ROOT / 'data/latest.json'
 OUT = ROOT / 'data/research/pipeline/final_selection.json'
 SUMMARY = ROOT / 'data/research/pipeline/final_selection_summary.json'
 TZ = ZoneInfo('Asia/Shanghai')
@@ -22,14 +23,18 @@ def main() -> int:
     common = load(COMMON)
     left = load(LEFT)
     right = load(RIGHT)
+    latest = load(LATEST)
     common_codes = set(common.get('common_pool_codes', []))
     left_codes = set(left.get('left_set_codes', []))
     right_codes = set(right.get('right_set_codes', []))
+    incomplete_right = sorted(set(right.get('incomplete_codes', [])))
 
     if left.get('common_pool_count') != len(common_codes) or right.get('common_pool_count') != len(common_codes):
         raise RuntimeError('left/right common-pool coverage mismatch')
     if not left_codes <= common_codes or not right_codes <= common_codes:
         raise RuntimeError('left/right set contains non-common-pool code')
+    if not set(incomplete_right) <= common_codes:
+        raise RuntimeError('right incomplete set contains non-common-pool code')
 
     intersection = sorted(left_codes & right_codes)
     union = left_codes | right_codes
@@ -42,8 +47,8 @@ def main() -> int:
         'intersection_count': len(intersection),
         'jaccard': round(jaccard, 4),
         'same_set_suspicious': suspicious,
-        'left_engine': 'forward normalized earnings + justified valuation multiple only',
-        'right_engine': '300-bar same-date daily/weekly/52-week pressure + support + R:R only',
+        'left_engine': 'forward earnings + versioned PE/PB/cycle valuation only',
+        'right_engine': 'local 120d core + 180d pressure + compact 52-week summary + support + R:R only',
     }
 
     left_by = {x['code']: x for x in left.get('companies', [])}
@@ -64,6 +69,8 @@ def main() -> int:
             hard_pass = False; reasons.append('未来1-2季度盈利门槛未通过')
         if l.get('valuation_status') != 'valid' or l.get('left_conclusion') not in {'safe_buy_zone','reasonable_buy_zone'}:
             hard_pass = False; reasons.append('不在左侧正式买入区')
+        if r.get('data_status') != 'verified':
+            hard_pass = False; reasons.append('右侧本地历史未完整验证')
         if r.get('conclusion') not in {'strong','participate'}:
             hard_pass = False; reasons.append('右侧结构结论未达到参与级')
         if not isinstance(upside, (int,float)) or upside < 10:
@@ -119,12 +126,15 @@ def main() -> int:
     top3 = [code for _,code in top3_candidates[:3]]
 
     final = {
-        'schema_version': 1,
+        'schema_version': 2,
         'final_frozen_at': datetime.now(TZ).isoformat(),
-        'market_trade_date': '2026-08-28',
+        'market_trade_date': latest.get('trade_date'),
         'common_pool_count': len(common_codes),
         'left_set_codes': sorted(left_codes),
         'right_set_codes': sorted(right_codes),
+        'right_structure_complete': not incomplete_right,
+        'right_structure_incomplete_count': len(incomplete_right),
+        'right_structure_incomplete_codes': incomplete_right,
         'initial_intersection_codes': intersection,
         'core_codes': sorted(core),
         'top3_codes': top3,
@@ -138,6 +148,11 @@ def main() -> int:
             'right_structure': 'PASS',
             'left_right_independence': independence['status'],
         },
+        'coverage_note': (
+            'right-side review complete for every common-pool code'
+            if not incomplete_right
+            else f'{len(incomplete_right)} common-pool codes have unverified local right-side history; they are incomplete, not technically rejected'
+        ),
         'reviews': reviews,
     }
     OUT.write_text(json.dumps(final, ensure_ascii=False, indent=2), encoding='utf-8')
@@ -147,8 +162,12 @@ def main() -> int:
         'market_trade_date': final['market_trade_date'],
         'counts': {
             'common': len(common_codes), 'left': len(left_codes), 'right': len(right_codes),
+            'right_incomplete': len(incomplete_right),
             'intersection': len(intersection), 'core': len(core), 'top3': len(top3),
         },
+        'coverage_note': final['coverage_note'],
+        'right_structure_complete': final['right_structure_complete'],
+        'right_structure_incomplete_codes': incomplete_right,
         'independence_audit': independence,
         'left_codes': sorted(left_codes),
         'right_codes': sorted(right_codes),
