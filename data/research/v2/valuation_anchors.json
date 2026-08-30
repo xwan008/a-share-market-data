@@ -1,22 +1,35 @@
 {
   "schema_version": 2,
   "mode": "shadow",
-  "generated_at": "2026-08-30T22:37:29.836896+08:00",
+  "generated_at": "2026-08-30T23:15:22.052536+08:00",
   "reference_trade_date": "2026-08-28",
   "valuation_queue_count": 75,
   "counts": {
-    "formal_zone_ready": 34,
+    "formal_zone_ready": 43,
     "valuation_divergence": 14,
-    "fundamental_history_divergence": 2,
-    "insufficient_confirming_anchors": 3,
-    "fundamental_unavailable": 22,
-    "peer_available": 36,
-    "peer_confirmed": 22,
+    "fundamental_history_divergence": 8,
+    "insufficient_confirming_anchors": 8,
+    "fundamental_unavailable": 2,
+    "peer_available": 37,
+    "peer_confirmed": 23,
     "history_available": 75,
-    "history_confirmed": 29
+    "history_confirmed": 37
   },
   "peer_errors": {
-    "600458": "peer_sample_insufficient:2"
+    "000800": "eps_missing",
+    "001309": "eps_missing",
+    "002636": "eps_missing",
+    "600379": "eps_missing",
+    "600458": "peer_sample_insufficient:2",
+    "600550": "eps_missing",
+    "600685": "eps_missing",
+    "601318": "KeyError:\"['EV/EBITDA-24A'] not in index\"",
+    "601319": "KeyError:\"['EV/EBITDA-24A'] not in index\"",
+    "601336": "KeyError:\"['EV/EBITDA-24A'] not in index\"",
+    "601601": "KeyError:\"['EV/EBITDA-24A'] not in index\"",
+    "601628": "KeyError:\"['EV/EBITDA-24A'] not in index\"",
+    "603083": "eps_missing",
+    "603538": "eps_missing"
   },
   "thresholds": {
     "peer_divergence_block_pct": 45.0,
@@ -164,15 +177,61 @@
       "code": "000612",
       "name": "焦作万方",
       "current_price": 11.46,
-      "status": "fundamental_anchor_unavailable",
       "fundamental_anchor": {
         "code": "000612",
         "name": "焦作万方",
-        "status": "review_required",
-        "reason": "cycle_consensus_required:reports=0,eps_now=None,eps_next=None",
+        "status": "available",
+        "reference_source": "v2_cycle_ttm_deducted_fallback",
         "route": "cycle",
         "cycle_tag": "nonferrous::电解铝",
-        "independent_anchor_count": 0
+        "reference_range": [
+          9.53,
+          13.1
+        ],
+        "valuation_model": "v2_cycle_ttm_deducted_fallback",
+        "valuation_basis_unit": "PE",
+        "ttm_deducted_eps": 1.481,
+        "normalized_ttm_deducted_eps": 1.1911,
+        "normalization_factor": 0.8936,
+        "earnings_normalization_method": "ttm_deducted_eps_neutral_commodity_then_regime",
+        "reasonable_multiple_reference": [
+          8.0,
+          11.0
+        ],
+        "market_pe_on_ttm_deducted_eps": 7.74,
+        "commodity_anchors": [
+          {
+            "symbol": "AL0",
+            "last_date": "2026-08-28",
+            "current": 23920.0,
+            "neutral_median": 20820.0,
+            "current_to_neutral": 1.148895292987512,
+            "weight": 0.7,
+            "direction": 1.0
+          },
+          {
+            "symbol": "AO0",
+            "last_date": "2026-08-28",
+            "current": 2648.0,
+            "neutral_median": 2921.5,
+            "current_to_neutral": 0.9063837069998288,
+            "weight": 0.3,
+            "direction": -1.0
+          }
+        ],
+        "cycle_regime": "near_term_tight_medium_term_normalizing",
+        "buy_band_policy": {
+          "safe_to_fair_floor": [
+            0.75,
+            0.88
+          ],
+          "reasonable_to_fair_floor": [
+            0.88,
+            1.0
+          ]
+        },
+        "independent_anchor_count": 1,
+        "fallback_note": "No H1 simple annualization. Uses statement-derived TTM deducted EPS plus existing cycle normalization and forward-bridge gate."
       },
       "peer_anchor": null,
       "history_cost_anchor": {
@@ -187,10 +246,28 @@
         "low": 9.345,
         "high": 14.815
       },
-      "formal_buy_zone_ready": false,
-      "independent_anchor_count": 0,
-      "safe_buy_range": null,
-      "reasonable_buy_range": null
+      "status": "valid",
+      "formal_buy_zone_ready": true,
+      "independent_anchor_count": 2,
+      "conservative_fair_floor": 9.53,
+      "safe_buy_range": [
+        7.15,
+        8.39
+      ],
+      "reasonable_buy_range": [
+        8.39,
+        9.53
+      ],
+      "value_anchor_range": [
+        7.15,
+        9.53
+      ],
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 1.99,
+      "peer_confirmed": false,
+      "history_confirmed": true,
+      "entry_method": "fair_floor_margin_of_safety",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied"
     },
     "000630": {
       "code": "000630",
@@ -305,15 +382,52 @@
       "code": "000737",
       "name": "北方铜业",
       "current_price": 15.37,
-      "status": "fundamental_anchor_unavailable",
       "fundamental_anchor": {
         "code": "000737",
         "name": "北方铜业",
-        "status": "review_required",
-        "reason": "cycle_consensus_required:reports=0,eps_now=None,eps_next=None",
+        "status": "available",
+        "reference_source": "v2_cycle_ttm_deducted_fallback",
         "route": "cycle",
         "cycle_tag": "nonferrous::铜矿资源",
-        "independent_anchor_count": 0
+        "reference_range": [
+          7.48,
+          10.2
+        ],
+        "valuation_model": "v2_cycle_ttm_deducted_fallback",
+        "valuation_basis_unit": "PE",
+        "ttm_deducted_eps": 0.883,
+        "normalized_ttm_deducted_eps": 0.68,
+        "normalization_factor": 0.7859,
+        "earnings_normalization_method": "ttm_deducted_eps_neutral_commodity_then_regime",
+        "reasonable_multiple_reference": [
+          11.0,
+          15.0
+        ],
+        "market_pe_on_ttm_deducted_eps": 17.41,
+        "commodity_anchors": [
+          {
+            "symbol": "CU0",
+            "last_date": "2026-08-28",
+            "current": 108900.0,
+            "neutral_median": 79880.0,
+            "current_to_neutral": 1.3632949424136205,
+            "weight": 1.0,
+            "direction": 1.0
+          }
+        ],
+        "cycle_regime": "tight_spot_medium_term_balancing",
+        "buy_band_policy": {
+          "safe_to_fair_floor": [
+            0.75,
+            0.88
+          ],
+          "reasonable_to_fair_floor": [
+            0.88,
+            1.0
+          ]
+        },
+        "independent_anchor_count": 1,
+        "fallback_note": "No H1 simple annualization. Uses statement-derived TTM deducted EPS plus existing cycle normalization and forward-bridge gate."
       },
       "peer_anchor": null,
       "history_cost_anchor": {
@@ -328,10 +442,17 @@
         "low": 11.7,
         "high": 20.43
       },
+      "status": "insufficient_confirming_anchors",
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 61.03,
+      "peer_confirmed": false,
+      "history_confirmed": false,
+      "independent_anchor_count": 1,
       "formal_buy_zone_ready": false,
-      "independent_anchor_count": 0,
       "safe_buy_range": null,
-      "reasonable_buy_range": null
+      "reasonable_buy_range": null,
+      "conservative_fair_floor": 7.48,
+      "entry_method": "fair_floor_margin_of_safety"
     },
     "000776": {
       "code": "000776",
@@ -433,13 +554,33 @@
       "code": "000800",
       "name": "一汽解放",
       "current_price": 6.22,
-      "status": "fundamental_anchor_unavailable",
       "fundamental_anchor": {
         "code": "000800",
         "name": "一汽解放",
-        "status": "review_required",
-        "reason": "consensus_required:reports=2,eps=0.265",
-        "independent_anchor_count": 0
+        "status": "available",
+        "reference_source": "v2_ttm_deducted_eps_fallback",
+        "route": "business",
+        "reference_range": [
+          1.17,
+          1.53
+        ],
+        "valuation_model": "heavy_truck_ttm_deducted_pe_fallback",
+        "valuation_basis_unit": "PE",
+        "ttm_deducted_eps": 0.09,
+        "earnings_basis": "reported_ttm_deducted_eps",
+        "reasonable_multiple_reference": [
+          13.0,
+          17.0
+        ],
+        "explicit_entry_multiple_range": null,
+        "explicit_entry_reference_range": null,
+        "buy_band_policy": {
+          "safe_to_fair_floor": null,
+          "reasonable_to_fair_floor": null
+        },
+        "market_pe_on_ttm_deducted_eps": 69.11,
+        "independent_anchor_count": 1,
+        "fallback_note": "TTM deducted EPS = FY2025 + H1 2026 - H1 2025; requires company forward bridge; never simple H1 annualization."
       },
       "peer_anchor": null,
       "history_cost_anchor": {
@@ -454,8 +595,13 @@
         "low": 5.805,
         "high": 7.135
       },
+      "status": "fundamental_history_divergence",
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 387.78,
+      "peer_confirmed": false,
+      "history_confirmed": false,
+      "independent_anchor_count": 1,
       "formal_buy_zone_ready": false,
-      "independent_anchor_count": 0,
       "safe_buy_range": null,
       "reasonable_buy_range": null
     },
@@ -1015,13 +1161,33 @@
       "code": "001309",
       "name": "德明利",
       "current_price": 429.03,
-      "status": "fundamental_anchor_unavailable",
       "fundamental_anchor": {
         "code": "001309",
         "name": "德明利",
-        "status": "review_required",
-        "reason": "consensus_required:reports=2,eps=51.12",
-        "independent_anchor_count": 0
+        "status": "available",
+        "reference_source": "v2_ttm_deducted_eps_fallback",
+        "route": "business",
+        "reference_range": [
+          666.38,
+          908.7
+        ],
+        "valuation_model": "company_ttm_deducted_pe_fallback",
+        "valuation_basis_unit": "PE",
+        "ttm_deducted_eps": 30.29,
+        "earnings_basis": "reported_ttm_deducted_eps",
+        "reasonable_multiple_reference": [
+          22.0,
+          30.0
+        ],
+        "explicit_entry_multiple_range": null,
+        "explicit_entry_reference_range": null,
+        "buy_band_policy": {
+          "safe_to_fair_floor": null,
+          "reasonable_to_fair_floor": null
+        },
+        "market_pe_on_ttm_deducted_eps": 14.16,
+        "independent_anchor_count": 1,
+        "fallback_note": "TTM deducted EPS = FY2025 + H1 2026 - H1 2025; requires company forward bridge; never simple H1 annualization."
       },
       "peer_anchor": null,
       "history_cost_anchor": {
@@ -1036,10 +1202,17 @@
         "low": 190.85,
         "high": 970.0
       },
+      "status": "insufficient_confirming_anchors",
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 100.11,
+      "peer_confirmed": false,
+      "history_confirmed": false,
+      "independent_anchor_count": 1,
       "formal_buy_zone_ready": false,
-      "independent_anchor_count": 0,
       "safe_buy_range": null,
-      "reasonable_buy_range": null
+      "reasonable_buy_range": null,
+      "conservative_fair_floor": 666.38,
+      "entry_method": "fair_floor_margin_of_safety"
     },
     "001389": {
       "code": "001389",
@@ -1531,15 +1704,42 @@
       "code": "002326",
       "name": "永太科技",
       "current_price": 19.09,
-      "status": "fundamental_anchor_unavailable",
       "fundamental_anchor": {
         "code": "002326",
         "name": "永太科技",
-        "status": "review_required",
-        "reason": "cycle_consensus_required:reports=0,eps_now=None,eps_next=None",
+        "status": "available",
+        "reference_source": "v2_cycle_ttm_deducted_fallback",
         "route": "cycle",
         "cycle_tag": "chemicals::氟化工",
-        "independent_anchor_count": 0
+        "reference_range": [
+          2.03,
+          2.71
+        ],
+        "valuation_model": "v2_cycle_ttm_deducted_fallback",
+        "valuation_basis_unit": "PE",
+        "ttm_deducted_eps": 0.1992,
+        "normalized_ttm_deducted_eps": 0.1693,
+        "normalization_factor": 0.85,
+        "earnings_normalization_method": "ttm_deducted_eps_single_cycle_factor",
+        "reasonable_multiple_reference": [
+          12.0,
+          16.0
+        ],
+        "market_pe_on_ttm_deducted_eps": 95.83,
+        "commodity_anchors": [],
+        "cycle_regime": "quota_supported_high_spread_with_demand_risk",
+        "buy_band_policy": {
+          "safe_to_fair_floor": [
+            0.72,
+            0.85
+          ],
+          "reasonable_to_fair_floor": [
+            0.85,
+            0.98
+          ]
+        },
+        "independent_anchor_count": 1,
+        "fallback_note": "No H1 simple annualization. Uses statement-derived TTM deducted EPS plus existing cycle normalization and forward-bridge gate."
       },
       "peer_anchor": null,
       "history_cost_anchor": {
@@ -1554,8 +1754,13 @@
         "low": 16.24,
         "high": 30.28
       },
+      "status": "fundamental_history_divergence",
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 879.32,
+      "peer_confirmed": false,
+      "history_confirmed": false,
+      "independent_anchor_count": 1,
       "formal_buy_zone_ready": false,
-      "independent_anchor_count": 0,
       "safe_buy_range": null,
       "reasonable_buy_range": null
     },
@@ -1563,15 +1768,42 @@
       "code": "002407",
       "name": "多氟多",
       "current_price": 36.94,
-      "status": "fundamental_anchor_unavailable",
       "fundamental_anchor": {
         "code": "002407",
         "name": "多氟多",
-        "status": "review_required",
-        "reason": "cycle_consensus_required:reports=2,eps_now=1.955,eps_next=2.39",
+        "status": "available",
+        "reference_source": "v2_cycle_ttm_deducted_fallback",
         "route": "cycle",
         "cycle_tag": "chemicals::氟化工",
-        "independent_anchor_count": 0
+        "reference_range": [
+          4.95,
+          6.59
+        ],
+        "valuation_model": "v2_cycle_ttm_deducted_fallback",
+        "valuation_basis_unit": "PE",
+        "ttm_deducted_eps": 0.4849,
+        "normalized_ttm_deducted_eps": 0.4122,
+        "normalization_factor": 0.85,
+        "earnings_normalization_method": "ttm_deducted_eps_single_cycle_factor",
+        "reasonable_multiple_reference": [
+          12.0,
+          16.0
+        ],
+        "market_pe_on_ttm_deducted_eps": 76.18,
+        "commodity_anchors": [],
+        "cycle_regime": "quota_supported_high_spread_with_demand_risk",
+        "buy_band_policy": {
+          "safe_to_fair_floor": [
+            0.72,
+            0.85
+          ],
+          "reasonable_to_fair_floor": [
+            0.85,
+            0.98
+          ]
+        },
+        "independent_anchor_count": 1,
+        "fallback_note": "No H1 simple annualization. Uses statement-derived TTM deducted EPS plus existing cycle normalization and forward-bridge gate."
       },
       "peer_anchor": null,
       "history_cost_anchor": {
@@ -1586,8 +1818,13 @@
         "low": 25.426,
         "high": 55.25
       },
+      "status": "fundamental_history_divergence",
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 456.6,
+      "peer_confirmed": false,
+      "history_confirmed": false,
+      "independent_anchor_count": 1,
       "formal_buy_zone_ready": false,
-      "independent_anchor_count": 0,
       "safe_buy_range": null,
       "reasonable_buy_range": null
     },
@@ -1970,13 +2207,33 @@
       "code": "002636",
       "name": "金安国纪",
       "current_price": 73.18,
-      "status": "fundamental_anchor_unavailable",
       "fundamental_anchor": {
         "code": "002636",
         "name": "金安国纪",
-        "status": "review_required",
-        "reason": "consensus_required:reports=0,eps=None",
-        "independent_anchor_count": 0
+        "status": "available",
+        "reference_source": "v2_ttm_deducted_eps_fallback",
+        "route": "business",
+        "reference_range": [
+          26.5,
+          37.1
+        ],
+        "valuation_model": "pcb_ccl_ttm_deducted_pe_fallback",
+        "valuation_basis_unit": "PE",
+        "ttm_deducted_eps": 1.325,
+        "earnings_basis": "reported_ttm_deducted_eps",
+        "reasonable_multiple_reference": [
+          20.0,
+          28.0
+        ],
+        "explicit_entry_multiple_range": null,
+        "explicit_entry_reference_range": null,
+        "buy_band_policy": {
+          "safe_to_fair_floor": null,
+          "reasonable_to_fair_floor": null
+        },
+        "market_pe_on_ttm_deducted_eps": 55.23,
+        "independent_anchor_count": 1,
+        "fallback_note": "TTM deducted EPS = FY2025 + H1 2026 - H1 2025; requires company forward bridge; never simple H1 annualization."
       },
       "peer_anchor": null,
       "history_cost_anchor": {
@@ -1991,10 +2248,28 @@
         "low": 14.835,
         "high": 119.97
       },
-      "formal_buy_zone_ready": false,
-      "independent_anchor_count": 0,
-      "safe_buy_range": null,
-      "reasonable_buy_range": null
+      "status": "valid",
+      "formal_buy_zone_ready": true,
+      "independent_anchor_count": 2,
+      "conservative_fair_floor": 26.5,
+      "safe_buy_range": [
+        21.73,
+        23.85
+      ],
+      "reasonable_buy_range": [
+        23.85,
+        26.5
+      ],
+      "value_anchor_range": [
+        21.73,
+        26.5
+      ],
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 26.81,
+      "peer_confirmed": false,
+      "history_confirmed": true,
+      "entry_method": "fair_floor_margin_of_safety",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied"
     },
     "002709": {
       "code": "002709",
@@ -2579,15 +2854,52 @@
       "code": "600362",
       "name": "江西铜业",
       "current_price": 49.01,
-      "status": "fundamental_anchor_unavailable",
       "fundamental_anchor": {
         "code": "600362",
         "name": "江西铜业",
-        "status": "review_required",
-        "reason": "cycle_consensus_required:reports=2,eps_now=4.29,eps_next=4.645",
+        "status": "available",
+        "reference_source": "v2_cycle_ttm_deducted_fallback",
         "route": "cycle",
         "cycle_tag": "nonferrous::铜矿资源",
-        "independent_anchor_count": 0
+        "reference_range": [
+          30.33,
+          41.36
+        ],
+        "valuation_model": "v2_cycle_ttm_deducted_fallback",
+        "valuation_basis_unit": "PE",
+        "ttm_deducted_eps": 3.58,
+        "normalized_ttm_deducted_eps": 2.7572,
+        "normalization_factor": 0.7859,
+        "earnings_normalization_method": "ttm_deducted_eps_neutral_commodity_then_regime",
+        "reasonable_multiple_reference": [
+          11.0,
+          15.0
+        ],
+        "market_pe_on_ttm_deducted_eps": 13.69,
+        "commodity_anchors": [
+          {
+            "symbol": "CU0",
+            "last_date": "2026-08-28",
+            "current": 108900.0,
+            "neutral_median": 79880.0,
+            "current_to_neutral": 1.3632949424136205,
+            "weight": 1.0,
+            "direction": 1.0
+          }
+        ],
+        "cycle_regime": "tight_spot_medium_term_balancing",
+        "buy_band_policy": {
+          "safe_to_fair_floor": [
+            0.75,
+            0.88
+          ],
+          "reasonable_to_fair_floor": [
+            0.88,
+            1.0
+          ]
+        },
+        "independent_anchor_count": 1,
+        "fallback_note": "No H1 simple annualization. Uses statement-derived TTM deducted EPS plus existing cycle normalization and forward-bridge gate."
       },
       "peer_anchor": null,
       "history_cost_anchor": {
@@ -2602,10 +2914,28 @@
         "low": 38.62,
         "high": 69.87
       },
-      "formal_buy_zone_ready": false,
-      "independent_anchor_count": 0,
-      "safe_buy_range": null,
-      "reasonable_buy_range": null
+      "status": "valid",
+      "formal_buy_zone_ready": true,
+      "independent_anchor_count": 2,
+      "conservative_fair_floor": 30.33,
+      "safe_buy_range": [
+        22.75,
+        26.69
+      ],
+      "reasonable_buy_range": [
+        26.69,
+        30.33
+      ],
+      "value_anchor_range": [
+        22.75,
+        30.33
+      ],
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 26.66,
+      "peer_confirmed": false,
+      "history_confirmed": true,
+      "entry_method": "fair_floor_margin_of_safety",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied"
     },
     "600378": {
       "code": "600378",
@@ -2685,13 +3015,33 @@
       "code": "600379",
       "name": "宝光股份",
       "current_price": 14.18,
-      "status": "fundamental_anchor_unavailable",
       "fundamental_anchor": {
         "code": "600379",
         "name": "宝光股份",
-        "status": "review_required",
-        "reason": "consensus_required:reports=2,eps=0.243333333333",
-        "independent_anchor_count": 0
+        "status": "available",
+        "reference_source": "v2_ttm_deducted_eps_fallback",
+        "route": "business",
+        "reference_range": [
+          2.8,
+          3.89
+        ],
+        "valuation_model": "grid_equipment_ttm_deducted_pe_fallback",
+        "valuation_basis_unit": "PE",
+        "ttm_deducted_eps": 0.1554,
+        "earnings_basis": "reported_ttm_deducted_eps",
+        "reasonable_multiple_reference": [
+          18.0,
+          25.0
+        ],
+        "explicit_entry_multiple_range": null,
+        "explicit_entry_reference_range": null,
+        "buy_band_policy": {
+          "safe_to_fair_floor": null,
+          "reasonable_to_fair_floor": null
+        },
+        "market_pe_on_ttm_deducted_eps": 91.25,
+        "independent_anchor_count": 1,
+        "fallback_note": "TTM deducted EPS = FY2025 + H1 2026 - H1 2025; requires company forward bridge; never simple H1 annualization."
       },
       "peer_anchor": null,
       "history_cost_anchor": {
@@ -2706,8 +3056,13 @@
         "low": 10.08,
         "high": 18.912
       },
+      "status": "fundamental_history_divergence",
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 279.43,
+      "peer_confirmed": false,
+      "history_confirmed": false,
+      "independent_anchor_count": 1,
       "formal_buy_zone_ready": false,
-      "independent_anchor_count": 0,
       "safe_buy_range": null,
       "reasonable_buy_range": null
     },
@@ -3057,15 +3412,42 @@
       "code": "600546",
       "name": "山煤国际",
       "current_price": 13.99,
-      "status": "fundamental_anchor_unavailable",
       "fundamental_anchor": {
         "code": "600546",
         "name": "山煤国际",
-        "status": "review_required",
-        "reason": "cycle_consensus_required:reports=0,eps_now=None,eps_next=None",
+        "status": "available",
+        "reference_source": "v2_cycle_ttm_deducted_fallback",
         "route": "cycle",
         "cycle_tag": "coal::动力煤",
-        "independent_anchor_count": 0
+        "reference_range": [
+          5.17,
+          7.38
+        ],
+        "valuation_model": "v2_cycle_ttm_deducted_fallback",
+        "valuation_basis_unit": "PE",
+        "ttm_deducted_eps": 0.82,
+        "normalized_ttm_deducted_eps": 0.738,
+        "normalization_factor": 0.9,
+        "earnings_normalization_method": "ttm_deducted_eps_single_cycle_factor",
+        "reasonable_multiple_reference": [
+          7.0,
+          10.0
+        ],
+        "market_pe_on_ttm_deducted_eps": 17.06,
+        "commodity_anchors": [],
+        "cycle_regime": "price_recovery_with_policy_supply_constraint",
+        "buy_band_policy": {
+          "safe_to_fair_floor": [
+            0.72,
+            0.85
+          ],
+          "reasonable_to_fair_floor": [
+            0.85,
+            0.98
+          ]
+        },
+        "independent_anchor_count": 1,
+        "fallback_note": "No H1 simple annualization. Uses statement-derived TTM deducted EPS plus existing cycle normalization and forward-bridge gate."
       },
       "peer_anchor": null,
       "history_cost_anchor": {
@@ -3080,22 +3462,49 @@
         "low": 9.725,
         "high": 14.915
       },
+      "status": "insufficient_confirming_anchors",
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 84.38,
+      "peer_confirmed": false,
+      "history_confirmed": false,
+      "independent_anchor_count": 1,
       "formal_buy_zone_ready": false,
-      "independent_anchor_count": 0,
       "safe_buy_range": null,
-      "reasonable_buy_range": null
+      "reasonable_buy_range": null,
+      "conservative_fair_floor": 5.17,
+      "entry_method": "fair_floor_margin_of_safety"
     },
     "600550": {
       "code": "600550",
       "name": "保变电气",
       "current_price": 11.0,
-      "status": "fundamental_anchor_unavailable",
       "fundamental_anchor": {
         "code": "600550",
         "name": "保变电气",
-        "status": "review_required",
-        "reason": "consensus_required:reports=0,eps=None",
-        "independent_anchor_count": 0
+        "status": "available",
+        "reference_source": "v2_ttm_deducted_eps_fallback",
+        "route": "business",
+        "reference_range": [
+          1.75,
+          2.43
+        ],
+        "valuation_model": "grid_equipment_ttm_deducted_pe_fallback",
+        "valuation_basis_unit": "PE",
+        "ttm_deducted_eps": 0.097,
+        "earnings_basis": "reported_ttm_deducted_eps",
+        "reasonable_multiple_reference": [
+          18.0,
+          25.0
+        ],
+        "explicit_entry_multiple_range": null,
+        "explicit_entry_reference_range": null,
+        "buy_band_policy": {
+          "safe_to_fair_floor": null,
+          "reasonable_to_fair_floor": null
+        },
+        "market_pe_on_ttm_deducted_eps": 113.4,
+        "independent_anchor_count": 1,
+        "fallback_note": "TTM deducted EPS = FY2025 + H1 2026 - H1 2025; requires company forward bridge; never simple H1 annualization."
       },
       "peer_anchor": null,
       "history_cost_anchor": {
@@ -3110,8 +3519,13 @@
         "low": 9.1,
         "high": 19.03
       },
+      "status": "fundamental_history_divergence",
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 536.6,
+      "peer_confirmed": false,
+      "history_confirmed": false,
+      "independent_anchor_count": 1,
       "formal_buy_zone_ready": false,
-      "independent_anchor_count": 0,
       "safe_buy_range": null,
       "reasonable_buy_range": null
     },
@@ -3312,13 +3726,33 @@
       "code": "600685",
       "name": "中船防务",
       "current_price": 26.33,
-      "status": "fundamental_anchor_unavailable",
       "fundamental_anchor": {
         "code": "600685",
         "name": "中船防务",
-        "status": "review_required",
-        "reason": "consensus_required:reports=0,eps=None",
-        "independent_anchor_count": 0
+        "status": "available",
+        "reference_source": "v2_ttm_deducted_eps_fallback",
+        "route": "business",
+        "reference_range": [
+          15.38,
+          20.51
+        ],
+        "valuation_model": "shipbuilding_ttm_deducted_pe_fallback",
+        "valuation_basis_unit": "PE",
+        "ttm_deducted_eps": 0.8544,
+        "earnings_basis": "reported_ttm_deducted_eps",
+        "reasonable_multiple_reference": [
+          18.0,
+          24.0
+        ],
+        "explicit_entry_multiple_range": null,
+        "explicit_entry_reference_range": null,
+        "buy_band_policy": {
+          "safe_to_fair_floor": null,
+          "reasonable_to_fair_floor": null
+        },
+        "market_pe_on_ttm_deducted_eps": 30.82,
+        "independent_anchor_count": 1,
+        "fallback_note": "TTM deducted EPS = FY2025 + H1 2026 - H1 2025; requires company forward bridge; never simple H1 annualization."
       },
       "peer_anchor": null,
       "history_cost_anchor": {
@@ -3333,10 +3767,17 @@
         "low": 24.425,
         "high": 37.325
       },
+      "status": "insufficient_confirming_anchors",
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 59.99,
+      "peer_confirmed": false,
+      "history_confirmed": false,
+      "independent_anchor_count": 1,
       "formal_buy_zone_ready": false,
-      "independent_anchor_count": 0,
       "safe_buy_range": null,
-      "reasonable_buy_range": null
+      "reasonable_buy_range": null,
+      "conservative_fair_floor": 15.38,
+      "entry_method": "fair_floor_margin_of_safety"
     },
     "600710": {
       "code": "600710",
@@ -3434,15 +3875,52 @@
       "code": "600906",
       "name": "财达证券",
       "current_price": 6.7,
-      "status": "fundamental_anchor_unavailable",
       "fundamental_anchor": {
         "code": "600906",
         "name": "财达证券",
-        "status": "review_required",
-        "reason": "consensus_required:reports=0,eps=None",
-        "independent_anchor_count": 0
+        "status": "available",
+        "reference_source": "v2_pb_roe_baidu_pb_fallback",
+        "route": "financial",
+        "financial_kind": "broker",
+        "reference_range": [
+          3.74,
+          5.12
+        ],
+        "valuation_model": "broker_forward_pb_roe",
+        "valuation_basis_unit": "PB",
+        "earnings_basis": "ttm_deducted_eps",
+        "earnings_per_share_basis": 0.35,
+        "book_value_per_share_proxy": 3.9412,
+        "market_pb": 1.7,
+        "market_indicator_source": "baidu_valuation_pb_latest",
+        "roe_basis": 0.0888,
+        "reasonable_multiple_reference": [
+          0.95,
+          1.3
+        ],
+        "buy_band_policy": {
+          "safe_to_fair_floor": [
+            0.78,
+            0.9
+          ],
+          "reasonable_to_fair_floor": [
+            0.9,
+            1.0
+          ]
+        },
+        "independent_anchor_count": 1
       },
-      "peer_anchor": null,
+      "peer_anchor": {
+        "source": "eastmoney_peer_valuation",
+        "valuation_column": "市净率-MRQ",
+        "sample_count": 6,
+        "peer_multiple_p25": 1.3152,
+        "peer_multiple_p50": 1.4285,
+        "fair_value_range": [
+          5.18,
+          5.63
+        ]
+      },
       "history_cost_anchor": {
         "history_points": 180,
         "p10": 6.269,
@@ -3455,10 +3933,36 @@
         "low": 5.95,
         "high": 7.92
       },
-      "formal_buy_zone_ready": false,
-      "independent_anchor_count": 0,
-      "safe_buy_range": null,
-      "reasonable_buy_range": null
+      "status": "valid",
+      "formal_buy_zone_ready": true,
+      "independent_anchor_count": 2,
+      "conservative_fair_floor": 3.74,
+      "safe_buy_range": [
+        2.92,
+        3.37
+      ],
+      "reasonable_buy_range": [
+        3.37,
+        3.74
+      ],
+      "value_anchor_range": [
+        2.92,
+        3.74
+      ],
+      "peer_divergence_pct": 22.01,
+      "history_fair_divergence_pct": 50.56,
+      "peer_confirmed": true,
+      "history_confirmed": false,
+      "entry_method": "fair_floor_margin_of_safety",
+      "calibration_method": "fundamental_only_history_unavailable",
+      "safe_implied_pb": [
+        0.74,
+        0.86
+      ],
+      "reasonable_implied_pb": [
+        0.86,
+        0.95
+      ]
     },
     "600909": {
       "code": "600909",
@@ -4092,13 +4596,40 @@
       "code": "601318",
       "name": "中国平安",
       "current_price": 55.85,
-      "status": "fundamental_anchor_unavailable",
       "fundamental_anchor": {
         "code": "601318",
         "name": "中国平安",
-        "status": "review_required",
-        "reason": "market_pb_required",
-        "independent_anchor_count": 0
+        "status": "available",
+        "reference_source": "v2_pb_roe_baidu_pb_fallback",
+        "route": "financial",
+        "financial_kind": "insurance",
+        "reference_range": [
+          51.29,
+          71.24
+        ],
+        "valuation_model": "insurance_forward_pb_roe_proxy",
+        "valuation_basis_unit": "PB",
+        "earnings_basis": "consensus_eps",
+        "earnings_per_share_basis": 8.2904,
+        "book_value_per_share_proxy": 56.9898,
+        "market_pb": 0.98,
+        "market_indicator_source": "baidu_valuation_pb_latest",
+        "roe_basis": 0.1455,
+        "reasonable_multiple_reference": [
+          0.9,
+          1.25
+        ],
+        "buy_band_policy": {
+          "safe_to_fair_floor": [
+            0.78,
+            0.9
+          ],
+          "reasonable_to_fair_floor": [
+            0.9,
+            1.0
+          ]
+        },
+        "independent_anchor_count": 1
       },
       "peer_anchor": null,
       "history_cost_anchor": {
@@ -4113,22 +4644,75 @@
         "low": 47.23,
         "high": 72.57
       },
-      "formal_buy_zone_ready": false,
-      "independent_anchor_count": 0,
-      "safe_buy_range": null,
-      "reasonable_buy_range": null
+      "status": "valid",
+      "formal_buy_zone_ready": true,
+      "independent_anchor_count": 2,
+      "conservative_fair_floor": 51.29,
+      "safe_buy_range": [
+        40.01,
+        46.16
+      ],
+      "reasonable_buy_range": [
+        46.16,
+        51.29
+      ],
+      "value_anchor_range": [
+        40.01,
+        51.29
+      ],
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 8.96,
+      "peer_confirmed": false,
+      "history_confirmed": true,
+      "entry_method": "fair_floor_margin_of_safety",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied",
+      "safe_implied_pb": [
+        0.7,
+        0.81
+      ],
+      "reasonable_implied_pb": [
+        0.81,
+        0.9
+      ]
     },
     "601319": {
       "code": "601319",
       "name": "中国人保",
       "current_price": 7.14,
-      "status": "fundamental_anchor_unavailable",
       "fundamental_anchor": {
         "code": "601319",
         "name": "中国人保",
-        "status": "review_required",
-        "reason": "market_pb_required",
-        "independent_anchor_count": 0
+        "status": "available",
+        "reference_source": "v2_pb_roe_baidu_pb_fallback",
+        "route": "financial",
+        "financial_kind": "insurance",
+        "reference_range": [
+          6.91,
+          9.6
+        ],
+        "valuation_model": "insurance_forward_pb_roe_proxy",
+        "valuation_basis_unit": "PB",
+        "earnings_basis": "consensus_eps",
+        "earnings_per_share_basis": 1.1485,
+        "book_value_per_share_proxy": 7.6774,
+        "market_pb": 0.93,
+        "market_indicator_source": "baidu_valuation_pb_latest",
+        "roe_basis": 0.1496,
+        "reasonable_multiple_reference": [
+          0.9,
+          1.25
+        ],
+        "buy_band_policy": {
+          "safe_to_fair_floor": [
+            0.78,
+            0.9
+          ],
+          "reasonable_to_fair_floor": [
+            0.9,
+            1.0
+          ]
+        },
+        "independent_anchor_count": 1
       },
       "peer_anchor": null,
       "history_cost_anchor": {
@@ -4143,22 +4727,75 @@
         "low": 6.385,
         "high": 9.785
       },
-      "formal_buy_zone_ready": false,
-      "independent_anchor_count": 0,
-      "safe_buy_range": null,
-      "reasonable_buy_range": null
+      "status": "valid",
+      "formal_buy_zone_ready": true,
+      "independent_anchor_count": 2,
+      "conservative_fair_floor": 6.91,
+      "safe_buy_range": [
+        5.39,
+        6.22
+      ],
+      "reasonable_buy_range": [
+        6.22,
+        6.91
+      ],
+      "value_anchor_range": [
+        5.39,
+        6.91
+      ],
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 13.24,
+      "peer_confirmed": false,
+      "history_confirmed": true,
+      "entry_method": "fair_floor_margin_of_safety",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied",
+      "safe_implied_pb": [
+        0.7,
+        0.81
+      ],
+      "reasonable_implied_pb": [
+        0.81,
+        0.9
+      ]
     },
     "601336": {
       "code": "601336",
       "name": "新华保险",
       "current_price": 59.8,
-      "status": "fundamental_anchor_unavailable",
       "fundamental_anchor": {
         "code": "601336",
         "name": "新华保险",
-        "status": "review_required",
-        "reason": "market_pb_required",
-        "independent_anchor_count": 0
+        "status": "available",
+        "reference_source": "v2_pb_roe_baidu_pb_fallback",
+        "route": "financial",
+        "financial_kind": "insurance",
+        "reference_range": [
+          43.56,
+          61.38
+        ],
+        "valuation_model": "insurance_forward_pb_roe_proxy",
+        "valuation_basis_unit": "PB",
+        "earnings_basis": "consensus_eps",
+        "earnings_per_share_basis": 12.0164,
+        "book_value_per_share_proxy": 39.6026,
+        "market_pb": 1.51,
+        "market_indicator_source": "baidu_valuation_pb_latest",
+        "roe_basis": 0.3034,
+        "reasonable_multiple_reference": [
+          1.1,
+          1.55
+        ],
+        "buy_band_policy": {
+          "safe_to_fair_floor": [
+            0.78,
+            0.9
+          ],
+          "reasonable_to_fair_floor": [
+            0.9,
+            1.0
+          ]
+        },
+        "independent_anchor_count": 1
       },
       "peer_anchor": null,
       "history_cost_anchor": {
@@ -4173,22 +4810,75 @@
         "low": 53.37,
         "high": 82.95
       },
-      "formal_buy_zone_ready": false,
-      "independent_anchor_count": 0,
-      "safe_buy_range": null,
-      "reasonable_buy_range": null
+      "status": "valid",
+      "formal_buy_zone_ready": true,
+      "independent_anchor_count": 2,
+      "conservative_fair_floor": 43.56,
+      "safe_buy_range": [
+        33.98,
+        39.2
+      ],
+      "reasonable_buy_range": [
+        39.2,
+        43.56
+      ],
+      "value_anchor_range": [
+        33.98,
+        43.56
+      ],
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 18.02,
+      "peer_confirmed": false,
+      "history_confirmed": true,
+      "entry_method": "fair_floor_margin_of_safety",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied",
+      "safe_implied_pb": [
+        0.86,
+        0.99
+      ],
+      "reasonable_implied_pb": [
+        0.99,
+        1.1
+      ]
     },
     "601601": {
       "code": "601601",
       "name": "中国太保",
       "current_price": 31.77,
-      "status": "fundamental_anchor_unavailable",
       "fundamental_anchor": {
         "code": "601601",
         "name": "中国太保",
-        "status": "review_required",
-        "reason": "market_pb_required",
-        "independent_anchor_count": 0
+        "status": "available",
+        "reference_source": "v2_pb_roe_baidu_pb_fallback",
+        "route": "financial",
+        "financial_kind": "insurance",
+        "reference_range": [
+          33.09,
+          46.33
+        ],
+        "valuation_model": "insurance_forward_pb_roe_proxy",
+        "valuation_basis_unit": "PB",
+        "earnings_basis": "consensus_eps",
+        "earnings_per_share_basis": 5.9157,
+        "book_value_per_share_proxy": 33.0938,
+        "market_pb": 0.96,
+        "market_indicator_source": "baidu_valuation_pb_latest",
+        "roe_basis": 0.1788,
+        "reasonable_multiple_reference": [
+          1.0,
+          1.4
+        ],
+        "buy_band_policy": {
+          "safe_to_fair_floor": [
+            0.78,
+            0.9
+          ],
+          "reasonable_to_fair_floor": [
+            0.9,
+            1.0
+          ]
+        },
+        "independent_anchor_count": 1
       },
       "peer_anchor": null,
       "history_cost_anchor": {
@@ -4203,22 +4893,75 @@
         "low": 27.28,
         "high": 46.74
       },
-      "formal_buy_zone_ready": false,
-      "independent_anchor_count": 0,
-      "safe_buy_range": null,
-      "reasonable_buy_range": null
+      "status": "valid",
+      "formal_buy_zone_ready": true,
+      "independent_anchor_count": 2,
+      "conservative_fair_floor": 33.09,
+      "safe_buy_range": [
+        25.81,
+        29.78
+      ],
+      "reasonable_buy_range": [
+        29.78,
+        32.86
+      ],
+      "value_anchor_range": [
+        25.81,
+        33.09
+      ],
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 10.43,
+      "peer_confirmed": false,
+      "history_confirmed": true,
+      "entry_method": "fair_floor_margin_of_safety",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied",
+      "safe_implied_pb": [
+        0.78,
+        0.9
+      ],
+      "reasonable_implied_pb": [
+        0.9,
+        0.99
+      ]
     },
     "601628": {
       "code": "601628",
       "name": "中国人寿",
       "current_price": 38.27,
-      "status": "fundamental_anchor_unavailable",
       "fundamental_anchor": {
         "code": "601628",
         "name": "中国人寿",
-        "status": "review_required",
-        "reason": "market_pb_required",
-        "independent_anchor_count": 0
+        "status": "available",
+        "reference_source": "v2_pb_roe_baidu_pb_fallback",
+        "route": "financial",
+        "financial_kind": "insurance",
+        "reference_range": [
+          25.83,
+          36.39
+        ],
+        "valuation_model": "insurance_forward_pb_roe_proxy",
+        "valuation_basis_unit": "PB",
+        "earnings_basis": "consensus_eps",
+        "earnings_per_share_basis": 5.5626,
+        "book_value_per_share_proxy": 23.4785,
+        "market_pb": 1.63,
+        "market_indicator_source": "baidu_valuation_pb_latest",
+        "roe_basis": 0.2369,
+        "reasonable_multiple_reference": [
+          1.1,
+          1.55
+        ],
+        "buy_band_policy": {
+          "safe_to_fair_floor": [
+            0.78,
+            0.9
+          ],
+          "reasonable_to_fair_floor": [
+            0.9,
+            1.0
+          ]
+        },
+        "independent_anchor_count": 1
       },
       "peer_anchor": null,
       "history_cost_anchor": {
@@ -4233,10 +4976,36 @@
         "low": 31.872,
         "high": 50.412
       },
-      "formal_buy_zone_ready": false,
-      "independent_anchor_count": 0,
-      "safe_buy_range": null,
-      "reasonable_buy_range": null
+      "status": "valid",
+      "formal_buy_zone_ready": true,
+      "independent_anchor_count": 2,
+      "conservative_fair_floor": 25.83,
+      "safe_buy_range": [
+        20.15,
+        23.25
+      ],
+      "reasonable_buy_range": [
+        23.25,
+        25.83
+      ],
+      "value_anchor_range": [
+        20.15,
+        25.83
+      ],
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 23.88,
+      "peer_confirmed": false,
+      "history_confirmed": true,
+      "entry_method": "fair_floor_margin_of_safety",
+      "calibration_method": "fundamental_plus_180d_cost_calibration:safe_history_ceiling_applied:reasonable_history_ceiling_applied",
+      "safe_implied_pb": [
+        0.86,
+        0.99
+      ],
+      "reasonable_implied_pb": [
+        0.99,
+        1.1
+      ]
     },
     "601869": {
       "code": "601869",
@@ -4392,13 +5161,33 @@
       "code": "603083",
       "name": "剑桥科技",
       "current_price": 192.31,
-      "status": "fundamental_anchor_unavailable",
       "fundamental_anchor": {
         "code": "603083",
         "name": "剑桥科技",
-        "status": "review_required",
-        "reason": "consensus_required:reports=0,eps=None",
-        "independent_anchor_count": 0
+        "status": "available",
+        "reference_source": "v2_ttm_deducted_eps_fallback",
+        "route": "business",
+        "reference_range": [
+          30.58,
+          41.7
+        ],
+        "valuation_model": "optical_ttm_deducted_pe_fallback",
+        "valuation_basis_unit": "PE",
+        "ttm_deducted_eps": 1.39,
+        "earnings_basis": "reported_ttm_deducted_eps",
+        "reasonable_multiple_reference": [
+          22.0,
+          30.0
+        ],
+        "explicit_entry_multiple_range": null,
+        "explicit_entry_reference_range": null,
+        "buy_band_policy": {
+          "safe_to_fair_floor": null,
+          "reasonable_to_fair_floor": null
+        },
+        "market_pe_on_ttm_deducted_eps": 138.35,
+        "independent_anchor_count": 1,
+        "fallback_note": "TTM deducted EPS = FY2025 + H1 2026 - H1 2025; requires company forward bridge; never simple H1 annualization."
       },
       "peer_anchor": null,
       "history_cost_anchor": {
@@ -4413,8 +5202,13 @@
         "low": 100.6,
         "high": 262.21
       },
+      "status": "fundamental_history_divergence",
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 277.7,
+      "peer_confirmed": false,
+      "history_confirmed": false,
+      "independent_anchor_count": 1,
       "formal_buy_zone_ready": false,
-      "independent_anchor_count": 0,
       "safe_buy_range": null,
       "reasonable_buy_range": null
     },
@@ -4830,13 +5624,33 @@
       "code": "603538",
       "name": "美诺华",
       "current_price": 27.3,
-      "status": "fundamental_anchor_unavailable",
       "fundamental_anchor": {
         "code": "603538",
         "name": "美诺华",
-        "status": "review_required",
-        "reason": "consensus_required:reports=1,eps=0.44",
-        "independent_anchor_count": 0
+        "status": "available",
+        "reference_source": "v2_ttm_deducted_eps_fallback",
+        "route": "business",
+        "reference_range": [
+          9.6,
+          13.44
+        ],
+        "valuation_model": "cxo_cdmo_ttm_deducted_pe_fallback",
+        "valuation_basis_unit": "PE",
+        "ttm_deducted_eps": 0.48,
+        "earnings_basis": "reported_ttm_deducted_eps",
+        "reasonable_multiple_reference": [
+          20.0,
+          28.0
+        ],
+        "explicit_entry_multiple_range": null,
+        "explicit_entry_reference_range": null,
+        "buy_band_policy": {
+          "safe_to_fair_floor": null,
+          "reasonable_to_fair_floor": null
+        },
+        "market_pe_on_ttm_deducted_eps": 56.88,
+        "independent_anchor_count": 1,
+        "fallback_note": "TTM deducted EPS = FY2025 + H1 2026 - H1 2025; requires company forward bridge; never simple H1 annualization."
       },
       "peer_anchor": null,
       "history_cost_anchor": {
@@ -4851,10 +5665,17 @@
         "low": 13.632,
         "high": 48.818
       },
+      "status": "insufficient_confirming_anchors",
+      "peer_divergence_pct": null,
+      "history_fair_divergence_pct": 132.07,
+      "peer_confirmed": false,
+      "history_confirmed": false,
+      "independent_anchor_count": 1,
       "formal_buy_zone_ready": false,
-      "independent_anchor_count": 0,
       "safe_buy_range": null,
-      "reasonable_buy_range": null
+      "reasonable_buy_range": null,
+      "conservative_fair_floor": 9.6,
+      "entry_method": "fair_floor_margin_of_safety"
     },
     "603659": {
       "code": "603659",
