@@ -1,5 +1,5 @@
 {
-  "schema_version": 4,
+  "schema_version": 5,
   "pipeline": "a_share_low_risk",
   "authoritative_files": {
     "orchestrator_skill": "skills/a-share-low-risk/orchestrator/SKILL.md",
@@ -8,6 +8,7 @@
     "company_registry": "data/research/company_industry_registry.json",
     "valuation_policy_registry": "config/valuation_policy_registry.json",
     "cycle_valuation_policy": "config/cycle_valuation_policy.json",
+    "cycle_regime_registry": "config/cycle_regime_registry.json",
     "weekly_pool": "data/research/weekly_fundamental_opportunity_pool.json",
     "market_health": "data/health.json",
     "backfill_status": "data/backfill_status.json"
@@ -71,13 +72,22 @@
       "requires": ["earnings_validation"],
       "skill": "skills/a-share-low-risk/cycle-valuation/SKILL.md",
       "policy": "config/cycle_valuation_policy.json",
+      "cycle_regime": "config/cycle_regime_registry.json",
       "runner": "python scripts/build_cycle_valuation.py",
       "output": "data/research/pipeline/cycle_valuation.json",
       "validator": "python scripts/validate_research_outputs.py cycle-valuation data/research/pipeline/cycle_valuation.json"
     },
     {
-      "id": "left_value_merge",
+      "id": "valuation_policy_audit",
       "requires": ["left_value_fundamental", "left_value_cycle"],
+      "runner": "python scripts/build_valuation_policy_audit.py",
+      "output": "data/research/pipeline/valuation_policy_audit.json",
+      "validator": "python scripts/validate_research_outputs.py valuation-policy-audit data/research/pipeline/valuation_policy_audit.json",
+      "failure_policy": "unsupported_policy_count_must_equal_zero; common_pool_coverage_must_equal_100_percent"
+    },
+    {
+      "id": "left_value_merge",
+      "requires": ["left_value_fundamental", "left_value_cycle", "valuation_policy_audit"],
       "runner": "python scripts/merge_left_valuation.py",
       "output": "data/research/pipeline/left_valuation_scan.json",
       "validator": "python scripts/validate_research_outputs.py left-valuation data/research/pipeline/left_valuation_scan.json"
@@ -99,6 +109,6 @@
   "hard_stop_on_validator_failure": true,
   "weekly_pool_forbidden_before_stage": "weekly_opportunity_scan",
   "recall_principle": "LLM classifies mechanically enumerated industries and companies; it does not recall the research universe from memory",
-  "valuation_principle": "Non-cycle formal valuation must use forward consensus/company-model earnings; cycle formal valuation must pass through commodity/spread anchors. H1 annualization and commodity_anchor_required are not valid terminal shortcuts.",
+  "valuation_principle": "Every non-cycle candidate must map to a versioned PE/PB/other valuation policy; unsupported_policy=0 is a hard gate. Resource cycle valuation must use current+next-year earnings, a reviewed 6-18m cycle regime and fresh commodity/cost anchors. Peak earnings and short-term commodity strength cannot be capitalized alone.",
   "selection_principle": "final selection only selects validated upstream outputs; it never repairs upstream calculations"
 }
