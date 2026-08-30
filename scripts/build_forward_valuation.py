@@ -83,7 +83,18 @@ def load_spot_indicators(ak):
 
 
 def business_policy(tags,policies):
-    s=' '.join(tags); mapping=[('船舶制造','shipbuilding'),('重卡','heavy_truck'),('CXO','cxo_cdmo'),('CDMO','cxo_cdmo'),('特高压','grid_equipment'),('电网一次设备','grid_equipment'),('AI服务器','ai_server'),('高速光模块','optical'),('PCB/CCL','pcb_ccl')]
+    """Map an earnings-driver tag to a versioned non-cycle business PE policy."""
+    s=' '.join(tags)
+    mapping=[
+        ('船舶制造','shipbuilding'),('重卡','heavy_truck'),('CXO','cxo_cdmo'),('CDMO','cxo_cdmo'),
+        ('特高压','grid_equipment'),('电网一次设备','grid_equipment'),('AI服务器','ai_server'),
+        ('高速光模块','optical'),('PCB/CCL','pcb_ccl'),('乘用车','passenger_car'),
+        ('商用车动力系统','commercial_powertrain'),('数据中心基础设施','data_center_infrastructure'),
+        ('航空主机','aviation_oem'),('半导体材料','semiconductor_materials'),('半导体设备','semiconductor_equipment'),
+        ('高速连接器/铜互连','high_speed_connector'),('工程机械','construction_machinery'),('船机动力','marine_power'),
+        ('创新药','innovative_drug'),('锂电池','lithium_battery'),('风电整机/零部件','wind_equipment'),
+        ('纺织制造','textile_manufacturing'),('核电','nuclear_utility'),
+    ]
     for needle,key in mapping:
         if needle in s and policies.get('business_policies',{}).get(key): return policies['business_policies'][key],key
     return None,None
@@ -104,11 +115,8 @@ def choose_pb_band(policy,forward_roe):
 
 
 def choose_low_risk_forward_roe(roe_now, roe_next):
-    """Current-year ROE is primary. Next-year upside cannot lift the PB band; downside can lower it."""
-    if roe_next is None:
-        return roe_now, 'current_year_only'
-    if roe_next < roe_now:
-        return roe_next, 'next_year_downside_guard'
+    if roe_next is None: return roe_now, 'current_year_only'
+    if roe_next < roe_now: return roe_next, 'next_year_downside_guard'
     return roe_now, 'current_year_primary_no_positive_next_year_uplift'
 
 
@@ -125,14 +133,11 @@ def choose_low_risk_pe_range(policy, growth_pct, policies):
     theoretical=policy.get('multiple_range')
     if not isinstance(theoretical,list) or len(theoretical)!=2: return None,None,None,None
     theo_lo,theo_hi=map(float,theoretical)
-    explicit=policy.get('low_risk_multiple_range')
-    cap=growth_pe_floor_cap(growth_pct,policies)
+    explicit=policy.get('low_risk_multiple_range'); cap=growth_pe_floor_cap(growth_pct,policies)
     if isinstance(explicit,list) and len(explicit)==2:
-        lo,hi=map(float,explicit)
-        return [lo,hi],[theo_lo,theo_hi],cap,'company_explicit_low_risk_pe'
+        lo,hi=map(float,explicit); return [lo,hi],[theo_lo,theo_hi],cap,'company_explicit_low_risk_pe'
     lo=theo_lo if cap is None else min(theo_lo,cap)
-    width=float(policies.get('low_risk_pe_policy',{}).get('derived_range_width',4))
-    hi=min(theo_hi,max(lo,lo+width))
+    width=float(policies.get('low_risk_pe_policy',{}).get('derived_range_width',4)); hi=min(theo_hi,max(lo,lo+width))
     method='theoretical_pe_unchanged' if lo==theo_lo and hi==theo_hi else 'growth_guarded_low_risk_pe'
     return [lo,hi],[theo_lo,theo_hi],cap,method
 
@@ -148,8 +153,7 @@ def zone(price,fair_floor,policy,default_band):
 def main():
     import akshare as ak
     common=load(COMMON); latest=load(LATEST); policies=load(POLICY); cycle_policy=load(CYCLE_POLICY); stocks=latest.get('stocks',{})
-    cycle_tags=set(cycle_policy.get('subchain_policies',{}))
-    consensus=load_consensus(ak); spot,spot_errors=load_spot_indicators(ak)
+    cycle_tags=set(cycle_policy.get('subchain_policies',{})); consensus=load_consensus(ak); spot,spot_errors=load_spot_indicators(ak)
     year=datetime.now(TZ).year; min_reports=int(policies.get('forecast_policy',{}).get('minimum_report_count',3)); default_band=policies.get('default_buy_band',{})
     companies=[]; left=[]; cycle_codes=[]; unsupported=[]; supported=[]
     execution={'valid':0,'consensus_insufficient':0,'market_data_missing':0,'normalization_required':0,'unsupported_policy':0}; model_counts={}
@@ -193,16 +197,13 @@ def main():
             lo,hi=low_risk_mult; theo_lo,theo_hi=theoretical_mult
             fair_lo,fair_hi=eps_now*lo,eps_now*hi; business_fair_lo,business_fair_hi=eps_now*theo_lo,eps_now*theo_hi
             safe,reasonable,conclusion=zone(price,fair_lo,policy,default_band)
-            rationale=policy.get('rationale') or 'Versioned business valuation policy.'
-            row={'code':code,'name':name,'current_price':round(price,3),'valuation_status':'valid','execution_state':'valid','policy_status':'supported','valuation_model':model,'valuation_basis_unit':'PE','forecast_source':'akshare.stock_profit_forecast_em','forecast_report_count':reports,'consensus_eps_current_year':round(eps_now,4),'consensus_eps_next_year':round(eps_next,4) if eps_next else None,'next_year_eps_growth_pct':round(growth,2) if growth is not None else None,'market_pe_dynamic':round(pe_dyn,4) if pe_dyn else None,'market_forward_pe_current_year':round(price/eps_now,2),'market_forward_pe_next_year':round(price/eps_next,2) if eps_next else None,'forward_earnings_basis':f'{year} consensus EPS={eps_now:.4f} is the low-risk earnings anchor; {year+1} EPS={eps_next:.4f} is used only as durability/growth guardrail.' if eps_next else f'{year} consensus EPS={eps_now:.4f}; next-year EPS unavailable, so no positive future-growth uplift is applied.','theoretical_business_multiple_range':[theo_lo,theo_hi],'growth_pe_floor_cap':growth_cap,'low_risk_pe_method':pe_method,'reasonable_multiple_range':[lo,hi],'multiple_rationale':rationale,'business_fair_value_range':[round(business_fair_lo,2),round(business_fair_hi,2)],'value_anchor_range':[round(fair_lo,2),round(fair_hi,2)],'safe_buy_range':[round(safe[0],2),round(safe[1],2)],'reasonable_buy_range':[round(reasonable[0],2),round(reasonable[1],2)],'key_sensitivities':['2026 earnings','2027 earnings durability','company-level low-risk PE','consensus revisions'],'invalidation_condition':gate.get('invalidation_condition') or 'future earnings bridge invalidated','left_conclusion':conclusion}
-        execution['valid']+=1; model_counts[row['valuation_model']]=model_counts.get(row['valuation_model'],0)+1
-        if row['left_conclusion'] in {'safe_buy_zone','reasonable_buy_zone'}: left.append(code)
-        companies.append(row)
+            row={'code':code,'name':name,'current_price':round(price,3),'valuation_status':'valid','execution_state':'valid','policy_status':'supported','valuation_model':model,'valuation_basis_unit':'PE','forecast_source':'akshare.stock_profit_forecast_em','forecast_report_count':reports,'consensus_eps_current_year':round(eps_now,4),'consensus_eps_next_year':round(eps_next,4) if eps_next else None,'next_year_eps_growth_pct':round(growth,2) if growth is not None else None,'market_forward_pe_current_year':round(price/eps_now,2),'market_forward_pe_next_year':round(price/eps_next,2) if eps_next else None,'market_pe_dynamic':round(pe_dyn,4) if pe_dyn else None,'market_indicator_source':market_source,'forward_earnings_basis':f'{year} consensus EPS is primary low-risk anchor; {year+1} EPS is a durability guard and positive growth cannot lift the {year} entry PE.','theoretical_business_multiple_range':[theo_lo,theo_hi],'growth_pe_floor_cap':growth_cap,'low_risk_pe_method':pe_method,'reasonable_multiple_range':[lo,hi],'multiple_rationale':policy.get('rationale'),'business_fair_value_range':[round(business_fair_lo,2),round(business_fair_hi,2)],'value_anchor_range':[round(fair_lo,2),round(fair_hi,2)],'safe_buy_range':[round(safe[0],2),round(safe[1],2)],'reasonable_buy_range':[round(reasonable[0],2),round(reasonable[1],2)],'key_sensitivities':['current-year EPS','next-year downside durability','company/industry low-risk PE','orders/volume/margin'],'invalidation_condition':gate.get('invalidation_condition') or 'future earnings bridge or business multiple deteriorates','left_conclusion':conclusion}
+        execution['valid']+=1; companies.append(row); model_counts[model]=model_counts.get(model,0)+1
+        if conclusion in {'safe_buy_zone','reasonable_buy_zone'}: left.append(code)
 
-    payload={'schema_version':5,'generated_at':datetime.now(TZ).isoformat(),'common_pool_count':len(common.get('common_pool_codes',[])),'fundamental_company_count':len(companies),'deferred_cycle_codes':sorted(cycle_codes),'market_indicator_errors':spot_errors,'policy_coverage':{'noncycle_count':len(companies),'supported_policy_count':len(set(supported)),'unsupported_policy_count':len(set(unsupported)),'supported_policy_codes':sorted(set(supported)),'unsupported_policy_codes':sorted(set(unsupported)),'execution_counts':execution,'model_counts':dict(sorted(model_counts.items()))},'companies':companies,'left_set_codes':sorted(left),'method_note':'Non-cycle PE valuation uses current-year consensus EPS as the low-risk earnings anchor. Industry/business PE ranges are theoretical fair-value references; low-risk entry PE is separately company-explicit or growth-guarded. Financial PB valuation uses current-year Forward ROE as primary; next-year ROE can only lower, never raise, the low-risk PB band. Cycle routing is driven by versioned recall tags and cycle policy registry rather than a hard-coded subchain list.'}
+    payload={'schema_version':5,'generated_at':datetime.now(TZ).isoformat(),'reference_trade_date':latest.get('trade_date'),'common_pool_count':len(common.get('common_pool_codes',[])),'fundamental_company_count':len(companies),'deferred_to_cycle_valuation_count':len(cycle_codes),'deferred_to_cycle_valuation_codes':sorted(cycle_codes),'forecast_policy':policies.get('forecast_policy'),'low_risk_pe_policy':policies.get('low_risk_pe_policy'),'policy_coverage':{'supported_count':len(set(supported)),'unsupported_count':len(set(unsupported)),'unsupported_codes':sorted(set(unsupported))},'execution_state_counts':execution,'market_indicator_errors':spot_errors,'model_counts':model_counts,'companies':companies,'left_set_codes':sorted(left)}
     OUT.write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
-    print(json.dumps({'status':'ok','fundamental':len(companies),'cycle_deferred':len(cycle_codes),'left':len(left),'unsupported_policy':len(set(unsupported)),'execution':execution,'market_indicator_errors':spot_errors},ensure_ascii=False))
-    return 0
+    print(json.dumps({'status':'ok','fundamental':len(companies),'cycle_deferred':len(cycle_codes),'left':len(left),'unsupported_policy':len(set(unsupported)),'execution':execution,'market_indicator_errors':spot_errors[:3]},ensure_ascii=False)); return 0
 
 
 if __name__=='__main__': raise SystemExit(main())
