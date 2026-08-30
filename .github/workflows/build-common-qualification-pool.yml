@@ -24,10 +24,14 @@ on:
       - 'scripts/build_t2_valuation_coverage_audit.py'
       - 'config/t2_exposure_rules.json'
       - 'config/t2_representative_policy.json'
+      - 'config/valuation_policy_registry.json'
       - 'config/cycle_valuation_policy.json'
       - 'config/cycle_regime_registry.json'
       - 'tests/test_company_index_fingerprint.py'
+      - 'tests/test_valuation_v4.py'
+      - 'tests/test_valuation_v5.py'
       - 'tests/test_cycle_coverage_v6.py'
+      - 'tests/test_t1_valuation_routes.py'
       - '.github/workflows/build-common-qualification-pool.yml'
 
 permissions:
@@ -65,7 +69,7 @@ jobs:
         run: python scripts/validate_common_pool_diversification.py
 
       - name: Run valuation regression tests
-        run: pytest -q tests/test_valuation_v4.py tests/test_valuation_v5.py tests/test_cycle_coverage_v6.py
+        run: pytest -q tests/test_valuation_v4.py tests/test_valuation_v5.py tests/test_cycle_coverage_v6.py tests/test_t1_valuation_routes.py
       - name: Build non-cycle forward valuation
         run: python scripts/build_forward_valuation_v5.py
       - name: Validate non-cycle valuation contract
@@ -82,7 +86,7 @@ jobs:
         run: python scripts/build_valuation_policy_audit.py
       - name: Validate valuation policy coverage audit
         run: python scripts/validate_research_outputs.py valuation-policy-audit data/research/pipeline/valuation_policy_audit.json
-      - name: Build and enforce T2 valuation coverage health
+      - name: Build and enforce recalled-chain valuation coverage health
         run: python scripts/build_t2_valuation_coverage_audit.py
       - name: Merge left valuation engines
         run: python scripts/merge_left_valuation.py
@@ -137,11 +141,11 @@ jobs:
           t2=common.get('t2_representative_selection',{})
           t1=common.get('conditional_t1_representative_selection',{})
           t2_focus={k:v for k,v in t2.items() if k in {'nonbank_finance::证券','nonferrous::电解铝','coal::动力煤','chemicals::氟化工','chemicals::氨纶'}}
-          t1_focus={k:v for k,v in t1.items() if k in {'coal::焦煤','chemicals::聚氨酯/MDI/TDI','nonferrous::锂资源/锂盐','pharma::创新药','power_equipment::风电整机/零部件','utilities::核电'}}
+          t1_focus={k:v for k,v in t1.items() if k in {'coal::焦煤','chemicals::聚氨酯/MDI/TDI','nonferrous::锂资源/锂盐','nonferrous::黄金','pharma::创新药','power_equipment::风电整机/零部件','utilities::核电'}}
           coverage=json.load(open('data/research/pipeline/t2_valuation_coverage_audit.json',encoding='utf-8'))
           final=json.load(open('data/research/pipeline/final_selection.json',encoding='utf-8'))
           print(json.dumps({'arithmetic':common.get('arithmetic'),'t2_focus':t2_focus,'t1_focus':t1_focus,'unconfirmed_review_required_tags':common.get('unconfirmed_review_required_tags')},ensure_ascii=False,indent=2))
-          print(json.dumps({'overall_valid_ratio':coverage['overall_valid_ratio'],'structural_blind_spot_tags':coverage['structural_blind_spot_tags'],'coverage_warnings':coverage['coverage_warnings']},ensure_ascii=False,indent=2))
+          print(json.dumps({'overall_valid_ratio':coverage['overall_valid_ratio'],'recalled_chain_count':coverage.get('recalled_chain_count'),'structural_blind_spot_tags':coverage['structural_blind_spot_tags'],'coverage_warnings':coverage['coverage_warnings']},ensure_ascii=False,indent=2))
           print(json.dumps({'left_set_codes':final['left_set_codes'],'right_set_codes':final['right_set_codes'],'intersection':final['initial_intersection_codes'],'top3':final['top3_codes']},ensure_ascii=False,indent=2))
           PY
 
