@@ -1,6 +1,8 @@
 {
-  "schema_version": 1,
-  "generated_at": "2026-08-30T09:52:51.694163+08:00",
+  "schema_version": 2,
+  "generated_at": "2026-08-30T09:59:08.461556+08:00",
+  "reference_trade_date": "2026-08-28",
+  "max_anchor_age_days": 7,
   "common_pool_count": 138,
   "cycle_company_count": 32,
   "cycle_codes": [
@@ -53,71 +55,29 @@
     "601899",
     "603993"
   ],
-  "anchor_errors": {},
+  "anchor_errors": {
+    "ZC0": "RuntimeError:stale_anchor:ZC0:last_date=2022-12-30:reference=2026-08-28:age_days=1337"
+  },
   "companies": [
     {
       "code": "000552",
       "name": "甘肃能化",
       "cycle_tag": "coal::动力煤",
       "current_price": 2.73,
-      "valuation_status": "valid",
+      "valuation_status": "unavailable",
       "valuation_model": "commodity_scenario_forward_pe",
-      "forecast_source": "akshare.stock_profit_forecast_em",
-      "forecast_report_count": 3,
-      "consensus_eps_current_year": 0.1,
-      "commodity_anchors": [
-        {
-          "symbol": "ZC0",
-          "last_date": "2022-12-30",
-          "current": 921.0,
-          "ma20": 882.3799999999999,
-          "ma60": 865.6800000000001,
-          "current_to_ma20": 1.0437679911149393,
-          "current_to_ma60": 1.063903520931522,
-          "drawdown_from_60d_high_pct": -13.925233644859814,
-          "trend_20_vs_60_pct": 1.9291193050549715,
-          "weight": 1.0,
-          "direction": 1.0
-        }
-      ],
-      "profit_sensitivity": 0.8,
-      "bear_base_bull_anchor_factor": [
-        0.9839,
-        1.0639,
-        1.1439
-      ],
-      "bear_base_bull_forward_eps": [
-        0.0987,
-        0.1051,
-        0.1115
-      ],
-      "forward_earnings_basis": "2026一致预期EPS=0.1000 → 商品/成本锚相对60日中枢 → sensitivity=0.80 → bear/base/bull盈利。",
+      "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
+      "commodity_anchors": [],
       "reasonable_multiple_range": [
-        7.0,
-        10.0
+        7,
+        10
       ],
-      "multiple_rationale": "按资源/周期业务质量和周期波动采用版本化估值区间。",
-      "value_anchor_range": [
-        0.69,
-        1.12
-      ],
-      "base_fair_value_floor": 0.74,
-      "safe_buy_range": [
-        0.53,
-        0.63
-      ],
-      "reasonable_buy_range": [
-        0.63,
-        0.72
-      ],
-      "key_sensitivities": [
-        "商品价格中枢",
-        "成本锚",
-        "产量/销量",
-        "一致预期EPS修正"
-      ],
-      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "above_buy_zone"
+      "value_anchor_range": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "left_conclusion": "unavailable",
+      "reason": "commodity_anchor_fetch_failed:['ZC0']",
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
     },
     {
       "code": "000612",
@@ -131,6 +91,7 @@
         {
           "symbol": "AL0",
           "last_date": "2026-08-28",
+          "age_days": 0,
           "current": 23920.0,
           "ma20": 23887.5,
           "ma60": 23541.75,
@@ -144,6 +105,7 @@
         {
           "symbol": "AO0",
           "last_date": "2026-08-28",
+          "age_days": 0,
           "current": 2648.0,
           "ma20": 2675.75,
           "ma60": 2737.4166666666665,
@@ -180,6 +142,7 @@
         {
           "symbol": "CU0",
           "last_date": "2026-08-28",
+          "age_days": 0,
           "current": 108900.0,
           "ma20": 107800.5,
           "ma60": 105268.66666666667,
@@ -242,6 +205,7 @@
         {
           "symbol": "CU0",
           "last_date": "2026-08-28",
+          "age_days": 0,
           "current": 108900.0,
           "ma20": 107800.5,
           "ma60": 105268.66666666667,
@@ -278,6 +242,7 @@
         {
           "symbol": "AL0",
           "last_date": "2026-08-28",
+          "age_days": 0,
           "current": 23920.0,
           "ma20": 23887.5,
           "ma60": 23541.75,
@@ -291,6 +256,7 @@
         {
           "symbol": "AO0",
           "last_date": "2026-08-28",
+          "age_days": 0,
           "current": 2648.0,
           "ma20": 2675.75,
           "ma60": 2737.4166666666665,
@@ -355,6 +321,7 @@
         {
           "symbol": "CU0",
           "last_date": "2026-08-28",
+          "age_days": 0,
           "current": 108900.0,
           "ma20": 107800.5,
           "ma60": 105268.66666666667,
@@ -419,6 +386,7 @@
         {
           "symbol": "AL0",
           "last_date": "2026-08-28",
+          "age_days": 0,
           "current": 23920.0,
           "ma20": 23887.5,
           "ma60": 23541.75,
@@ -432,6 +400,7 @@
         {
           "symbol": "AO0",
           "last_date": "2026-08-28",
+          "age_days": 0,
           "current": 2648.0,
           "ma20": 2675.75,
           "ma60": 2737.4166666666665,
@@ -521,64 +490,20 @@
       "name": "电投能源",
       "cycle_tag": "coal::动力煤",
       "current_price": 29.11,
-      "valuation_status": "valid",
+      "valuation_status": "unavailable",
       "valuation_model": "commodity_scenario_forward_pe",
-      "forecast_source": "akshare.stock_profit_forecast_em",
-      "forecast_report_count": 11,
-      "consensus_eps_current_year": 3.3864,
-      "commodity_anchors": [
-        {
-          "symbol": "ZC0",
-          "last_date": "2022-12-30",
-          "current": 921.0,
-          "ma20": 882.3799999999999,
-          "ma60": 865.6800000000001,
-          "current_to_ma20": 1.0437679911149393,
-          "current_to_ma60": 1.063903520931522,
-          "drawdown_from_60d_high_pct": -13.925233644859814,
-          "trend_20_vs_60_pct": 1.9291193050549715,
-          "weight": 1.0,
-          "direction": 1.0
-        }
-      ],
-      "profit_sensitivity": 0.8,
-      "bear_base_bull_anchor_factor": [
-        0.9839,
-        1.0639,
-        1.1439
-      ],
-      "bear_base_bull_forward_eps": [
-        3.3428,
-        3.5595,
-        3.7762
-      ],
-      "forward_earnings_basis": "2026一致预期EPS=3.3864 → 商品/成本锚相对60日中枢 → sensitivity=0.80 → bear/base/bull盈利。",
+      "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
+      "commodity_anchors": [],
       "reasonable_multiple_range": [
-        7.0,
-        10.0
+        7,
+        10
       ],
-      "multiple_rationale": "按资源/周期业务质量和周期波动采用版本化估值区间。",
-      "value_anchor_range": [
-        23.4,
-        37.76
-      ],
-      "base_fair_value_floor": 24.92,
-      "safe_buy_range": [
-        17.94,
-        21.18
-      ],
-      "reasonable_buy_range": [
-        21.18,
-        24.42
-      ],
-      "key_sensitivities": [
-        "商品价格中枢",
-        "成本锚",
-        "产量/销量",
-        "一致预期EPS修正"
-      ],
-      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "above_buy_zone"
+      "value_anchor_range": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "left_conclusion": "unavailable",
+      "reason": "commodity_anchor_fetch_failed:['ZC0']",
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
     },
     {
       "code": "002326",
@@ -628,6 +553,7 @@
         {
           "symbol": "AL0",
           "last_date": "2026-08-28",
+          "age_days": 0,
           "current": 23920.0,
           "ma20": 23887.5,
           "ma60": 23541.75,
@@ -641,6 +567,7 @@
         {
           "symbol": "AO0",
           "last_date": "2026-08-28",
+          "age_days": 0,
           "current": 2648.0,
           "ma20": 2675.75,
           "ma60": 2737.4166666666665,
@@ -730,64 +657,20 @@
       "name": "兖矿能源",
       "cycle_tag": "coal::动力煤",
       "current_price": 23.02,
-      "valuation_status": "valid",
+      "valuation_status": "unavailable",
       "valuation_model": "commodity_scenario_forward_pe",
-      "forecast_source": "akshare.stock_profit_forecast_em",
-      "forecast_report_count": 23,
-      "consensus_eps_current_year": 1.7183,
-      "commodity_anchors": [
-        {
-          "symbol": "ZC0",
-          "last_date": "2022-12-30",
-          "current": 921.0,
-          "ma20": 882.3799999999999,
-          "ma60": 865.6800000000001,
-          "current_to_ma20": 1.0437679911149393,
-          "current_to_ma60": 1.063903520931522,
-          "drawdown_from_60d_high_pct": -13.925233644859814,
-          "trend_20_vs_60_pct": 1.9291193050549715,
-          "weight": 1.0,
-          "direction": 1.0
-        }
-      ],
-      "profit_sensitivity": 0.8,
-      "bear_base_bull_anchor_factor": [
-        0.9839,
-        1.0639,
-        1.1439
-      ],
-      "bear_base_bull_forward_eps": [
-        1.6961,
-        1.8061,
-        1.9161
-      ],
-      "forward_earnings_basis": "2026一致预期EPS=1.7183 → 商品/成本锚相对60日中枢 → sensitivity=0.80 → bear/base/bull盈利。",
+      "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
+      "commodity_anchors": [],
       "reasonable_multiple_range": [
-        7.0,
-        10.0
+        7,
+        10
       ],
-      "multiple_rationale": "按资源/周期业务质量和周期波动采用版本化估值区间。",
-      "value_anchor_range": [
-        11.87,
-        19.16
-      ],
-      "base_fair_value_floor": 12.64,
-      "safe_buy_range": [
-        9.1,
-        10.75
-      ],
-      "reasonable_buy_range": [
-        10.75,
-        12.39
-      ],
-      "key_sensitivities": [
-        "商品价格中枢",
-        "成本锚",
-        "产量/销量",
-        "一致预期EPS修正"
-      ],
-      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "above_buy_zone"
+      "value_anchor_range": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "left_conclusion": "unavailable",
+      "reason": "commodity_anchor_fetch_failed:['ZC0']",
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
     },
     {
       "code": "600362",
@@ -801,6 +684,7 @@
         {
           "symbol": "CU0",
           "last_date": "2026-08-28",
+          "age_days": 0,
           "current": 108900.0,
           "ma20": 107800.5,
           "ma60": 105268.66666666667,
@@ -848,21 +732,7 @@
       "valuation_status": "unavailable",
       "valuation_model": "commodity_scenario_forward_pe",
       "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
-      "commodity_anchors": [
-        {
-          "symbol": "ZC0",
-          "last_date": "2022-12-30",
-          "current": 921.0,
-          "ma20": 882.3799999999999,
-          "ma60": 865.6800000000001,
-          "current_to_ma20": 1.0437679911149393,
-          "current_to_ma60": 1.063903520931522,
-          "drawdown_from_60d_high_pct": -13.925233644859814,
-          "trend_20_vs_60_pct": 1.9291193050549715,
-          "weight": 1.0,
-          "direction": 1.0
-        }
-      ],
+      "commodity_anchors": [],
       "reasonable_multiple_range": [
         7,
         10
@@ -871,7 +741,7 @@
       "safe_buy_range": null,
       "reasonable_buy_range": null,
       "left_conclusion": "unavailable",
-      "reason": "forward_consensus_insufficient:reports=0,eps=None",
+      "reason": "commodity_anchor_fetch_failed:['ZC0'];forward_consensus_insufficient:reports=0,eps=None",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
     },
     {
@@ -888,6 +758,7 @@
         {
           "symbol": "AL0",
           "last_date": "2026-08-28",
+          "age_days": 0,
           "current": 23920.0,
           "ma20": 23887.5,
           "ma60": 23541.75,
@@ -901,6 +772,7 @@
         {
           "symbol": "AO0",
           "last_date": "2026-08-28",
+          "age_days": 0,
           "current": 2648.0,
           "ma20": 2675.75,
           "ma60": 2737.4166666666665,
@@ -982,6 +854,7 @@
         {
           "symbol": "CU0",
           "last_date": "2026-08-28",
+          "age_days": 0,
           "current": 108900.0,
           "ma20": 107800.5,
           "ma60": 105268.66666666667,
@@ -1037,192 +910,60 @@
       "name": "恒源煤电",
       "cycle_tag": "coal::动力煤",
       "current_price": 9.02,
-      "valuation_status": "valid",
+      "valuation_status": "unavailable",
       "valuation_model": "commodity_scenario_forward_pe",
-      "forecast_source": "akshare.stock_profit_forecast_em",
-      "forecast_report_count": 5,
-      "consensus_eps_current_year": 0.43,
-      "commodity_anchors": [
-        {
-          "symbol": "ZC0",
-          "last_date": "2022-12-30",
-          "current": 921.0,
-          "ma20": 882.3799999999999,
-          "ma60": 865.6800000000001,
-          "current_to_ma20": 1.0437679911149393,
-          "current_to_ma60": 1.063903520931522,
-          "drawdown_from_60d_high_pct": -13.925233644859814,
-          "trend_20_vs_60_pct": 1.9291193050549715,
-          "weight": 1.0,
-          "direction": 1.0
-        }
-      ],
-      "profit_sensitivity": 0.8,
-      "bear_base_bull_anchor_factor": [
-        0.9839,
-        1.0639,
-        1.1439
-      ],
-      "bear_base_bull_forward_eps": [
-        0.4245,
-        0.452,
-        0.4795
-      ],
-      "forward_earnings_basis": "2026一致预期EPS=0.4300 → 商品/成本锚相对60日中枢 → sensitivity=0.80 → bear/base/bull盈利。",
+      "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
+      "commodity_anchors": [],
       "reasonable_multiple_range": [
-        7.0,
-        10.0
+        7,
+        10
       ],
-      "multiple_rationale": "按资源/周期业务质量和周期波动采用版本化估值区间。",
-      "value_anchor_range": [
-        2.97,
-        4.8
-      ],
-      "base_fair_value_floor": 3.16,
-      "safe_buy_range": [
-        2.28,
-        2.69
-      ],
-      "reasonable_buy_range": [
-        2.69,
-        3.1
-      ],
-      "key_sensitivities": [
-        "商品价格中枢",
-        "成本锚",
-        "产量/销量",
-        "一致预期EPS修正"
-      ],
-      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "above_buy_zone"
+      "value_anchor_range": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "left_conclusion": "unavailable",
+      "reason": "commodity_anchor_fetch_failed:['ZC0']",
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
     },
     {
       "code": "601088",
       "name": "中国神华",
       "cycle_tag": "coal::动力煤",
       "current_price": 47.63,
-      "valuation_status": "valid",
+      "valuation_status": "unavailable",
       "valuation_model": "commodity_scenario_forward_pe",
-      "forecast_source": "akshare.stock_profit_forecast_em",
-      "forecast_report_count": 23,
-      "consensus_eps_current_year": 2.733,
-      "commodity_anchors": [
-        {
-          "symbol": "ZC0",
-          "last_date": "2022-12-30",
-          "current": 921.0,
-          "ma20": 882.3799999999999,
-          "ma60": 865.6800000000001,
-          "current_to_ma20": 1.0437679911149393,
-          "current_to_ma60": 1.063903520931522,
-          "drawdown_from_60d_high_pct": -13.925233644859814,
-          "trend_20_vs_60_pct": 1.9291193050549715,
-          "weight": 1.0,
-          "direction": 1.0
-        }
-      ],
-      "profit_sensitivity": 0.8,
-      "bear_base_bull_anchor_factor": [
-        0.9839,
-        1.0639,
-        1.1439
-      ],
-      "bear_base_bull_forward_eps": [
-        2.6978,
-        2.8728,
-        3.0477
-      ],
-      "forward_earnings_basis": "2026一致预期EPS=2.7330 → 商品/成本锚相对60日中枢 → sensitivity=0.80 → bear/base/bull盈利。",
+      "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
+      "commodity_anchors": [],
       "reasonable_multiple_range": [
-        7.0,
-        10.0
+        7,
+        10
       ],
-      "multiple_rationale": "按资源/周期业务质量和周期波动采用版本化估值区间。",
-      "value_anchor_range": [
-        18.88,
-        30.48
-      ],
-      "base_fair_value_floor": 20.11,
-      "safe_buy_range": [
-        14.48,
-        17.09
-      ],
-      "reasonable_buy_range": [
-        17.09,
-        19.71
-      ],
-      "key_sensitivities": [
-        "商品价格中枢",
-        "成本锚",
-        "产量/销量",
-        "一致预期EPS修正"
-      ],
-      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "above_buy_zone"
+      "value_anchor_range": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "left_conclusion": "unavailable",
+      "reason": "commodity_anchor_fetch_failed:['ZC0']",
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
     },
     {
       "code": "601101",
       "name": "昊华能源",
       "cycle_tag": "coal::动力煤",
       "current_price": 14.81,
-      "valuation_status": "valid",
+      "valuation_status": "unavailable",
       "valuation_model": "commodity_scenario_forward_pe",
-      "forecast_source": "akshare.stock_profit_forecast_em",
-      "forecast_report_count": 8,
-      "consensus_eps_current_year": 0.9663,
-      "commodity_anchors": [
-        {
-          "symbol": "ZC0",
-          "last_date": "2022-12-30",
-          "current": 921.0,
-          "ma20": 882.3799999999999,
-          "ma60": 865.6800000000001,
-          "current_to_ma20": 1.0437679911149393,
-          "current_to_ma60": 1.063903520931522,
-          "drawdown_from_60d_high_pct": -13.925233644859814,
-          "trend_20_vs_60_pct": 1.9291193050549715,
-          "weight": 1.0,
-          "direction": 1.0
-        }
-      ],
-      "profit_sensitivity": 0.8,
-      "bear_base_bull_anchor_factor": [
-        0.9839,
-        1.0639,
-        1.1439
-      ],
-      "bear_base_bull_forward_eps": [
-        0.9538,
-        1.0156,
-        1.0775
-      ],
-      "forward_earnings_basis": "2026一致预期EPS=0.9663 → 商品/成本锚相对60日中枢 → sensitivity=0.80 → bear/base/bull盈利。",
+      "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
+      "commodity_anchors": [],
       "reasonable_multiple_range": [
-        7.0,
-        10.0
+        7,
+        10
       ],
-      "multiple_rationale": "按资源/周期业务质量和周期波动采用版本化估值区间。",
-      "value_anchor_range": [
-        6.68,
-        10.77
-      ],
-      "base_fair_value_floor": 7.11,
-      "safe_buy_range": [
-        5.12,
-        6.04
-      ],
-      "reasonable_buy_range": [
-        6.04,
-        6.97
-      ],
-      "key_sensitivities": [
-        "商品价格中枢",
-        "成本锚",
-        "产量/销量",
-        "一致预期EPS修正"
-      ],
-      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "above_buy_zone"
+      "value_anchor_range": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "left_conclusion": "unavailable",
+      "reason": "commodity_anchor_fetch_failed:['ZC0']",
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
     },
     {
       "code": "601168",
@@ -1238,6 +979,7 @@
         {
           "symbol": "CU0",
           "last_date": "2026-08-28",
+          "age_days": 0,
           "current": 108900.0,
           "ma20": 107800.5,
           "ma60": 105268.66666666667,
@@ -1293,64 +1035,20 @@
       "name": "陕西煤业",
       "cycle_tag": "coal::动力煤",
       "current_price": 27.07,
-      "valuation_status": "valid",
+      "valuation_status": "unavailable",
       "valuation_model": "commodity_scenario_forward_pe",
-      "forecast_source": "akshare.stock_profit_forecast_em",
-      "forecast_report_count": 17,
-      "consensus_eps_current_year": 2.1359,
-      "commodity_anchors": [
-        {
-          "symbol": "ZC0",
-          "last_date": "2022-12-30",
-          "current": 921.0,
-          "ma20": 882.3799999999999,
-          "ma60": 865.6800000000001,
-          "current_to_ma20": 1.0437679911149393,
-          "current_to_ma60": 1.063903520931522,
-          "drawdown_from_60d_high_pct": -13.925233644859814,
-          "trend_20_vs_60_pct": 1.9291193050549715,
-          "weight": 1.0,
-          "direction": 1.0
-        }
-      ],
-      "profit_sensitivity": 0.8,
-      "bear_base_bull_anchor_factor": [
-        0.9839,
-        1.0639,
-        1.1439
-      ],
-      "bear_base_bull_forward_eps": [
-        2.1084,
-        2.2451,
-        2.3818
-      ],
-      "forward_earnings_basis": "2026一致预期EPS=2.1359 → 商品/成本锚相对60日中枢 → sensitivity=0.80 → bear/base/bull盈利。",
+      "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
+      "commodity_anchors": [],
       "reasonable_multiple_range": [
-        7.0,
-        10.0
+        7,
+        10
       ],
-      "multiple_rationale": "按资源/周期业务质量和周期波动采用版本化估值区间。",
-      "value_anchor_range": [
-        14.76,
-        23.82
-      ],
-      "base_fair_value_floor": 15.72,
-      "safe_buy_range": [
-        11.32,
-        13.36
-      ],
-      "reasonable_buy_range": [
-        13.36,
-        15.4
-      ],
-      "key_sensitivities": [
-        "商品价格中枢",
-        "成本锚",
-        "产量/销量",
-        "一致预期EPS修正"
-      ],
-      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "above_buy_zone"
+      "value_anchor_range": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "left_conclusion": "unavailable",
+      "reason": "commodity_anchor_fetch_failed:['ZC0']",
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
     },
     {
       "code": "601600",
@@ -1366,6 +1064,7 @@
         {
           "symbol": "AL0",
           "last_date": "2026-08-28",
+          "age_days": 0,
           "current": 23920.0,
           "ma20": 23887.5,
           "ma60": 23541.75,
@@ -1379,6 +1078,7 @@
         {
           "symbol": "AO0",
           "last_date": "2026-08-28",
+          "age_days": 0,
           "current": 2648.0,
           "ma20": 2675.75,
           "ma60": 2737.4166666666665,
@@ -1443,6 +1143,7 @@
         {
           "symbol": "AU0",
           "last_date": "2026-08-28",
+          "age_days": 0,
           "current": 999.28,
           "ma20": 956.333,
           "ma60": 919.8233333333334,
@@ -1456,6 +1157,7 @@
         {
           "symbol": "CU0",
           "last_date": "2026-08-28",
+          "age_days": 0,
           "current": 108900.0,
           "ma20": 107800.5,
           "ma60": 105268.66666666667,
@@ -1511,64 +1213,20 @@
       "name": "新集能源",
       "cycle_tag": "coal::动力煤",
       "current_price": 10.88,
-      "valuation_status": "valid",
+      "valuation_status": "unavailable",
       "valuation_model": "commodity_scenario_forward_pe",
-      "forecast_source": "akshare.stock_profit_forecast_em",
-      "forecast_report_count": 17,
-      "consensus_eps_current_year": 0.9476,
-      "commodity_anchors": [
-        {
-          "symbol": "ZC0",
-          "last_date": "2022-12-30",
-          "current": 921.0,
-          "ma20": 882.3799999999999,
-          "ma60": 865.6800000000001,
-          "current_to_ma20": 1.0437679911149393,
-          "current_to_ma60": 1.063903520931522,
-          "drawdown_from_60d_high_pct": -13.925233644859814,
-          "trend_20_vs_60_pct": 1.9291193050549715,
-          "weight": 1.0,
-          "direction": 1.0
-        }
-      ],
-      "profit_sensitivity": 0.8,
-      "bear_base_bull_anchor_factor": [
-        0.9839,
-        1.0639,
-        1.1439
-      ],
-      "bear_base_bull_forward_eps": [
-        0.9354,
-        0.9961,
-        1.0567
-      ],
-      "forward_earnings_basis": "2026一致预期EPS=0.9476 → 商品/成本锚相对60日中枢 → sensitivity=0.80 → bear/base/bull盈利。",
+      "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
+      "commodity_anchors": [],
       "reasonable_multiple_range": [
-        7.0,
-        10.0
+        7,
+        10
       ],
-      "multiple_rationale": "按资源/周期业务质量和周期波动采用版本化估值区间。",
-      "value_anchor_range": [
-        6.55,
-        10.57
-      ],
-      "base_fair_value_floor": 6.97,
-      "safe_buy_range": [
-        5.02,
-        5.93
-      ],
-      "reasonable_buy_range": [
-        5.93,
-        6.83
-      ],
-      "key_sensitivities": [
-        "商品价格中枢",
-        "成本锚",
-        "产量/销量",
-        "一致预期EPS修正"
-      ],
-      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
-      "left_conclusion": "above_buy_zone"
+      "value_anchor_range": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "left_conclusion": "unavailable",
+      "reason": "commodity_anchor_fetch_failed:['ZC0']",
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
     },
     {
       "code": "603993",
@@ -1584,6 +1242,7 @@
         {
           "symbol": "CU0",
           "last_date": "2026-08-28",
+          "age_days": 0,
           "current": 108900.0,
           "ma20": 107800.5,
           "ma60": 105268.66666666667,
@@ -1661,5 +1320,5 @@
     "601600",
     "601899"
   ],
-  "method_note": "Resource cycle valuation cannot terminate at commodity_anchor_required when machine-readable anchors are available; commodity trend is an explicit upstream earnings input."
+  "method_note": "Resource cycle valuation requires fresh commodity anchors near the market trade date; stale continuous contracts become explicit unavailable inputs instead of silently entering valuation."
 }
