@@ -1,7 +1,7 @@
 {
   "schema_version": 3,
   "mode": "shadow",
-  "generated_at": "2026-08-30T23:16:53.847641+08:00",
+  "generated_at": "2026-08-30T23:24:54.978120+08:00",
   "reference_trade_date": "2026-08-28",
   "ranked_count": 75,
   "state_counts": {
@@ -12,9 +12,9 @@
     "WAIT_PULLBACK": 9,
     "REJECT": 27
   },
-  "entry_price_eligible_count": 4,
+  "entry_price_eligible_count": 2,
   "shadow_priority_eligible_count": 15,
-  "production_publish_eligible_count": 2,
+  "production_publish_eligible_count": 1,
   "shadow_top3": [
     {
       "code": "600150",
@@ -123,120 +123,6 @@
         "新船价格显著下跌、新接订单持续转弱或成本侵蚀利润"
       ],
       "reason": "research=pass; value=reasonable_buy_zone; expectation=reasonable_zone_not_started; structure=base_not_started; chase=low"
-    },
-    {
-      "code": "600710",
-      "name": "苏美达",
-      "state": "LEFT_WATCH",
-      "current_price": 10.72,
-      "primary_driver": "machinery::船舶制造",
-      "driver_links": [
-        {
-          "driver_id": "machinery::船舶制造",
-          "subchain": "船舶制造",
-          "value_chain_link": "整船建造/交付",
-          "exposure_summary": "整船建造/交付业务暴露；判定依据=显式业务暴露规则命中",
-          "exposure_materiality": "material",
-          "source": "company_industry_registry"
-        }
-      ],
-      "earnings_direction": "up",
-      "research_status": "pass",
-      "forward_bridge_valid": true,
-      "forward_bridges": [
-        {
-          "source": "driver",
-          "driver_id": "machinery::船舶制造",
-          "text": "长交期高价值订单继续进入交付兑现期"
-        },
-        {
-          "source": "weekly_deep_review",
-          "driver_id": null,
-          "text": "H1新签船舶35艘、在手105艘、排期至2030年，同时出口新签订单+29% → 船舶与供应链持续交付 → Q3/Q4盈利温和向上。"
-        }
-      ],
-      "financial_evidence": {
-        "source": "eastmoney_financial_analysis",
-        "report_date": "2026-06-30",
-        "deducted_net_profit": 630068700.0,
-        "deducted_eps": 0.48,
-        "deducted_profit_yoy_pct": 6.191485180487,
-        "deducted_profit_qoq_pct": 2.068743306844,
-        "operating_cashflow_per_share": 2.280457072989,
-        "operating_cashflow_to_revenue_pct": 0.044864174719,
-        "operating_cashflow_to_net_profit_pct": null,
-        "one_off_share_of_parent_profit_pct": 9.13,
-        "non_main_profit_ratio_pct": null,
-        "main_profit_ratio_pct": null,
-        "ttm_deducted_eps": 0.98,
-        "recurring_profit_verified": true,
-        "cashflow_quality_verified": true,
-        "quality_rule": "扣非净利润/扣非EPS为正；一次性因素占归母利润原则上<=35%；现金流至少一项非负或经营现金/净利润>=30%。"
-      },
-      "production_evidence_ready": true,
-      "expectation_gap_state": "safe_zone_not_started",
-      "value_gap_state": "safe_buy_zone",
-      "entry_price_eligible": true,
-      "gap_to_reference_mid_pct": 25.61,
-      "fundamental_anchor_range": [
-        11.22,
-        15.71
-      ],
-      "value_anchor_range": [
-        11.22,
-        13.47
-      ],
-      "safe_buy_range": [
-        11.22,
-        12.46
-      ],
-      "reasonable_buy_range": [
-        12.46,
-        13.47
-      ],
-      "formal_buy_zone": {
-        "safe": [
-          11.22,
-          12.46
-        ],
-        "reasonable": [
-          12.46,
-          13.47
-        ]
-      },
-      "valuation_anchor_status": "valid",
-      "independent_v2_anchor_count": 3,
-      "implied_zone_valuation": {
-        "safe_implied_pe": [
-          10.0,
-          11.1
-        ],
-        "reasonable_implied_pe": [
-          11.1,
-          12.0
-        ]
-      },
-      "structure_type": "base_not_started",
-      "structure_action": "wait_breakout",
-      "chase_risk": "low",
-      "score_components": {
-        "research": 30,
-        "forward_bridge": 15,
-        "expectation_gap": 12.8,
-        "buy_zone": 12,
-        "price_timing": 6,
-        "chase_risk": 5,
-        "earnings_quality_evidence": 5
-      },
-      "diagnostic_score": 85.8,
-      "shadow_priority_eligible": true,
-      "production_publish_eligible": true,
-      "blockers": [],
-      "invalidation_conditions": [
-        "新船价格显著下跌、新接订单持续转弱或成本侵蚀利润",
-        "船舶订单取消/延期、船价或交付毛利明显下降、出口订单转负。"
-      ],
-      "reason": "research=pass; value=safe_buy_zone; expectation=safe_zone_not_started; structure=base_not_started; chase=low"
     },
     {
       "code": "603259",
@@ -353,6 +239,116 @@
         "订单增速显著下滑、监管/地缘政策冲击订单或经调整利润率明显低于指引。"
       ],
       "reason": "research=pass; value=remaining_gap_above_buy_zone; expectation=trend_confirmed_gap_remaining; structure=trend_continuation; chase=medium"
+    },
+    {
+      "code": "600595",
+      "name": "中孚实业",
+      "state": "LEFT_WATCH",
+      "current_price": 6.34,
+      "primary_driver": "nonferrous::电解铝",
+      "driver_links": [
+        {
+          "driver_id": "nonferrous::电解铝",
+          "subchain": "电解铝",
+          "value_chain_link": "电解铝冶炼",
+          "exposure_summary": "电解铝冶炼业务暴露；判定依据=显式业务暴露规则命中",
+          "exposure_materiality": "material",
+          "source": "company_industry_registry"
+        }
+      ],
+      "earnings_direction": "up",
+      "research_status": "pass",
+      "forward_bridge_valid": true,
+      "forward_bridges": [
+        {
+          "source": "driver",
+          "driver_id": "nonferrous::电解铝",
+          "text": "铝价高位与氧化铝弱势扩大吨铝利润并传导上市公司盈利"
+        }
+      ],
+      "financial_evidence": {
+        "source": "eastmoney_financial_analysis",
+        "report_date": "2026-06-30",
+        "deducted_net_profit": 1921950275.39,
+        "deducted_eps": 0.48,
+        "deducted_profit_yoy_pct": 197.477085689961,
+        "deducted_profit_qoq_pct": 25.319599487557,
+        "operating_cashflow_per_share": 0.252993195662,
+        "operating_cashflow_to_revenue_pct": 0.07111571428,
+        "operating_cashflow_to_net_profit_pct": null,
+        "one_off_share_of_parent_profit_pct": -2.19,
+        "non_main_profit_ratio_pct": null,
+        "main_profit_ratio_pct": null,
+        "ttm_deducted_eps": 0.72,
+        "recurring_profit_verified": true,
+        "cashflow_quality_verified": true,
+        "quality_rule": "扣非净利润/扣非EPS为正；一次性因素占归母利润原则上<=35%；现金流至少一项非负或经营现金/净利润>=30%。"
+      },
+      "production_evidence_ready": true,
+      "expectation_gap_state": "gap_above_zone_not_started",
+      "value_gap_state": "remaining_gap_above_buy_zone",
+      "entry_price_eligible": false,
+      "gap_to_reference_mid_pct": 17.27,
+      "fundamental_anchor_range": [
+        6.26,
+        8.61
+      ],
+      "value_anchor_range": [
+        4.7,
+        6.26
+      ],
+      "safe_buy_range": [
+        4.7,
+        5.51
+      ],
+      "reasonable_buy_range": [
+        5.51,
+        6.26
+      ],
+      "formal_buy_zone": {
+        "safe": [
+          4.7,
+          5.51
+        ],
+        "reasonable": [
+          5.51,
+          6.26
+        ]
+      },
+      "valuation_anchor_status": "valid",
+      "independent_v2_anchor_count": 2,
+      "implied_zone_valuation": {
+        "safe_implied_pe": [
+          4.96,
+          5.81
+        ],
+        "reasonable_implied_pe": [
+          5.81,
+          6.6
+        ]
+      },
+      "structure_type": "base_not_started",
+      "structure_action": "wait_breakout",
+      "chase_risk": "low",
+      "score_components": {
+        "research": 38.56,
+        "forward_bridge": 15,
+        "expectation_gap": 8.63,
+        "buy_zone": -2,
+        "price_timing": 6,
+        "chase_risk": 5,
+        "earnings_quality_evidence": 5
+      },
+      "diagnostic_score": 76.19,
+      "shadow_priority_eligible": true,
+      "production_publish_eligible": false,
+      "blockers": [
+        "current_price_above_reasonable_buy_zone"
+      ],
+      "invalidation_conditions": [
+        "铝价显著下跌、库存累积或氧化铝/电力成本快速上升"
+      ],
+      "reason": "research=pass; value=remaining_gap_above_buy_zone; expectation=gap_above_zone_not_started; structure=base_not_started; chase=low"
     }
   ],
   "production_top3": [
@@ -463,120 +459,6 @@
         "新船价格显著下跌、新接订单持续转弱或成本侵蚀利润"
       ],
       "reason": "research=pass; value=reasonable_buy_zone; expectation=reasonable_zone_not_started; structure=base_not_started; chase=low"
-    },
-    {
-      "code": "600710",
-      "name": "苏美达",
-      "state": "LEFT_WATCH",
-      "current_price": 10.72,
-      "primary_driver": "machinery::船舶制造",
-      "driver_links": [
-        {
-          "driver_id": "machinery::船舶制造",
-          "subchain": "船舶制造",
-          "value_chain_link": "整船建造/交付",
-          "exposure_summary": "整船建造/交付业务暴露；判定依据=显式业务暴露规则命中",
-          "exposure_materiality": "material",
-          "source": "company_industry_registry"
-        }
-      ],
-      "earnings_direction": "up",
-      "research_status": "pass",
-      "forward_bridge_valid": true,
-      "forward_bridges": [
-        {
-          "source": "driver",
-          "driver_id": "machinery::船舶制造",
-          "text": "长交期高价值订单继续进入交付兑现期"
-        },
-        {
-          "source": "weekly_deep_review",
-          "driver_id": null,
-          "text": "H1新签船舶35艘、在手105艘、排期至2030年，同时出口新签订单+29% → 船舶与供应链持续交付 → Q3/Q4盈利温和向上。"
-        }
-      ],
-      "financial_evidence": {
-        "source": "eastmoney_financial_analysis",
-        "report_date": "2026-06-30",
-        "deducted_net_profit": 630068700.0,
-        "deducted_eps": 0.48,
-        "deducted_profit_yoy_pct": 6.191485180487,
-        "deducted_profit_qoq_pct": 2.068743306844,
-        "operating_cashflow_per_share": 2.280457072989,
-        "operating_cashflow_to_revenue_pct": 0.044864174719,
-        "operating_cashflow_to_net_profit_pct": null,
-        "one_off_share_of_parent_profit_pct": 9.13,
-        "non_main_profit_ratio_pct": null,
-        "main_profit_ratio_pct": null,
-        "ttm_deducted_eps": 0.98,
-        "recurring_profit_verified": true,
-        "cashflow_quality_verified": true,
-        "quality_rule": "扣非净利润/扣非EPS为正；一次性因素占归母利润原则上<=35%；现金流至少一项非负或经营现金/净利润>=30%。"
-      },
-      "production_evidence_ready": true,
-      "expectation_gap_state": "safe_zone_not_started",
-      "value_gap_state": "safe_buy_zone",
-      "entry_price_eligible": true,
-      "gap_to_reference_mid_pct": 25.61,
-      "fundamental_anchor_range": [
-        11.22,
-        15.71
-      ],
-      "value_anchor_range": [
-        11.22,
-        13.47
-      ],
-      "safe_buy_range": [
-        11.22,
-        12.46
-      ],
-      "reasonable_buy_range": [
-        12.46,
-        13.47
-      ],
-      "formal_buy_zone": {
-        "safe": [
-          11.22,
-          12.46
-        ],
-        "reasonable": [
-          12.46,
-          13.47
-        ]
-      },
-      "valuation_anchor_status": "valid",
-      "independent_v2_anchor_count": 3,
-      "implied_zone_valuation": {
-        "safe_implied_pe": [
-          10.0,
-          11.1
-        ],
-        "reasonable_implied_pe": [
-          11.1,
-          12.0
-        ]
-      },
-      "structure_type": "base_not_started",
-      "structure_action": "wait_breakout",
-      "chase_risk": "low",
-      "score_components": {
-        "research": 30,
-        "forward_bridge": 15,
-        "expectation_gap": 12.8,
-        "buy_zone": 12,
-        "price_timing": 6,
-        "chase_risk": 5,
-        "earnings_quality_evidence": 5
-      },
-      "diagnostic_score": 85.8,
-      "shadow_priority_eligible": true,
-      "production_publish_eligible": true,
-      "blockers": [],
-      "invalidation_conditions": [
-        "新船价格显著下跌、新接订单持续转弱或成本侵蚀利润",
-        "船舶订单取消/延期、船价或交付毛利明显下降、出口订单转负。"
-      ],
-      "reason": "research=pass; value=safe_buy_zone; expectation=safe_zone_not_started; structure=base_not_started; chase=low"
     }
   ],
   "state_buckets": {
@@ -809,120 +691,6 @@
         "reason": "research=pass; value=reasonable_buy_zone; expectation=reasonable_zone_not_started; structure=base_not_started; chase=low"
       },
       {
-        "code": "600710",
-        "name": "苏美达",
-        "state": "LEFT_WATCH",
-        "current_price": 10.72,
-        "primary_driver": "machinery::船舶制造",
-        "driver_links": [
-          {
-            "driver_id": "machinery::船舶制造",
-            "subchain": "船舶制造",
-            "value_chain_link": "整船建造/交付",
-            "exposure_summary": "整船建造/交付业务暴露；判定依据=显式业务暴露规则命中",
-            "exposure_materiality": "material",
-            "source": "company_industry_registry"
-          }
-        ],
-        "earnings_direction": "up",
-        "research_status": "pass",
-        "forward_bridge_valid": true,
-        "forward_bridges": [
-          {
-            "source": "driver",
-            "driver_id": "machinery::船舶制造",
-            "text": "长交期高价值订单继续进入交付兑现期"
-          },
-          {
-            "source": "weekly_deep_review",
-            "driver_id": null,
-            "text": "H1新签船舶35艘、在手105艘、排期至2030年，同时出口新签订单+29% → 船舶与供应链持续交付 → Q3/Q4盈利温和向上。"
-          }
-        ],
-        "financial_evidence": {
-          "source": "eastmoney_financial_analysis",
-          "report_date": "2026-06-30",
-          "deducted_net_profit": 630068700.0,
-          "deducted_eps": 0.48,
-          "deducted_profit_yoy_pct": 6.191485180487,
-          "deducted_profit_qoq_pct": 2.068743306844,
-          "operating_cashflow_per_share": 2.280457072989,
-          "operating_cashflow_to_revenue_pct": 0.044864174719,
-          "operating_cashflow_to_net_profit_pct": null,
-          "one_off_share_of_parent_profit_pct": 9.13,
-          "non_main_profit_ratio_pct": null,
-          "main_profit_ratio_pct": null,
-          "ttm_deducted_eps": 0.98,
-          "recurring_profit_verified": true,
-          "cashflow_quality_verified": true,
-          "quality_rule": "扣非净利润/扣非EPS为正；一次性因素占归母利润原则上<=35%；现金流至少一项非负或经营现金/净利润>=30%。"
-        },
-        "production_evidence_ready": true,
-        "expectation_gap_state": "safe_zone_not_started",
-        "value_gap_state": "safe_buy_zone",
-        "entry_price_eligible": true,
-        "gap_to_reference_mid_pct": 25.61,
-        "fundamental_anchor_range": [
-          11.22,
-          15.71
-        ],
-        "value_anchor_range": [
-          11.22,
-          13.47
-        ],
-        "safe_buy_range": [
-          11.22,
-          12.46
-        ],
-        "reasonable_buy_range": [
-          12.46,
-          13.47
-        ],
-        "formal_buy_zone": {
-          "safe": [
-            11.22,
-            12.46
-          ],
-          "reasonable": [
-            12.46,
-            13.47
-          ]
-        },
-        "valuation_anchor_status": "valid",
-        "independent_v2_anchor_count": 3,
-        "implied_zone_valuation": {
-          "safe_implied_pe": [
-            10.0,
-            11.1
-          ],
-          "reasonable_implied_pe": [
-            11.1,
-            12.0
-          ]
-        },
-        "structure_type": "base_not_started",
-        "structure_action": "wait_breakout",
-        "chase_risk": "low",
-        "score_components": {
-          "research": 30,
-          "forward_bridge": 15,
-          "expectation_gap": 12.8,
-          "buy_zone": 12,
-          "price_timing": 6,
-          "chase_risk": 5,
-          "earnings_quality_evidence": 5
-        },
-        "diagnostic_score": 85.8,
-        "shadow_priority_eligible": true,
-        "production_publish_eligible": true,
-        "blockers": [],
-        "invalidation_conditions": [
-          "新船价格显著下跌、新接订单持续转弱或成本侵蚀利润",
-          "船舶订单取消/延期、船价或交付毛利明显下降、出口订单转负。"
-        ],
-        "reason": "research=pass; value=safe_buy_zone; expectation=safe_zone_not_started; structure=base_not_started; chase=low"
-      },
-      {
         "code": "601601",
         "name": "中国太保",
         "state": "LEFT_WATCH",
@@ -1139,6 +907,122 @@
           "铝价显著下跌、库存累积或氧化铝/电力成本快速上升"
         ],
         "reason": "research=pass; value=remaining_gap_above_buy_zone; expectation=gap_above_zone_not_started; structure=base_not_started; chase=low"
+      },
+      {
+        "code": "600710",
+        "name": "苏美达",
+        "state": "LEFT_WATCH",
+        "current_price": 10.72,
+        "primary_driver": "machinery::船舶制造",
+        "driver_links": [
+          {
+            "driver_id": "machinery::船舶制造",
+            "subchain": "船舶制造",
+            "value_chain_link": "整船建造/交付",
+            "exposure_summary": "整船建造/交付业务暴露；判定依据=显式业务暴露规则命中",
+            "exposure_materiality": "material",
+            "source": "company_industry_registry"
+          }
+        ],
+        "earnings_direction": "up",
+        "research_status": "pass",
+        "forward_bridge_valid": true,
+        "forward_bridges": [
+          {
+            "source": "driver",
+            "driver_id": "machinery::船舶制造",
+            "text": "长交期高价值订单继续进入交付兑现期"
+          },
+          {
+            "source": "weekly_deep_review",
+            "driver_id": null,
+            "text": "H1新签船舶35艘、在手105艘、排期至2030年，同时出口新签订单+29% → 船舶与供应链持续交付 → Q3/Q4盈利温和向上。"
+          }
+        ],
+        "financial_evidence": {
+          "source": "eastmoney_financial_analysis",
+          "report_date": "2026-06-30",
+          "deducted_net_profit": 630068700.0,
+          "deducted_eps": 0.48,
+          "deducted_profit_yoy_pct": 6.191485180487,
+          "deducted_profit_qoq_pct": 2.068743306844,
+          "operating_cashflow_per_share": 2.280457072989,
+          "operating_cashflow_to_revenue_pct": 0.044864174719,
+          "operating_cashflow_to_net_profit_pct": null,
+          "one_off_share_of_parent_profit_pct": 9.13,
+          "non_main_profit_ratio_pct": null,
+          "main_profit_ratio_pct": null,
+          "ttm_deducted_eps": 0.98,
+          "recurring_profit_verified": true,
+          "cashflow_quality_verified": true,
+          "quality_rule": "扣非净利润/扣非EPS为正；一次性因素占归母利润原则上<=35%；现金流至少一项非负或经营现金/净利润>=30%。"
+        },
+        "production_evidence_ready": true,
+        "expectation_gap_state": "deep_value_review",
+        "value_gap_state": "below_safe_zone_review",
+        "entry_price_eligible": false,
+        "gap_to_reference_mid_pct": 25.61,
+        "fundamental_anchor_range": [
+          11.22,
+          15.71
+        ],
+        "value_anchor_range": [
+          11.22,
+          13.47
+        ],
+        "safe_buy_range": [
+          11.22,
+          12.46
+        ],
+        "reasonable_buy_range": [
+          12.46,
+          13.47
+        ],
+        "formal_buy_zone": {
+          "safe": [
+            11.22,
+            12.46
+          ],
+          "reasonable": [
+            12.46,
+            13.47
+          ]
+        },
+        "valuation_anchor_status": "valid",
+        "independent_v2_anchor_count": 3,
+        "implied_zone_valuation": {
+          "safe_implied_pe": [
+            10.0,
+            11.1
+          ],
+          "reasonable_implied_pe": [
+            11.1,
+            12.0
+          ]
+        },
+        "structure_type": "base_not_started",
+        "structure_action": "wait_breakout",
+        "chase_risk": "low",
+        "score_components": {
+          "research": 30,
+          "forward_bridge": 15,
+          "expectation_gap": 12.8,
+          "buy_zone": 0,
+          "price_timing": 6,
+          "chase_risk": 5,
+          "earnings_quality_evidence": 5
+        },
+        "diagnostic_score": 73.8,
+        "shadow_priority_eligible": true,
+        "production_publish_eligible": false,
+        "blockers": [
+          "current_price_not_in_formal_entry_zone"
+        ],
+        "invalidation_conditions": [
+          "新船价格显著下跌、新接订单持续转弱或成本侵蚀利润",
+          "船舶订单取消/延期、船价或交付毛利明显下降、出口订单转负。"
+        ],
+        "reason": "research=pass; value=below_safe_zone_review; expectation=deep_value_review; structure=base_not_started; chase=low"
       },
       {
         "code": "000737",
@@ -5133,122 +5017,6 @@
     ],
     "REJECT": [
       {
-        "code": "002475",
-        "name": "立讯精密",
-        "state": "REJECT",
-        "current_price": 56.6,
-        "primary_driver": "electronics::高速连接器/铜互连",
-        "driver_links": [
-          {
-            "driver_id": "electronics::高速连接器/铜互连",
-            "subchain": "高速连接器/铜互连",
-            "value_chain_link": null,
-            "exposure_summary": "weekly deep-review mapping hint",
-            "exposure_materiality": "unknown",
-            "source": "weekly_deep_review_mapping_hint"
-          }
-        ],
-        "earnings_direction": "up",
-        "research_status": "watch",
-        "forward_bridge_valid": true,
-        "forward_bridges": [
-          {
-            "source": "driver",
-            "driver_id": "electronics::高速连接器/铜互连",
-            "text": "成熟产品放量较明确，但需更多行业级订单验证后升级T2"
-          },
-          {
-            "source": "weekly_deep_review",
-            "driver_id": null,
-            "text": "公司预计2026年前三季度归母净利润132.46-143.98亿元、同比+15%-25% → 数据中心高速互连/热管理/电源与汽车电子协同继续落地 → Q3盈利已得到公司指引确认。"
-          }
-        ],
-        "financial_evidence": {
-          "source": "eastmoney_financial_analysis",
-          "report_date": "2026-06-30",
-          "deducted_net_profit": 5961877867.17,
-          "deducted_eps": 0.819,
-          "deducted_profit_yoy_pct": 6.472875651221,
-          "deducted_profit_qoq_pct": -0.029221836853,
-          "operating_cashflow_per_share": -0.334349418799,
-          "operating_cashflow_to_revenue_pct": -0.014016058646,
-          "operating_cashflow_to_net_profit_pct": null,
-          "one_off_share_of_parent_profit_pct": 23.98,
-          "non_main_profit_ratio_pct": null,
-          "main_profit_ratio_pct": null,
-          "ttm_deducted_eps": 1.999,
-          "recurring_profit_verified": true,
-          "cashflow_quality_verified": false,
-          "quality_rule": "扣非净利润/扣非EPS为正；一次性因素占归母利润原则上<=35%；现金流至少一项非负或经营现金/净利润>=30%。"
-        },
-        "production_evidence_ready": false,
-        "expectation_gap_state": "fundamental_price_conflict",
-        "value_gap_state": "safe_buy_zone",
-        "entry_price_eligible": true,
-        "gap_to_reference_mid_pct": 12.0,
-        "fundamental_anchor_range": [
-          57.63,
-          69.15
-        ],
-        "value_anchor_range": [
-          57.63,
-          69.15
-        ],
-        "safe_buy_range": [
-          57.63,
-          63.97
-        ],
-        "reasonable_buy_range": [
-          63.97,
-          69.15
-        ],
-        "formal_buy_zone": {
-          "safe": [
-            57.63,
-            63.97
-          ],
-          "reasonable": [
-            63.97,
-            69.15
-          ]
-        },
-        "valuation_anchor_status": "valid",
-        "independent_v2_anchor_count": 3,
-        "implied_zone_valuation": {
-          "safe_implied_pe": [
-            20.0,
-            22.2
-          ],
-          "reasonable_implied_pe": [
-            22.2,
-            24.0
-          ]
-        },
-        "structure_type": "damaged",
-        "structure_action": "avoid",
-        "chase_risk": "low",
-        "score_components": {
-          "research": 28.0,
-          "forward_bridge": 15,
-          "expectation_gap": 6.0,
-          "buy_zone": 12,
-          "price_timing": -20,
-          "chase_risk": 5,
-          "earnings_quality_evidence": 5
-        },
-        "diagnostic_score": 51.0,
-        "shadow_priority_eligible": false,
-        "production_publish_eligible": false,
-        "blockers": [
-          "cashflow_quality_verification_required"
-        ],
-        "invalidation_conditions": [
-          "Q3实际业绩低于预告下沿，或数据中心/汽车电子增长显著弱于公司表述。",
-          "产品验证延期或技术路线替代"
-        ],
-        "reason": "research=watch; value=safe_buy_zone; expectation=fundamental_price_conflict; structure=damaged; chase=low"
-      },
-      {
         "code": "600999",
         "name": "招商证券",
         "state": "REJECT",
@@ -6888,6 +6656,123 @@
         "reason": "research=pass; value=priced_in; expectation=priced_in_or_overheated; structure=transition; chase=low"
       },
       {
+        "code": "002475",
+        "name": "立讯精密",
+        "state": "REJECT",
+        "current_price": 56.6,
+        "primary_driver": "electronics::高速连接器/铜互连",
+        "driver_links": [
+          {
+            "driver_id": "electronics::高速连接器/铜互连",
+            "subchain": "高速连接器/铜互连",
+            "value_chain_link": null,
+            "exposure_summary": "weekly deep-review mapping hint",
+            "exposure_materiality": "unknown",
+            "source": "weekly_deep_review_mapping_hint"
+          }
+        ],
+        "earnings_direction": "up",
+        "research_status": "watch",
+        "forward_bridge_valid": true,
+        "forward_bridges": [
+          {
+            "source": "driver",
+            "driver_id": "electronics::高速连接器/铜互连",
+            "text": "成熟产品放量较明确，但需更多行业级订单验证后升级T2"
+          },
+          {
+            "source": "weekly_deep_review",
+            "driver_id": null,
+            "text": "公司预计2026年前三季度归母净利润132.46-143.98亿元、同比+15%-25% → 数据中心高速互连/热管理/电源与汽车电子协同继续落地 → Q3盈利已得到公司指引确认。"
+          }
+        ],
+        "financial_evidence": {
+          "source": "eastmoney_financial_analysis",
+          "report_date": "2026-06-30",
+          "deducted_net_profit": 5961877867.17,
+          "deducted_eps": 0.819,
+          "deducted_profit_yoy_pct": 6.472875651221,
+          "deducted_profit_qoq_pct": -0.029221836853,
+          "operating_cashflow_per_share": -0.334349418799,
+          "operating_cashflow_to_revenue_pct": -0.014016058646,
+          "operating_cashflow_to_net_profit_pct": null,
+          "one_off_share_of_parent_profit_pct": 23.98,
+          "non_main_profit_ratio_pct": null,
+          "main_profit_ratio_pct": null,
+          "ttm_deducted_eps": 1.999,
+          "recurring_profit_verified": true,
+          "cashflow_quality_verified": false,
+          "quality_rule": "扣非净利润/扣非EPS为正；一次性因素占归母利润原则上<=35%；现金流至少一项非负或经营现金/净利润>=30%。"
+        },
+        "production_evidence_ready": false,
+        "expectation_gap_state": "fundamental_price_conflict",
+        "value_gap_state": "below_safe_zone_review",
+        "entry_price_eligible": false,
+        "gap_to_reference_mid_pct": 12.0,
+        "fundamental_anchor_range": [
+          57.63,
+          69.15
+        ],
+        "value_anchor_range": [
+          57.63,
+          69.15
+        ],
+        "safe_buy_range": [
+          57.63,
+          63.97
+        ],
+        "reasonable_buy_range": [
+          63.97,
+          69.15
+        ],
+        "formal_buy_zone": {
+          "safe": [
+            57.63,
+            63.97
+          ],
+          "reasonable": [
+            63.97,
+            69.15
+          ]
+        },
+        "valuation_anchor_status": "valid",
+        "independent_v2_anchor_count": 3,
+        "implied_zone_valuation": {
+          "safe_implied_pe": [
+            20.0,
+            22.2
+          ],
+          "reasonable_implied_pe": [
+            22.2,
+            24.0
+          ]
+        },
+        "structure_type": "damaged",
+        "structure_action": "avoid",
+        "chase_risk": "low",
+        "score_components": {
+          "research": 28.0,
+          "forward_bridge": 15,
+          "expectation_gap": 6.0,
+          "buy_zone": 0,
+          "price_timing": -20,
+          "chase_risk": 5,
+          "earnings_quality_evidence": 5
+        },
+        "diagnostic_score": 39.0,
+        "shadow_priority_eligible": false,
+        "production_publish_eligible": false,
+        "blockers": [
+          "cashflow_quality_verification_required",
+          "current_price_not_in_formal_entry_zone"
+        ],
+        "invalidation_conditions": [
+          "Q3实际业绩低于预告下沿，或数据中心/汽车电子增长显著弱于公司表述。",
+          "产品验证延期或技术路线替代"
+        ],
+        "reason": "research=watch; value=below_safe_zone_review; expectation=fundamental_price_conflict; structure=damaged; chase=low"
+      },
+      {
         "code": "600183",
         "name": "生益科技",
         "state": "REJECT",
@@ -8226,120 +8111,6 @@
       "reason": "research=pass; value=reasonable_buy_zone; expectation=reasonable_zone_not_started; structure=base_not_started; chase=low"
     },
     {
-      "code": "600710",
-      "name": "苏美达",
-      "state": "LEFT_WATCH",
-      "current_price": 10.72,
-      "primary_driver": "machinery::船舶制造",
-      "driver_links": [
-        {
-          "driver_id": "machinery::船舶制造",
-          "subchain": "船舶制造",
-          "value_chain_link": "整船建造/交付",
-          "exposure_summary": "整船建造/交付业务暴露；判定依据=显式业务暴露规则命中",
-          "exposure_materiality": "material",
-          "source": "company_industry_registry"
-        }
-      ],
-      "earnings_direction": "up",
-      "research_status": "pass",
-      "forward_bridge_valid": true,
-      "forward_bridges": [
-        {
-          "source": "driver",
-          "driver_id": "machinery::船舶制造",
-          "text": "长交期高价值订单继续进入交付兑现期"
-        },
-        {
-          "source": "weekly_deep_review",
-          "driver_id": null,
-          "text": "H1新签船舶35艘、在手105艘、排期至2030年，同时出口新签订单+29% → 船舶与供应链持续交付 → Q3/Q4盈利温和向上。"
-        }
-      ],
-      "financial_evidence": {
-        "source": "eastmoney_financial_analysis",
-        "report_date": "2026-06-30",
-        "deducted_net_profit": 630068700.0,
-        "deducted_eps": 0.48,
-        "deducted_profit_yoy_pct": 6.191485180487,
-        "deducted_profit_qoq_pct": 2.068743306844,
-        "operating_cashflow_per_share": 2.280457072989,
-        "operating_cashflow_to_revenue_pct": 0.044864174719,
-        "operating_cashflow_to_net_profit_pct": null,
-        "one_off_share_of_parent_profit_pct": 9.13,
-        "non_main_profit_ratio_pct": null,
-        "main_profit_ratio_pct": null,
-        "ttm_deducted_eps": 0.98,
-        "recurring_profit_verified": true,
-        "cashflow_quality_verified": true,
-        "quality_rule": "扣非净利润/扣非EPS为正；一次性因素占归母利润原则上<=35%；现金流至少一项非负或经营现金/净利润>=30%。"
-      },
-      "production_evidence_ready": true,
-      "expectation_gap_state": "safe_zone_not_started",
-      "value_gap_state": "safe_buy_zone",
-      "entry_price_eligible": true,
-      "gap_to_reference_mid_pct": 25.61,
-      "fundamental_anchor_range": [
-        11.22,
-        15.71
-      ],
-      "value_anchor_range": [
-        11.22,
-        13.47
-      ],
-      "safe_buy_range": [
-        11.22,
-        12.46
-      ],
-      "reasonable_buy_range": [
-        12.46,
-        13.47
-      ],
-      "formal_buy_zone": {
-        "safe": [
-          11.22,
-          12.46
-        ],
-        "reasonable": [
-          12.46,
-          13.47
-        ]
-      },
-      "valuation_anchor_status": "valid",
-      "independent_v2_anchor_count": 3,
-      "implied_zone_valuation": {
-        "safe_implied_pe": [
-          10.0,
-          11.1
-        ],
-        "reasonable_implied_pe": [
-          11.1,
-          12.0
-        ]
-      },
-      "structure_type": "base_not_started",
-      "structure_action": "wait_breakout",
-      "chase_risk": "low",
-      "score_components": {
-        "research": 30,
-        "forward_bridge": 15,
-        "expectation_gap": 12.8,
-        "buy_zone": 12,
-        "price_timing": 6,
-        "chase_risk": 5,
-        "earnings_quality_evidence": 5
-      },
-      "diagnostic_score": 85.8,
-      "shadow_priority_eligible": true,
-      "production_publish_eligible": true,
-      "blockers": [],
-      "invalidation_conditions": [
-        "新船价格显著下跌、新接订单持续转弱或成本侵蚀利润",
-        "船舶订单取消/延期、船价或交付毛利明显下降、出口订单转负。"
-      ],
-      "reason": "research=pass; value=safe_buy_zone; expectation=safe_zone_not_started; structure=base_not_started; chase=low"
-    },
-    {
       "code": "601601",
       "name": "中国太保",
       "state": "LEFT_WATCH",
@@ -8556,6 +8327,122 @@
         "铝价显著下跌、库存累积或氧化铝/电力成本快速上升"
       ],
       "reason": "research=pass; value=remaining_gap_above_buy_zone; expectation=gap_above_zone_not_started; structure=base_not_started; chase=low"
+    },
+    {
+      "code": "600710",
+      "name": "苏美达",
+      "state": "LEFT_WATCH",
+      "current_price": 10.72,
+      "primary_driver": "machinery::船舶制造",
+      "driver_links": [
+        {
+          "driver_id": "machinery::船舶制造",
+          "subchain": "船舶制造",
+          "value_chain_link": "整船建造/交付",
+          "exposure_summary": "整船建造/交付业务暴露；判定依据=显式业务暴露规则命中",
+          "exposure_materiality": "material",
+          "source": "company_industry_registry"
+        }
+      ],
+      "earnings_direction": "up",
+      "research_status": "pass",
+      "forward_bridge_valid": true,
+      "forward_bridges": [
+        {
+          "source": "driver",
+          "driver_id": "machinery::船舶制造",
+          "text": "长交期高价值订单继续进入交付兑现期"
+        },
+        {
+          "source": "weekly_deep_review",
+          "driver_id": null,
+          "text": "H1新签船舶35艘、在手105艘、排期至2030年，同时出口新签订单+29% → 船舶与供应链持续交付 → Q3/Q4盈利温和向上。"
+        }
+      ],
+      "financial_evidence": {
+        "source": "eastmoney_financial_analysis",
+        "report_date": "2026-06-30",
+        "deducted_net_profit": 630068700.0,
+        "deducted_eps": 0.48,
+        "deducted_profit_yoy_pct": 6.191485180487,
+        "deducted_profit_qoq_pct": 2.068743306844,
+        "operating_cashflow_per_share": 2.280457072989,
+        "operating_cashflow_to_revenue_pct": 0.044864174719,
+        "operating_cashflow_to_net_profit_pct": null,
+        "one_off_share_of_parent_profit_pct": 9.13,
+        "non_main_profit_ratio_pct": null,
+        "main_profit_ratio_pct": null,
+        "ttm_deducted_eps": 0.98,
+        "recurring_profit_verified": true,
+        "cashflow_quality_verified": true,
+        "quality_rule": "扣非净利润/扣非EPS为正；一次性因素占归母利润原则上<=35%；现金流至少一项非负或经营现金/净利润>=30%。"
+      },
+      "production_evidence_ready": true,
+      "expectation_gap_state": "deep_value_review",
+      "value_gap_state": "below_safe_zone_review",
+      "entry_price_eligible": false,
+      "gap_to_reference_mid_pct": 25.61,
+      "fundamental_anchor_range": [
+        11.22,
+        15.71
+      ],
+      "value_anchor_range": [
+        11.22,
+        13.47
+      ],
+      "safe_buy_range": [
+        11.22,
+        12.46
+      ],
+      "reasonable_buy_range": [
+        12.46,
+        13.47
+      ],
+      "formal_buy_zone": {
+        "safe": [
+          11.22,
+          12.46
+        ],
+        "reasonable": [
+          12.46,
+          13.47
+        ]
+      },
+      "valuation_anchor_status": "valid",
+      "independent_v2_anchor_count": 3,
+      "implied_zone_valuation": {
+        "safe_implied_pe": [
+          10.0,
+          11.1
+        ],
+        "reasonable_implied_pe": [
+          11.1,
+          12.0
+        ]
+      },
+      "structure_type": "base_not_started",
+      "structure_action": "wait_breakout",
+      "chase_risk": "low",
+      "score_components": {
+        "research": 30,
+        "forward_bridge": 15,
+        "expectation_gap": 12.8,
+        "buy_zone": 0,
+        "price_timing": 6,
+        "chase_risk": 5,
+        "earnings_quality_evidence": 5
+      },
+      "diagnostic_score": 73.8,
+      "shadow_priority_eligible": true,
+      "production_publish_eligible": false,
+      "blockers": [
+        "current_price_not_in_formal_entry_zone"
+      ],
+      "invalidation_conditions": [
+        "新船价格显著下跌、新接订单持续转弱或成本侵蚀利润",
+        "船舶订单取消/延期、船价或交付毛利明显下降、出口订单转负。"
+      ],
+      "reason": "research=pass; value=below_safe_zone_review; expectation=deep_value_review; structure=base_not_started; chase=low"
     },
     {
       "code": "000737",
@@ -12544,122 +12431,6 @@
       "reason": "research=pass; value=priced_in; expectation=priced_in_or_overheated; structure=overheated; chase=high"
     },
     {
-      "code": "002475",
-      "name": "立讯精密",
-      "state": "REJECT",
-      "current_price": 56.6,
-      "primary_driver": "electronics::高速连接器/铜互连",
-      "driver_links": [
-        {
-          "driver_id": "electronics::高速连接器/铜互连",
-          "subchain": "高速连接器/铜互连",
-          "value_chain_link": null,
-          "exposure_summary": "weekly deep-review mapping hint",
-          "exposure_materiality": "unknown",
-          "source": "weekly_deep_review_mapping_hint"
-        }
-      ],
-      "earnings_direction": "up",
-      "research_status": "watch",
-      "forward_bridge_valid": true,
-      "forward_bridges": [
-        {
-          "source": "driver",
-          "driver_id": "electronics::高速连接器/铜互连",
-          "text": "成熟产品放量较明确，但需更多行业级订单验证后升级T2"
-        },
-        {
-          "source": "weekly_deep_review",
-          "driver_id": null,
-          "text": "公司预计2026年前三季度归母净利润132.46-143.98亿元、同比+15%-25% → 数据中心高速互连/热管理/电源与汽车电子协同继续落地 → Q3盈利已得到公司指引确认。"
-        }
-      ],
-      "financial_evidence": {
-        "source": "eastmoney_financial_analysis",
-        "report_date": "2026-06-30",
-        "deducted_net_profit": 5961877867.17,
-        "deducted_eps": 0.819,
-        "deducted_profit_yoy_pct": 6.472875651221,
-        "deducted_profit_qoq_pct": -0.029221836853,
-        "operating_cashflow_per_share": -0.334349418799,
-        "operating_cashflow_to_revenue_pct": -0.014016058646,
-        "operating_cashflow_to_net_profit_pct": null,
-        "one_off_share_of_parent_profit_pct": 23.98,
-        "non_main_profit_ratio_pct": null,
-        "main_profit_ratio_pct": null,
-        "ttm_deducted_eps": 1.999,
-        "recurring_profit_verified": true,
-        "cashflow_quality_verified": false,
-        "quality_rule": "扣非净利润/扣非EPS为正；一次性因素占归母利润原则上<=35%；现金流至少一项非负或经营现金/净利润>=30%。"
-      },
-      "production_evidence_ready": false,
-      "expectation_gap_state": "fundamental_price_conflict",
-      "value_gap_state": "safe_buy_zone",
-      "entry_price_eligible": true,
-      "gap_to_reference_mid_pct": 12.0,
-      "fundamental_anchor_range": [
-        57.63,
-        69.15
-      ],
-      "value_anchor_range": [
-        57.63,
-        69.15
-      ],
-      "safe_buy_range": [
-        57.63,
-        63.97
-      ],
-      "reasonable_buy_range": [
-        63.97,
-        69.15
-      ],
-      "formal_buy_zone": {
-        "safe": [
-          57.63,
-          63.97
-        ],
-        "reasonable": [
-          63.97,
-          69.15
-        ]
-      },
-      "valuation_anchor_status": "valid",
-      "independent_v2_anchor_count": 3,
-      "implied_zone_valuation": {
-        "safe_implied_pe": [
-          20.0,
-          22.2
-        ],
-        "reasonable_implied_pe": [
-          22.2,
-          24.0
-        ]
-      },
-      "structure_type": "damaged",
-      "structure_action": "avoid",
-      "chase_risk": "low",
-      "score_components": {
-        "research": 28.0,
-        "forward_bridge": 15,
-        "expectation_gap": 6.0,
-        "buy_zone": 12,
-        "price_timing": -20,
-        "chase_risk": 5,
-        "earnings_quality_evidence": 5
-      },
-      "diagnostic_score": 51.0,
-      "shadow_priority_eligible": false,
-      "production_publish_eligible": false,
-      "blockers": [
-        "cashflow_quality_verification_required"
-      ],
-      "invalidation_conditions": [
-        "Q3实际业绩低于预告下沿，或数据中心/汽车电子增长显著弱于公司表述。",
-        "产品验证延期或技术路线替代"
-      ],
-      "reason": "research=watch; value=safe_buy_zone; expectation=fundamental_price_conflict; structure=damaged; chase=low"
-    },
-    {
       "code": "600999",
       "name": "招商证券",
       "state": "REJECT",
@@ -14297,6 +14068,123 @@
         "CSP资本开支下修、AI订单放缓或高端板供给快速扩张"
       ],
       "reason": "research=pass; value=priced_in; expectation=priced_in_or_overheated; structure=transition; chase=low"
+    },
+    {
+      "code": "002475",
+      "name": "立讯精密",
+      "state": "REJECT",
+      "current_price": 56.6,
+      "primary_driver": "electronics::高速连接器/铜互连",
+      "driver_links": [
+        {
+          "driver_id": "electronics::高速连接器/铜互连",
+          "subchain": "高速连接器/铜互连",
+          "value_chain_link": null,
+          "exposure_summary": "weekly deep-review mapping hint",
+          "exposure_materiality": "unknown",
+          "source": "weekly_deep_review_mapping_hint"
+        }
+      ],
+      "earnings_direction": "up",
+      "research_status": "watch",
+      "forward_bridge_valid": true,
+      "forward_bridges": [
+        {
+          "source": "driver",
+          "driver_id": "electronics::高速连接器/铜互连",
+          "text": "成熟产品放量较明确，但需更多行业级订单验证后升级T2"
+        },
+        {
+          "source": "weekly_deep_review",
+          "driver_id": null,
+          "text": "公司预计2026年前三季度归母净利润132.46-143.98亿元、同比+15%-25% → 数据中心高速互连/热管理/电源与汽车电子协同继续落地 → Q3盈利已得到公司指引确认。"
+        }
+      ],
+      "financial_evidence": {
+        "source": "eastmoney_financial_analysis",
+        "report_date": "2026-06-30",
+        "deducted_net_profit": 5961877867.17,
+        "deducted_eps": 0.819,
+        "deducted_profit_yoy_pct": 6.472875651221,
+        "deducted_profit_qoq_pct": -0.029221836853,
+        "operating_cashflow_per_share": -0.334349418799,
+        "operating_cashflow_to_revenue_pct": -0.014016058646,
+        "operating_cashflow_to_net_profit_pct": null,
+        "one_off_share_of_parent_profit_pct": 23.98,
+        "non_main_profit_ratio_pct": null,
+        "main_profit_ratio_pct": null,
+        "ttm_deducted_eps": 1.999,
+        "recurring_profit_verified": true,
+        "cashflow_quality_verified": false,
+        "quality_rule": "扣非净利润/扣非EPS为正；一次性因素占归母利润原则上<=35%；现金流至少一项非负或经营现金/净利润>=30%。"
+      },
+      "production_evidence_ready": false,
+      "expectation_gap_state": "fundamental_price_conflict",
+      "value_gap_state": "below_safe_zone_review",
+      "entry_price_eligible": false,
+      "gap_to_reference_mid_pct": 12.0,
+      "fundamental_anchor_range": [
+        57.63,
+        69.15
+      ],
+      "value_anchor_range": [
+        57.63,
+        69.15
+      ],
+      "safe_buy_range": [
+        57.63,
+        63.97
+      ],
+      "reasonable_buy_range": [
+        63.97,
+        69.15
+      ],
+      "formal_buy_zone": {
+        "safe": [
+          57.63,
+          63.97
+        ],
+        "reasonable": [
+          63.97,
+          69.15
+        ]
+      },
+      "valuation_anchor_status": "valid",
+      "independent_v2_anchor_count": 3,
+      "implied_zone_valuation": {
+        "safe_implied_pe": [
+          20.0,
+          22.2
+        ],
+        "reasonable_implied_pe": [
+          22.2,
+          24.0
+        ]
+      },
+      "structure_type": "damaged",
+      "structure_action": "avoid",
+      "chase_risk": "low",
+      "score_components": {
+        "research": 28.0,
+        "forward_bridge": 15,
+        "expectation_gap": 6.0,
+        "buy_zone": 0,
+        "price_timing": -20,
+        "chase_risk": 5,
+        "earnings_quality_evidence": 5
+      },
+      "diagnostic_score": 39.0,
+      "shadow_priority_eligible": false,
+      "production_publish_eligible": false,
+      "blockers": [
+        "cashflow_quality_verification_required",
+        "current_price_not_in_formal_entry_zone"
+      ],
+      "invalidation_conditions": [
+        "Q3实际业绩低于预告下沿，或数据中心/汽车电子增长显著弱于公司表述。",
+        "产品验证延期或技术路线替代"
+      ],
+      "reason": "research=watch; value=below_safe_zone_review; expectation=fundamental_price_conflict; structure=damaged; chase=low"
     },
     {
       "code": "600183",
