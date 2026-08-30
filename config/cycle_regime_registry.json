@@ -1,114 +1,83 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "reviewed_at": "2026-08-30",
   "max_review_age_days": 45,
   "purpose": "Structured 6-18 month cycle regime inputs. Machine-readable commodity anchors are preferred where reliable; otherwise the registry supplies conservative supply-demand normalization factors for anchorless cycle valuation. T1 cycle chains use deliberately weaker base factors until industry evidence upgrades.",
   "subchains": {
     "nonferrous::电解铝": {
-      "regime": "near_term_tight_medium_term_normalizing",
-      "horizon": "6-18m",
-      "bear_base_bull_earnings_factor": [0.78, 0.90, 1.02],
-      "multiple_range_by_regime": [8.0, 11.0],
-      "supply_score": -1.0,
-      "demand_score": -0.5,
-      "inventory_score": 1.0,
-      "summary": "近端库存与地缘扰动仍支撑铝价，但中东复产快于此前预期、2027库存重建/供给过剩风险意味着当前高利润不应直接按高倍PE资本化。",
-      "evidence": [
-        {"date":"2026-07-06","source":"Goldman Sachs summary via AEGIS/Newsquawk","url":"https://instanext.com/insights/metals/daily-first-look/2026-07-06","effect":"medium_term_supply_bearish","note":"Middle East supply recovery faster than expected; Q4 2026 LME forecast cut to 2950/t and 2027 average to 2700/t; inventories expected to rebuild into 2027."},
-        {"date":"2026-07-06","source":"Newsquawk summary of Goldman Sachs","url":"https://www.newsquawk.com/headlines/goldman-sachs-lowered-its-lme-aluminium-price-forecast-to-usd-2950t-for-q4-2026-and-lowered-its-2027-average-forecast-to-usd-2700t","effect":"medium_term_balance_bearish","note":"2026 deficit cut to about 100kt and 2027 surplus raised to about 1.5mt."},
-        {"date":"2026-08-13","source":"Reuters","url":"https://www.reuters.com/commentary/reuters-open-interest/aluminium-thin-ice-lme-stocks-hit-36-year-low-2026-08-13/","effect":"near_term_inventory_bullish","note":"LME aluminium stocks at a 36-year low, while the market simultaneously prices recovering Middle East/Indonesia/China supply."}
-      ],
-      "invalidation_triggers": ["Middle East restart materially delayed again","LME/SHFE inventories keep falling while physical premiums accelerate","2027 consensus EPS is revised materially upward despite supply recovery","major demand indicators reaccelerate enough to absorb expected supply recovery"]
+      "regime":"near_term_tight_medium_term_normalizing","horizon":"6-18m","bear_base_bull_earnings_factor":[0.78,0.90,1.02],"multiple_range_by_regime":[8.0,11.0],"supply_score":-1.0,"demand_score":-0.5,"inventory_score":1.0,
+      "summary":"近端库存与地缘扰动仍支撑铝价，但中东复产快于此前预期、2027库存重建/供给过剩风险意味着当前高利润不应直接按高倍PE资本化。",
+      "evidence":[{"date":"2026-07-06","source":"Goldman Sachs summary via AEGIS/Newsquawk","url":"https://instanext.com/insights/metals/daily-first-look/2026-07-06","effect":"medium_term_supply_bearish","note":"Middle East supply recovery faster than expected; Q4 2026 LME forecast cut to 2950/t and 2027 average to 2700/t; inventories expected to rebuild into 2027."},{"date":"2026-07-06","source":"Newsquawk summary of Goldman Sachs","url":"https://www.newsquawk.com/headlines/goldman-sachs-lowered-its-lme-aluminium-price-forecast-to-usd-2950t-for-q4-2026-and-lowered-its-2027-average-forecast-to-usd-2700t","effect":"medium_term_balance_bearish","note":"2026 deficit cut to about 100kt and 2027 surplus raised to about 1.5mt."},{"date":"2026-08-13","source":"Reuters","url":"https://www.reuters.com/commentary/reuters-open-interest/aluminium-thin-ice-lme-stocks-hit-36-year-low-2026-08-13/","effect":"near_term_inventory_bullish","note":"LME aluminium stocks at a 36-year low, while the market simultaneously prices recovering Middle East/Indonesia/China supply."}],
+      "invalidation_triggers":["Middle East restart materially delayed again","LME/SHFE inventories keep falling while physical premiums accelerate","2027 consensus EPS is revised materially upward despite supply recovery","major demand indicators reaccelerate enough to absorb expected supply recovery"]
     },
     "nonferrous::铜矿资源": {
-      "regime": "tight_spot_medium_term_balancing",
-      "horizon": "6-18m",
-      "bear_base_bull_earnings_factor": [0.90, 0.98, 1.08],
-      "multiple_range_by_regime": [11.0, 15.0],
-      "supply_score": 0.0,
-      "demand_score": 0.5,
-      "inventory_score": 0.5,
-      "summary": "现货/区域流动性偏紧与矿端扰动支撑价格，但2026全球统计口径仍可能呈现供应过剩，估值不能把短期高铜价永久化。",
-      "evidence": [{"date":"2026-08-25","source":"Reuters","url":"https://www.reuters.com/business/us-tariff-threat-upends-copper-surplus-prices-test-all-time-peak-2026-08-25/","effect":"mixed","note":"Copper near record highs amid US tariff-driven inventory relocation, mine disruptions and smelter outages, while analysts still estimate a 2026 global surplus."}],
-      "invalidation_triggers": ["mine/smelter disruptions ease faster than expected while ex-US inventories rebuild","China demand weakens materially","US tariff-driven inventory distortion reverses and releases metal back to global market"]
+      "regime":"tight_spot_medium_term_balancing","horizon":"6-18m","bear_base_bull_earnings_factor":[0.90,0.98,1.08],"multiple_range_by_regime":[11.0,15.0],"supply_score":0.0,"demand_score":0.5,"inventory_score":0.5,
+      "summary":"现货/区域流动性偏紧与矿端扰动支撑价格，但2026全球统计口径仍可能呈现供应过剩，估值不能把短期高铜价永久化。",
+      "evidence":[{"date":"2026-08-25","source":"Reuters","url":"https://www.reuters.com/business/us-tariff-threat-upends-copper-surplus-prices-test-all-time-peak-2026-08-25/","effect":"mixed","note":"Copper near record highs amid US tariff-driven inventory relocation, mine disruptions and smelter outages, while analysts still estimate a 2026 global surplus."}],
+      "invalidation_triggers":["mine/smelter disruptions ease faster than expected while ex-US inventories rebuild","China demand weakens materially","US tariff-driven inventory distortion reverses and releases metal back to global market"]
+    },
+    "nonferrous::黄金": {
+      "regime":"high_price_support_with_macro_reversal_risk","horizon":"6-18m","bear_base_bull_earnings_factor":[0.82,0.92,1.04],"multiple_range_by_regime":[10.0,14.0],"supply_score":0.0,"demand_score":0.25,"inventory_score":0.0,
+      "summary":"高金价仍支撑矿企盈利，但行业扫描已提示8月末金价回落与前瞻盈利锚下修风险。T1阶段不把高金价持续性视为已确认，先用长期中性金价归一化，再按偏保守基准盈利估值。",
+      "evidence":[{"date":"2026-08-30","source":"data/research/pipeline/industry_scan.json","effect":"constructive_but_unconfirmed","note":"黄金为T1：高金价支撑盈利，但8月末金价明显回落，等待价格中枢重新稳定。"}],
+      "invalidation_triggers":["国际金价持续跌破中期中枢","实际利率与美元持续上行压制金价","央行购金显著降温","矿山成本上升侵蚀金价红利"]
+    },
+    "nonferrous::锂资源/锂盐": {
+      "regime":"demand_recovery_with_supply_overhang","horizon":"6-18m","bear_base_bull_earnings_factor":[0.65,0.82,1.05],"multiple_range_by_regime":[8.0,12.0],"supply_score":-0.75,"demand_score":0.5,"inventory_score":0.0,
+      "summary":"储能和锂电出口需求较强，但锂资源供给弹性、库存和价格中枢持续性仍未完全确认。T1阶段仅允许公司强盈利作为研究信号，估值基准对当前盈利施加较深周期折价。",
+      "evidence":[{"date":"2026-08-30","source":"data/research/pipeline/industry_scan.json","effect":"mixed","note":"锂资源/锂盐为T1：储能与锂电出口需求较强，但价格与供给持续性仍需验证。"}],
+      "invalidation_triggers":["锂盐库存持续累积","新增矿山/盐湖供给快于需求","锂价重新跌破行业现金成本附近","储能和动力电池需求低于预期"]
     },
     "coal::动力煤": {
-      "regime": "price_recovery_with_policy_supply_constraint",
-      "horizon": "6-18m",
-      "bear_base_bull_earnings_factor": [0.82, 0.95, 1.05],
-      "multiple_range_by_regime": [7.0, 10.0],
-      "supply_score": 0.5,
-      "demand_score": 0.5,
-      "inventory_score": 0.0,
-      "summary": "2026年以来动力煤价格中枢抬升、煤企盈利改善，安监与反超产限制供给弹性；但煤炭仍是强政策/天气周期行业，低风险估值不把现货上涨直接外推，基准盈利继续保留折价。",
-      "evidence": [
-        {"date":"2026-08-30","source":"data/research/pipeline/industry_scan.json","effect":"constructive","note":"动力煤被识别为T2 early；8月28日秦皇岛Q5500约867元/吨，1-7月煤炭开采洗选利润明显改善。"},
-        {"date":"2026-07-13","source":"中泰证券煤炭行业公开观点","url":"https://finance.sina.com.cn/wm/2026-07-13/doc-inihrhfn9075972.shtml","effect":"constructive_with_cycle_risk","note":"2026H1动力煤价格中枢同比上升，供给受安监与进口约束；仍需防范季节、政策和需求波动。"}
-      ],
-      "invalidation_triggers": ["安全监管和反超产约束明显放松导致供给快速恢复","火电及化工耗煤需求持续转弱","港口库存持续累积并推动Q5500价格显著跌破中期中枢"]
+      "regime":"price_recovery_with_policy_supply_constraint","horizon":"6-18m","bear_base_bull_earnings_factor":[0.82,0.95,1.05],"multiple_range_by_regime":[7.0,10.0],"supply_score":0.5,"demand_score":0.5,"inventory_score":0.0,
+      "summary":"2026年以来动力煤价格中枢抬升、煤企盈利改善，安监与反超产限制供给弹性；但煤炭仍是强政策/天气周期行业，低风险估值不把现货上涨直接外推，基准盈利继续保留折价。",
+      "evidence":[{"date":"2026-08-30","source":"data/research/pipeline/industry_scan.json","effect":"constructive","note":"动力煤被识别为T2 early；8月28日秦皇岛Q5500约867元/吨，1-7月煤炭开采洗选利润明显改善。"},{"date":"2026-07-13","source":"中泰证券煤炭行业公开观点","url":"https://finance.sina.com.cn/wm/2026-07-13/doc-inihrhfn9075972.shtml","effect":"constructive_with_cycle_risk","note":"2026H1动力煤价格中枢同比上升，供给受安监与进口约束；仍需防范季节、政策和需求波动。"}],
+      "invalidation_triggers":["安全监管和反超产约束明显放松导致供给快速恢复","火电及化工耗煤需求持续转弱","港口库存持续累积并推动Q5500价格显著跌破中期中枢"]
     },
     "coal::焦煤": {
-      "regime": "price_strong_downstream_confirmation_incomplete",
-      "horizon": "6-18m",
-      "bear_base_bull_earnings_factor": [0.75, 0.88, 1.02],
-      "multiple_range_by_regime": [6.0, 9.0],
-      "supply_score": 0.25,
-      "demand_score": -0.5,
-      "inventory_score": 0.0,
-      "summary": "8月焦煤价格表现偏强，但钢铁利润和终端承接仍偏弱，因此产业链维持T1而非T2。低风险估值用更低基准盈利因子，只有钢材需求、焦化开工和库存共同改善后才允许上调。",
-      "evidence": [{"date":"2026-08-30","source":"data/research/pipeline/industry_scan.json","effect":"mixed","note":"焦煤为T1：8月价格强势，但钢铁行业利润显著下滑，价格向矿企盈利的持续传导仍需确认。"}],
-      "invalidation_triggers": ["钢材需求继续下行且钢厂利润恶化","焦煤/精煤库存持续累积","焦化开工明显走弱","焦煤价格回落并跌破阶段中枢"]
+      "regime":"price_strong_downstream_confirmation_incomplete","horizon":"6-18m","bear_base_bull_earnings_factor":[0.75,0.88,1.02],"multiple_range_by_regime":[6.0,9.0],"supply_score":0.25,"demand_score":-0.5,"inventory_score":0.0,
+      "summary":"8月焦煤价格表现偏强，但钢铁利润和终端承接仍偏弱，因此产业链维持T1而非T2。低风险估值用更低基准盈利因子，只有钢材需求、焦化开工和库存共同改善后才允许上调。",
+      "evidence":[{"date":"2026-08-30","source":"data/research/pipeline/industry_scan.json","effect":"mixed","note":"焦煤为T1：8月价格强势，但钢铁行业利润显著下滑，价格向矿企盈利的持续传导仍需确认。"}],
+      "invalidation_triggers":["钢材需求继续下行且钢厂利润恶化","焦煤/精煤库存持续累积","焦化开工明显走弱","焦煤价格回落并跌破阶段中枢"]
     },
     "chemicals::氟化工": {
-      "regime": "quota_supported_high_spread_with_demand_risk",
-      "horizon": "6-18m",
-      "bear_base_bull_earnings_factor": [0.80, 0.95, 1.05],
-      "multiple_range_by_regime": [12.0, 16.0],
-      "supply_score": 1.0,
-      "demand_score": 0.0,
-      "inventory_score": 0.0,
-      "summary": "三代制冷剂配额约束仍支撑供给纪律，2026H1价格和龙头利润继续改善；但空调等终端排产波动意味着当前高价差不能永久资本化，低风险基准盈利按95%周期因子处理。",
-      "evidence": [
-        {"date":"2026-08-30","source":"data/research/pipeline/industry_scan.json","effect":"constructive","note":"氟化工为T2 mid；2026H1制冷剂均价同比约+15.6%，龙头利润已明显受益。"},
-        {"date":"2026-08-29","source":"巨化股份2026H1公开研报汇总","url":"https://basic.10jqka.com.cn/144/600160/worth.html","effect":"constructive","note":"H1制冷剂销售价格同比提升，Q3初主要制冷剂价格仍处高位。"}
-      ],
-      "invalidation_triggers": ["HFC配额约束明显放松","R32/R134a/R125价格持续显著回落","萤石/氢氟酸等成本快速上升而产品涨价无法覆盖","下游空调/汽车需求持续弱于预期"]
+      "regime":"quota_supported_high_spread_with_demand_risk","horizon":"6-18m","bear_base_bull_earnings_factor":[0.80,0.95,1.05],"multiple_range_by_regime":[12.0,16.0],"supply_score":1.0,"demand_score":0.0,"inventory_score":0.0,
+      "summary":"三代制冷剂配额约束仍支撑供给纪律，2026H1价格和龙头利润继续改善；但空调等终端排产波动意味着当前高价差不能永久资本化，低风险基准盈利按95%周期因子处理。",
+      "evidence":[{"date":"2026-08-30","source":"data/research/pipeline/industry_scan.json","effect":"constructive","note":"氟化工为T2 mid；2026H1制冷剂均价同比约+15.6%，龙头利润已明显受益。"},{"date":"2026-08-29","source":"巨化股份2026H1公开研报汇总","url":"https://basic.10jqka.com.cn/144/600160/worth.html","effect":"constructive","note":"H1制冷剂销售价格同比提升，Q3初主要制冷剂价格仍处高位。"}],
+      "invalidation_triggers":["HFC配额约束明显放松","R32/R134a/R125价格持续显著回落","萤石/氢氟酸等成本快速上升而产品涨价无法覆盖","下游空调/汽车需求持续弱于预期"]
     },
     "chemicals::氨纶": {
-      "regime": "early_recovery_with_export_and_capacity_risk",
-      "horizon": "6-18m",
-      "bear_base_bull_earnings_factor": [0.75, 0.90, 1.05],
-      "multiple_range_by_regime": [10.0, 14.0],
-      "supply_score": 0.0,
-      "demand_score": 0.0,
-      "inventory_score": 0.5,
-      "summary": "氨纶价格和价差较低位修复、龙头H1盈利超预期，但出口同比偏弱且新增产能/原料波动仍在，属于早期修复而非稳定高景气；基准盈利按90%周期因子处理。",
-      "evidence": [
-        {"date":"2026-08-30","source":"data/research/pipeline/industry_scan.json","effect":"constructive","note":"氨纶为T2 early；华峰化学H1氨纶收入和毛利改善，新乡化纤H1净利同比大增。"},
-        {"date":"2026-08-07","source":"华峰化学2026H1公开研报汇总","url":"https://basic.10jqka.com.cn/002064/worth.html","effect":"constructive_with_risk","note":"H1氨纶业务景气修复，但行业仍需观察出口、需求和新增产能。"}
-      ],
-      "invalidation_triggers": ["氨纶库存重新持续累积","PTMEG/MDI成本上升导致价差明显收窄","出口和纺织旺季订单持续弱于预期","新增产能投放重新造成供给压力"]
+      "regime":"early_recovery_with_export_and_capacity_risk","horizon":"6-18m","bear_base_bull_earnings_factor":[0.75,0.90,1.05],"multiple_range_by_regime":[10.0,14.0],"supply_score":0.0,"demand_score":0.0,"inventory_score":0.5,
+      "summary":"氨纶价格和价差较低位修复、龙头H1盈利超预期，但出口同比偏弱且新增产能/原料波动仍在，属于早期修复而非稳定高景气；基准盈利按90%周期因子处理。",
+      "evidence":[{"date":"2026-08-30","source":"data/research/pipeline/industry_scan.json","effect":"constructive","note":"氨纶为T2 early；华峰化学H1氨纶收入和毛利改善，新乡化纤H1净利同比大增。"},{"date":"2026-08-07","source":"华峰化学2026H1公开研报汇总","url":"https://basic.10jqka.com.cn/002064/worth.html","effect":"constructive_with_risk","note":"H1氨纶业务景气修复，但行业仍需观察出口、需求和新增产能。"}],
+      "invalidation_triggers":["氨纶库存重新持续累积","PTMEG/MDI成本上升导致价差明显收窄","出口和纺织旺季订单持续弱于预期","新增产能投放重新造成供给压力"]
     },
     "chemicals::聚氨酯/MDI/TDI": {
-      "regime": "earnings_recovery_price_center_not_fully_confirmed",
-      "horizon": "6-18m",
-      "bear_base_bull_earnings_factor": [0.78, 0.90, 1.04],
-      "multiple_range_by_regime": [11.0, 15.0],
-      "supply_score": 0.0,
-      "demand_score": 0.0,
-      "inventory_score": 0.0,
-      "summary": "聚氨酯/MDI/TDI已出现H1盈利改善，但产品价格中枢和下游需求的持续性尚未达到T2确认标准。估值按T1周期链处理：当前盈利改善可以触发公司条件召回，但不能等价为产业链高景气长期化。",
-      "evidence": [{"date":"2026-08-30","source":"data/research/pipeline/industry_scan.json","effect":"constructive_but_unconfirmed","note":"聚氨酯/MDI/TDI为T1；H1盈利传导改善，但需要继续确认MDI/TDI价格中枢和下游需求。"}],
-      "invalidation_triggers": ["MDI/TDI价格继续下行并伴随库存累积","下游家电/建筑/汽车等需求明显转弱","原料成本上升导致价差持续收窄","公司盈利改善不能在后续季度延续"]
+      "regime":"earnings_recovery_price_center_not_fully_confirmed","horizon":"6-18m","bear_base_bull_earnings_factor":[0.78,0.90,1.04],"multiple_range_by_regime":[11.0,15.0],"supply_score":0.0,"demand_score":0.0,"inventory_score":0.0,
+      "summary":"聚氨酯/MDI/TDI已出现H1盈利改善，但产品价格中枢和下游需求的持续性尚未达到T2确认标准。估值按T1周期链处理：当前盈利改善可以触发公司条件召回，但不能等价为产业链高景气长期化。",
+      "evidence":[{"date":"2026-08-30","source":"data/research/pipeline/industry_scan.json","effect":"constructive_but_unconfirmed","note":"聚氨酯/MDI/TDI为T1；H1盈利传导改善，但需要继续确认MDI/TDI价格中枢和下游需求。"}],
+      "invalidation_triggers":["MDI/TDI价格继续下行并伴随库存累积","下游家电/建筑/汽车等需求明显转弱","原料成本上升导致价差持续收窄","公司盈利改善不能在后续季度延续"]
+    },
+    "chemicals::磷化工": {
+      "regime":"price_recovery_needs_spread_confirmation","horizon":"6-18m","bear_base_bull_earnings_factor":[0.72,0.88,1.03],"multiple_range_by_regime":[8.0,12.0],"supply_score":0.0,"demand_score":0.25,"inventory_score":0.0,
+      "summary":"黄磷等价格已有回升，但磷矿、能源和下游磷肥/磷酸盐需求导致公司利润分化。T1阶段仅按偏弱基准盈利估值，等待价差与利润连续兑现。",
+      "evidence":[{"date":"2026-08-30","source":"data/research/pipeline/industry_scan.json","effect":"constructive_but_early","note":"磷化工为T1：8月中旬黄磷价格回升，但利润传导和持续性仍需验证。"}],
+      "invalidation_triggers":["黄磷/磷肥价格回落","磷矿或能源成本上升导致价差收窄","出口/农业需求弱于预期","行业开工恢复造成供给压力"]
+    },
+    "building_materials::玻纤": {
+      "regime":"profit_recovery_with_product_divergence","horizon":"6-18m","bear_base_bull_earnings_factor":[0.75,0.90,1.05],"multiple_range_by_regime":[10.0,14.0],"supply_score":0.0,"demand_score":0.25,"inventory_score":0.25,
+      "summary":"玻纤价格和行业利润有修复迹象，但电子纱、粗纱等品种分化且新增供给仍需观察。T1阶段不把单季度利润修复直接视为新一轮高景气中枢。",
+      "evidence":[{"date":"2026-08-30","source":"data/research/pipeline/industry_scan.json","effect":"constructive_but_unconfirmed","note":"玻纤为T1：价格/利润改善需要继续验证持续性。"}],
+      "invalidation_triggers":["玻纤库存重新累积","新增产能明显快于需求","价格回落而能源成本上升","风电/汽车/电子需求转弱"]
+    },
+    "oil_gas::油气开采": {
+      "regime":"cashflow_supported_with_commodity_volatility","horizon":"6-18m","bear_base_bull_earnings_factor":[0.78,0.90,1.05],"multiple_range_by_regime":[7.0,11.0],"supply_score":0.0,"demand_score":0.0,"inventory_score":0.0,
+      "summary":"上游油气公司现金流受产量与油气价格支撑，但国际油价、OPEC+供给和全球需求波动仍大。T1阶段按中性偏弱盈利因子处理，不把阶段性油价上冲资本化。",
+      "evidence":[{"date":"2026-08-30","source":"data/research/pipeline/industry_scan.json","effect":"mixed","note":"油气开采为T1；需要继续验证油价/气价与产量向公司利润的持续传导。"}],
+      "invalidation_triggers":["国际油价持续跌破中期中枢","OPEC+或非OPEC供给快速增加","全球需求显著转弱","单位开采成本明显上升"]
     }
   },
   "company_overrides": {
-    "601899": {
-      "name": "紫金矿业",
-      "regime": "gold_copper_diversified_constructive",
-      "bear_base_bull_earnings_factor": [0.94, 1.02, 1.10],
-      "multiple_range_by_regime": [12.0, 16.0],
-      "summary": "黄金与铜双主业降低单一铜周期误判；仍需用正常化盈利中枢而不是当前高商品价格直接外推。"
-    }
+    "601899": {"name":"紫金矿业","regime":"gold_copper_diversified_constructive","bear_base_bull_earnings_factor":[0.94,1.02,1.10],"multiple_range_by_regime":[12.0,16.0],"summary":"黄金与铜双主业降低单一铜周期误判；仍需用正常化盈利中枢而不是当前高商品价格直接外推。"}
   }
 }
