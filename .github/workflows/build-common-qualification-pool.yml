@@ -5,17 +5,23 @@ on:
   push:
     branches: [main]
     paths:
+      - 'data/research/pipeline/industry_scan.json'
       - 'data/research/pipeline/t2_company_recall.json'
       - 'data/research/pipeline/weekly_opportunity_scan.json'
+      - 'data/research/pipeline/weekly_light_recall.json'
       - 'scripts/company_index_fingerprint.py'
       - 'scripts/build_t2_recall_from_rules.py'
       - 'scripts/validate_t2_recall_v2.py'
       - 'scripts/build_common_qualification_pool.py'
       - 'scripts/validate_common_pool_diversification.py'
+      - 'scripts/build_forward_valuation.py'
+      - 'scripts/build_forward_valuation_v5.py'
+      - 'scripts/build_cycle_valuation.py'
       - 'scripts/validate_pe_low_risk_contract.py'
       - 'scripts/repair_anchorless_cycle_valuation.py'
       - 'scripts/validate_cycle_valuation_v2.py'
       - 'scripts/build_t2_valuation_coverage_audit.py'
+      - 'config/t2_exposure_rules.json'
       - 'config/t2_representative_policy.json'
       - 'config/cycle_valuation_policy.json'
       - 'config/cycle_regime_registry.json'
@@ -46,13 +52,13 @@ jobs:
 
       - name: Test stable company index fingerprint semantics
         run: pytest -q tests/test_company_index_fingerprint.py
-      - name: Revalidate frozen T2 recall
+      - name: Revalidate tiered company recall
         run: python scripts/validate_t2_recall_v2.py data/research/pipeline/t2_company_recall.json --industry-scan data/research/pipeline/industry_scan.json
       - name: Revalidate weekly scan
         run: python scripts/validate_research_outputs.py weekly-scan data/research/pipeline/weekly_opportunity_scan.json
       - name: Build diversified common qualification pool
         run: python scripts/build_common_qualification_pool.py
-      - name: Validate T2 representative diversification
+      - name: Validate recalled-chain representative diversification
         run: python scripts/validate_common_pool_diversification.py
 
       - name: Run valuation regression tests
@@ -125,11 +131,13 @@ jobs:
           python - <<'PY'
           import json
           common=json.load(open('data/research/pipeline/common_qualification_pool.json',encoding='utf-8'))
-          audit=common.get('t2_representative_selection',{})
-          focus={k:v for k,v in audit.items() if k in {'nonbank_finance::证券','nonferrous::电解铝','coal::动力煤','chemicals::氟化工','chemicals::氨纶'}}
+          t2=common.get('t2_representative_selection',{})
+          t1=common.get('conditional_t1_representative_selection',{})
+          focus={k:v for k,v in t2.items() if k in {'nonbank_finance::证券','nonferrous::电解铝','coal::动力煤','chemicals::氟化工','chemicals::氨纶'}}
+          t1_focus={k:v for k,v in t1.items() if k in {'coal::焦煤','chemicals::聚氨酯/MDI/TDI'}}
           coverage=json.load(open('data/research/pipeline/t2_valuation_coverage_audit.json',encoding='utf-8'))
           final=json.load(open('data/research/pipeline/final_selection.json',encoding='utf-8'))
-          print(json.dumps({'arithmetic':common.get('arithmetic'),'focus':focus},ensure_ascii=False,indent=2))
+          print(json.dumps({'arithmetic':common.get('arithmetic'),'t2_focus':focus,'t1_focus':t1_focus,'unconfirmed_review_required_tags':common.get('unconfirmed_review_required_tags')},ensure_ascii=False,indent=2))
           print(json.dumps({'overall_valid_ratio':coverage['overall_valid_ratio'],'structural_blind_spot_tags':coverage['structural_blind_spot_tags'],'coverage_warnings':coverage['coverage_warnings']},ensure_ascii=False,indent=2))
           print(json.dumps({'left_set_codes':final['left_set_codes'],'right_set_codes':final['right_set_codes'],'intersection':final['initial_intersection_codes'],'top3':final['top3_codes']},ensure_ascii=False,indent=2))
           PY
