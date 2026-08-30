@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - 'scripts/build_common_qualification_pool.py'
+      - 'scripts/validate_common_pool_diversification.py'
       - 'config/t2_representative_policy.json'
       - '.github/workflows/build-common-qualification-pool.yml'
 
@@ -19,7 +20,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
         with:
@@ -27,26 +28,109 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+          cache: 'pip'
+      - run: pip install -r requirements-research.txt pytest
+
       - name: Revalidate frozen T2 recall
         run: python scripts/validate_t2_recall_v2.py data/research/pipeline/t2_company_recall.json --industry-scan data/research/pipeline/industry_scan.json
       - name: Revalidate weekly scan
         run: python scripts/validate_research_outputs.py weekly-scan data/research/pipeline/weekly_opportunity_scan.json
-      - name: Build common qualification pool
+      - name: Build diversified common qualification pool
         run: python scripts/build_common_qualification_pool.py
-      - name: Commit common qualification pool
+      - name: Validate T2 representative diversification
+        run: python scripts/validate_common_pool_diversification.py
+
+      - name: Run valuation regression tests
+        run: pytest -q tests/test_valuation_v4.py tests/test_valuation_v5.py
+      - name: Build non-cycle forward valuation
+        run: python scripts/build_forward_valuation_v5.py
+      - name: Validate non-cycle valuation contract
+        run: python scripts/validate_research_outputs.py fundamental-valuation data/research/pipeline/fundamental_valuation.json
+      - name: Enforce low-risk PE hard gate
+        run: python scripts/validate_pe_low_risk_contract.py
+      - name: Build resource and cycle valuation
+        run: python scripts/build_cycle_valuation.py
+      - name: Validate cycle valuation contract
+        run: python scripts/validate_research_outputs.py cycle-valuation data/research/pipeline/cycle_valuation.json
+      - name: Build valuation policy coverage audit
+        run: python scripts/build_valuation_policy_audit.py
+      - name: Validate valuation policy coverage audit
+        run: python scripts/validate_research_outputs.py valuation-policy-audit data/research/pipeline/valuation_policy_audit.json
+      - name: Merge left valuation engines
+        run: python scripts/merge_left_valuation.py
+      - name: Validate full left coverage
+        run: python scripts/validate_research_outputs.py left-valuation data/research/pipeline/left_valuation_scan.json
+
+      - name: Run local right-side unit tests
+        run: python -m pytest -q tests/test_candidate_structure_local.py
+      - name: Rebuild right structure for diversified common pool
+        run: python scripts/build_candidate_structure_260d.py
+      - name: Validate right-side coverage and freshness
+        run: |
+          python - <<'PY'
+          import json,sys
+          p=json.load(open('data/research/pipeline/right_structure_scan.json'))
+          latest=json.load(open('data/latest.json'))
+          common=json.load(open('data/research/pipeline/common_qualification_pool.json'))
+          expected=latest.get('trade_date')
+          errs=[]
+          companies=p.get('companies',{})
+          expected_codes=set(common.get('common_pool_codes',[]))
+          if set(companies) != expected_codes: errs.append('common_pool_code_mismatch')
+          if p.get('common_pool_count') != len(companies): errs.append('coverage_mismatch')
+          incomplete=set(p.get('incomplete_codes',[]))
+          actual_incomplete={c for c,r in companies.items() if r.get('conclusion')=='unavailable'}
+          if incomplete != actual_incomplete: errs.append('incomplete_code_mismatch')
+          if p.get('reference_trade_date') != expected: errs.append(f'reference_date:{p.get("reference_trade_date")}!={expected}')
+          if p.get('history_source') != 'local_bounded_history': errs.append('wrong_history_source')
+          if p.get('core_structure_window_sessions') != 120: errs.append('core_window_not_120')
+          if p.get('local_history_target_sessions') != 180: errs.append('local_window_not_180')
+          for c,r in companies.items():
+              if r.get('conclusion')=='unavailable':
+                  if not r.get('error'): errs.append(f'{c}:unavailable_without_reason')
+                  continue
+              if r.get('history_source')!='local_history_shards': errs.append(f'{c}:not_local_history')
+              if r.get('history_points',0)<120: errs.append(f'{c}:history_lt_120')
+              if r.get('data_date')!=expected: errs.append(f'{c}:date:{r.get("data_date")}')
+              if r.get('long_term_summary_status')!='fresh': errs.append(f'{c}:52w_summary_not_fresh')
+          print({'status':'PASS' if not errs else 'FAIL','verified':len(companies)-len(incomplete),'incomplete':len(incomplete),'errors':errs[:30]})
+          sys.exit(0 if not errs else 2)
+          PY
+
+      - name: Build final intersection and hard-gate selection
+        run: python scripts/build_final_selection.py
+      - name: Validate final selection
+        run: python scripts/validate_research_outputs.py final-selection data/research/pipeline/final_selection.json
+      - name: Print diversification diagnostics
+        run: |
+          python - <<'PY'
+          import json
+          common=json.load(open('data/research/pipeline/common_qualification_pool.json',encoding='utf-8'))
+          audit=common.get('t2_representative_selection',{})
+          focus={k:v for k,v in audit.items() if k in {'nonbank_finance::证券','nonferrous::电解铝'}}
+          final=json.load(open('data/research/pipeline/final_selection.json',encoding='utf-8'))
+          print(json.dumps({'arithmetic':common.get('arithmetic'),'focus':focus},ensure_ascii=False,indent=2))
+          print(json.dumps({'left_set_codes':final['left_set_codes'],'right_set_codes':final['right_set_codes'],'intersection':final['initial_intersection_codes'],'top3':final['top3_codes']},ensure_ascii=False,indent=2))
+          PY
+
+      - name: Commit diversified pool and all dependent scans atomically
         shell: bash
         run: |
-          if git status --porcelain -- data/research/pipeline/common_qualification_pool.json | grep -q .; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add data/research/pipeline/common_qualification_pool.json
-            git commit -m "research: freeze common qualification pool"
-            for attempt in 1 2 3; do
-              git pull --rebase origin main
-              if git push; then exit 0; fi
-              sleep $((attempt * 2))
-            done
-            exit 1
-          else
-            echo "No common pool changes."
-          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/research/pipeline/common_qualification_pool.json \
+                  data/research/pipeline/fundamental_valuation.json \
+                  data/research/pipeline/cycle_valuation.json \
+                  data/research/pipeline/valuation_policy_audit.json \
+                  data/research/pipeline/left_valuation_scan.json \
+                  data/research/pipeline/right_structure_scan.json \
+                  data/research/pipeline/final_selection.json \
+                  data/research/pipeline/final_selection_summary.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "research: freeze diversified common pool and dependent scans"
+          for attempt in 1 2 3; do
+            git pull --rebase origin main
+            if git push origin "HEAD:${GITHUB_REF_NAME}"; then exit 0; fi
+            sleep $((attempt * 2))
+          done
+          exit 1
