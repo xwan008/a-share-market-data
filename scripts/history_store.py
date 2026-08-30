@@ -11,7 +11,9 @@ DATA_DIR = ROOT / "data"
 HISTORY_SHARDS_DIR = DATA_DIR / "history_shards"
 LATEST_PATH = DATA_DIR / "latest.json"
 
-ROLLING_DAYS = 65
+# One bounded full-market history store. 5/20/60/120/180 views are derived from
+# the same rows; the repository never grows beyond this window per stock.
+ROLLING_DAYS = 180
 HISTORY_SHARD_KEY_LENGTH = 4
 USABLE_CONFIDENCE = {"high", "medium"}
 COMPLETED_SESSION_STATUSES = {"closed", "closed_or_no_trade"}
@@ -24,13 +26,7 @@ def read_json(path: Path, default: dict) -> dict:
 
 
 def should_append_history(latest: dict) -> bool:
-    """Accept any snapshot that represents an already-completed trading session.
-
-    Scheduled GitHub jobs can run after midnight or on a weekend/holiday. In that
-    case fetch_market marks the snapshot as ``closed_or_no_trade`` while its
-    trade_date still points at the latest completed A-share session. That row is
-    safe to persist because merge_rows de-duplicates by trade date.
-    """
+    """Accept any snapshot that represents an already-completed trading session."""
     return latest.get("market_status") in COMPLETED_SESSION_STATUSES
 
 
@@ -75,6 +71,36 @@ def _basis_after_merge(old_basis: str | None, item: dict, replace: bool) -> str:
     return old_basis or "live_close_only"
 
 
+def _merge_long_term_summary(old: dict, incoming: dict, rows: list[dict]) -> dict | None:
+    """Keep the latest compact 52-week summary without storing 252 full bars.
+
+    A weekly qfq refresh recomputes the summary exactly. Between full refreshes we
+    only extend a new high/low if the newly appended completed sessions create one;
+    expiry of an old 52-week extreme is handled by the next scheduled full refresh.
+    """
+    summary = dict(incoming or old or {})
+    if not summary:
+        return None
+    for row in rows[-5:]:
+        try:
+            high = float(row.get("high"))
+            low = float(row.get("low"))
+        except (TypeError, ValueError):
+            continue
+        d = str(row.get("date") or "")
+        old_high = summary.get("high_52w")
+        old_low = summary.get("low_52w")
+        if old_high is None or high > float(old_high):
+            summary["high_52w"] = high
+            summary["high_52w_date"] = d
+        if old_low is None or low < float(old_low):
+            summary["low_52w"] = low
+            summary["low_52w_date"] = d
+        if d:
+            summary["latest_seen_date"] = max(str(summary.get("latest_seen_date") or ""), d)
+    return summary
+
+
 def write_history_shards(
     series: dict[str, dict],
     generated_at: str | None = None,
@@ -110,10 +136,16 @@ def write_history_shards(
                 [] if replace else old.get("history", []),
                 item.get("history", []),
             )
+            summary = _merge_long_term_summary(
+                old.get("long_term_summary") or {},
+                item.get("long_term_summary") or {},
+                rows,
+            )
             current_stocks[code] = {
                 "name": item.get("name") or old.get("name"),
                 "history_basis": _basis_after_merge(old.get("history_basis"), item, replace),
                 "last_full_refresh": item.get("last_full_refresh") or old.get("last_full_refresh"),
+                "long_term_summary": summary,
                 "history": rows,
             }
 
@@ -123,7 +155,7 @@ def write_history_shards(
             continue
 
         payload = {
-            "schema_version": 3,
+            "schema_version": 4,
             "generated_at": generated_at,
             "rolling_days": ROLLING_DAYS,
             "history_shard_key_length": HISTORY_SHARD_KEY_LENGTH,
