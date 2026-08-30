@@ -16,7 +16,6 @@ POLICY = ROOT / 'config/cycle_valuation_policy.json'
 REGIME = ROOT / 'config/cycle_regime_registry.json'
 OUT = ROOT / 'data/research/pipeline/cycle_valuation.json'
 TZ = ZoneInfo('Asia/Shanghai')
-CYCLE_TAGS = ('nonferrous::铜矿资源', 'nonferrous::电解铝', 'coal::动力煤', 'chemicals::氟化工', 'chemicals::氨纶')
 RESOURCE_TAGS = ('nonferrous::铜矿资源', 'nonferrous::电解铝')
 MAX_ANCHOR_AGE_DAYS = 7
 
@@ -211,8 +210,6 @@ def calibrate_low_risk_buy_bands(fair_floor: float, market_anchor: dict | None, 
     market_reasonable = [float(x) for x in market_anchor['reasonable_percentile_band']]
     market_reasonable_upper = min(market_reasonable[1], reasonable_ceiling)
 
-    # If the normalized fundamental ceiling has fallen below the historical p35 area, valuation
-    # must dominate rather than forcing an artificial historical band.
     if market_reasonable_upper < market_reasonable[0]:
         return valuation_safe, valuation_reasonable, [valuation_safe[0], valuation_reasonable[1]], 'valuation_dominant_below_market_p35'
 
@@ -227,10 +224,11 @@ def calibrate_low_risk_buy_bands(fair_floor: float, market_anchor: dict | None, 
 
 
 def policy_for(tags: list[str], code: str, cfg: dict) -> tuple[str | None, dict | None]:
-    matched = next((t for t in tags if t in CYCLE_TAGS), None)
+    subchain_policies = cfg.get('subchain_policies', {})
+    matched = next((t for t in tags if t in subchain_policies), None)
     if not matched:
         return None, None
-    base = dict(cfg.get('subchain_policies', {}).get(matched, {}))
+    base = dict(subchain_policies.get(matched, {}))
     override = cfg.get('company_overrides', {}).get(code, {})
     if override:
         base.update(override)
@@ -288,7 +286,7 @@ def main() -> int:
 
     for code in common.get('common_pool_codes', []):
         gate = common['future_earnings_gate'][code]
-        tags = gate.get('t2_tags') or []
+        tags = gate.get('recall_tags') or gate.get('t2_tags') or []
         matched_tag, policy = policy_for(tags, code, cfg)
         if not matched_tag:
             continue
@@ -475,7 +473,7 @@ def main() -> int:
         'resource_cycle_codes': sorted([r['code'] for r in companies if r.get('cycle_tag') in RESOURCE_TAGS]),
         'anchor_errors': anchor_errors,
         'companies': companies, 'left_set_codes': sorted(left),
-        'method_note': 'Resource low-risk valuation first normalizes current+next-year consensus against a long-window neutral commodity/cost anchor, then applies the reviewed 6-18m regime. Positive short-term commodity strength cannot lift a low-risk buy zone. Final value/safe/reasonable bands are calibrated against the stock own bounded 180-session price distribution and MA60 ceiling; theoretical bear/base/bull values are retained separately as scenario_fair_value_range.',
+        'method_note': 'Cycle routing is driven by versioned recall tags and the cycle policy registry. Resource low-risk valuation normalizes consensus against long-window commodity/cost anchors; anchorless cycles are repaired with current-year EPS, next-year downside guard, structural haircut, reviewed regime and 180d price calibration.',
     }
     OUT.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding='utf-8')
     print(json.dumps({'status': 'ok', 'cycle': len(companies), 'left': len(left), 'reference_trade_date': reference_trade_date, 'regime_age_days': regime_age_days, 'anchor_errors': anchor_errors}, ensure_ascii=False))
