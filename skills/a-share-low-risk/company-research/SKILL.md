@@ -11,54 +11,52 @@
 3. `weekly_full_market_recall`：现有周度宽召回数据资产，仅作为补漏来源。
 
 ## 机械召回不是盈利验证
-机械层的归母净利润同比/环比只能回答“值得不值得进一步看”，不能证明盈利质量。若机械数据源不提供扣非净利润，必须显式标记 `recurring_profit_unverified`，不得把归母高增替代为扣非改善。
+归母净利润同比/环比只回答“是否值得进一步看”，不能证明盈利质量。估值队列形成后，必须自动补充财报级证据，优先读取东方财富主要财务指标，失败可回退新浪财务指标。
 
-机械层允许附带以下复核信号，但这些信号原则上不直接删除普通公司：
-- 经营现金流/每股经营现金流为负；
-- 利润增速远高于收入，需排查低基数、投资收益、处置收益、补贴等；
-- 当前仍亏损但出现环比改善；
-- 毛利率/ROE等盈利质量指标异常。
+机器证据至少包括：
+- 扣非净利润、扣非EPS；
+- 扣非净利润同比/环比（可用时）；
+- 每股经营现金流、经营现金流/收入或经营现金流/净利润；
+- 一次性收益占归母利润比例；
+- TTM扣非EPS。
 
-风险警示证券仍可被全市场扫描用于覆盖与诊断，但**不得进入“低风险”主榜或Top机会**，这是Universe风险资格，不是个股黑名单。
+### TTM扣非EPS
+统一使用：
+`TTM扣非EPS = 2025全年扣非EPS + 2026H1扣非EPS - 2025H1扣非EPS`
+
+禁止用“2026H1扣非EPS × 2”简单年化制造伪精度。
+
+## Production盈利证据硬门槛
+正式盈利证据至少满足：
+- `research_status = pass`；
+- Forward Bridge成立；
+- 扣非净利润与扣非EPS为正；
+- 一次性因素占归母利润原则上不超过35%；
+- 现金流质量通过：每股经营现金流/经营现金流占收入至少一项非负，或经营现金流/净利润达到约30%以上；
+- 非风险警示证券。
+
+任一项缺失都进入明确blocker，不允许被综合评分修复。若扣非亏损或一次性因素占比超过50%，原`pass`应降为`quality_review_required`。
 
 ## 公司级固定研究
 每家公司必须回答：
-- `why_now`：为什么本期值得研究；
-- `driver_links`：对应哪些盈利驱动链，各自暴露纯度；
-- `revenue_yoy / recurring_profit_yoy / qoq_profit`；
-- `margin_quality`：毛利/净利率是否改善；
-- `cashflow_quality`：经营现金流是否支持；
-- `one_off_risk`：投资收益、处置收益、补贴等是否主导；
-- `forward_bridge`：未来1–2季度具体传导链；
+- `why_now`；
+- `driver_links`及暴露纯度；
+- 收入、归母、扣非变化；
+- `margin_quality`；
+- `cashflow_quality`；
+- `one_off_risk`；
+- `forward_bridge`；
 - `evidence_for / evidence_against`；
 - `invalidation_condition`；
-- `earnings_direction`：up / inflection_up / flat / down / uncertain；
-- `earnings_confidence`：high / medium / low。
-
-## 正式研究通过原则
-至少满足：
-- 主营或扣非盈利有改善证据，而非仅归母表观增长；
-- 未来1–2季度存在可验证Bridge；
-- 一次性收益没有掩盖主营恶化；
-- 现金流与盈利差异得到解释；
-- 数据不足时显式 `insufficient_evidence`，不得猜。
-
-不设置T1/T2不同门槛。驱动证据强弱只进入`earnings_confidence`，不作为断崖式准入等级，也不得进入估值折价。
+- `earnings_direction`与`earnings_confidence`。
 
 ## 代表性压缩
-估值前每条盈利驱动原则上保留3–5家，排序优先：
-1. 直接业务暴露纯度；
-2. 主营/扣非盈利兑现质量；
-3. 行业地位与规模；
-4. 未来Bridge持续性；
-5. 现金流与财务质量。
-
-禁止在此阶段使用估值、股价涨幅、技术结构、R:R淘汰公司。估值完成后再决定每条链最终展示1–2家。
+估值前每条Driver原则上保留3–5家，优先考虑直接暴露、扣非兑现、行业地位、Bridge持续性和现金流质量。禁止在此阶段使用估值、股价涨幅、技术结构淘汰公司。
 
 ## 反向发现
-强公司盈利异常无法映射到现有driver时输出 `driver_review_required`，回到盈利驱动扫描研究产品/订单/成本原因，不得静默删除。
+强公司盈利异常无法映射现有driver时输出`driver_review_required`，不得静默删除。
 
 ## 输出
-V2 shadow期：`data/research/v2/company_research.json`。
+`data/research/v2/company_research.json`
 
-每只公司必须能解释：`从哪里召回 → 对什么驱动有暴露 → 主营/扣非为什么改善 → 未来1–2季度为什么继续 → 什么会推翻`。
+每只公司必须能解释：`从哪里召回 → 对什么驱动有暴露 → 扣非/主营为什么改善 → 现金流是否支持 → 未来1–2季度为什么继续 → 什么会推翻`。
