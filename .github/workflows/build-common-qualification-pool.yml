@@ -5,6 +5,9 @@ on:
   push:
     branches: [main]
     paths:
+      - 'scripts/company_index_fingerprint.py'
+      - 'scripts/build_t2_recall_from_rules.py'
+      - 'scripts/validate_t2_recall_v2.py'
       - 'scripts/build_common_qualification_pool.py'
       - 'scripts/validate_common_pool_diversification.py'
       - 'scripts/repair_anchorless_cycle_valuation.py'
@@ -13,6 +16,7 @@ on:
       - 'config/t2_representative_policy.json'
       - 'config/cycle_valuation_policy.json'
       - 'config/cycle_regime_registry.json'
+      - 'tests/test_company_index_fingerprint.py'
       - 'tests/test_cycle_coverage_v6.py'
       - '.github/workflows/build-common-qualification-pool.yml'
 
@@ -37,6 +41,8 @@ jobs:
           cache: 'pip'
       - run: pip install -r requirements-research.txt pytest
 
+      - name: Test stable company index fingerprint semantics
+        run: pytest -q tests/test_company_index_fingerprint.py
       - name: Revalidate frozen T2 recall
         run: python scripts/validate_t2_recall_v2.py data/research/pipeline/t2_company_recall.json --industry-scan data/research/pipeline/industry_scan.json
       - name: Revalidate weekly scan
