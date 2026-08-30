@@ -1,17 +1,45 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "reviewed_at": "2026-08-30",
-  "purpose": "Keep T2 recall broad, but prevent one hot subchain from flooding the formal common qualification pool with near-duplicate companies.",
+  "purpose": "Keep direct T2 recall broad while allowing selected T1 chains to enter a stricter company-confirmation path. Prevent any one chain from flooding the formal common qualification pool.",
+  "earnings_gate": {
+    "direct_t2": {
+      "profit_must_be_positive": true,
+      "exclude_st": true,
+      "yoy_path": {"net_profit_yoy_pct_min": 15, "revenue_yoy_pct_min": 5},
+      "qoq_path": {"net_profit_qoq_pct_min": 20, "revenue_yoy_pct_min": 0},
+      "rule": "T2 already has the strongest industry-level confirmation, so company validation requires positive profit plus either meaningful H1 revenue/profit transmission or a strong latest-quarter sequential profit improvement."
+    },
+    "conditional_t1": {
+      "profit_must_be_positive": true,
+      "exclude_st": true,
+      "yoy_path": {"net_profit_yoy_pct_min": 25, "revenue_yoy_pct_min": 8},
+      "qoq_path": {"net_profit_qoq_pct_min": 35, "revenue_yoy_pct_min": 3},
+      "rule": "T1 is not strong enough to pass merely because the company is exposed. The company must provide stronger current earnings confirmation than a T2 name before entering representative selection."
+    },
+    "unconfirmed_reverse_trigger": {
+      "screen_statuses": ["pass"],
+      "qoq_path": {"net_profit_qoq_pct_min": 50, "revenue_yoy_pct_min": 0},
+      "profit_must_be_positive": true,
+      "exclude_st": true,
+      "rule": "An unconfirmed subchain is never promoted automatically. A very strong company-level earnings anomaly only creates a review_required signal so the subchain evidence must be re-checked."
+    }
+  },
   "cap_rules": [
     {"max_earnings_gate_passers": 4, "max_companies_in_common_pool": 1},
     {"max_earnings_gate_passers": 12, "max_companies_in_common_pool": 2},
     {"max_earnings_gate_passers": 1000000, "max_companies_in_common_pool": 3}
   ],
+  "conditional_t1": {
+    "max_companies_in_common_pool_per_subchain": 1,
+    "rule": "A T1 chain remains less certain than T2, so even after stricter company confirmation it can contribute at most one representative until the industry chain itself upgrades to T2."
+  },
   "weekly_deep_review": {
     "priority_within_t2_subchain": true,
+    "priority_within_recalled_subchain": true,
     "unmapped_weekly_names_remain_independently_eligible": true,
     "counts_toward_subchain_cap": true,
-    "rule": "Weekly deep review is an independent positive signal, so a weekly-validated company receives priority when competing inside a T2 subchain. But it does not create unlimited slots: every company carrying that T2 tag remains subject to the same representative cap. Weekly-only names with no active T2 tag remain independently eligible."
+    "rule": "Weekly deep review is an independent positive signal, so a weekly-validated company receives priority when competing inside a recalled subchain. It does not create unlimited slots. Weekly-only names with no active recalled tag remain independently eligible."
   },
   "ranking": {
     "method": "weekly_priority_then_earnings_transmission_plus_profit_scale",
@@ -36,11 +64,11 @@
       "higher_revenue_yoy_pct",
       "lower_code"
     ],
-    "rule": "Representative selection balances absolute profit scale with current earnings transmission. Profit scale is deliberately weighted heavily so low-base percentage growth cannot crowd out established industry representatives. Weekly deep-review evidence gets priority only inside the same T2 cap. Valuation and right-side technical structure are never used here, preserving stage independence."
+    "rule": "Representative selection balances absolute profit scale with current earnings transmission. Profit scale is deliberately weighted heavily so low-base percentage growth cannot crowd out established industry representatives. Valuation and right-side technical structure are never used here, preserving stage independence."
   },
   "output_policy": {
     "keep_deferred_companies_in_audit": true,
     "deferred_status": "deferred_by_subchain_diversification",
-    "rule": "Deferred companies remain visible in future_earnings_gate for auditability but are excluded from common_pool_codes. Multi-tag companies remain subject to every subchain cap; winning one chain cannot be used to overfill another."
+    "rule": "Deferred companies remain visible in future_earnings_gate for auditability but are excluded from common_pool_codes. Multi-tag companies remain subject to every recalled subchain cap."
   }
 }
