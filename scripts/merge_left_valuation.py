@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 COMMON = ROOT / 'data/research/pipeline/common_qualification_pool.json'
 FUND = ROOT / 'data/research/pipeline/fundamental_valuation.json'
 CYCLE = ROOT / 'data/research/pipeline/cycle_valuation.json'
+AUDIT = ROOT / 'data/research/pipeline/valuation_policy_audit.json'
 OUT = ROOT / 'data/research/pipeline/left_valuation_scan.json'
 TZ = ZoneInfo('Asia/Shanghai')
 
@@ -21,6 +22,9 @@ def main() -> int:
     common = load(COMMON)
     fund = load(FUND)
     cycle = load(CYCLE)
+    audit = load(AUDIT)
+    if audit.get('hard_gate', {}).get('status') != 'PASS':
+        raise RuntimeError(f"valuation policy audit not PASS:{audit.get('hard_gate')}")
     common_codes = list(common.get('common_pool_codes', []))
     by_code = {}
     for source, payload in [('fundamental', fund), ('cycle', cycle)]:
@@ -36,15 +40,15 @@ def main() -> int:
     companies = [by_code[c] for c in common_codes]
     left = sorted({c for c in fund.get('left_set_codes', [])} | {c for c in cycle.get('left_set_codes', [])})
     payload = {
-        'schema_version': 2,
+        'schema_version': 3,
         'generated_at': datetime.now(TZ).isoformat(),
         'common_pool_count': len(common_codes),
         'fundamental_count': len(fund.get('companies', [])),
         'cycle_count': len(cycle.get('companies', [])),
         'companies': companies,
         'left_set_codes': left,
-        'upstream': {'fundamental_valuation': 'PASS', 'cycle_valuation': 'PASS'},
-        'method_note': 'Left valuation is a strict union of mutually exclusive fundamental and cycle valuation engines; cycle candidates cannot be silently evaluated by the non-cycle engine.'
+        'upstream': {'fundamental_valuation': 'PASS', 'cycle_valuation': 'PASS', 'valuation_policy_audit': 'PASS'},
+        'method_note': 'Left valuation is a strict union of mutually exclusive fundamental and cycle engines and is blocked unless the full valuation-policy coverage audit passes with unsupported_policy=0.'
     }
     OUT.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding='utf-8')
     print(json.dumps({'status':'ok','common':len(common_codes),'fundamental':payload['fundamental_count'],'cycle':payload['cycle_count'],'left':len(left)}, ensure_ascii=False))

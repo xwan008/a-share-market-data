@@ -78,13 +78,11 @@ def validate_weekly_scan(scan: dict) -> list[str]:
     normalized = {normalize_code(code): item for code, item in results.items()}
     require(len(normalized) == len(results), "weekly_screen_duplicate_normalized_codes", errors)
     require(all(is_main_board(code) for code in normalized), "weekly_screen_contains_non_main_board_code", errors)
-
     universe_count = scan.get("universe_count")
     screened_count = scan.get("screened_count")
     require(isinstance(universe_count, int) and universe_count >= 0, "weekly_invalid_universe_count", errors)
     require(screened_count == len(normalized), f"weekly_screened_count_mismatch:{screened_count}!={len(normalized)}", errors)
     require(universe_count == screened_count, f"weekly_universe_not_fully_screened:{universe_count}!={screened_count}", errors)
-
     pass_or_uncertain: set[str] = set()
     for code, item in normalized.items():
         status = item.get("status") if isinstance(item, dict) else None
@@ -92,7 +90,6 @@ def validate_weekly_scan(scan: dict) -> list[str]:
         require(bool(item.get("reason")) if isinstance(item, dict) else False, f"weekly_missing_reason:{code}", errors)
         if status in {"pass", "uncertain"}:
             pass_or_uncertain.add(code)
-
     deep = {normalize_code(code) for code in scan.get("deep_verified_codes", [])}
     active = {normalize_code(code) for code in scan.get("pool_active_codes", [])}
     require(deep <= pass_or_uncertain, f"weekly_deep_codes_not_from_recall:{sorted(deep-pass_or_uncertain)}", errors)
@@ -134,13 +131,35 @@ def validate_fundamental_valuation(output: dict) -> list[str]:
     if isinstance(common_count, int):
         require(len(seen | deferred) == common_count, f"valuation_fundamental_plus_cycle_count_mismatch:{len(seen | deferred)}!={common_count}", errors)
         require(not (seen & deferred), f"valuation_cycle_codes_leaked_into_fundamental:{sorted(seen & deferred)}", errors)
+
+    coverage = output.get('policy_coverage', {})
+    require(isinstance(coverage, dict), 'valuation_missing_policy_coverage', errors)
+    if isinstance(coverage, dict):
+        require(coverage.get('noncycle_count') == len(seen), f"valuation_policy_noncycle_count_mismatch:{coverage.get('noncycle_count')}!={len(seen)}", errors)
+        unsupported = {normalize_code(x) for x in coverage.get('unsupported_policy_codes', [])}
+        supported = {normalize_code(x) for x in coverage.get('supported_policy_codes', [])}
+        require(coverage.get('unsupported_policy_count') == len(unsupported), 'valuation_unsupported_policy_count_mismatch', errors)
+        require(coverage.get('supported_policy_count') == len(supported), 'valuation_supported_policy_count_mismatch', errors)
+        require(not unsupported, f"valuation_unsupported_policy_codes:{sorted(unsupported)}", errors)
+        require(supported == seen, f"valuation_policy_not_full_coverage:missing={sorted(seen-supported)}:extra={sorted(supported-seen)}", errors)
+
     for row in output.get("companies", []) if isinstance(output.get("companies"), list) else []:
+        code = normalize_code(row.get('code'))
+        require(row.get('policy_status') == 'supported', f"valuation_policy_not_supported:{code}:{row.get('policy_status')}", errors)
         if row.get("valuation_status") == "valid":
             source = str(row.get("forecast_source") or "")
             basis = str(row.get("forward_earnings_basis") or "")
-            require("profit_forecast" in source or "consensus" in source.lower(), f"valuation_formal_without_consensus_source:{row.get('code')}:{source}", errors)
-            require("H1 EPS×2" not in basis and "H1 EPS*2" not in basis, f"valuation_formal_uses_h1_times_two:{row.get('code')}", errors)
-            require(bool(row.get("multiple_rationale")), f"valuation_missing_multiple_rationale:{row.get('code')}", errors)
+            require("profit_forecast" in source or "consensus" in source.lower(), f"valuation_formal_without_consensus_source:{code}:{source}", errors)
+            require("H1 EPS×2" not in basis and "H1 EPS*2" not in basis, f"valuation_formal_uses_h1_times_two:{code}", errors)
+            require(bool(row.get("multiple_rationale")), f"valuation_missing_multiple_rationale:{code}", errors)
+            unit = row.get('valuation_basis_unit')
+            require(unit in {'PE','PB'}, f"valuation_invalid_basis_unit:{code}:{unit}", errors)
+            if unit == 'PB':
+                require(isinstance(row.get('market_pb'), (int,float)) and row.get('market_pb') > 0, f"valuation_financial_missing_market_pb:{code}", errors)
+                require(isinstance(row.get('book_value_per_share_proxy'), (int,float)) and row.get('book_value_per_share_proxy') > 0, f"valuation_financial_missing_bvps:{code}", errors)
+                require(isinstance(row.get('forward_roe_current_year'), (int,float)), f"valuation_financial_missing_forward_roe:{code}", errors)
+            else:
+                require(isinstance(row.get('consensus_eps_current_year'), (int,float)) and row.get('consensus_eps_current_year') > 0, f"valuation_pe_missing_forward_eps:{code}", errors)
     return errors
 
 
@@ -154,6 +173,13 @@ def validate_cycle_valuation(output: dict) -> list[str]:
     max_age = output.get("max_anchor_age_days")
     require(reference_day is not None, "cycle_missing_reference_trade_date", errors)
     require(isinstance(max_age, int) and 0 <= max_age <= 14, f"cycle_invalid_max_anchor_age_days:{max_age}", errors)
+    regime_age = output.get('cycle_regime_age_days')
+    max_regime_age = output.get('max_cycle_regime_age_days')
+    require(isinstance(regime_age, int), f"cycle_missing_regime_age:{regime_age}", errors)
+    require(isinstance(max_regime_age, int) and 1 <= max_regime_age <= 120, f"cycle_bad_max_regime_age:{max_regime_age}", errors)
+    if isinstance(regime_age, int) and isinstance(max_regime_age, int):
+        require(-7 <= regime_age <= max_regime_age, f"cycle_regime_stale:age={regime_age}:max={max_regime_age}", errors)
+
     for row in output.get("companies", []) if isinstance(output.get("companies"), list) else []:
         code = normalize_code(row.get("code"))
         tag = row.get("cycle_tag")
@@ -167,17 +193,50 @@ def validate_cycle_valuation(output: dict) -> list[str]:
                     if anchor_day is not None:
                         age = (reference_day - anchor_day).days
                         require(-1 <= age <= max_age, f"cycle_stale_anchor:{code}:{anchor.get('symbol')}:{anchor_day}:age={age}", errors)
-            factors = row.get("bear_base_bull_anchor_factor")
             earnings = row.get("bear_base_bull_forward_eps")
-            require(isinstance(factors, list) and len(factors) == 3, f"cycle_missing_scenarios:{code}", errors)
+            regime_factors = row.get('bear_base_bull_regime_factor')
             require(isinstance(earnings, list) and len(earnings) == 3, f"cycle_missing_forward_earnings_scenarios:{code}", errors)
+            require(isinstance(regime_factors, list) and len(regime_factors) == 3, f"cycle_missing_regime_scenarios:{code}", errors)
             require(bool(row.get("profit_sensitivity")), f"cycle_missing_profit_sensitivity:{code}", errors)
+            if tag in RESOURCE_CYCLE_TAGS:
+                require(isinstance(row.get('consensus_eps_current_year'), (int,float)) and row.get('consensus_eps_current_year') > 0, f"resource_cycle_missing_current_eps:{code}", errors)
+                require(isinstance(row.get('consensus_eps_next_year'), (int,float)) and row.get('consensus_eps_next_year') > 0, f"resource_cycle_missing_next_eps:{code}", errors)
+                require(isinstance(row.get('forward_12m_eps_proxy'), (int,float)) and row.get('forward_12m_eps_proxy') > 0, f"resource_cycle_missing_forward_12m_eps:{code}", errors)
+                require(bool(row.get('cycle_regime')), f"resource_cycle_missing_regime:{code}", errors)
+                require(bool(row.get('cycle_regime_summary')), f"resource_cycle_missing_regime_summary:{code}", errors)
+                require(bool(row.get('cycle_regime_evidence')), f"resource_cycle_missing_regime_evidence:{code}", errors)
+                require(isinstance(row.get('market_forward_pe_12m_proxy'), (int,float)) and row.get('market_forward_pe_12m_proxy') > 0, f"resource_cycle_missing_market_forward_pe:{code}", errors)
         elif tag in RESOURCE_CYCLE_TAGS:
             reason = str(row.get("reason") or "")
-            allowed = "commodity_anchor_fetch_failed" in reason or "forward_consensus_insufficient" in reason or "current_price_missing" in reason
+            allowed = any(key in reason for key in ("commodity_anchor_fetch_failed", "forward_consensus_insufficient", "current_price_missing", "cycle_regime_missing_or_stale"))
             require(allowed, f"resource_cycle_silently_unavailable:{code}:{reason}", errors)
             if "commodity_anchor_fetch_failed" in reason:
                 require(bool(anchor_errors), f"resource_cycle_claims_anchor_failure_without_error_map:{code}", errors)
+    return errors
+
+
+def validate_policy_audit(output: dict) -> list[str]:
+    errors: list[str] = []
+    common = output.get('common_pool_count')
+    fundamental = output.get('fundamental_count')
+    cycle = output.get('cycle_count')
+    coverage = output.get('coverage_count')
+    require(isinstance(common, int) and common >= 0, 'policy_audit_bad_common_count', errors)
+    require(isinstance(fundamental, int) and isinstance(cycle, int), 'policy_audit_bad_stage_counts', errors)
+    if all(isinstance(x, int) for x in (common, fundamental, cycle, coverage)):
+        require(fundamental + cycle == common, f"policy_audit_fundamental_cycle_mismatch:{fundamental}+{cycle}!={common}", errors)
+        require(coverage == common, f"policy_audit_incomplete_coverage:{coverage}!={common}", errors)
+    require(not output.get('missing_codes'), f"policy_audit_missing_codes:{output.get('missing_codes')}", errors)
+    require(not output.get('extra_codes'), f"policy_audit_extra_codes:{output.get('extra_codes')}", errors)
+    noncycle = output.get('noncycle_policy_coverage', {})
+    require(isinstance(noncycle, dict), 'policy_audit_missing_noncycle_section', errors)
+    if isinstance(noncycle, dict):
+        unsupported = noncycle.get('unsupported_policy_codes', [])
+        require(noncycle.get('unsupported_policy_count') == len(unsupported), 'policy_audit_unsupported_count_mismatch', errors)
+        require(not unsupported, f"policy_audit_unsupported_policy_codes:{unsupported}", errors)
+        require(noncycle.get('supported_policy_count') == noncycle.get('noncycle_count'), f"policy_audit_policy_not_full:{noncycle.get('supported_policy_count')}!={noncycle.get('noncycle_count')}", errors)
+    hard = output.get('hard_gate', {})
+    require(isinstance(hard, dict) and hard.get('status') == 'PASS', f"policy_audit_hard_gate_not_pass:{hard}", errors)
     return errors
 
 
@@ -197,6 +256,8 @@ def validate_left_valuation(output: dict) -> list[str]:
     upstream = output.get('upstream', {})
     require(upstream.get('fundamental_valuation') == 'PASS', 'left_fundamental_upstream_not_pass', errors)
     require(upstream.get('cycle_valuation') == 'PASS', 'left_cycle_upstream_not_pass', errors)
+    if 'valuation_policy_audit' in upstream:
+        require(upstream.get('valuation_policy_audit') == 'PASS', 'left_policy_audit_upstream_not_pass', errors)
     return errors
 
 
@@ -208,20 +269,17 @@ def validate_final_selection(final: dict) -> list[str]:
     core = {normalize_code(x) for x in final.get("core_codes", [])}
     top3_list = [normalize_code(x) for x in final.get("top3_codes", [])]
     top3 = set(top3_list)
-
     require(intersection == left & right, f"final_intersection_mismatch:expected={sorted(left & right)}:got={sorted(intersection)}", errors)
     require(core <= intersection, f"final_core_not_subset_of_intersection:{sorted(core-intersection)}", errors)
     require(top3 <= core, f"final_top3_not_subset_of_core:{sorted(top3-core)}", errors)
     require(len(top3_list) == len(top3), "final_top3_duplicate_codes", errors)
     require(len(top3_list) <= 3, "final_top3_more_than_three", errors)
     require(bool(parse_iso(final.get("final_frozen_at"))), "final_missing_frozen_at", errors)
-
     upstream = final.get("upstream_validator_status", {})
     require(isinstance(upstream, dict), "final_upstream_status_must_be_object", errors)
     failed = [name for name, value in upstream.items() if value != "PASS"] if isinstance(upstream, dict) else ["invalid"]
     if failed:
         require(not core and not top3, f"final_has_core_despite_upstream_fail:{failed}", errors)
-
     reviews = final.get("reviews", {})
     require(isinstance(reviews, dict), "final_reviews_must_be_object", errors)
     if isinstance(reviews, dict):
@@ -250,7 +308,7 @@ def print_result(stage: str, errors: list[str]) -> int:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate modular A-share research stage outputs")
     sub = parser.add_subparsers(dest="command", required=True)
-    for name in ("weekly-scan", "fundamental-valuation", "cycle-valuation", "left-valuation", "final-selection"):
+    for name in ("weekly-scan", "fundamental-valuation", "cycle-valuation", "valuation-policy-audit", "left-valuation", "final-selection"):
         p = sub.add_parser(name)
         p.add_argument("path")
     args = parser.parse_args()
@@ -262,6 +320,8 @@ def main() -> int:
             return print_result(args.command, validate_fundamental_valuation(payload))
         if args.command == "cycle-valuation":
             return print_result(args.command, validate_cycle_valuation(payload))
+        if args.command == "valuation-policy-audit":
+            return print_result(args.command, validate_policy_audit(payload))
         if args.command == "left-valuation":
             return print_result(args.command, validate_left_valuation(payload))
         return print_result(args.command, validate_final_selection(payload))

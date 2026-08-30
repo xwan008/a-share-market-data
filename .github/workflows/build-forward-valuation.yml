@@ -6,15 +6,24 @@ on:
     branches: [main]
     paths:
       - 'scripts/build_forward_valuation.py'
+      - 'scripts/build_forward_valuation_v5.py'
       - 'scripts/build_cycle_valuation.py'
+      - 'scripts/build_valuation_policy_audit.py'
       - 'scripts/merge_left_valuation.py'
       - 'scripts/validate_research_outputs.py'
       - 'config/valuation_policy_registry.json'
       - 'config/cycle_valuation_policy.json'
+      - 'config/cycle_regime_registry.json'
+      - 'config/research_pipeline_manifest.json'
       - 'skills/a-share-low-risk/fundamental-valuation/SKILL.md'
       - 'skills/a-share-low-risk/cycle-valuation/SKILL.md'
       - 'tests/test_valuation_v4.py'
+      - 'tests/test_valuation_v5.py'
       - '.github/workflows/build-forward-valuation.yml'
+
+concurrency:
+  group: valuation-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: write
@@ -33,15 +42,19 @@ jobs:
           cache: 'pip'
       - run: pip install -r requirements-research.txt pytest
       - name: Run valuation regression tests
-        run: pytest -q tests/test_valuation_v4.py
+        run: pytest -q tests/test_valuation_v4.py tests/test_valuation_v5.py
       - name: Build non-cycle forward valuation
-        run: python scripts/build_forward_valuation.py
+        run: python scripts/build_forward_valuation_v5.py
       - name: Validate non-cycle valuation contract
         run: python scripts/validate_research_outputs.py fundamental-valuation data/research/pipeline/fundamental_valuation.json
       - name: Build resource and cycle valuation
         run: python scripts/build_cycle_valuation.py
       - name: Validate cycle valuation contract
         run: python scripts/validate_research_outputs.py cycle-valuation data/research/pipeline/cycle_valuation.json
+      - name: Build valuation policy coverage audit
+        run: python scripts/build_valuation_policy_audit.py
+      - name: Validate valuation policy coverage audit
+        run: python scripts/validate_research_outputs.py valuation-policy-audit data/research/pipeline/valuation_policy_audit.json
       - name: Merge left valuation engines
         run: python scripts/merge_left_valuation.py
       - name: Validate full left coverage
@@ -51,17 +64,19 @@ jobs:
           python - <<'PY'
           import json
           p=json.load(open('data/research/pipeline/left_valuation_scan.json',encoding='utf-8'))
-          focus={'000338','002475','000807','601600','601899'}
+          focus={'000338','002475','000807','601600','601899','600030','601318'}
           rows=[r for r in p['companies'] if r['code'] in focus]
           print(json.dumps(rows,ensure_ascii=False,indent=2))
+          audit=json.load(open('data/research/pipeline/valuation_policy_audit.json',encoding='utf-8'))
+          print(json.dumps(audit['noncycle_policy_coverage'],ensure_ascii=False,indent=2))
           PY
       - name: Commit valuation scans
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/research/pipeline/fundamental_valuation.json data/research/pipeline/cycle_valuation.json data/research/pipeline/left_valuation_scan.json
+          git add data/research/pipeline/fundamental_valuation.json data/research/pipeline/cycle_valuation.json data/research/pipeline/valuation_policy_audit.json data/research/pipeline/left_valuation_scan.json
           if git diff --cached --quiet; then exit 0; fi
-          git commit -m "research: freeze forward and cycle valuation scans"
-          git pull --rebase origin main
-          git push
+          git commit -m "research: freeze valuation v5 scans"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

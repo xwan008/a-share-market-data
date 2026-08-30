@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "reviewed_at": "2026-08-30",
   "anchor_series": {
     "CU0": {"name": "沪铜连续", "role": "revenue_price"},
@@ -8,11 +8,21 @@
     "AO0": {"name": "氧化铝连续", "role": "input_cost"},
     "ZC0": {"name": "动力煤连续", "role": "revenue_price"}
   },
+  "forward_earnings_policy": {
+    "method": "calendar_weighted_current_next_consensus",
+    "minimum_report_count": 3,
+    "require_next_year_eps_for_resource": true,
+    "rule": "At late-cycle or normalization risk, current-year peak EPS must not be capitalized alone. Build a forward-12-month proxy by calendar-weighting current-year and next-year consensus EPS, then stress it with the structured 6-18m cycle regime and only a limited short-term commodity-anchor adjustment."
+  },
+  "short_term_anchor_policy": {
+    "max_absolute_effect_on_eps": 0.05,
+    "rule": "Current/MA60 commodity strength is a near-term modifier only. It cannot override a bearish/normalizing 6-18m supply-demand regime."
+  },
   "subchain_policies": {
     "nonferrous::铜矿资源": {
       "anchors": [{"symbol": "CU0", "weight": 1.0, "direction": 1}],
       "earnings_sensitivity": 0.75,
-      "multiple_range": [12, 16],
+      "fallback_multiple_range": [11, 15],
       "safe_to_fair_floor": [0.75, 0.88],
       "reasonable_to_fair_floor": [0.88, 1.0]
     },
@@ -22,14 +32,14 @@
         {"symbol": "AO0", "weight": 0.3, "direction": -1}
       ],
       "earnings_sensitivity": 0.9,
-      "multiple_range": [10, 14],
+      "fallback_multiple_range": [8, 11],
       "safe_to_fair_floor": [0.75, 0.88],
       "reasonable_to_fair_floor": [0.88, 1.0]
     },
     "coal::动力煤": {
       "anchors": [{"symbol": "ZC0", "weight": 1.0, "direction": 1}],
       "earnings_sensitivity": 0.8,
-      "multiple_range": [7, 10],
+      "fallback_multiple_range": [7, 10],
       "safe_to_fair_floor": [0.72, 0.85],
       "reasonable_to_fair_floor": [0.85, 0.98]
     }
@@ -42,28 +52,26 @@
         {"symbol": "CU0", "weight": 0.45, "direction": 1}
       ],
       "earnings_sensitivity": 0.7,
-      "multiple_range": [13, 17],
+      "fallback_multiple_range": [12, 16],
       "safe_to_fair_floor": [0.76, 0.88],
       "reasonable_to_fair_floor": [0.88, 1.0],
-      "rationale": "2026H1黄金和铜合计贡献集团毛利约75.5%，以黄金/铜双商品锚而不是单一铜价或TTM PE决定前瞻盈利中枢。"
+      "rationale": "2026H1黄金和铜合计贡献集团毛利约75.5%，以黄金/铜双商品锚和跨年度Forward盈利中枢共同决定估值。"
     },
     "601600": {
       "name": "中国铝业",
       "earnings_sensitivity": 0.9,
-      "multiple_range": [10, 14],
-      "rationale": "原铝板块为主要利润弹性来源，氧化铝同时是业务与成本变量；必须联合观察铝价和氧化铝成本方向。"
+      "fallback_multiple_range": [8, 11],
+      "rationale": "原铝板块为主要利润弹性来源，氧化铝同时是业务与成本变量；高利润阶段必须用2027供给恢复风险压测Forward盈利。"
     },
     "000807": {
       "name": "云铝股份",
       "earnings_sensitivity": 0.95,
-      "multiple_range": [11, 15],
-      "rationale": "低成本水电铝与一体化优势使盈利对铝价上行/氧化铝成本回落具有高弹性，同时给予成本优势一定估值溢价。"
+      "fallback_multiple_range": [9, 12],
+      "rationale": "低成本水电铝与一体化优势支持相对溢价，但中东复产、库存重建和需求正常化风险意味着不能把当前高吨铝利润按11-15倍永久资本化。"
     }
   },
   "scenario_rules": {
-    "base_anchor_ratio_clip": [0.85, 1.15],
-    "bear_shock": -0.08,
-    "bull_shock": 0.08,
-    "rule": "Anchor factor uses weighted current/60-day-average ratios; input-cost anchors enter with negative direction. Consensus forward EPS is then stress-tested by the anchor factor through company/subchain earnings sensitivity."
+    "short_term_anchor_ratio_clip": [0.95, 1.05],
+    "rule": "Final cycle EPS scenario starts from calendar-weighted 2026/2027 consensus, applies structured 6-18m regime bear/base/bull factors, then applies only a capped short-term commodity/MA60 adjustment through earnings sensitivity."
   }
 }
