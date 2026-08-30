@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-08-30",
+  "purpose": "Keep T2 recall broad, but prevent one hot subchain from flooding the formal common qualification pool with near-duplicate companies.",
+  "cap_rules": [
+    {"max_earnings_gate_passers": 4, "max_companies_in_common_pool": 1},
+    {"max_earnings_gate_passers": 12, "max_companies_in_common_pool": 2},
+    {"max_earnings_gate_passers": 1000000, "max_companies_in_common_pool": 3}
+  ],
+  "weekly_deep_review": {
+    "always_keep_if_active": true,
+    "counts_toward_subchain_cap": true,
+    "rule": "A company independently validated by the weekly deep review remains eligible. It consumes a representative slot for any T2 subchain it belongs to, so the T2-only path cannot refill the same chain with duplicates."
+  },
+  "ranking": {
+    "method": "company_earnings_transmission_score",
+    "weights": {
+      "net_profit_yoy_pct": 0.45,
+      "revenue_yoy_pct": 0.25,
+      "net_profit_qoq_pct": 0.20,
+      "q3_positive_forecast": 0.10
+    },
+    "normalization_caps": {
+      "net_profit_yoy_pct": [0, 100],
+      "revenue_yoy_pct": [0, 50],
+      "net_profit_qoq_pct": [0, 80]
+    },
+    "tie_breakers": [
+      "higher_net_profit_yoy_pct",
+      "higher_revenue_yoy_pct",
+      "higher_net_profit",
+      "lower_code"
+    ],
+    "rule": "The representative step ranks only companies that already passed the company-level future-earnings gate. It does not use valuation or right-side technical structure, preserving stage independence."
+  },
+  "output_policy": {
+    "keep_deferred_companies_in_audit": true,
+    "deferred_status": "deferred_by_subchain_diversification",
+    "rule": "Deferred companies remain visible in future_earnings_gate for auditability but are excluded from common_pool_codes. A company exposed to multiple T2 chains is retained if it wins a representative slot in any one chain."
+  }
+}
