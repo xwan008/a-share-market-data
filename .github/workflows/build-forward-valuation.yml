@@ -25,6 +25,7 @@ on:
       - 'skills/a-share-low-risk/orchestrator/SKILL.md'
       - 'tests/test_valuation_v4.py'
       - 'tests/test_valuation_v5.py'
+      - 'tests/test_cycle_coverage_v6.py'
       - '.github/workflows/build-forward-valuation.yml'
 
 concurrency:
@@ -48,7 +49,7 @@ jobs:
           cache: 'pip'
       - run: pip install -r requirements-research.txt pytest
       - name: Run valuation regression tests
-        run: pytest -q tests/test_valuation_v4.py tests/test_valuation_v5.py
+        run: pytest -q tests/test_valuation_v4.py tests/test_valuation_v5.py tests/test_cycle_coverage_v6.py
       - name: Build non-cycle forward valuation
         run: python scripts/build_forward_valuation_v5.py
       - name: Validate non-cycle valuation contract
