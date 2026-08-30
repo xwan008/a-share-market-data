@@ -1,19 +1,23 @@
 {
-  "schema_version": 2,
-  "generated_at": "2026-08-30T17:43:41.587565+08:00",
-  "t2_recall_frozen_at": "2026-08-30T08:49:08.100552+08:00",
+  "schema_version": 3,
+  "generated_at": "2026-08-30T17:56:13.404413+08:00",
+  "t2_recall_frozen_at": "2026-08-30T17:44:18.936120+08:00",
   "weekly_pool_generated_at": "2026-08-30T09:17:13.081752+08:00",
-  "t2_representative_policy_reviewed_at": "2026-08-30",
-  "t2_representative_policy_schema_version": 3,
+  "representative_policy_reviewed_at": "2026-08-30",
+  "representative_policy_schema_version": 4,
   "arithmetic": {
-    "t2_recall_unique_count": 174,
+    "recall_unique_count": 190,
+    "direct_t2_recall_unique_count": 174,
+    "conditional_t1_recall_unique_count": 16,
     "weekly_pool_effective_count": 16,
     "overlap_count": 3,
-    "merged_pre_gate_count": 187,
-    "future_earnings_gate_removals": 49,
-    "future_earnings_gate_pass_count": 138,
-    "representative_selection_deferrals": 98,
-    "common_qualification_pool_count": 40
+    "merged_pre_gate_count": 203,
+    "future_earnings_gate_removals": 57,
+    "future_earnings_gate_pass_count": 146,
+    "representative_selection_deferrals": 104,
+    "common_qualification_pool_count": 42,
+    "unconfirmed_reverse_review_required_count": 2,
+    "t2_recall_unique_count": 174
   },
   "overlap_codes": [
     "600685",
@@ -46,10 +50,12 @@
     "000823",
     "000878",
     "000933",
+    "000937",
     "000938",
     "000949",
     "000951",
     "000977",
+    "000983",
     "000988",
     "001309",
     "001389",
@@ -60,6 +66,7 @@
     "002134",
     "002141",
     "002156",
+    "002165",
     "002261",
     "002270",
     "002281",
@@ -101,6 +108,7 @@
     "600095",
     "600109",
     "600121",
+    "600123",
     "600150",
     "600155",
     "600160",
@@ -109,19 +117,24 @@
     "600188",
     "600192",
     "600219",
+    "600230",
     "600268",
+    "600309",
     "600312",
+    "600348",
     "600362",
     "600369",
     "600375",
     "600378",
     "600379",
+    "600395",
     "600403",
     "600406",
     "600418",
     "600458",
     "600482",
     "600487",
+    "600508",
     "600525",
     "600546",
     "600550",
@@ -133,6 +146,7 @@
     "600710",
     "600711",
     "600721",
+    "600758",
     "600864",
     "600888",
     "600906",
@@ -141,6 +155,8 @@
     "600925",
     "600958",
     "600971",
+    "600985",
+    "600997",
     "600999",
     "601001",
     "601059",
@@ -168,8 +184,10 @@
     "601600",
     "601601",
     "601628",
+    "601666",
     "601688",
     "601696",
+    "601699",
     "601788",
     "601869",
     "601878",
@@ -182,12 +200,14 @@
     "601990",
     "601995",
     "603019",
+    "603041",
     "603083",
     "603088",
     "603097",
     "603127",
     "603186",
     "603191",
+    "603192",
     "603228",
     "603259",
     "603268",
@@ -214,10 +234,15 @@
       "code": "000034",
       "name": "神州数码",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "computer::AI服务器/算力整机"
+      ],
       "t2_tags": [
         "computer::AI服务器/算力整机"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "神州数码对AI服务器/算力整机的AI服务器/算力整机存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -229,22 +254,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(computer::AI服务器/算力整机) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "000063": {
       "code": "000063",
       "name": "中兴通讯",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "computer::AI服务器/算力整机"
+      ],
       "t2_tags": [
         "computer::AI服务器/算力整机"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "中兴通讯对AI服务器/算力整机的AI服务器/算力整机存在直接或实质业务暴露",
         "跨申万一级行业发现，对AI服务器/算力整机存在实质业务暴露"
       ],
@@ -267,10 +297,15 @@
       "code": "000066",
       "name": "中国长城",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "computer::AI服务器/算力整机"
+      ],
       "t2_tags": [
         "computer::AI服务器/算力整机"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "中国长城对AI服务器/算力整机的AI服务器/算力整机存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -282,22 +317,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(computer::AI服务器/算力整机) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "000166": {
       "code": "000166",
       "name": "申万宏源",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "申万宏源对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -309,20 +349,23 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "000338": {
       "code": "000338",
       "name": "潍柴动力",
       "source": "weekly",
+      "gate_mode": "weekly_deep_review",
+      "recall_tags": [],
       "t2_tags": [],
-      "t2_exposure": [],
+      "conditional_t1_tags": [],
+      "recall_exposure": [],
       "metrics": {
         "revenue_yoy_pct": 8.847564221,
         "net_profit_yoy_pct": 36.46,
@@ -345,10 +388,15 @@
       "code": "000533",
       "name": "顺钠股份",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "power_equipment::电网一次设备/变压器/高压开关"
+      ],
       "t2_tags": [
         "power_equipment::电网一次设备/变压器/高压开关"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "顺钠股份对电网一次设备/变压器/高压开关的变压器/高压开关/一次设备存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -360,22 +408,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(power_equipment::电网一次设备/变压器/高压开关) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "000550": {
       "code": "000550",
       "name": "江铃汽车",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "automotive::重卡"
+      ],
       "t2_tags": [
         "automotive::重卡"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "江铃汽车对重卡的重卡整车存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -397,10 +450,15 @@
       "code": "000552",
       "name": "甘肃能化",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "coal::动力煤"
+      ],
       "t2_tags": [
         "coal::动力煤"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "甘肃能化对动力煤的动力煤开采存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -412,22 +470,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(coal::动力煤) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "000571": {
       "code": "000571",
       "name": "新大洲A",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "coal::动力煤"
+      ],
       "t2_tags": [
         "coal::动力煤"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "新大洲A对动力煤的动力煤开采存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -449,10 +512,15 @@
       "code": "000612",
       "name": "焦作万方",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonferrous::电解铝"
+      ],
       "t2_tags": [
         "nonferrous::电解铝"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "焦作万方对电解铝的电解铝冶炼存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -464,22 +532,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonferrous::电解铝) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "000627": {
       "code": "000627",
       "name": "*ST天茂",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::保险"
+      ],
       "t2_tags": [
         "nonbank_finance::保险"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "*ST天茂对保险的寿险/财险存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -501,10 +574,15 @@
       "code": "000630",
       "name": "铜陵有色",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonferrous::铜矿资源"
+      ],
       "t2_tags": [
         "nonferrous::铜矿资源"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "铜陵有色对铜矿资源的铜矿采选/资源权益存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -516,22 +594,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonferrous::铜矿资源) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "000686": {
       "code": "000686",
       "name": "东北证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "东北证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -543,22 +626,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "000712": {
       "code": "000712",
       "name": "锦龙股份",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "锦龙股份对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -580,10 +668,15 @@
       "code": "000728",
       "name": "国元证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "国元证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -595,22 +688,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "000737": {
       "code": "000737",
       "name": "北方铜业",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonferrous::铜矿资源"
+      ],
       "t2_tags": [
         "nonferrous::铜矿资源"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "北方铜业对铜矿资源的铜矿采选/资源权益存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -622,22 +720,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonferrous::铜矿资源) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "000739": {
       "code": "000739",
       "name": "普洛药业",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "pharma::CXO/CDMO/CRDMO"
+      ],
       "t2_tags": [
         "pharma::CXO/CDMO/CRDMO"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "普洛药业对CXO/CDMO/CRDMO的CRO/CDMO/CRDMO服务存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -659,10 +762,15 @@
       "code": "000750",
       "name": "国海证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "国海证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -674,22 +782,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "000776": {
       "code": "000776",
       "name": "广发证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "广发证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -701,7 +814,7 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "selected_t2_representative",
@@ -714,10 +827,15 @@
       "code": "000783",
       "name": "长江证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "长江证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -729,22 +847,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "000800": {
       "code": "000800",
       "name": "一汽解放",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "automotive::重卡"
+      ],
       "t2_tags": [
         "automotive::重卡"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "一汽解放对重卡的重卡整车存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -756,7 +879,7 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(automotive::重卡) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "selected_t2_representative",
@@ -769,10 +892,15 @@
       "code": "000807",
       "name": "云铝股份",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonferrous::电解铝"
+      ],
       "t2_tags": [
         "nonferrous::电解铝"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "云铝股份对电解铝的电解铝冶炼存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -784,7 +912,7 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonferrous::电解铝) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "selected_t2_representative",
@@ -797,10 +925,15 @@
       "code": "000823",
       "name": "超声电子",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "electronics::PCB/CCL"
+      ],
       "t2_tags": [
         "electronics::PCB/CCL"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "超声电子对PCB/CCL的高端PCB/覆铜板存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -812,22 +945,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(electronics::PCB/CCL) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "000878": {
       "code": "000878",
       "name": "云南铜业",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonferrous::铜矿资源"
+      ],
       "t2_tags": [
         "nonferrous::铜矿资源"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "云南铜业对铜矿资源的铜矿采选/资源权益存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -839,22 +977,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonferrous::铜矿资源) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "000933": {
       "code": "000933",
       "name": "神火股份",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonferrous::电解铝"
+      ],
       "t2_tags": [
         "nonferrous::电解铝"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "神火股份对电解铝的电解铝冶炼存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -866,7 +1009,7 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonferrous::电解铝) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "selected_t2_representative",
@@ -875,14 +1018,49 @@
       ],
       "final_pool_status": "pass"
     },
+    "000937": {
+      "code": "000937",
+      "name": "冀中能源",
+      "source": "T1-conditional",
+      "gate_mode": "conditional_t1",
+      "recall_tags": [
+        "coal::焦煤"
+      ],
+      "t2_tags": [],
+      "conditional_t1_tags": [
+        "coal::焦煤"
+      ],
+      "recall_exposure": [
+        "冀中能源对焦煤的焦煤开采/洗选存在直接或实质业务暴露"
+      ],
+      "metrics": {
+        "revenue_yoy_pct": 1.597856585,
+        "net_profit_yoy_pct": -24.18,
+        "net_profit_qoq_pct": 36.9302,
+        "revenue": 7409843238.69,
+        "net_profit": 263934358.48,
+        "q3_positive_forecast": false
+      },
+      "gate_status": "reject",
+      "reason": "公司属于T1条件召回链，但未达到高于T2普通门槛的公司级确认标准；保留召回审计，不进入正式共同池。",
+      "forward_bridge": null,
+      "invalidation_condition": null,
+      "representative_selection_status": "not_eligible",
+      "final_pool_status": "reject"
+    },
     "000938": {
       "code": "000938",
       "name": "紫光股份",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "computer::AI服务器/算力整机"
+      ],
       "t2_tags": [
         "computer::AI服务器/算力整机"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "紫光股份对AI服务器/算力整机的AI服务器/算力整机存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -894,7 +1072,7 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(computer::AI服务器/算力整机) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "selected_t2_representative",
@@ -907,10 +1085,15 @@
       "code": "000949",
       "name": "新乡化纤",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "chemicals::氨纶"
+      ],
       "t2_tags": [
         "chemicals::氨纶"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "新乡化纤对氨纶的氨纶纤维存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -922,22 +1105,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(chemicals::氨纶) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "000951": {
       "code": "000951",
       "name": "中国重汽",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "automotive::重卡"
+      ],
       "t2_tags": [
         "automotive::重卡"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "中国重汽对重卡的重卡整车存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -949,7 +1137,7 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(automotive::重卡) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "selected_t2_representative",
@@ -962,10 +1150,15 @@
       "code": "000977",
       "name": "浪潮信息",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "computer::AI服务器/算力整机"
+      ],
       "t2_tags": [
         "computer::AI服务器/算力整机"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "浪潮信息对AI服务器/算力整机的AI服务器/算力整机存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -977,22 +1170,57 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(computer::AI服务器/算力整机) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+    },
+    "000983": {
+      "code": "000983",
+      "name": "山西焦煤",
+      "source": "T1-conditional",
+      "gate_mode": "conditional_t1",
+      "recall_tags": [
+        "coal::焦煤"
+      ],
+      "t2_tags": [],
+      "conditional_t1_tags": [
+        "coal::焦煤"
+      ],
+      "recall_exposure": [
+        "山西焦煤对焦煤的焦煤开采/洗选存在直接或实质业务暴露"
+      ],
+      "metrics": {
+        "revenue_yoy_pct": -0.1397235197,
+        "net_profit_yoy_pct": 22.03,
+        "net_profit_qoq_pct": -46.887,
+        "revenue": 18028068060.87,
+        "net_profit": 1236969534.66,
+        "q3_positive_forecast": false
+      },
+      "gate_status": "reject",
+      "reason": "公司属于T1条件召回链，但未达到高于T2普通门槛的公司级确认标准；保留召回审计，不进入正式共同池。",
+      "forward_bridge": null,
+      "invalidation_condition": null,
+      "representative_selection_status": "not_eligible",
+      "final_pool_status": "reject"
     },
     "000988": {
       "code": "000988",
       "name": "华工科技",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "communication::高速光模块/光器件"
+      ],
       "t2_tags": [
         "communication::高速光模块/光器件"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "华工科技对高速光模块/光器件的800G/1.6T光模块/高速光器件存在直接或实质业务暴露",
         "跨申万一级行业发现，对800G/1.6T光模块/高速光器件存在实质业务暴露"
       ],
@@ -1015,8 +1243,11 @@
       "code": "001309",
       "name": "德明利",
       "source": "weekly",
+      "gate_mode": "weekly_deep_review",
+      "recall_tags": [],
       "t2_tags": [],
-      "t2_exposure": [],
+      "conditional_t1_tags": [],
+      "recall_exposure": [],
       "metrics": {
         "revenue_yoy_pct": 311.5455913213,
         "net_profit_yoy_pct": 5201.6,
@@ -1039,10 +1270,15 @@
       "code": "001389",
       "name": "广合科技",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "electronics::PCB/CCL"
+      ],
       "t2_tags": [
         "electronics::PCB/CCL"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "广合科技对PCB/CCL的高端PCB/覆铜板存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -1054,23 +1290,29 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(electronics::PCB/CCL) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "002028": {
       "code": "002028",
       "name": "思源电气",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "power_equipment::特高压",
+        "power_equipment::电网一次设备/变压器/高压开关"
+      ],
       "t2_tags": [
         "power_equipment::特高压",
         "power_equipment::电网一次设备/变压器/高压开关"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "思源电气对特高压的特高压核心设备存在直接或实质业务暴露",
         "思源电气对电网一次设备/变压器/高压开关的变压器/高压开关/一次设备存在直接或实质业务暴露"
       ],
@@ -1083,7 +1325,7 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(power_equipment::特高压 / power_equipment::电网一次设备/变压器/高压开关) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "selected_t2_representative",
@@ -1097,10 +1339,15 @@
       "code": "002064",
       "name": "华峰化学",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "chemicals::氨纶"
+      ],
       "t2_tags": [
         "chemicals::氨纶"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "华峰化学对氨纶的氨纶纤维存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -1112,7 +1359,7 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(chemicals::氨纶) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "selected_t2_representative",
@@ -1125,10 +1372,15 @@
       "code": "002112",
       "name": "三变科技",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "power_equipment::电网一次设备/变压器/高压开关"
+      ],
       "t2_tags": [
         "power_equipment::电网一次设备/变压器/高压开关"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "三变科技对电网一次设备/变压器/高压开关的变压器/高压开关/一次设备存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -1150,10 +1402,15 @@
       "code": "002128",
       "name": "电投能源",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "coal::动力煤"
+      ],
       "t2_tags": [
         "coal::动力煤"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "电投能源对动力煤的动力煤开采存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -1165,22 +1422,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(coal::动力煤) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "002134": {
       "code": "002134",
       "name": "天津普林",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "electronics::PCB/CCL"
+      ],
       "t2_tags": [
         "electronics::PCB/CCL"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "天津普林对PCB/CCL的高端PCB/覆铜板存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -1192,22 +1454,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(electronics::PCB/CCL) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "002141": {
       "code": "002141",
       "name": "贤丰控股",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "electronics::PCB/CCL"
+      ],
       "t2_tags": [
         "electronics::PCB/CCL"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "贤丰控股对PCB/CCL的高端PCB/覆铜板存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -1229,8 +1496,11 @@
       "code": "002156",
       "name": "通富微电",
       "source": "weekly",
+      "gate_mode": "weekly_deep_review",
+      "recall_tags": [],
       "t2_tags": [],
-      "t2_exposure": [],
+      "conditional_t1_tags": [],
+      "recall_exposure": [],
       "metrics": {
         "revenue_yoy_pct": 23.0305036236,
         "net_profit_yoy_pct": 316.77,
@@ -1249,14 +1519,49 @@
       ],
       "final_pool_status": "pass"
     },
+    "002165": {
+      "code": "002165",
+      "name": "红宝丽",
+      "source": "T1-conditional",
+      "gate_mode": "conditional_t1",
+      "recall_tags": [
+        "chemicals::聚氨酯/MDI/TDI"
+      ],
+      "t2_tags": [],
+      "conditional_t1_tags": [
+        "chemicals::聚氨酯/MDI/TDI"
+      ],
+      "recall_exposure": [
+        "红宝丽对聚氨酯/MDI/TDI的MDI/TDI/聚氨酯材料存在直接或实质业务暴露"
+      ],
+      "metrics": {
+        "revenue_yoy_pct": 22.9534395654,
+        "net_profit_yoy_pct": -134.77,
+        "net_profit_qoq_pct": 164.687,
+        "revenue": 1530979857.96,
+        "net_profit": -8479363.07,
+        "q3_positive_forecast": false
+      },
+      "gate_status": "reject",
+      "reason": "公司属于T1条件召回链，但未达到高于T2普通门槛的公司级确认标准；保留召回审计，不进入正式共同池。",
+      "forward_bridge": null,
+      "invalidation_condition": null,
+      "representative_selection_status": "not_eligible",
+      "final_pool_status": "reject"
+    },
     "002261": {
       "code": "002261",
       "name": "拓维信息",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "computer::AI服务器/算力整机"
+      ],
       "t2_tags": [
         "computer::AI服务器/算力整机"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "拓维信息对AI服务器/算力整机的AI服务器/算力整机存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -1278,10 +1583,15 @@
       "code": "002270",
       "name": "华明装备",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "power_equipment::电网一次设备/变压器/高压开关"
+      ],
       "t2_tags": [
         "power_equipment::电网一次设备/变压器/高压开关"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "华明装备对电网一次设备/变压器/高压开关的变压器/高压开关/一次设备存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -1293,22 +1603,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(power_equipment::电网一次设备/变压器/高压开关) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "002281": {
       "code": "002281",
       "name": "光迅科技",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "communication::高速光模块/光器件"
+      ],
       "t2_tags": [
         "communication::高速光模块/光器件"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "光迅科技对高速光模块/光器件的800G/1.6T光模块/高速光器件存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -1320,22 +1635,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(communication::高速光模块/光器件) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "002326": {
       "code": "002326",
       "name": "永太科技",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "chemicals::氟化工"
+      ],
       "t2_tags": [
         "chemicals::氟化工"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "永太科技对氟化工的制冷剂/含氟材料存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -1347,7 +1667,7 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(chemicals::氟化工) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "selected_t2_representative",
@@ -1360,11 +1680,17 @@
       "code": "002350",
       "name": "北京科锐",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "power_equipment::特高压",
+        "power_equipment::电网一次设备/变压器/高压开关"
+      ],
       "t2_tags": [
         "power_equipment::特高压",
         "power_equipment::电网一次设备/变压器/高压开关"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "北京科锐对特高压的特高压核心设备存在直接或实质业务暴露",
         "北京科锐对电网一次设备/变压器/高压开关的变压器/高压开关/一次设备存在直接或实质业务暴露"
       ],
@@ -1387,10 +1713,15 @@
       "code": "002358",
       "name": "森源电气",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "power_equipment::电网一次设备/变压器/高压开关"
+      ],
       "t2_tags": [
         "power_equipment::电网一次设备/变压器/高压开关"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "森源电气对电网一次设备/变压器/高压开关的变压器/高压开关/一次设备存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -1412,10 +1743,15 @@
       "code": "002384",
       "name": "东山精密",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "electronics::PCB/CCL"
+      ],
       "t2_tags": [
         "electronics::PCB/CCL"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "东山精密对PCB/CCL的高端PCB/覆铜板存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -1427,7 +1763,7 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(electronics::PCB/CCL) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "selected_t2_representative",
@@ -1440,10 +1776,15 @@
       "code": "002407",
       "name": "多氟多",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "chemicals::氟化工"
+      ],
       "t2_tags": [
         "chemicals::氟化工"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "多氟多对氟化工的制冷剂/含氟材料存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -1455,22 +1796,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(chemicals::氟化工) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "002436": {
       "code": "002436",
       "name": "兴森科技",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "electronics::PCB/CCL"
+      ],
       "t2_tags": [
         "electronics::PCB/CCL"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "兴森科技对PCB/CCL的高端PCB/覆铜板存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -1482,22 +1828,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(electronics::PCB/CCL) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "002452": {
       "code": "002452",
       "name": "长高电气",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "power_equipment::电网一次设备/变压器/高压开关"
+      ],
       "t2_tags": [
         "power_equipment::电网一次设备/变压器/高压开关"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "长高电气对电网一次设备/变压器/高压开关的变压器/高压开关/一次设备存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -1509,7 +1860,7 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(power_equipment::电网一次设备/变压器/高压开关) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "selected_t2_representative",
@@ -1522,10 +1873,15 @@
       "code": "002463",
       "name": "沪电股份",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "electronics::PCB/CCL"
+      ],
       "t2_tags": [
         "electronics::PCB/CCL"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "沪电股份对PCB/CCL的高端PCB/覆铜板存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -1537,20 +1893,23 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(electronics::PCB/CCL) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "002475": {
       "code": "002475",
       "name": "立讯精密",
       "source": "weekly",
+      "gate_mode": "weekly_deep_review",
+      "recall_tags": [],
       "t2_tags": [],
-      "t2_exposure": [],
+      "conditional_t1_tags": [],
+      "recall_exposure": [],
       "metrics": {
         "revenue_yoy_pct": 40.1605518581,
         "net_profit_yoy_pct": 18.04,
@@ -1573,10 +1932,15 @@
       "code": "002500",
       "name": "山西证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "山西证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -1588,22 +1952,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "002532": {
       "code": "002532",
       "name": "天山铝业",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonferrous::电解铝"
+      ],
       "t2_tags": [
         "nonferrous::电解铝"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "天山铝业对电解铝的电解铝冶炼存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -1615,22 +1984,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonferrous::电解铝) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "002552": {
       "code": "002552",
       "name": "宝鼎科技",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "electronics::PCB/CCL"
+      ],
       "t2_tags": [
         "electronics::PCB/CCL"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "宝鼎科技对PCB/CCL的高端PCB/覆铜板存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -1642,22 +2016,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(electronics::PCB/CCL) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "002579": {
       "code": "002579",
       "name": "中京电子",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "electronics::PCB/CCL"
+      ],
       "t2_tags": [
         "electronics::PCB/CCL"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "中京电子对PCB/CCL的高端PCB/覆铜板存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -1679,10 +2058,15 @@
       "code": "002636",
       "name": "金安国纪",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "electronics::PCB/CCL"
+      ],
       "t2_tags": [
         "electronics::PCB/CCL"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "金安国纪对PCB/CCL的高端PCB/覆铜板存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -1694,7 +2078,7 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(electronics::PCB/CCL) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "selected_t2_representative",
@@ -1707,10 +2091,15 @@
       "code": "002670",
       "name": "国盛证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "国盛证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -1722,22 +2111,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "002673": {
       "code": "002673",
       "name": "西部证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "西部证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -1749,20 +2143,23 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "002709": {
       "code": "002709",
       "name": "天赐材料",
       "source": "weekly",
+      "gate_mode": "weekly_deep_review",
+      "recall_tags": [],
       "t2_tags": [],
-      "t2_exposure": [],
+      "conditional_t1_tags": [],
+      "recall_exposure": [],
       "metrics": {
         "revenue_yoy_pct": 109.2767908568,
         "net_profit_yoy_pct": 967.91,
@@ -1785,10 +2182,15 @@
       "code": "002736",
       "name": "国信证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "国信证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -1800,22 +2202,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "002797": {
       "code": "002797",
       "name": "第一创业",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "第一创业对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -1827,20 +2234,23 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "002812": {
       "code": "002812",
       "name": "恩捷股份",
       "source": "weekly",
+      "gate_mode": "weekly_deep_review",
+      "recall_tags": [],
       "t2_tags": [],
-      "t2_exposure": [],
+      "conditional_t1_tags": [],
+      "recall_exposure": [],
       "metrics": {
         "revenue_yoy_pct": 50.4661972629,
         "net_profit_yoy_pct": 980.99,
@@ -1863,10 +2273,15 @@
       "code": "002815",
       "name": "崇达技术",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "electronics::PCB/CCL"
+      ],
       "t2_tags": [
         "electronics::PCB/CCL"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "崇达技术对PCB/CCL的高端PCB/覆铜板存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -1878,22 +2293,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(electronics::PCB/CCL) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "002821": {
       "code": "002821",
       "name": "凯莱英",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "pharma::CXO/CDMO/CRDMO"
+      ],
       "t2_tags": [
         "pharma::CXO/CDMO/CRDMO"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "凯莱英对CXO/CDMO/CRDMO的CRO/CDMO/CRDMO服务存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -1915,10 +2335,15 @@
       "code": "002902",
       "name": "铭普光磁",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "communication::高速光模块/光器件"
+      ],
       "t2_tags": [
         "communication::高速光模块/光器件"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "铭普光磁对高速光模块/光器件的800G/1.6T光模块/高速光器件存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -1940,10 +2365,15 @@
       "code": "002913",
       "name": "奥士康",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "electronics::PCB/CCL"
+      ],
       "t2_tags": [
         "electronics::PCB/CCL"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "奥士康对PCB/CCL的高端PCB/覆铜板存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -1955,22 +2385,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(electronics::PCB/CCL) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "002915": {
       "code": "002915",
       "name": "中欣氟材",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "chemicals::氟化工"
+      ],
       "t2_tags": [
         "chemicals::氟化工"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "中欣氟材对氟化工的制冷剂/含氟材料存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -1982,22 +2417,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(chemicals::氟化工) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "002916": {
       "code": "002916",
       "name": "深南电路",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "electronics::PCB/CCL"
+      ],
       "t2_tags": [
         "electronics::PCB/CCL"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "深南电路对PCB/CCL的高端PCB/覆铜板存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -2009,22 +2449,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(electronics::PCB/CCL) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "002926": {
       "code": "002926",
       "name": "华西证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "华西证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -2036,22 +2481,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "002938": {
       "code": "002938",
       "name": "鹏鼎控股",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "electronics::PCB/CCL"
+      ],
       "t2_tags": [
         "electronics::PCB/CCL"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "鹏鼎控股对PCB/CCL的高端PCB/覆铜板存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -2063,22 +2513,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(electronics::PCB/CCL) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "002939": {
       "code": "002939",
       "name": "长城证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "长城证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -2100,10 +2555,15 @@
       "code": "002945",
       "name": "华林证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "华林证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -2115,22 +2575,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "600006": {
       "code": "600006",
       "name": "东风股份",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "automotive::重卡"
+      ],
       "t2_tags": [
         "automotive::重卡"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "东风股份对重卡的重卡整车存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -2142,22 +2607,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(automotive::重卡) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "600030": {
       "code": "600030",
       "name": "中信证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "中信证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -2169,7 +2639,7 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "selected_t2_representative",
@@ -2182,10 +2652,15 @@
       "code": "600061",
       "name": "国投资本",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "国投资本对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -2207,8 +2682,11 @@
       "code": "600066",
       "name": "宇通客车",
       "source": "weekly",
+      "gate_mode": "weekly_deep_review",
+      "recall_tags": [],
       "t2_tags": [],
-      "t2_exposure": [],
+      "conditional_t1_tags": [],
+      "recall_exposure": [],
       "metrics": {
         "revenue_yoy_pct": 3.6524784174,
         "net_profit_yoy_pct": -3.52,
@@ -2231,11 +2709,17 @@
       "code": "600089",
       "name": "特变电工",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "power_equipment::特高压",
+        "power_equipment::电网一次设备/变压器/高压开关"
+      ],
       "t2_tags": [
         "power_equipment::特高压",
         "power_equipment::电网一次设备/变压器/高压开关"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "特变电工对特高压的特高压核心设备存在直接或实质业务暴露",
         "特变电工对电网一次设备/变压器/高压开关的变压器/高压开关/一次设备存在直接或实质业务暴露"
       ],
@@ -2258,10 +2742,15 @@
       "code": "600095",
       "name": "湘财股份",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "湘财股份对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -2273,22 +2762,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "600109": {
       "code": "600109",
       "name": "国金证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "国金证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -2300,22 +2794,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "600121": {
       "code": "600121",
       "name": "郑州煤电",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "coal::动力煤"
+      ],
       "t2_tags": [
         "coal::动力煤"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "郑州煤电对动力煤的动力煤开采存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -2333,14 +2832,51 @@
       "representative_selection_status": "not_eligible",
       "final_pool_status": "reject"
     },
+    "600123": {
+      "code": "600123",
+      "name": "兰花科创",
+      "source": "T1-conditional",
+      "gate_mode": "conditional_t1",
+      "recall_tags": [
+        "coal::焦煤"
+      ],
+      "t2_tags": [],
+      "conditional_t1_tags": [
+        "coal::焦煤"
+      ],
+      "recall_exposure": [
+        "兰花科创对焦煤的焦煤开采/洗选存在直接或实质业务暴露"
+      ],
+      "metrics": {
+        "revenue_yoy_pct": 18.3220666654,
+        "net_profit_yoy_pct": 44.6,
+        "net_profit_qoq_pct": 502.6682,
+        "revenue": 4792184737.38,
+        "net_profit": 83110382.03,
+        "q3_positive_forecast": false
+      },
+      "gate_status": "pass",
+      "reason": "产业链仍为T1，但公司H1/Q2盈利传导达到更严格的条件召回门槛；允许进入单代表竞争，不代表产业链已升级为T2。",
+      "forward_bridge": "T1产业链(coal::焦煤)尚未完全确认 → 公司自身盈利传导显著强于行业最低证据 → 仅以条件候选进入后续筛选；行业升级仍需独立证据。",
+      "invalidation_condition": "公司盈利传导减弱，或对应T1链进一步恶化/降级，则条件资格立即失效。",
+      "representative_selection_status": "deferred_by_subchain_diversification",
+      "selected_via": [],
+      "final_pool_status": "deferred",
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+    },
     "600150": {
       "code": "600150",
       "name": "中国船舶",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "machinery::船舶制造"
+      ],
       "t2_tags": [
         "machinery::船舶制造"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "中国船舶对船舶制造的整船建造/交付存在直接或实质业务暴露",
         "跨申万一级行业发现，对整船建造/交付存在实质业务暴露"
       ],
@@ -2363,10 +2899,15 @@
       "code": "600155",
       "name": "华创云信",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "华创云信对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -2388,10 +2929,15 @@
       "code": "600160",
       "name": "巨化股份",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "chemicals::氟化工"
+      ],
       "t2_tags": [
         "chemicals::氟化工"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "巨化股份对氟化工的制冷剂/含氟材料存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -2403,22 +2949,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(chemicals::氟化工) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "600166": {
       "code": "600166",
       "name": "福田汽车",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "automotive::重卡"
+      ],
       "t2_tags": [
         "automotive::重卡"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "福田汽车对重卡的重卡整车存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -2430,22 +2981,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(automotive::重卡) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "600183": {
       "code": "600183",
       "name": "生益科技",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "electronics::PCB/CCL"
+      ],
       "t2_tags": [
         "electronics::PCB/CCL"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "生益科技对PCB/CCL的高端PCB/覆铜板存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -2457,7 +3013,7 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(electronics::PCB/CCL) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "selected_t2_representative",
@@ -2470,10 +3026,15 @@
       "code": "600188",
       "name": "兖矿能源",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "coal::动力煤"
+      ],
       "t2_tags": [
         "coal::动力煤"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "兖矿能源对动力煤的动力煤开采存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -2485,22 +3046,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(coal::动力煤) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "600192": {
       "code": "600192",
       "name": "长城电工",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "power_equipment::电网一次设备/变压器/高压开关"
+      ],
       "t2_tags": [
         "power_equipment::电网一次设备/变压器/高压开关"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "长城电工对电网一次设备/变压器/高压开关的变压器/高压开关/一次设备存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -2522,10 +3088,15 @@
       "code": "600219",
       "name": "南山铝业",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonferrous::电解铝"
+      ],
       "t2_tags": [
         "nonferrous::电解铝"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "南山铝业对电解铝的电解铝冶炼存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -2543,14 +3114,49 @@
       "representative_selection_status": "not_eligible",
       "final_pool_status": "reject"
     },
+    "600230": {
+      "code": "600230",
+      "name": "沧州大化",
+      "source": "T1-conditional",
+      "gate_mode": "conditional_t1",
+      "recall_tags": [
+        "chemicals::聚氨酯/MDI/TDI"
+      ],
+      "t2_tags": [],
+      "conditional_t1_tags": [
+        "chemicals::聚氨酯/MDI/TDI"
+      ],
+      "recall_exposure": [
+        "沧州大化对聚氨酯/MDI/TDI的MDI/TDI/聚氨酯材料存在直接或实质业务暴露"
+      ],
+      "metrics": {
+        "revenue_yoy_pct": -4.1052202347,
+        "net_profit_yoy_pct": 330.75,
+        "net_profit_qoq_pct": -25.7929,
+        "revenue": 2152615667.91,
+        "net_profit": 100737314.05,
+        "q3_positive_forecast": false
+      },
+      "gate_status": "reject",
+      "reason": "公司属于T1条件召回链，但未达到高于T2普通门槛的公司级确认标准；保留召回审计，不进入正式共同池。",
+      "forward_bridge": null,
+      "invalidation_condition": null,
+      "representative_selection_status": "not_eligible",
+      "final_pool_status": "reject"
+    },
     "600268": {
       "code": "600268",
       "name": "国电南自",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "power_equipment::电网一次设备/变压器/高压开关"
+      ],
       "t2_tags": [
         "power_equipment::电网一次设备/变压器/高压开关"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "国电南自对电网一次设备/变压器/高压开关的变压器/高压开关/一次设备存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -2568,15 +3174,54 @@
       "representative_selection_status": "not_eligible",
       "final_pool_status": "reject"
     },
+    "600309": {
+      "code": "600309",
+      "name": "万华化学",
+      "source": "T1-conditional",
+      "gate_mode": "conditional_t1",
+      "recall_tags": [
+        "chemicals::聚氨酯/MDI/TDI"
+      ],
+      "t2_tags": [],
+      "conditional_t1_tags": [
+        "chemicals::聚氨酯/MDI/TDI"
+      ],
+      "recall_exposure": [
+        "万华化学对聚氨酯/MDI/TDI的MDI/TDI/聚氨酯材料存在直接或实质业务暴露"
+      ],
+      "metrics": {
+        "revenue_yoy_pct": 31.2585013331,
+        "net_profit_yoy_pct": 64.35,
+        "net_profit_qoq_pct": 70.6766,
+        "revenue": 119315863794.85,
+        "net_profit": 10062963544.81,
+        "q3_positive_forecast": false
+      },
+      "gate_status": "pass",
+      "reason": "产业链仍为T1，但公司H1/Q2盈利传导达到更严格的条件召回门槛；允许进入单代表竞争，不代表产业链已升级为T2。",
+      "forward_bridge": "T1产业链(chemicals::聚氨酯/MDI/TDI)尚未完全确认 → 公司自身盈利传导显著强于行业最低证据 → 仅以条件候选进入后续筛选；行业升级仍需独立证据。",
+      "invalidation_condition": "公司盈利传导减弱，或对应T1链进一步恶化/降级，则条件资格立即失效。",
+      "representative_selection_status": "selected_conditional_t1_representative",
+      "selected_via": [
+        "chemicals::聚氨酯/MDI/TDI"
+      ],
+      "final_pool_status": "pass"
+    },
     "600312": {
       "code": "600312",
       "name": "平高电气",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "power_equipment::特高压",
+        "power_equipment::电网一次设备/变压器/高压开关"
+      ],
       "t2_tags": [
         "power_equipment::特高压",
         "power_equipment::电网一次设备/变压器/高压开关"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "平高电气对特高压的特高压核心设备存在直接或实质业务暴露",
         "平高电气对电网一次设备/变压器/高压开关的变压器/高压开关/一次设备存在直接或实质业务暴露"
       ],
@@ -2595,14 +3240,49 @@
       "representative_selection_status": "not_eligible",
       "final_pool_status": "reject"
     },
+    "600348": {
+      "code": "600348",
+      "name": "华阳股份",
+      "source": "T1-conditional",
+      "gate_mode": "conditional_t1",
+      "recall_tags": [
+        "coal::焦煤"
+      ],
+      "t2_tags": [],
+      "conditional_t1_tags": [
+        "coal::焦煤"
+      ],
+      "recall_exposure": [
+        "华阳股份对焦煤的焦煤开采/洗选存在直接或实质业务暴露"
+      ],
+      "metrics": {
+        "revenue_yoy_pct": -11.731713938,
+        "net_profit_yoy_pct": 35.63,
+        "net_profit_qoq_pct": 19.5025,
+        "revenue": 9920997063.88,
+        "net_profit": 1061528744.17,
+        "q3_positive_forecast": false
+      },
+      "gate_status": "reject",
+      "reason": "公司属于T1条件召回链，但未达到高于T2普通门槛的公司级确认标准；保留召回审计，不进入正式共同池。",
+      "forward_bridge": null,
+      "invalidation_condition": null,
+      "representative_selection_status": "not_eligible",
+      "final_pool_status": "reject"
+    },
     "600362": {
       "code": "600362",
       "name": "江西铜业",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonferrous::铜矿资源"
+      ],
       "t2_tags": [
         "nonferrous::铜矿资源"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "江西铜业对铜矿资源的铜矿采选/资源权益存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -2614,7 +3294,7 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonferrous::铜矿资源) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "selected_t2_representative",
@@ -2627,10 +3307,15 @@
       "code": "600369",
       "name": "西南证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "西南证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -2642,22 +3327,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "600375": {
       "code": "600375",
       "name": "汉马科技",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "automotive::重卡"
+      ],
       "t2_tags": [
         "automotive::重卡"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "汉马科技对重卡的重卡整车存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -2669,22 +3359,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(automotive::重卡) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "600378": {
       "code": "600378",
       "name": "昊华科技",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "chemicals::氟化工"
+      ],
       "t2_tags": [
         "chemicals::氟化工"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "昊华科技对氟化工的制冷剂/含氟材料存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -2696,22 +3391,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(chemicals::氟化工) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "600379": {
       "code": "600379",
       "name": "宝光股份",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "power_equipment::电网一次设备/变压器/高压开关"
+      ],
       "t2_tags": [
         "power_equipment::电网一次设备/变压器/高压开关"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "宝光股份对电网一次设备/变压器/高压开关的变压器/高压开关/一次设备存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -2723,22 +3423,57 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(power_equipment::电网一次设备/变压器/高压开关) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+    },
+    "600395": {
+      "code": "600395",
+      "name": "盘江股份",
+      "source": "T1-conditional",
+      "gate_mode": "conditional_t1",
+      "recall_tags": [
+        "coal::焦煤"
+      ],
+      "t2_tags": [],
+      "conditional_t1_tags": [
+        "coal::焦煤"
+      ],
+      "recall_exposure": [
+        "盘江股份对焦煤的焦煤开采/洗选存在直接或实质业务暴露"
+      ],
+      "metrics": {
+        "revenue_yoy_pct": -5.9520766476,
+        "net_profit_yoy_pct": 1344.48,
+        "net_profit_qoq_pct": -60.1047,
+        "revenue": 4845327021.28,
+        "net_profit": 63407056.0,
+        "q3_positive_forecast": false
+      },
+      "gate_status": "reject",
+      "reason": "公司属于T1条件召回链，但未达到高于T2普通门槛的公司级确认标准；保留召回审计，不进入正式共同池。",
+      "forward_bridge": null,
+      "invalidation_condition": null,
+      "representative_selection_status": "not_eligible",
+      "final_pool_status": "reject"
     },
     "600403": {
       "code": "600403",
       "name": "大有能源",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "coal::动力煤"
+      ],
       "t2_tags": [
         "coal::动力煤"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "大有能源对动力煤的动力煤开采存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -2760,10 +3495,15 @@
       "code": "600406",
       "name": "国电南瑞",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "power_equipment::特高压"
+      ],
       "t2_tags": [
         "power_equipment::特高压"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "国电南瑞对特高压的特高压核心设备存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -2775,7 +3515,7 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(power_equipment::特高压) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "selected_t2_representative",
@@ -2788,10 +3528,15 @@
       "code": "600418",
       "name": "江淮汽车",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "automotive::重卡"
+      ],
       "t2_tags": [
         "automotive::重卡"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "江淮汽车对重卡的重卡整车存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -2813,8 +3558,11 @@
       "code": "600458",
       "name": "时代新材",
       "source": "weekly",
+      "gate_mode": "weekly_deep_review",
+      "recall_tags": [],
       "t2_tags": [],
-      "t2_exposure": [],
+      "conditional_t1_tags": [],
+      "recall_exposure": [],
       "metrics": {
         "revenue_yoy_pct": 13.0874937431,
         "net_profit_yoy_pct": 14.08,
@@ -2837,8 +3585,11 @@
       "code": "600482",
       "name": "中国动力",
       "source": "weekly",
+      "gate_mode": "weekly_deep_review",
+      "recall_tags": [],
       "t2_tags": [],
-      "t2_exposure": [],
+      "conditional_t1_tags": [],
+      "recall_exposure": [],
       "metrics": {
         "revenue_yoy_pct": null,
         "net_profit_yoy_pct": null,
@@ -2861,10 +3612,15 @@
       "code": "600487",
       "name": "亨通光电",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "communication::高速光模块/光器件"
+      ],
       "t2_tags": [
         "communication::高速光模块/光器件"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "亨通光电对高速光模块/光器件的800G/1.6T光模块/高速光器件存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -2876,7 +3632,7 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(communication::高速光模块/光器件) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "selected_t2_representative",
@@ -2885,14 +3641,51 @@
       ],
       "final_pool_status": "pass"
     },
+    "600508": {
+      "code": "600508",
+      "name": "上海能源",
+      "source": "T1-conditional",
+      "gate_mode": "conditional_t1",
+      "recall_tags": [
+        "coal::焦煤"
+      ],
+      "t2_tags": [],
+      "conditional_t1_tags": [
+        "coal::焦煤"
+      ],
+      "recall_exposure": [
+        "上海能源对焦煤的焦煤开采/洗选存在直接或实质业务暴露"
+      ],
+      "metrics": {
+        "revenue_yoy_pct": 27.2058796934,
+        "net_profit_yoy_pct": 38.02,
+        "net_profit_qoq_pct": 183.1952,
+        "revenue": 4449724639.68,
+        "net_profit": 283492856.45,
+        "q3_positive_forecast": false
+      },
+      "gate_status": "pass",
+      "reason": "产业链仍为T1，但公司H1/Q2盈利传导达到更严格的条件召回门槛；允许进入单代表竞争，不代表产业链已升级为T2。",
+      "forward_bridge": "T1产业链(coal::焦煤)尚未完全确认 → 公司自身盈利传导显著强于行业最低证据 → 仅以条件候选进入后续筛选；行业升级仍需独立证据。",
+      "invalidation_condition": "公司盈利传导减弱，或对应T1链进一步恶化/降级，则条件资格立即失效。",
+      "representative_selection_status": "deferred_by_subchain_diversification",
+      "selected_via": [],
+      "final_pool_status": "deferred",
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+    },
     "600525": {
       "code": "600525",
       "name": "长园集团",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "power_equipment::电网一次设备/变压器/高压开关"
+      ],
       "t2_tags": [
         "power_equipment::电网一次设备/变压器/高压开关"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "长园集团对电网一次设备/变压器/高压开关的变压器/高压开关/一次设备存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -2914,10 +3707,15 @@
       "code": "600546",
       "name": "山煤国际",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "coal::动力煤"
+      ],
       "t2_tags": [
         "coal::动力煤"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "山煤国际对动力煤的动力煤开采存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -2929,23 +3727,29 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(coal::动力煤) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "600550": {
       "code": "600550",
       "name": "保变电气",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "power_equipment::特高压",
+        "power_equipment::电网一次设备/变压器/高压开关"
+      ],
       "t2_tags": [
         "power_equipment::特高压",
         "power_equipment::电网一次设备/变压器/高压开关"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "保变电气对特高压的特高压核心设备存在直接或实质业务暴露",
         "保变电气对电网一次设备/变压器/高压开关的变压器/高压开关/一次设备存在直接或实质业务暴露"
       ],
@@ -2958,22 +3762,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(power_equipment::特高压 / power_equipment::电网一次设备/变压器/高压开关) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "600595": {
       "code": "600595",
       "name": "中孚实业",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonferrous::电解铝"
+      ],
       "t2_tags": [
         "nonferrous::电解铝"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "中孚实业对电解铝的电解铝冶炼存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -2985,22 +3794,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonferrous::电解铝) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "600601": {
       "code": "600601",
       "name": "方正科技",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "electronics::PCB/CCL"
+      ],
       "t2_tags": [
         "electronics::PCB/CCL"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "方正科技对PCB/CCL的高端PCB/覆铜板存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -3012,22 +3826,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(electronics::PCB/CCL) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "600621": {
       "code": "600621",
       "name": "华鑫股份",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "华鑫股份对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -3039,22 +3858,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "600673": {
       "code": "600673",
       "name": "东阳光",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "chemicals::氟化工"
+      ],
       "t2_tags": [
         "chemicals::氟化工"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "东阳光对氟化工的制冷剂/含氟材料存在直接或实质业务暴露",
         "跨申万一级行业发现，对制冷剂/含氟材料存在实质业务暴露"
       ],
@@ -3067,22 +3891,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(chemicals::氟化工) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "600685": {
       "code": "600685",
       "name": "中船防务",
       "source": "both",
+      "gate_mode": "weekly_deep_review",
+      "recall_tags": [
+        "machinery::船舶制造"
+      ],
       "t2_tags": [
         "machinery::船舶制造"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "中船防务对船舶制造的整船建造/交付存在直接或实质业务暴露",
         "跨申万一级行业发现，对整船建造/交付存在实质业务暴露"
       ],
@@ -3098,7 +3927,7 @@
       "reason": "周度全市场深验已验证未来1-2季度盈利桥。",
       "forward_bridge": "6月底手持订单约745亿元、其中造船约734亿元，173艘船舶+1座海工装备 → 多年排产与交付 → Q3/Q4收入确认与毛利兑现保持增长。",
       "invalidation_condition": "订单取消/延期显著增加、新船价格明显下行或交付毛利率逆转。",
-      "representative_selection_status": "weekly_priority_t2_representative",
+      "representative_selection_status": "weekly_priority_recalled_representative",
       "selected_via": [
         "machinery::船舶制造",
         "weekly_deep_review"
@@ -3109,10 +3938,15 @@
       "code": "600710",
       "name": "苏美达",
       "source": "both",
+      "gate_mode": "weekly_deep_review",
+      "recall_tags": [
+        "machinery::船舶制造"
+      ],
       "t2_tags": [
         "machinery::船舶制造"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "苏美达对船舶制造的整船建造/交付存在直接或实质业务暴露",
         "跨申万一级行业发现，对整船建造/交付存在实质业务暴露"
       ],
@@ -3131,16 +3965,21 @@
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "600711": {
       "code": "600711",
       "name": "盛屯矿业",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonferrous::铜矿资源"
+      ],
       "t2_tags": [
         "nonferrous::铜矿资源"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "盛屯矿业对铜矿资源的铜矿采选/资源权益存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -3152,22 +3991,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonferrous::铜矿资源) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "600721": {
       "code": "600721",
       "name": "百花医药",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "pharma::CXO/CDMO/CRDMO"
+      ],
       "t2_tags": [
         "pharma::CXO/CDMO/CRDMO"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "百花医药对CXO/CDMO/CRDMO的CRO/CDMO/CRDMO服务存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -3185,14 +4029,49 @@
       "representative_selection_status": "not_eligible",
       "final_pool_status": "reject"
     },
+    "600758": {
+      "code": "600758",
+      "name": "辽宁能源",
+      "source": "T1-conditional",
+      "gate_mode": "conditional_t1",
+      "recall_tags": [
+        "coal::焦煤"
+      ],
+      "t2_tags": [],
+      "conditional_t1_tags": [
+        "coal::焦煤"
+      ],
+      "recall_exposure": [
+        "辽宁能源对焦煤的焦煤开采/洗选存在直接或实质业务暴露"
+      ],
+      "metrics": {
+        "revenue_yoy_pct": -27.4643393064,
+        "net_profit_yoy_pct": -3333.45,
+        "net_profit_qoq_pct": -197.6411,
+        "revenue": 1747978262.95,
+        "net_profit": -459647082.15,
+        "q3_positive_forecast": false
+      },
+      "gate_status": "reject",
+      "reason": "公司属于T1条件召回链，但未达到高于T2普通门槛的公司级确认标准；保留召回审计，不进入正式共同池。",
+      "forward_bridge": null,
+      "invalidation_condition": null,
+      "representative_selection_status": "not_eligible",
+      "final_pool_status": "reject"
+    },
     "600864": {
       "code": "600864",
       "name": "哈投股份",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "哈投股份对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -3204,22 +4083,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "600888": {
       "code": "600888",
       "name": "新疆众和",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonferrous::电解铝"
+      ],
       "t2_tags": [
         "nonferrous::电解铝"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "新疆众和对电解铝的电解铝冶炼存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -3241,10 +4125,15 @@
       "code": "600906",
       "name": "财达证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "财达证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -3256,22 +4145,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "600909": {
       "code": "600909",
       "name": "华安证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "华安证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -3283,22 +4177,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "600918": {
       "code": "600918",
       "name": "中泰证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "中泰证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -3310,22 +4209,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "600925": {
       "code": "600925",
       "name": "苏能股份",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "coal::动力煤"
+      ],
       "t2_tags": [
         "coal::动力煤"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "苏能股份对动力煤的动力煤开采存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -3347,10 +4251,15 @@
       "code": "600958",
       "name": "东方证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "东方证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -3362,22 +4271,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "600971": {
       "code": "600971",
       "name": "恒源煤电",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "coal::动力煤"
+      ],
       "t2_tags": [
         "coal::动力煤"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "恒源煤电对动力煤的动力煤开采存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -3389,22 +4303,89 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(coal::动力煤) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+    },
+    "600985": {
+      "code": "600985",
+      "name": "淮北矿业",
+      "source": "T1-conditional",
+      "gate_mode": "conditional_t1",
+      "recall_tags": [
+        "coal::焦煤"
+      ],
+      "t2_tags": [],
+      "conditional_t1_tags": [
+        "coal::焦煤"
+      ],
+      "recall_exposure": [
+        "淮北矿业对焦煤的焦煤开采/洗选存在直接或实质业务暴露"
+      ],
+      "metrics": {
+        "revenue_yoy_pct": 3.6866137617,
+        "net_profit_yoy_pct": 20.11,
+        "net_profit_qoq_pct": 52.3693,
+        "revenue": 21444701501.49,
+        "net_profit": 1239107460.32,
+        "q3_positive_forecast": false
+      },
+      "gate_status": "pass",
+      "reason": "产业链仍为T1，但公司H1/Q2盈利传导达到更严格的条件召回门槛；允许进入单代表竞争，不代表产业链已升级为T2。",
+      "forward_bridge": "T1产业链(coal::焦煤)尚未完全确认 → 公司自身盈利传导显著强于行业最低证据 → 仅以条件候选进入后续筛选；行业升级仍需独立证据。",
+      "invalidation_condition": "公司盈利传导减弱，或对应T1链进一步恶化/降级，则条件资格立即失效。",
+      "representative_selection_status": "deferred_by_subchain_diversification",
+      "selected_via": [],
+      "final_pool_status": "deferred",
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+    },
+    "600997": {
+      "code": "600997",
+      "name": "开滦股份",
+      "source": "T1-conditional",
+      "gate_mode": "conditional_t1",
+      "recall_tags": [
+        "coal::焦煤"
+      ],
+      "t2_tags": [],
+      "conditional_t1_tags": [
+        "coal::焦煤"
+      ],
+      "recall_exposure": [
+        "开滦股份对焦煤的焦煤开采/洗选存在直接或实质业务暴露"
+      ],
+      "metrics": {
+        "revenue_yoy_pct": 7.2460956218,
+        "net_profit_yoy_pct": -138.3,
+        "net_profit_qoq_pct": 73.5784,
+        "revenue": 9461895313.49,
+        "net_profit": -138153681.64,
+        "q3_positive_forecast": false
+      },
+      "gate_status": "reject",
+      "reason": "公司属于T1条件召回链，但未达到高于T2普通门槛的公司级确认标准；保留召回审计，不进入正式共同池。",
+      "forward_bridge": null,
+      "invalidation_condition": null,
+      "representative_selection_status": "not_eligible",
+      "final_pool_status": "reject"
     },
     "600999": {
       "code": "600999",
       "name": "招商证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "招商证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -3416,7 +4397,7 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "selected_t2_representative",
@@ -3429,10 +4410,15 @@
       "code": "601001",
       "name": "晋控煤业",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "coal::动力煤"
+      ],
       "t2_tags": [
         "coal::动力煤"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "晋控煤业对动力煤的动力煤开采存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -3454,10 +4440,15 @@
       "code": "601059",
       "name": "信达证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "信达证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -3469,22 +4460,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "601066": {
       "code": "601066",
       "name": "中信建投",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "中信建投对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -3496,22 +4492,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "601088": {
       "code": "601088",
       "name": "中国神华",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "coal::动力煤"
+      ],
       "t2_tags": [
         "coal::动力煤"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "中国神华对动力煤的动力煤开采存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -3523,7 +4524,7 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(coal::动力煤) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "selected_t2_representative",
@@ -3536,10 +4537,15 @@
       "code": "601099",
       "name": "太平洋",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "太平洋对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -3551,22 +4557,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "601101": {
       "code": "601101",
       "name": "昊华能源",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "coal::动力煤"
+      ],
       "t2_tags": [
         "coal::动力煤"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "昊华能源对动力煤的动力煤开采存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -3578,22 +4589,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(coal::动力煤) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "601108": {
       "code": "601108",
       "name": "财通证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "财通证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -3605,22 +4621,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "601136": {
       "code": "601136",
       "name": "首创证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "首创证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -3632,22 +4653,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "601138": {
       "code": "601138",
       "name": "工业富联",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "computer::AI服务器/算力整机"
+      ],
       "t2_tags": [
         "computer::AI服务器/算力整机"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "工业富联对AI服务器/算力整机的AI服务器/算力整机存在直接或实质业务暴露",
         "跨申万一级行业发现，对AI服务器/算力整机存在实质业务暴露"
       ],
@@ -3660,7 +4686,7 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(computer::AI服务器/算力整机) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "selected_t2_representative",
@@ -3673,10 +4699,15 @@
       "code": "601162",
       "name": "天风证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "天风证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -3698,10 +4729,15 @@
       "code": "601168",
       "name": "西部矿业",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonferrous::铜矿资源"
+      ],
       "t2_tags": [
         "nonferrous::铜矿资源"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "西部矿业对铜矿资源的铜矿采选/资源权益存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -3713,23 +4749,29 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonferrous::铜矿资源) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "601179": {
       "code": "601179",
       "name": "中国西电",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "power_equipment::特高压",
+        "power_equipment::电网一次设备/变压器/高压开关"
+      ],
       "t2_tags": [
         "power_equipment::特高压",
         "power_equipment::电网一次设备/变压器/高压开关"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "中国西电对特高压的特高压核心设备存在直接或实质业务暴露",
         "中国西电对电网一次设备/变压器/高压开关的变压器/高压开关/一次设备存在直接或实质业务暴露"
       ],
@@ -3742,22 +4784,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(power_equipment::特高压 / power_equipment::电网一次设备/变压器/高压开关) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "601198": {
       "code": "601198",
       "name": "东兴证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "东兴证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -3769,22 +4816,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "601211": {
       "code": "601211",
       "name": "国泰海通",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "国泰海通对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -3796,22 +4848,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "601225": {
       "code": "601225",
       "name": "陕西煤业",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "coal::动力煤"
+      ],
       "t2_tags": [
         "coal::动力煤"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "陕西煤业对动力煤的动力煤开采存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -3823,7 +4880,7 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(coal::动力煤) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "selected_t2_representative",
@@ -3836,10 +4893,15 @@
       "code": "601236",
       "name": "红塔证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "红塔证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -3861,10 +4923,15 @@
       "code": "601318",
       "name": "中国平安",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::保险"
+      ],
       "t2_tags": [
         "nonbank_finance::保险"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "中国平安对保险的寿险/财险存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -3876,22 +4943,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::保险) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "601319": {
       "code": "601319",
       "name": "中国人保",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::保险"
+      ],
       "t2_tags": [
         "nonbank_finance::保险"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "中国人保对保险的寿险/财险存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -3903,22 +4975,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::保险) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "601336": {
       "code": "601336",
       "name": "新华保险",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::保险"
+      ],
       "t2_tags": [
         "nonbank_finance::保险"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "新华保险对保险的寿险/财险存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -3930,7 +5007,7 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::保险) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "selected_t2_representative",
@@ -3943,10 +5020,15 @@
       "code": "601375",
       "name": "中原证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "中原证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -3958,22 +5040,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "601377": {
       "code": "601377",
       "name": "兴业证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "兴业证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -3985,22 +5072,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "601456": {
       "code": "601456",
       "name": "国联民生",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "国联民生对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -4012,22 +5104,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "601555": {
       "code": "601555",
       "name": "东吴证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "东吴证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -4049,10 +5146,15 @@
       "code": "601600",
       "name": "中国铝业",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonferrous::电解铝"
+      ],
       "t2_tags": [
         "nonferrous::电解铝"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "中国铝业对电解铝的电解铝冶炼存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -4064,22 +5166,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonferrous::电解铝) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "601601": {
       "code": "601601",
       "name": "中国太保",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::保险"
+      ],
       "t2_tags": [
         "nonbank_finance::保险"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "中国太保对保险的寿险/财险存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -4091,22 +5198,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::保险) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "601628": {
       "code": "601628",
       "name": "中国人寿",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::保险"
+      ],
       "t2_tags": [
         "nonbank_finance::保险"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "中国人寿对保险的寿险/财险存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -4118,7 +5230,7 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::保险) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "selected_t2_representative",
@@ -4127,14 +5239,51 @@
       ],
       "final_pool_status": "pass"
     },
+    "601666": {
+      "code": "601666",
+      "name": "平煤股份",
+      "source": "T1-conditional",
+      "gate_mode": "conditional_t1",
+      "recall_tags": [
+        "coal::焦煤"
+      ],
+      "t2_tags": [],
+      "conditional_t1_tags": [
+        "coal::焦煤"
+      ],
+      "recall_exposure": [
+        "平煤股份对焦煤的焦煤开采/洗选存在直接或实质业务暴露"
+      ],
+      "metrics": {
+        "revenue_yoy_pct": 21.3438753172,
+        "net_profit_yoy_pct": 22.84,
+        "net_profit_qoq_pct": 63.7002,
+        "revenue": 12280128893.71,
+        "net_profit": 316755460.63,
+        "q3_positive_forecast": false
+      },
+      "gate_status": "pass",
+      "reason": "产业链仍为T1，但公司H1/Q2盈利传导达到更严格的条件召回门槛；允许进入单代表竞争，不代表产业链已升级为T2。",
+      "forward_bridge": "T1产业链(coal::焦煤)尚未完全确认 → 公司自身盈利传导显著强于行业最低证据 → 仅以条件候选进入后续筛选；行业升级仍需独立证据。",
+      "invalidation_condition": "公司盈利传导减弱，或对应T1链进一步恶化/降级，则条件资格立即失效。",
+      "representative_selection_status": "deferred_by_subchain_diversification",
+      "selected_via": [],
+      "final_pool_status": "deferred",
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+    },
     "601688": {
       "code": "601688",
       "name": "华泰证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "华泰证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -4146,22 +5295,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "601696": {
       "code": "601696",
       "name": "中银证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "中银证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -4173,22 +5327,60 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+    },
+    "601699": {
+      "code": "601699",
+      "name": "潞安环能",
+      "source": "T1-conditional",
+      "gate_mode": "conditional_t1",
+      "recall_tags": [
+        "coal::焦煤"
+      ],
+      "t2_tags": [],
+      "conditional_t1_tags": [
+        "coal::焦煤"
+      ],
+      "recall_exposure": [
+        "潞安环能对焦煤的焦煤开采/洗选存在直接或实质业务暴露"
+      ],
+      "metrics": {
+        "revenue_yoy_pct": 6.6840005595,
+        "net_profit_yoy_pct": 31.85,
+        "net_profit_qoq_pct": 47.188,
+        "revenue": 15009619814.21,
+        "net_profit": 1777889138.44,
+        "q3_positive_forecast": false
+      },
+      "gate_status": "pass",
+      "reason": "产业链仍为T1，但公司H1/Q2盈利传导达到更严格的条件召回门槛；允许进入单代表竞争，不代表产业链已升级为T2。",
+      "forward_bridge": "T1产业链(coal::焦煤)尚未完全确认 → 公司自身盈利传导显著强于行业最低证据 → 仅以条件候选进入后续筛选；行业升级仍需独立证据。",
+      "invalidation_condition": "公司盈利传导减弱，或对应T1链进一步恶化/降级，则条件资格立即失效。",
+      "representative_selection_status": "selected_conditional_t1_representative",
+      "selected_via": [
+        "coal::焦煤"
+      ],
+      "final_pool_status": "pass"
     },
     "601788": {
       "code": "601788",
       "name": "XD光大证",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "XD光大证对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -4200,20 +5392,23 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "601869": {
       "code": "601869",
       "name": "长飞光纤",
       "source": "weekly",
+      "gate_mode": "weekly_deep_review",
+      "recall_tags": [],
       "t2_tags": [],
-      "t2_exposure": [],
+      "conditional_t1_tags": [],
+      "recall_exposure": [],
       "metrics": {
         "revenue_yoy_pct": 53.637732146,
         "net_profit_yoy_pct": 888.88,
@@ -4236,10 +5431,15 @@
       "code": "601878",
       "name": "浙商证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "浙商证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -4251,22 +5451,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "601881": {
       "code": "601881",
       "name": "中国银河",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "中国银河对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -4278,22 +5483,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "601898": {
       "code": "601898",
       "name": "中煤能源",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "coal::动力煤"
+      ],
       "t2_tags": [
         "coal::动力煤"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "中煤能源对动力煤的动力煤开采存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -4315,10 +5525,15 @@
       "code": "601899",
       "name": "紫金矿业",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonferrous::铜矿资源"
+      ],
       "t2_tags": [
         "nonferrous::铜矿资源"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "紫金矿业对铜矿资源的铜矿采选/资源权益存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -4330,22 +5545,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonferrous::铜矿资源) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "601901": {
       "code": "601901",
       "name": "方正证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "方正证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -4357,22 +5577,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "601918": {
       "code": "601918",
       "name": "新集能源",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "coal::动力煤"
+      ],
       "t2_tags": [
         "coal::动力煤"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "新集能源对动力煤的动力煤开采存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -4384,22 +5609,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(coal::动力煤) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "601989": {
       "code": "601989",
       "name": "中国重工",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "machinery::船舶制造"
+      ],
       "t2_tags": [
         "machinery::船舶制造"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "中国重工对船舶制造的整船建造/交付存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -4421,10 +5651,15 @@
       "code": "601990",
       "name": "南京证券",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "南京证券对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -4436,22 +5671,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "601995": {
       "code": "601995",
       "name": "中金公司",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonbank_finance::证券"
+      ],
       "t2_tags": [
         "nonbank_finance::证券"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "中金公司对证券的证券经纪/信用/投行/自营存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -4463,22 +5703,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonbank_finance::证券) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "603019": {
       "code": "603019",
       "name": "中科曙光",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "computer::AI服务器/算力整机"
+      ],
       "t2_tags": [
         "computer::AI服务器/算力整机"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "中科曙光对AI服务器/算力整机的AI服务器/算力整机存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -4490,22 +5735,59 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(computer::AI服务器/算力整机) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+    },
+    "603041": {
+      "code": "603041",
+      "name": "美思德",
+      "source": "T1-conditional",
+      "gate_mode": "conditional_t1",
+      "recall_tags": [
+        "chemicals::聚氨酯/MDI/TDI"
+      ],
+      "t2_tags": [],
+      "conditional_t1_tags": [
+        "chemicals::聚氨酯/MDI/TDI"
+      ],
+      "recall_exposure": [
+        "美思德对聚氨酯/MDI/TDI的MDI/TDI/聚氨酯材料存在直接或实质业务暴露"
+      ],
+      "metrics": {
+        "revenue_yoy_pct": 13.6262652439,
+        "net_profit_yoy_pct": 15.84,
+        "net_profit_qoq_pct": 63.9623,
+        "revenue": 351783891.18,
+        "net_profit": 37608232.39,
+        "q3_positive_forecast": false
+      },
+      "gate_status": "pass",
+      "reason": "产业链仍为T1，但公司H1/Q2盈利传导达到更严格的条件召回门槛；允许进入单代表竞争，不代表产业链已升级为T2。",
+      "forward_bridge": "T1产业链(chemicals::聚氨酯/MDI/TDI)尚未完全确认 → 公司自身盈利传导显著强于行业最低证据 → 仅以条件候选进入后续筛选；行业升级仍需独立证据。",
+      "invalidation_condition": "公司盈利传导减弱，或对应T1链进一步恶化/降级，则条件资格立即失效。",
+      "representative_selection_status": "deferred_by_subchain_diversification",
+      "selected_via": [],
+      "final_pool_status": "deferred",
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "603083": {
       "code": "603083",
       "name": "剑桥科技",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "communication::高速光模块/光器件"
+      ],
       "t2_tags": [
         "communication::高速光模块/光器件"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "剑桥科技对高速光模块/光器件的800G/1.6T光模块/高速光器件存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -4517,20 +5799,23 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(communication::高速光模块/光器件) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "603088": {
       "code": "603088",
       "name": "宁波精达",
       "source": "weekly",
+      "gate_mode": "weekly_deep_review",
+      "recall_tags": [],
       "t2_tags": [],
-      "t2_exposure": [],
+      "conditional_t1_tags": [],
+      "recall_exposure": [],
       "metrics": {
         "revenue_yoy_pct": 12.1410782076,
         "net_profit_yoy_pct": -23.19,
@@ -4553,10 +5838,15 @@
       "code": "603097",
       "name": "江苏华辰",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "power_equipment::电网一次设备/变压器/高压开关"
+      ],
       "t2_tags": [
         "power_equipment::电网一次设备/变压器/高压开关"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "江苏华辰对电网一次设备/变压器/高压开关的变压器/高压开关/一次设备存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -4578,10 +5868,15 @@
       "code": "603127",
       "name": "昭衍新药",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "pharma::CXO/CDMO/CRDMO"
+      ],
       "t2_tags": [
         "pharma::CXO/CDMO/CRDMO"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "昭衍新药对CXO/CDMO/CRDMO的CRO/CDMO/CRDMO服务存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -4593,22 +5888,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(pharma::CXO/CDMO/CRDMO) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "603186": {
       "code": "603186",
       "name": "华正新材",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "electronics::PCB/CCL"
+      ],
       "t2_tags": [
         "electronics::PCB/CCL"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "华正新材对PCB/CCL的高端PCB/覆铜板存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -4630,11 +5930,17 @@
       "code": "603191",
       "name": "望变电气",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "power_equipment::特高压",
+        "power_equipment::电网一次设备/变压器/高压开关"
+      ],
       "t2_tags": [
         "power_equipment::特高压",
         "power_equipment::电网一次设备/变压器/高压开关"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "望变电气对特高压的特高压核心设备存在直接或实质业务暴露",
         "望变电气对电网一次设备/变压器/高压开关的变压器/高压开关/一次设备存在直接或实质业务暴露"
       ],
@@ -4653,14 +5959,51 @@
       "representative_selection_status": "not_eligible",
       "final_pool_status": "reject"
     },
+    "603192": {
+      "code": "603192",
+      "name": "汇得科技",
+      "source": "T1-conditional",
+      "gate_mode": "conditional_t1",
+      "recall_tags": [
+        "chemicals::聚氨酯/MDI/TDI"
+      ],
+      "t2_tags": [],
+      "conditional_t1_tags": [
+        "chemicals::聚氨酯/MDI/TDI"
+      ],
+      "recall_exposure": [
+        "汇得科技对聚氨酯/MDI/TDI的MDI/TDI/聚氨酯材料存在直接或实质业务暴露"
+      ],
+      "metrics": {
+        "revenue_yoy_pct": 8.5115676385,
+        "net_profit_yoy_pct": -18.82,
+        "net_profit_qoq_pct": 66.8974,
+        "revenue": 1320683093.44,
+        "net_profit": 40436301.14,
+        "q3_positive_forecast": false
+      },
+      "gate_status": "pass",
+      "reason": "产业链仍为T1，但公司H1/Q2盈利传导达到更严格的条件召回门槛；允许进入单代表竞争，不代表产业链已升级为T2。",
+      "forward_bridge": "T1产业链(chemicals::聚氨酯/MDI/TDI)尚未完全确认 → 公司自身盈利传导显著强于行业最低证据 → 仅以条件候选进入后续筛选；行业升级仍需独立证据。",
+      "invalidation_condition": "公司盈利传导减弱，或对应T1链进一步恶化/降级，则条件资格立即失效。",
+      "representative_selection_status": "deferred_by_subchain_diversification",
+      "selected_via": [],
+      "final_pool_status": "deferred",
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+    },
     "603228": {
       "code": "603228",
       "name": "景旺电子",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "electronics::PCB/CCL"
+      ],
       "t2_tags": [
         "electronics::PCB/CCL"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "景旺电子对PCB/CCL的高端PCB/覆铜板存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -4672,22 +6015,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(electronics::PCB/CCL) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "603259": {
       "code": "603259",
       "name": "药明康德",
       "source": "both",
+      "gate_mode": "weekly_deep_review",
+      "recall_tags": [
+        "pharma::CXO/CDMO/CRDMO"
+      ],
       "t2_tags": [
         "pharma::CXO/CDMO/CRDMO"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "药明康德对CXO/CDMO/CRDMO的CRO/CDMO/CRDMO服务存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -4702,7 +6050,7 @@
       "reason": "周度全市场深验已验证未来1-2季度盈利桥。",
       "forward_bridge": "持续经营业务在手订单664.3亿元、同比+25.2% → 公司将2026持续经营收入增速指引上调至35%-39%，TIDES约+45% → Q3/Q4收入与经调整利润保持高增长。",
       "invalidation_condition": "订单增速显著下滑、监管/地缘政策冲击订单或经调整利润率明显低于指引。",
-      "representative_selection_status": "weekly_priority_t2_representative",
+      "representative_selection_status": "weekly_priority_recalled_representative",
       "selected_via": [
         "pharma::CXO/CDMO/CRDMO",
         "weekly_deep_review"
@@ -4713,10 +6061,15 @@
       "code": "603268",
       "name": "松发股份",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "machinery::船舶制造"
+      ],
       "t2_tags": [
         "machinery::船舶制造"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "松发股份对船舶制造的整船建造/交付存在直接或实质业务暴露",
         "跨申万一级行业发现，对整船建造/交付存在实质业务暴露"
       ],
@@ -4729,22 +6082,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(machinery::船舶制造) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "603310": {
       "code": "603310",
       "name": "巍华新材",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "chemicals::氟化工"
+      ],
       "t2_tags": [
         "chemicals::氟化工"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "巍华新材对氟化工的制冷剂/含氟材料存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -4766,10 +6124,15 @@
       "code": "603312",
       "name": "西典新能",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "power_equipment::电网一次设备/变压器/高压开关"
+      ],
       "t2_tags": [
         "power_equipment::电网一次设备/变压器/高压开关"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "西典新能对电网一次设备/变压器/高压开关的变压器/高压开关/一次设备存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -4791,10 +6154,15 @@
       "code": "603328",
       "name": "依顿电子",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "electronics::PCB/CCL"
+      ],
       "t2_tags": [
         "electronics::PCB/CCL"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "依顿电子对PCB/CCL的高端PCB/覆铜板存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -4806,22 +6174,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(electronics::PCB/CCL) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "603379": {
       "code": "603379",
       "name": "三美股份",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "chemicals::氟化工"
+      ],
       "t2_tags": [
         "chemicals::氟化工"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "三美股份对氟化工的制冷剂/含氟材料存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -4843,10 +6216,15 @@
       "code": "603386",
       "name": "骏亚科技",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "electronics::PCB/CCL"
+      ],
       "t2_tags": [
         "electronics::PCB/CCL"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "骏亚科技对PCB/CCL的高端PCB/覆铜板存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -4868,10 +6246,15 @@
       "code": "603456",
       "name": "九洲药业",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "pharma::CXO/CDMO/CRDMO"
+      ],
       "t2_tags": [
         "pharma::CXO/CDMO/CRDMO"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "九洲药业对CXO/CDMO/CRDMO的CRO/CDMO/CRDMO服务存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -4893,10 +6276,15 @@
       "code": "603505",
       "name": "金石资源",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "chemicals::氟化工"
+      ],
       "t2_tags": [
         "chemicals::氟化工"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "金石资源对氟化工的制冷剂/含氟材料存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -4918,11 +6306,17 @@
       "code": "603530",
       "name": "神马电力",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "power_equipment::特高压",
+        "power_equipment::电网一次设备/变压器/高压开关"
+      ],
       "t2_tags": [
         "power_equipment::特高压",
         "power_equipment::电网一次设备/变压器/高压开关"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "神马电力对特高压的特高压核心设备存在直接或实质业务暴露",
         "神马电力对电网一次设备/变压器/高压开关的变压器/高压开关/一次设备存在直接或实质业务暴露"
       ],
@@ -4935,22 +6329,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(power_equipment::特高压 / power_equipment::电网一次设备/变压器/高压开关) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "603538": {
       "code": "603538",
       "name": "美诺华",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "pharma::CXO/CDMO/CRDMO"
+      ],
       "t2_tags": [
         "pharma::CXO/CDMO/CRDMO"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "美诺华对CXO/CDMO/CRDMO的CRO/CDMO/CRDMO服务存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -4962,20 +6361,23 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(pharma::CXO/CDMO/CRDMO) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "603659": {
       "code": "603659",
       "name": "璞泰来",
       "source": "weekly",
+      "gate_mode": "weekly_deep_review",
+      "recall_tags": [],
       "t2_tags": [],
-      "t2_exposure": [],
+      "conditional_t1_tags": [],
+      "recall_exposure": [],
       "metrics": {
         "revenue_yoy_pct": 42.7046197898,
         "net_profit_yoy_pct": 37.58,
@@ -4998,10 +6400,15 @@
       "code": "603920",
       "name": "世运电路",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "electronics::PCB/CCL"
+      ],
       "t2_tags": [
         "electronics::PCB/CCL"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "世运电路对PCB/CCL的高端PCB/覆铜板存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -5013,22 +6420,27 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(electronics::PCB/CCL) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "deferred_by_subchain_diversification",
       "selected_via": [],
       "final_pool_status": "deferred",
-      "representative_selection_reason": "公司已通过未来盈利门槛，但所在T2细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
+      "representative_selection_reason": "公司已通过对应召回模式的未来盈利门槛，但所在细分链已有更强代表公司占用正式候选名额；保留在宽召回审计中，不进入共同资格池。"
     },
     "603936": {
       "code": "603936",
       "name": "博敏电子",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "electronics::PCB/CCL"
+      ],
       "t2_tags": [
         "electronics::PCB/CCL"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "博敏电子对PCB/CCL的高端PCB/覆铜板存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -5050,8 +6462,11 @@
       "code": "603986",
       "name": "兆易创新",
       "source": "weekly",
+      "gate_mode": "weekly_deep_review",
+      "recall_tags": [],
       "t2_tags": [],
-      "t2_exposure": [],
+      "conditional_t1_tags": [],
+      "recall_exposure": [],
       "metrics": {
         "revenue_yoy_pct": 178.6722977786,
         "net_profit_yoy_pct": 1091.5,
@@ -5074,10 +6489,15 @@
       "code": "603993",
       "name": "洛阳钼业",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "nonferrous::铜矿资源"
+      ],
       "t2_tags": [
         "nonferrous::铜矿资源"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "洛阳钼业对铜矿资源的铜矿采选/资源权益存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -5089,7 +6509,7 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(nonferrous::铜矿资源) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "selected_t2_representative",
@@ -5102,10 +6522,15 @@
       "code": "605020",
       "name": "永和股份",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "chemicals::氟化工"
+      ],
       "t2_tags": [
         "chemicals::氟化工"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "永和股份对氟化工的制冷剂/含氟材料存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -5117,7 +6542,7 @@
         "q3_positive_forecast": false
       },
       "gate_status": "pass",
-      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导已出现；满足公司级未来盈利门槛的最低验证要求。",
+      "reason": "冻结T2直接盈利链仍有效，且公司H1/Q2主营盈利传导达到T2公司级门槛。",
       "forward_bridge": "冻结T2领先变量(chemicals::氟化工) → 公司已验证的直接业务暴露 → 当前收入/利润传导为正 → 若T2链不降级，未来1-2季度盈利方向保持向上。",
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "representative_selection_status": "selected_t2_representative",
@@ -5130,10 +6555,15 @@
       "code": "605058",
       "name": "澳弘电子",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "electronics::PCB/CCL"
+      ],
       "t2_tags": [
         "electronics::PCB/CCL"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "澳弘电子对PCB/CCL的高端PCB/覆铜板存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -5155,10 +6585,15 @@
       "code": "605258",
       "name": "协和电子",
       "source": "T2-subchain",
+      "gate_mode": "direct_t2",
+      "recall_tags": [
+        "electronics::PCB/CCL"
+      ],
       "t2_tags": [
         "electronics::PCB/CCL"
       ],
-      "t2_exposure": [
+      "conditional_t1_tags": [],
+      "recall_exposure": [
         "协和电子对PCB/CCL的高端PCB/覆铜板存在直接或实质业务暴露"
       ],
       "metrics": {
@@ -5179,11 +6614,12 @@
   },
   "t2_representative_selection": {
     "automotive::重卡": {
+      "recall_mode": "direct_t2",
       "earnings_gate_pass_count": 5,
       "representative_cap": 2,
       "selected_count": 2,
       "weekly_deep_review_selected_codes": [],
-      "selected_t2_only_codes": [
+      "selected_nonweekly_codes": [
         "000800",
         "000951"
       ],
@@ -5208,11 +6644,12 @@
       }
     },
     "chemicals::氟化工": {
+      "recall_mode": "direct_t2",
       "earnings_gate_pass_count": 7,
       "representative_cap": 2,
       "selected_count": 2,
       "weekly_deep_review_selected_codes": [],
-      "selected_t2_only_codes": [
+      "selected_nonweekly_codes": [
         "002326",
         "605020"
       ],
@@ -5243,11 +6680,12 @@
       }
     },
     "chemicals::氨纶": {
+      "recall_mode": "direct_t2",
       "earnings_gate_pass_count": 2,
       "representative_cap": 1,
       "selected_count": 1,
       "weekly_deep_review_selected_codes": [],
-      "selected_t2_only_codes": [
+      "selected_nonweekly_codes": [
         "002064"
       ],
       "deferred_codes": [
@@ -5263,11 +6701,12 @@
       }
     },
     "coal::动力煤": {
+      "recall_mode": "direct_t2",
       "earnings_gate_pass_count": 9,
       "representative_cap": 2,
       "selected_count": 2,
       "weekly_deep_review_selected_codes": [],
-      "selected_t2_only_codes": [
+      "selected_nonweekly_codes": [
         "601088",
         "601225"
       ],
@@ -5304,11 +6743,12 @@
       }
     },
     "communication::高速光模块/光器件": {
+      "recall_mode": "direct_t2",
       "earnings_gate_pass_count": 3,
       "representative_cap": 1,
       "selected_count": 1,
       "weekly_deep_review_selected_codes": [],
-      "selected_t2_only_codes": [
+      "selected_nonweekly_codes": [
         "600487"
       ],
       "deferred_codes": [
@@ -5327,11 +6767,12 @@
       }
     },
     "computer::AI服务器/算力整机": {
+      "recall_mode": "direct_t2",
       "earnings_gate_pass_count": 6,
       "representative_cap": 2,
       "selected_count": 2,
       "weekly_deep_review_selected_codes": [],
-      "selected_t2_only_codes": [
+      "selected_nonweekly_codes": [
         "000938",
         "601138"
       ],
@@ -5359,11 +6800,12 @@
       }
     },
     "electronics::PCB/CCL": {
+      "recall_mode": "direct_t2",
       "earnings_gate_pass_count": 17,
       "representative_cap": 3,
       "selected_count": 3,
       "weekly_deep_review_selected_codes": [],
-      "selected_t2_only_codes": [
+      "selected_nonweekly_codes": [
         "002384",
         "002636",
         "600183"
@@ -5424,13 +6866,14 @@
       }
     },
     "machinery::船舶制造": {
+      "recall_mode": "direct_t2",
       "earnings_gate_pass_count": 3,
       "representative_cap": 1,
       "selected_count": 1,
       "weekly_deep_review_selected_codes": [
         "600685"
       ],
-      "selected_t2_only_codes": [],
+      "selected_nonweekly_codes": [],
       "deferred_codes": [
         "600710",
         "603268"
@@ -5447,11 +6890,12 @@
       }
     },
     "nonbank_finance::保险": {
+      "recall_mode": "direct_t2",
       "earnings_gate_pass_count": 5,
       "representative_cap": 2,
       "selected_count": 2,
       "weekly_deep_review_selected_codes": [],
-      "selected_t2_only_codes": [
+      "selected_nonweekly_codes": [
         "601336",
         "601628"
       ],
@@ -5476,11 +6920,12 @@
       }
     },
     "nonbank_finance::证券": {
+      "recall_mode": "direct_t2",
       "earnings_gate_pass_count": 42,
       "representative_cap": 3,
       "selected_count": 3,
       "weekly_deep_review_selected_codes": [],
-      "selected_t2_only_codes": [
+      "selected_nonweekly_codes": [
         "000776",
         "600030",
         "600999"
@@ -5616,11 +7061,12 @@
       }
     },
     "nonferrous::电解铝": {
+      "recall_mode": "direct_t2",
       "earnings_gate_pass_count": 6,
       "representative_cap": 2,
       "selected_count": 2,
       "weekly_deep_review_selected_codes": [],
-      "selected_t2_only_codes": [
+      "selected_nonweekly_codes": [
         "000807",
         "000933"
       ],
@@ -5648,11 +7094,12 @@
       }
     },
     "nonferrous::铜矿资源": {
+      "recall_mode": "direct_t2",
       "earnings_gate_pass_count": 8,
       "representative_cap": 2,
       "selected_count": 2,
       "weekly_deep_review_selected_codes": [],
-      "selected_t2_only_codes": [
+      "selected_nonweekly_codes": [
         "600362",
         "603993"
       ],
@@ -5686,13 +7133,14 @@
       }
     },
     "pharma::CXO/CDMO/CRDMO": {
+      "recall_mode": "direct_t2",
       "earnings_gate_pass_count": 3,
       "representative_cap": 1,
       "selected_count": 1,
       "weekly_deep_review_selected_codes": [
         "603259"
       ],
-      "selected_t2_only_codes": [],
+      "selected_nonweekly_codes": [],
       "deferred_codes": [
         "603127",
         "603538"
@@ -5709,11 +7157,12 @@
       }
     },
     "power_equipment::特高压": {
+      "recall_mode": "direct_t2",
       "earnings_gate_pass_count": 5,
       "representative_cap": 2,
       "selected_count": 2,
       "weekly_deep_review_selected_codes": [],
-      "selected_t2_only_codes": [
+      "selected_nonweekly_codes": [
         "002028",
         "600406"
       ],
@@ -5738,11 +7187,12 @@
       }
     },
     "power_equipment::电网一次设备/变压器/高压开关": {
+      "recall_mode": "direct_t2",
       "earnings_gate_pass_count": 8,
       "representative_cap": 2,
       "selected_count": 2,
       "weekly_deep_review_selected_codes": [],
-      "selected_t2_only_codes": [
+      "selected_nonweekly_codes": [
         "002028",
         "002452"
       ],
@@ -5776,6 +7226,131 @@
       }
     }
   },
+  "conditional_t1_representative_selection": {
+    "chemicals::聚氨酯/MDI/TDI": {
+      "recall_mode": "conditional_t1",
+      "earnings_gate_pass_count": 3,
+      "representative_cap": 1,
+      "selected_count": 1,
+      "weekly_deep_review_selected_codes": [],
+      "selected_nonweekly_codes": [
+        "600309"
+      ],
+      "deferred_codes": [
+        "603041",
+        "603192"
+      ],
+      "ranked_all_codes": [
+        "600309",
+        "603041",
+        "603192"
+      ],
+      "selection_scores": {
+        "600309": 0.747241,
+        "603041": 0.160432,
+        "603192": 0.109156
+      }
+    },
+    "coal::焦煤": {
+      "recall_mode": "conditional_t1",
+      "earnings_gate_pass_count": 5,
+      "representative_cap": 1,
+      "selected_count": 1,
+      "weekly_deep_review_selected_codes": [],
+      "selected_nonweekly_codes": [
+        "601699"
+      ],
+      "deferred_codes": [
+        "600508",
+        "600985",
+        "601666",
+        "600123"
+      ],
+      "ranked_all_codes": [
+        "601699",
+        "600508",
+        "600985",
+        "601666",
+        "600123"
+      ],
+      "selection_scores": {
+        "601699": 0.410952,
+        "600508": 0.368012,
+        "600985": 0.347437,
+        "601666": 0.301827,
+        "600123": 0.266466
+      }
+    }
+  },
+  "unconfirmed_reverse_trigger_audit": {
+    "chemicals::C2/C3轻烃": {
+      "industry_status": "unconfirmed",
+      "review_status": "review_required",
+      "value_chain_link": "乙烷裂解/乙烯/丙烯酸及下游材料",
+      "review_variables": [
+        "乙烷/原油相对成本",
+        "乙烯-乙烷价差",
+        "丙烯酸及酯价差",
+        "聚乙烯价差",
+        "装置开工率",
+        "库存和下游需求"
+      ],
+      "trigger_companies": [
+        {
+          "code": "002648",
+          "name": "卫星化学",
+          "screen_status": "pass",
+          "screen_reason": "H1收入同比30.9%且净利同比126.9%；最新季度净利环比改善94.1%",
+          "metrics": {
+            "revenue_yoy_pct": 30.9167563939,
+            "net_profit_yoy_pct": 126.94,
+            "net_profit_qoq_pct": 94.1248,
+            "revenue": 30713154590.56,
+            "net_profit": 6226634598.0,
+            "q3_positive_forecast": false
+          },
+          "triggered": true,
+          "trigger_reason": "full-market light screen already shows strong earnings transmission"
+        }
+      ],
+      "rule": "A strong company signal reopens industry evidence review; it does not auto-promote the subchain or auto-admit the company to the common pool."
+    },
+    "chemicals::煤化工": {
+      "industry_status": "unconfirmed",
+      "review_status": "review_required",
+      "value_chain_link": "煤制甲醇/醋酸/烯烃等煤化工产品",
+      "review_variables": [
+        "煤炭成本",
+        "甲醇/醋酸/烯烃价格与价差",
+        "装置开工率",
+        "库存",
+        "下游需求"
+      ],
+      "trigger_companies": [
+        {
+          "code": "600722",
+          "name": "金牛化工",
+          "screen_status": "uncertain",
+          "screen_reason": "最新季度净利环比改善69.0%",
+          "metrics": {
+            "revenue_yoy_pct": 1.9450518509,
+            "net_profit_yoy_pct": 31.42,
+            "net_profit_qoq_pct": 69.0199,
+            "revenue": 239149075.37,
+            "net_profit": 35099764.48,
+            "q3_positive_forecast": false
+          },
+          "triggered": true,
+          "trigger_reason": "latest-quarter profit acceleration is strong enough to require subchain re-review"
+        }
+      ],
+      "rule": "A strong company signal reopens industry evidence review; it does not auto-promote the subchain or auto-admit the company to the common pool."
+    }
+  },
+  "unconfirmed_review_required_tags": [
+    "chemicals::C2/C3轻烃",
+    "chemicals::煤化工"
+  ],
   "common_pool_codes": [
     "000338",
     "000776",
@@ -5798,6 +7373,7 @@
     "600030",
     "600066",
     "600183",
+    "600309",
     "600362",
     "600406",
     "600458",
@@ -5810,6 +7386,7 @@
     "601225",
     "601336",
     "601628",
+    "601699",
     "601869",
     "603088",
     "603259",
