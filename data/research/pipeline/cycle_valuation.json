@@ -1,0 +1,1324 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-08-30T09:59:08.461556+08:00",
+  "reference_trade_date": "2026-08-28",
+  "max_anchor_age_days": 7,
+  "common_pool_count": 138,
+  "cycle_company_count": 32,
+  "cycle_codes": [
+    "000552",
+    "000612",
+    "000630",
+    "000737",
+    "000807",
+    "000878",
+    "000933",
+    "000949",
+    "002064",
+    "002128",
+    "002326",
+    "002407",
+    "002532",
+    "002915",
+    "600160",
+    "600188",
+    "600362",
+    "600378",
+    "600546",
+    "600595",
+    "600673",
+    "600711",
+    "600971",
+    "601088",
+    "601101",
+    "601168",
+    "601225",
+    "601600",
+    "601899",
+    "601918",
+    "603993",
+    "605020"
+  ],
+  "resource_cycle_codes": [
+    "000612",
+    "000630",
+    "000737",
+    "000807",
+    "000878",
+    "000933",
+    "002532",
+    "600362",
+    "600595",
+    "600711",
+    "601168",
+    "601600",
+    "601899",
+    "603993"
+  ],
+  "anchor_errors": {
+    "ZC0": "RuntimeError:stale_anchor:ZC0:last_date=2022-12-30:reference=2026-08-28:age_days=1337"
+  },
+  "companies": [
+    {
+      "code": "000552",
+      "name": "甘肃能化",
+      "cycle_tag": "coal::动力煤",
+      "current_price": 2.73,
+      "valuation_status": "unavailable",
+      "valuation_model": "commodity_scenario_forward_pe",
+      "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
+      "commodity_anchors": [],
+      "reasonable_multiple_range": [
+        7,
+        10
+      ],
+      "value_anchor_range": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "left_conclusion": "unavailable",
+      "reason": "commodity_anchor_fetch_failed:['ZC0']",
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
+    },
+    {
+      "code": "000612",
+      "name": "焦作万方",
+      "cycle_tag": "nonferrous::电解铝",
+      "current_price": 11.46,
+      "valuation_status": "unavailable",
+      "valuation_model": "commodity_scenario_forward_pe",
+      "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
+      "commodity_anchors": [
+        {
+          "symbol": "AL0",
+          "last_date": "2026-08-28",
+          "age_days": 0,
+          "current": 23920.0,
+          "ma20": 23887.5,
+          "ma60": 23541.75,
+          "current_to_ma20": 1.0013605442176872,
+          "current_to_ma60": 1.0160671997621247,
+          "drawdown_from_60d_high_pct": -1.56378600823045,
+          "trend_20_vs_60_pct": 1.4686673675491368,
+          "weight": 0.7,
+          "direction": 1.0
+        },
+        {
+          "symbol": "AO0",
+          "last_date": "2026-08-28",
+          "age_days": 0,
+          "current": 2648.0,
+          "ma20": 2675.75,
+          "ma60": 2737.4166666666665,
+          "current_to_ma20": 0.9896290759600113,
+          "current_to_ma60": 0.9673353831166855,
+          "drawdown_from_60d_high_pct": -9.40814231953473,
+          "trend_20_vs_60_pct": -2.252732198849272,
+          "weight": 0.3,
+          "direction": -1.0
+        }
+      ],
+      "reasonable_multiple_range": [
+        10,
+        14
+      ],
+      "value_anchor_range": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "left_conclusion": "unavailable",
+      "reason": "forward_consensus_insufficient:reports=0,eps=None",
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
+    },
+    {
+      "code": "000630",
+      "name": "铜陵有色",
+      "cycle_tag": "nonferrous::铜矿资源",
+      "current_price": 6.76,
+      "valuation_status": "valid",
+      "valuation_model": "commodity_scenario_forward_pe",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 3,
+      "consensus_eps_current_year": 0.4567,
+      "commodity_anchors": [
+        {
+          "symbol": "CU0",
+          "last_date": "2026-08-28",
+          "age_days": 0,
+          "current": 108900.0,
+          "ma20": 107800.5,
+          "ma60": 105268.66666666667,
+          "current_to_ma20": 1.010199396106697,
+          "current_to_ma60": 1.0344958613832542,
+          "drawdown_from_60d_high_pct": -0.584261457002011,
+          "trend_20_vs_60_pct": 2.4051157989398497,
+          "weight": 1.0,
+          "direction": 1.0
+        }
+      ],
+      "profit_sensitivity": 0.75,
+      "bear_base_bull_anchor_factor": [
+        0.9545,
+        1.0345,
+        1.1145
+      ],
+      "bear_base_bull_forward_eps": [
+        0.4411,
+        0.4685,
+        0.4959
+      ],
+      "forward_earnings_basis": "2026一致预期EPS=0.4567 → 商品/成本锚相对60日中枢 → sensitivity=0.75 → bear/base/bull盈利。",
+      "reasonable_multiple_range": [
+        12.0,
+        16.0
+      ],
+      "multiple_rationale": "按资源/周期业务质量和周期波动采用版本化估值区间。",
+      "value_anchor_range": [
+        5.29,
+        7.93
+      ],
+      "base_fair_value_floor": 5.62,
+      "safe_buy_range": [
+        4.22,
+        4.95
+      ],
+      "reasonable_buy_range": [
+        4.95,
+        5.62
+      ],
+      "key_sensitivities": [
+        "商品价格中枢",
+        "成本锚",
+        "产量/销量",
+        "一致预期EPS修正"
+      ],
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "left_conclusion": "above_buy_zone"
+    },
+    {
+      "code": "000737",
+      "name": "北方铜业",
+      "cycle_tag": "nonferrous::铜矿资源",
+      "current_price": 15.37,
+      "valuation_status": "unavailable",
+      "valuation_model": "commodity_scenario_forward_pe",
+      "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
+      "commodity_anchors": [
+        {
+          "symbol": "CU0",
+          "last_date": "2026-08-28",
+          "age_days": 0,
+          "current": 108900.0,
+          "ma20": 107800.5,
+          "ma60": 105268.66666666667,
+          "current_to_ma20": 1.010199396106697,
+          "current_to_ma60": 1.0344958613832542,
+          "drawdown_from_60d_high_pct": -0.584261457002011,
+          "trend_20_vs_60_pct": 2.4051157989398497,
+          "weight": 1.0,
+          "direction": 1.0
+        }
+      ],
+      "reasonable_multiple_range": [
+        12,
+        16
+      ],
+      "value_anchor_range": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "left_conclusion": "unavailable",
+      "reason": "forward_consensus_insufficient:reports=0,eps=None",
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
+    },
+    {
+      "code": "000807",
+      "name": "云铝股份",
+      "cycle_tag": "nonferrous::电解铝",
+      "current_price": 27.23,
+      "valuation_status": "valid",
+      "valuation_model": "commodity_scenario_forward_pe",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 19,
+      "consensus_eps_current_year": 3.794,
+      "commodity_anchors": [
+        {
+          "symbol": "AL0",
+          "last_date": "2026-08-28",
+          "age_days": 0,
+          "current": 23920.0,
+          "ma20": 23887.5,
+          "ma60": 23541.75,
+          "current_to_ma20": 1.0013605442176872,
+          "current_to_ma60": 1.0160671997621247,
+          "drawdown_from_60d_high_pct": -1.56378600823045,
+          "trend_20_vs_60_pct": 1.4686673675491368,
+          "weight": 0.7,
+          "direction": 1.0
+        },
+        {
+          "symbol": "AO0",
+          "last_date": "2026-08-28",
+          "age_days": 0,
+          "current": 2648.0,
+          "ma20": 2675.75,
+          "ma60": 2737.4166666666665,
+          "current_to_ma20": 0.9896290759600113,
+          "current_to_ma60": 0.9673353831166855,
+          "drawdown_from_60d_high_pct": -9.40814231953473,
+          "trend_20_vs_60_pct": -2.252732198849272,
+          "weight": 0.3,
+          "direction": -1.0
+        }
+      ],
+      "profit_sensitivity": 0.95,
+      "bear_base_bull_anchor_factor": [
+        0.941,
+        1.021,
+        1.101
+      ],
+      "bear_base_bull_forward_eps": [
+        3.5815,
+        3.8699,
+        4.1582
+      ],
+      "forward_earnings_basis": "2026一致预期EPS=3.7940 → 商品/成本锚相对60日中枢 → sensitivity=0.95 → bear/base/bull盈利。",
+      "reasonable_multiple_range": [
+        11.0,
+        15.0
+      ],
+      "multiple_rationale": "低成本水电铝与一体化优势使盈利对铝价上行/氧化铝成本回落具有高弹性，同时给予成本优势一定估值溢价。",
+      "value_anchor_range": [
+        39.4,
+        62.37
+      ],
+      "base_fair_value_floor": 42.57,
+      "safe_buy_range": [
+        31.93,
+        37.46
+      ],
+      "reasonable_buy_range": [
+        37.46,
+        42.57
+      ],
+      "key_sensitivities": [
+        "商品价格中枢",
+        "成本锚",
+        "产量/销量",
+        "一致预期EPS修正"
+      ],
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "left_conclusion": "safe_buy_zone"
+    },
+    {
+      "code": "000878",
+      "name": "云南铜业",
+      "cycle_tag": "nonferrous::铜矿资源",
+      "current_price": 17.85,
+      "valuation_status": "valid",
+      "valuation_model": "commodity_scenario_forward_pe",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 3,
+      "consensus_eps_current_year": 1.1867,
+      "commodity_anchors": [
+        {
+          "symbol": "CU0",
+          "last_date": "2026-08-28",
+          "age_days": 0,
+          "current": 108900.0,
+          "ma20": 107800.5,
+          "ma60": 105268.66666666667,
+          "current_to_ma20": 1.010199396106697,
+          "current_to_ma60": 1.0344958613832542,
+          "drawdown_from_60d_high_pct": -0.584261457002011,
+          "trend_20_vs_60_pct": 2.4051157989398497,
+          "weight": 1.0,
+          "direction": 1.0
+        }
+      ],
+      "profit_sensitivity": 0.75,
+      "bear_base_bull_anchor_factor": [
+        0.9545,
+        1.0345,
+        1.1145
+      ],
+      "bear_base_bull_forward_eps": [
+        1.1462,
+        1.2174,
+        1.2886
+      ],
+      "forward_earnings_basis": "2026一致预期EPS=1.1867 → 商品/成本锚相对60日中枢 → sensitivity=0.75 → bear/base/bull盈利。",
+      "reasonable_multiple_range": [
+        12.0,
+        16.0
+      ],
+      "multiple_rationale": "按资源/周期业务质量和周期波动采用版本化估值区间。",
+      "value_anchor_range": [
+        13.75,
+        20.62
+      ],
+      "base_fair_value_floor": 14.61,
+      "safe_buy_range": [
+        10.96,
+        12.86
+      ],
+      "reasonable_buy_range": [
+        12.86,
+        14.61
+      ],
+      "key_sensitivities": [
+        "商品价格中枢",
+        "成本锚",
+        "产量/销量",
+        "一致预期EPS修正"
+      ],
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "left_conclusion": "above_buy_zone"
+    },
+    {
+      "code": "000933",
+      "name": "神火股份",
+      "cycle_tag": "nonferrous::电解铝",
+      "current_price": 27.59,
+      "valuation_status": "valid",
+      "valuation_model": "commodity_scenario_forward_pe",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 20,
+      "consensus_eps_current_year": 3.9321,
+      "commodity_anchors": [
+        {
+          "symbol": "AL0",
+          "last_date": "2026-08-28",
+          "age_days": 0,
+          "current": 23920.0,
+          "ma20": 23887.5,
+          "ma60": 23541.75,
+          "current_to_ma20": 1.0013605442176872,
+          "current_to_ma60": 1.0160671997621247,
+          "drawdown_from_60d_high_pct": -1.56378600823045,
+          "trend_20_vs_60_pct": 1.4686673675491368,
+          "weight": 0.7,
+          "direction": 1.0
+        },
+        {
+          "symbol": "AO0",
+          "last_date": "2026-08-28",
+          "age_days": 0,
+          "current": 2648.0,
+          "ma20": 2675.75,
+          "ma60": 2737.4166666666665,
+          "current_to_ma20": 0.9896290759600113,
+          "current_to_ma60": 0.9673353831166855,
+          "drawdown_from_60d_high_pct": -9.40814231953473,
+          "trend_20_vs_60_pct": -2.252732198849272,
+          "weight": 0.3,
+          "direction": -1.0
+        }
+      ],
+      "profit_sensitivity": 0.9,
+      "bear_base_bull_anchor_factor": [
+        0.941,
+        1.021,
+        1.101
+      ],
+      "bear_base_bull_forward_eps": [
+        3.7235,
+        4.0066,
+        4.2897
+      ],
+      "forward_earnings_basis": "2026一致预期EPS=3.9321 → 商品/成本锚相对60日中枢 → sensitivity=0.90 → bear/base/bull盈利。",
+      "reasonable_multiple_range": [
+        10.0,
+        14.0
+      ],
+      "multiple_rationale": "按资源/周期业务质量和周期波动采用版本化估值区间。",
+      "value_anchor_range": [
+        37.23,
+        60.06
+      ],
+      "base_fair_value_floor": 40.07,
+      "safe_buy_range": [
+        30.05,
+        35.26
+      ],
+      "reasonable_buy_range": [
+        35.26,
+        40.07
+      ],
+      "key_sensitivities": [
+        "商品价格中枢",
+        "成本锚",
+        "产量/销量",
+        "一致预期EPS修正"
+      ],
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "left_conclusion": "safe_buy_zone"
+    },
+    {
+      "code": "000949",
+      "name": "新乡化纤",
+      "cycle_tag": "chemicals::氨纶",
+      "current_price": 7.38,
+      "valuation_status": "unavailable",
+      "valuation_model": "manual_spread_anchor_required",
+      "forward_earnings_basis": "该细分链尚无可机械验证的商品/价差锚；不得退回TTM PE。",
+      "commodity_anchors": [],
+      "reasonable_multiple_range": null,
+      "value_anchor_range": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "left_conclusion": "unavailable",
+      "reason": "cycle_policy_missing_machine_readable_anchor",
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
+    },
+    {
+      "code": "002064",
+      "name": "华峰化学",
+      "cycle_tag": "chemicals::氨纶",
+      "current_price": 11.89,
+      "valuation_status": "unavailable",
+      "valuation_model": "manual_spread_anchor_required",
+      "forward_earnings_basis": "该细分链尚无可机械验证的商品/价差锚；不得退回TTM PE。",
+      "commodity_anchors": [],
+      "reasonable_multiple_range": null,
+      "value_anchor_range": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "left_conclusion": "unavailable",
+      "reason": "cycle_policy_missing_machine_readable_anchor",
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
+    },
+    {
+      "code": "002128",
+      "name": "电投能源",
+      "cycle_tag": "coal::动力煤",
+      "current_price": 29.11,
+      "valuation_status": "unavailable",
+      "valuation_model": "commodity_scenario_forward_pe",
+      "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
+      "commodity_anchors": [],
+      "reasonable_multiple_range": [
+        7,
+        10
+      ],
+      "value_anchor_range": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "left_conclusion": "unavailable",
+      "reason": "commodity_anchor_fetch_failed:['ZC0']",
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
+    },
+    {
+      "code": "002326",
+      "name": "永太科技",
+      "cycle_tag": "chemicals::氟化工",
+      "current_price": 19.09,
+      "valuation_status": "unavailable",
+      "valuation_model": "manual_spread_anchor_required",
+      "forward_earnings_basis": "该细分链尚无可机械验证的商品/价差锚；不得退回TTM PE。",
+      "commodity_anchors": [],
+      "reasonable_multiple_range": null,
+      "value_anchor_range": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "left_conclusion": "unavailable",
+      "reason": "cycle_policy_missing_machine_readable_anchor",
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
+    },
+    {
+      "code": "002407",
+      "name": "多氟多",
+      "cycle_tag": "chemicals::氟化工",
+      "current_price": 36.94,
+      "valuation_status": "unavailable",
+      "valuation_model": "manual_spread_anchor_required",
+      "forward_earnings_basis": "该细分链尚无可机械验证的商品/价差锚；不得退回TTM PE。",
+      "commodity_anchors": [],
+      "reasonable_multiple_range": null,
+      "value_anchor_range": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "left_conclusion": "unavailable",
+      "reason": "cycle_policy_missing_machine_readable_anchor",
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
+    },
+    {
+      "code": "002532",
+      "name": "天山铝业",
+      "cycle_tag": "nonferrous::电解铝",
+      "current_price": 13.17,
+      "valuation_status": "valid",
+      "valuation_model": "commodity_scenario_forward_pe",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 18,
+      "consensus_eps_current_year": 1.9353,
+      "commodity_anchors": [
+        {
+          "symbol": "AL0",
+          "last_date": "2026-08-28",
+          "age_days": 0,
+          "current": 23920.0,
+          "ma20": 23887.5,
+          "ma60": 23541.75,
+          "current_to_ma20": 1.0013605442176872,
+          "current_to_ma60": 1.0160671997621247,
+          "drawdown_from_60d_high_pct": -1.56378600823045,
+          "trend_20_vs_60_pct": 1.4686673675491368,
+          "weight": 0.7,
+          "direction": 1.0
+        },
+        {
+          "symbol": "AO0",
+          "last_date": "2026-08-28",
+          "age_days": 0,
+          "current": 2648.0,
+          "ma20": 2675.75,
+          "ma60": 2737.4166666666665,
+          "current_to_ma20": 0.9896290759600113,
+          "current_to_ma60": 0.9673353831166855,
+          "drawdown_from_60d_high_pct": -9.40814231953473,
+          "trend_20_vs_60_pct": -2.252732198849272,
+          "weight": 0.3,
+          "direction": -1.0
+        }
+      ],
+      "profit_sensitivity": 0.9,
+      "bear_base_bull_anchor_factor": [
+        0.941,
+        1.021,
+        1.101
+      ],
+      "bear_base_bull_forward_eps": [
+        1.8326,
+        1.972,
+        2.1113
+      ],
+      "forward_earnings_basis": "2026一致预期EPS=1.9353 → 商品/成本锚相对60日中枢 → sensitivity=0.90 → bear/base/bull盈利。",
+      "reasonable_multiple_range": [
+        10.0,
+        14.0
+      ],
+      "multiple_rationale": "按资源/周期业务质量和周期波动采用版本化估值区间。",
+      "value_anchor_range": [
+        18.33,
+        29.56
+      ],
+      "base_fair_value_floor": 19.72,
+      "safe_buy_range": [
+        14.79,
+        17.35
+      ],
+      "reasonable_buy_range": [
+        17.35,
+        19.72
+      ],
+      "key_sensitivities": [
+        "商品价格中枢",
+        "成本锚",
+        "产量/销量",
+        "一致预期EPS修正"
+      ],
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "left_conclusion": "safe_buy_zone"
+    },
+    {
+      "code": "002915",
+      "name": "中欣氟材",
+      "cycle_tag": "chemicals::氟化工",
+      "current_price": 18.87,
+      "valuation_status": "unavailable",
+      "valuation_model": "manual_spread_anchor_required",
+      "forward_earnings_basis": "该细分链尚无可机械验证的商品/价差锚；不得退回TTM PE。",
+      "commodity_anchors": [],
+      "reasonable_multiple_range": null,
+      "value_anchor_range": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "left_conclusion": "unavailable",
+      "reason": "cycle_policy_missing_machine_readable_anchor",
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
+    },
+    {
+      "code": "600160",
+      "name": "巨化股份",
+      "cycle_tag": "chemicals::氟化工",
+      "current_price": 40.54,
+      "valuation_status": "unavailable",
+      "valuation_model": "manual_spread_anchor_required",
+      "forward_earnings_basis": "该细分链尚无可机械验证的商品/价差锚；不得退回TTM PE。",
+      "commodity_anchors": [],
+      "reasonable_multiple_range": null,
+      "value_anchor_range": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "left_conclusion": "unavailable",
+      "reason": "cycle_policy_missing_machine_readable_anchor",
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
+    },
+    {
+      "code": "600188",
+      "name": "兖矿能源",
+      "cycle_tag": "coal::动力煤",
+      "current_price": 23.02,
+      "valuation_status": "unavailable",
+      "valuation_model": "commodity_scenario_forward_pe",
+      "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
+      "commodity_anchors": [],
+      "reasonable_multiple_range": [
+        7,
+        10
+      ],
+      "value_anchor_range": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "left_conclusion": "unavailable",
+      "reason": "commodity_anchor_fetch_failed:['ZC0']",
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
+    },
+    {
+      "code": "600362",
+      "name": "江西铜业",
+      "cycle_tag": "nonferrous::铜矿资源",
+      "current_price": 49.01,
+      "valuation_status": "unavailable",
+      "valuation_model": "commodity_scenario_forward_pe",
+      "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
+      "commodity_anchors": [
+        {
+          "symbol": "CU0",
+          "last_date": "2026-08-28",
+          "age_days": 0,
+          "current": 108900.0,
+          "ma20": 107800.5,
+          "ma60": 105268.66666666667,
+          "current_to_ma20": 1.010199396106697,
+          "current_to_ma60": 1.0344958613832542,
+          "drawdown_from_60d_high_pct": -0.584261457002011,
+          "trend_20_vs_60_pct": 2.4051157989398497,
+          "weight": 1.0,
+          "direction": 1.0
+        }
+      ],
+      "reasonable_multiple_range": [
+        12,
+        16
+      ],
+      "value_anchor_range": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "left_conclusion": "unavailable",
+      "reason": "forward_consensus_insufficient:reports=2,eps=4.29",
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
+    },
+    {
+      "code": "600378",
+      "name": "昊华科技",
+      "cycle_tag": "chemicals::氟化工",
+      "current_price": 53.31,
+      "valuation_status": "unavailable",
+      "valuation_model": "manual_spread_anchor_required",
+      "forward_earnings_basis": "该细分链尚无可机械验证的商品/价差锚；不得退回TTM PE。",
+      "commodity_anchors": [],
+      "reasonable_multiple_range": null,
+      "value_anchor_range": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "left_conclusion": "unavailable",
+      "reason": "cycle_policy_missing_machine_readable_anchor",
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
+    },
+    {
+      "code": "600546",
+      "name": "山煤国际",
+      "cycle_tag": "coal::动力煤",
+      "current_price": 13.99,
+      "valuation_status": "unavailable",
+      "valuation_model": "commodity_scenario_forward_pe",
+      "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
+      "commodity_anchors": [],
+      "reasonable_multiple_range": [
+        7,
+        10
+      ],
+      "value_anchor_range": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "left_conclusion": "unavailable",
+      "reason": "commodity_anchor_fetch_failed:['ZC0'];forward_consensus_insufficient:reports=0,eps=None",
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
+    },
+    {
+      "code": "600595",
+      "name": "中孚实业",
+      "cycle_tag": "nonferrous::电解铝",
+      "current_price": 6.34,
+      "valuation_status": "valid",
+      "valuation_model": "commodity_scenario_forward_pe",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 6,
+      "consensus_eps_current_year": 0.9483,
+      "commodity_anchors": [
+        {
+          "symbol": "AL0",
+          "last_date": "2026-08-28",
+          "age_days": 0,
+          "current": 23920.0,
+          "ma20": 23887.5,
+          "ma60": 23541.75,
+          "current_to_ma20": 1.0013605442176872,
+          "current_to_ma60": 1.0160671997621247,
+          "drawdown_from_60d_high_pct": -1.56378600823045,
+          "trend_20_vs_60_pct": 1.4686673675491368,
+          "weight": 0.7,
+          "direction": 1.0
+        },
+        {
+          "symbol": "AO0",
+          "last_date": "2026-08-28",
+          "age_days": 0,
+          "current": 2648.0,
+          "ma20": 2675.75,
+          "ma60": 2737.4166666666665,
+          "current_to_ma20": 0.9896290759600113,
+          "current_to_ma60": 0.9673353831166855,
+          "drawdown_from_60d_high_pct": -9.40814231953473,
+          "trend_20_vs_60_pct": -2.252732198849272,
+          "weight": 0.3,
+          "direction": -1.0
+        }
+      ],
+      "profit_sensitivity": 0.9,
+      "bear_base_bull_anchor_factor": [
+        0.941,
+        1.021,
+        1.101
+      ],
+      "bear_base_bull_forward_eps": [
+        0.898,
+        0.9663,
+        1.0346
+      ],
+      "forward_earnings_basis": "2026一致预期EPS=0.9483 → 商品/成本锚相对60日中枢 → sensitivity=0.90 → bear/base/bull盈利。",
+      "reasonable_multiple_range": [
+        10.0,
+        14.0
+      ],
+      "multiple_rationale": "按资源/周期业务质量和周期波动采用版本化估值区间。",
+      "value_anchor_range": [
+        8.98,
+        14.48
+      ],
+      "base_fair_value_floor": 9.66,
+      "safe_buy_range": [
+        7.25,
+        8.5
+      ],
+      "reasonable_buy_range": [
+        8.5,
+        9.66
+      ],
+      "key_sensitivities": [
+        "商品价格中枢",
+        "成本锚",
+        "产量/销量",
+        "一致预期EPS修正"
+      ],
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "left_conclusion": "safe_buy_zone"
+    },
+    {
+      "code": "600673",
+      "name": "东阳光",
+      "cycle_tag": "chemicals::氟化工",
+      "current_price": 31.88,
+      "valuation_status": "unavailable",
+      "valuation_model": "manual_spread_anchor_required",
+      "forward_earnings_basis": "该细分链尚无可机械验证的商品/价差锚；不得退回TTM PE。",
+      "commodity_anchors": [],
+      "reasonable_multiple_range": null,
+      "value_anchor_range": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "left_conclusion": "unavailable",
+      "reason": "cycle_policy_missing_machine_readable_anchor",
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
+    },
+    {
+      "code": "600711",
+      "name": "盛屯矿业",
+      "cycle_tag": "nonferrous::铜矿资源",
+      "current_price": 12.0,
+      "valuation_status": "valid",
+      "valuation_model": "commodity_scenario_forward_pe",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 4,
+      "consensus_eps_current_year": 1.13,
+      "commodity_anchors": [
+        {
+          "symbol": "CU0",
+          "last_date": "2026-08-28",
+          "age_days": 0,
+          "current": 108900.0,
+          "ma20": 107800.5,
+          "ma60": 105268.66666666667,
+          "current_to_ma20": 1.010199396106697,
+          "current_to_ma60": 1.0344958613832542,
+          "drawdown_from_60d_high_pct": -0.584261457002011,
+          "trend_20_vs_60_pct": 2.4051157989398497,
+          "weight": 1.0,
+          "direction": 1.0
+        }
+      ],
+      "profit_sensitivity": 0.75,
+      "bear_base_bull_anchor_factor": [
+        0.9545,
+        1.0345,
+        1.1145
+      ],
+      "bear_base_bull_forward_eps": [
+        1.0914,
+        1.1592,
+        1.227
+      ],
+      "forward_earnings_basis": "2026一致预期EPS=1.1300 → 商品/成本锚相对60日中枢 → sensitivity=0.75 → bear/base/bull盈利。",
+      "reasonable_multiple_range": [
+        12.0,
+        16.0
+      ],
+      "multiple_rationale": "按资源/周期业务质量和周期波动采用版本化估值区间。",
+      "value_anchor_range": [
+        13.1,
+        19.63
+      ],
+      "base_fair_value_floor": 13.91,
+      "safe_buy_range": [
+        10.43,
+        12.24
+      ],
+      "reasonable_buy_range": [
+        12.24,
+        13.91
+      ],
+      "key_sensitivities": [
+        "商品价格中枢",
+        "成本锚",
+        "产量/销量",
+        "一致预期EPS修正"
+      ],
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "left_conclusion": "safe_buy_zone"
+    },
+    {
+      "code": "600971",
+      "name": "恒源煤电",
+      "cycle_tag": "coal::动力煤",
+      "current_price": 9.02,
+      "valuation_status": "unavailable",
+      "valuation_model": "commodity_scenario_forward_pe",
+      "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
+      "commodity_anchors": [],
+      "reasonable_multiple_range": [
+        7,
+        10
+      ],
+      "value_anchor_range": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "left_conclusion": "unavailable",
+      "reason": "commodity_anchor_fetch_failed:['ZC0']",
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
+    },
+    {
+      "code": "601088",
+      "name": "中国神华",
+      "cycle_tag": "coal::动力煤",
+      "current_price": 47.63,
+      "valuation_status": "unavailable",
+      "valuation_model": "commodity_scenario_forward_pe",
+      "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
+      "commodity_anchors": [],
+      "reasonable_multiple_range": [
+        7,
+        10
+      ],
+      "value_anchor_range": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "left_conclusion": "unavailable",
+      "reason": "commodity_anchor_fetch_failed:['ZC0']",
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
+    },
+    {
+      "code": "601101",
+      "name": "昊华能源",
+      "cycle_tag": "coal::动力煤",
+      "current_price": 14.81,
+      "valuation_status": "unavailable",
+      "valuation_model": "commodity_scenario_forward_pe",
+      "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
+      "commodity_anchors": [],
+      "reasonable_multiple_range": [
+        7,
+        10
+      ],
+      "value_anchor_range": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "left_conclusion": "unavailable",
+      "reason": "commodity_anchor_fetch_failed:['ZC0']",
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
+    },
+    {
+      "code": "601168",
+      "name": "西部矿业",
+      "cycle_tag": "nonferrous::铜矿资源",
+      "current_price": 39.12,
+      "valuation_status": "valid",
+      "valuation_model": "commodity_scenario_forward_pe",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 19,
+      "consensus_eps_current_year": 2.8868,
+      "commodity_anchors": [
+        {
+          "symbol": "CU0",
+          "last_date": "2026-08-28",
+          "age_days": 0,
+          "current": 108900.0,
+          "ma20": 107800.5,
+          "ma60": 105268.66666666667,
+          "current_to_ma20": 1.010199396106697,
+          "current_to_ma60": 1.0344958613832542,
+          "drawdown_from_60d_high_pct": -0.584261457002011,
+          "trend_20_vs_60_pct": 2.4051157989398497,
+          "weight": 1.0,
+          "direction": 1.0
+        }
+      ],
+      "profit_sensitivity": 0.75,
+      "bear_base_bull_anchor_factor": [
+        0.9545,
+        1.0345,
+        1.1145
+      ],
+      "bear_base_bull_forward_eps": [
+        2.7883,
+        2.9615,
+        3.1347
+      ],
+      "forward_earnings_basis": "2026一致预期EPS=2.8868 → 商品/成本锚相对60日中枢 → sensitivity=0.75 → bear/base/bull盈利。",
+      "reasonable_multiple_range": [
+        12.0,
+        16.0
+      ],
+      "multiple_rationale": "按资源/周期业务质量和周期波动采用版本化估值区间。",
+      "value_anchor_range": [
+        33.46,
+        50.16
+      ],
+      "base_fair_value_floor": 35.54,
+      "safe_buy_range": [
+        26.65,
+        31.27
+      ],
+      "reasonable_buy_range": [
+        31.27,
+        35.54
+      ],
+      "key_sensitivities": [
+        "商品价格中枢",
+        "成本锚",
+        "产量/销量",
+        "一致预期EPS修正"
+      ],
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "left_conclusion": "above_buy_zone"
+    },
+    {
+      "code": "601225",
+      "name": "陕西煤业",
+      "cycle_tag": "coal::动力煤",
+      "current_price": 27.07,
+      "valuation_status": "unavailable",
+      "valuation_model": "commodity_scenario_forward_pe",
+      "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
+      "commodity_anchors": [],
+      "reasonable_multiple_range": [
+        7,
+        10
+      ],
+      "value_anchor_range": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "left_conclusion": "unavailable",
+      "reason": "commodity_anchor_fetch_failed:['ZC0']",
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
+    },
+    {
+      "code": "601600",
+      "name": "中国铝业",
+      "cycle_tag": "nonferrous::电解铝",
+      "current_price": 9.82,
+      "valuation_status": "valid",
+      "valuation_model": "commodity_scenario_forward_pe",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 10,
+      "consensus_eps_current_year": 1.2972,
+      "commodity_anchors": [
+        {
+          "symbol": "AL0",
+          "last_date": "2026-08-28",
+          "age_days": 0,
+          "current": 23920.0,
+          "ma20": 23887.5,
+          "ma60": 23541.75,
+          "current_to_ma20": 1.0013605442176872,
+          "current_to_ma60": 1.0160671997621247,
+          "drawdown_from_60d_high_pct": -1.56378600823045,
+          "trend_20_vs_60_pct": 1.4686673675491368,
+          "weight": 0.7,
+          "direction": 1.0
+        },
+        {
+          "symbol": "AO0",
+          "last_date": "2026-08-28",
+          "age_days": 0,
+          "current": 2648.0,
+          "ma20": 2675.75,
+          "ma60": 2737.4166666666665,
+          "current_to_ma20": 0.9896290759600113,
+          "current_to_ma60": 0.9673353831166855,
+          "drawdown_from_60d_high_pct": -9.40814231953473,
+          "trend_20_vs_60_pct": -2.252732198849272,
+          "weight": 0.3,
+          "direction": -1.0
+        }
+      ],
+      "profit_sensitivity": 0.9,
+      "bear_base_bull_anchor_factor": [
+        0.941,
+        1.021,
+        1.101
+      ],
+      "bear_base_bull_forward_eps": [
+        1.2284,
+        1.3218,
+        1.4152
+      ],
+      "forward_earnings_basis": "2026一致预期EPS=1.2972 → 商品/成本锚相对60日中枢 → sensitivity=0.90 → bear/base/bull盈利。",
+      "reasonable_multiple_range": [
+        10.0,
+        14.0
+      ],
+      "multiple_rationale": "原铝板块为主要利润弹性来源，氧化铝同时是业务与成本变量；必须联合观察铝价和氧化铝成本方向。",
+      "value_anchor_range": [
+        12.28,
+        19.81
+      ],
+      "base_fair_value_floor": 13.22,
+      "safe_buy_range": [
+        9.91,
+        11.63
+      ],
+      "reasonable_buy_range": [
+        11.63,
+        13.22
+      ],
+      "key_sensitivities": [
+        "商品价格中枢",
+        "成本锚",
+        "产量/销量",
+        "一致预期EPS修正"
+      ],
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "left_conclusion": "safe_buy_zone"
+    },
+    {
+      "code": "601899",
+      "name": "紫金矿业",
+      "cycle_tag": "nonferrous::铜矿资源",
+      "current_price": 34.65,
+      "valuation_status": "valid",
+      "valuation_model": "commodity_scenario_forward_pe",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 21,
+      "consensus_eps_current_year": 3.1176,
+      "commodity_anchors": [
+        {
+          "symbol": "AU0",
+          "last_date": "2026-08-28",
+          "age_days": 0,
+          "current": 999.28,
+          "ma20": 956.333,
+          "ma60": 919.8233333333334,
+          "current_to_ma20": 1.0449079975280577,
+          "current_to_ma60": 1.0863825299785828,
+          "drawdown_from_60d_high_pct": -0.7488925527899815,
+          "trend_20_vs_60_pct": 3.969204231247292,
+          "weight": 0.55,
+          "direction": 1.0
+        },
+        {
+          "symbol": "CU0",
+          "last_date": "2026-08-28",
+          "age_days": 0,
+          "current": 108900.0,
+          "ma20": 107800.5,
+          "ma60": 105268.66666666667,
+          "current_to_ma20": 1.010199396106697,
+          "current_to_ma60": 1.0344958613832542,
+          "drawdown_from_60d_high_pct": -0.584261457002011,
+          "trend_20_vs_60_pct": 2.4051157989398497,
+          "weight": 0.45,
+          "direction": 1.0
+        }
+      ],
+      "profit_sensitivity": 0.7,
+      "bear_base_bull_anchor_factor": [
+        0.983,
+        1.063,
+        1.143
+      ],
+      "bear_base_bull_forward_eps": [
+        3.0806,
+        3.2552,
+        3.4298
+      ],
+      "forward_earnings_basis": "2026一致预期EPS=3.1176 → 商品/成本锚相对60日中枢 → sensitivity=0.70 → bear/base/bull盈利。",
+      "reasonable_multiple_range": [
+        13.0,
+        17.0
+      ],
+      "multiple_rationale": "2026H1黄金和铜合计贡献集团毛利约75.5%，以黄金/铜双商品锚而不是单一铜价或TTM PE决定前瞻盈利中枢。",
+      "value_anchor_range": [
+        40.05,
+        58.31
+      ],
+      "base_fair_value_floor": 42.32,
+      "safe_buy_range": [
+        32.16,
+        37.24
+      ],
+      "reasonable_buy_range": [
+        37.24,
+        42.32
+      ],
+      "key_sensitivities": [
+        "商品价格中枢",
+        "成本锚",
+        "产量/销量",
+        "一致预期EPS修正"
+      ],
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "left_conclusion": "safe_buy_zone"
+    },
+    {
+      "code": "601918",
+      "name": "新集能源",
+      "cycle_tag": "coal::动力煤",
+      "current_price": 10.88,
+      "valuation_status": "unavailable",
+      "valuation_model": "commodity_scenario_forward_pe",
+      "forward_earnings_basis": "2026一致预期EPS经商品锚压力测试；缺少关键输入时禁止形成正式价值锚。",
+      "commodity_anchors": [],
+      "reasonable_multiple_range": [
+        7,
+        10
+      ],
+      "value_anchor_range": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "left_conclusion": "unavailable",
+      "reason": "commodity_anchor_fetch_failed:['ZC0']",
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
+    },
+    {
+      "code": "603993",
+      "name": "洛阳钼业",
+      "cycle_tag": "nonferrous::铜矿资源",
+      "current_price": 19.51,
+      "valuation_status": "valid",
+      "valuation_model": "commodity_scenario_forward_pe",
+      "forecast_source": "akshare.stock_profit_forecast_em",
+      "forecast_report_count": 20,
+      "consensus_eps_current_year": 1.5585,
+      "commodity_anchors": [
+        {
+          "symbol": "CU0",
+          "last_date": "2026-08-28",
+          "age_days": 0,
+          "current": 108900.0,
+          "ma20": 107800.5,
+          "ma60": 105268.66666666667,
+          "current_to_ma20": 1.010199396106697,
+          "current_to_ma60": 1.0344958613832542,
+          "drawdown_from_60d_high_pct": -0.584261457002011,
+          "trend_20_vs_60_pct": 2.4051157989398497,
+          "weight": 1.0,
+          "direction": 1.0
+        }
+      ],
+      "profit_sensitivity": 0.75,
+      "bear_base_bull_anchor_factor": [
+        0.9545,
+        1.0345,
+        1.1145
+      ],
+      "bear_base_bull_forward_eps": [
+        1.5053,
+        1.5988,
+        1.6923
+      ],
+      "forward_earnings_basis": "2026一致预期EPS=1.5585 → 商品/成本锚相对60日中枢 → sensitivity=0.75 → bear/base/bull盈利。",
+      "reasonable_multiple_range": [
+        12.0,
+        16.0
+      ],
+      "multiple_rationale": "按资源/周期业务质量和周期波动采用版本化估值区间。",
+      "value_anchor_range": [
+        18.06,
+        27.08
+      ],
+      "base_fair_value_floor": 19.19,
+      "safe_buy_range": [
+        14.39,
+        16.88
+      ],
+      "reasonable_buy_range": [
+        16.88,
+        19.19
+      ],
+      "key_sensitivities": [
+        "商品价格中枢",
+        "成本锚",
+        "产量/销量",
+        "一致预期EPS修正"
+      ],
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
+      "left_conclusion": "above_buy_zone"
+    },
+    {
+      "code": "605020",
+      "name": "永和股份",
+      "cycle_tag": "chemicals::氟化工",
+      "current_price": 34.35,
+      "valuation_status": "unavailable",
+      "valuation_model": "manual_spread_anchor_required",
+      "forward_earnings_basis": "该细分链尚无可机械验证的商品/价差锚；不得退回TTM PE。",
+      "commodity_anchors": [],
+      "reasonable_multiple_range": null,
+      "value_anchor_range": null,
+      "safe_buy_range": null,
+      "reasonable_buy_range": null,
+      "left_conclusion": "unavailable",
+      "reason": "cycle_policy_missing_machine_readable_anchor",
+      "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。"
+    }
+  ],
+  "left_set_codes": [
+    "000807",
+    "000933",
+    "002532",
+    "600595",
+    "600711",
+    "601600",
+    "601899"
+  ],
+  "method_note": "Resource cycle valuation requires fresh commodity anchors near the market trade date; stale continuous contracts become explicit unavailable inputs instead of silently entering valuation."
+}
