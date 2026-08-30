@@ -21,18 +21,24 @@ def test_weichai_and_luxshare_policy_regression_ranges():
     assert weichai['multiple_range'] == [16, 20]
     assert luxshare['multiple_range'] == [20, 24]
 
-    # Use current public consensus snapshots only as regression fixtures for policy geometry.
-    weichai_eps = 1.67
+    # Regression fixtures mirror the 2026-08-30 consensus snapshot seen by CI.
+    weichai_eps = 1.668
     weichai_floor = weichai_eps * weichai['multiple_range'][0]
+    weichai_safe = [weichai_floor * x for x in weichai['safe_to_fair_floor']]
     weichai_reasonable = [weichai_floor * x for x in weichai['reasonable_to_fair_floor']]
-    assert 23.0 <= weichai_reasonable[0] <= 24.5
-    assert 26.0 <= weichai_reasonable[1] <= 27.5
+    assert 20.5 <= weichai_safe[0] <= 21.0
+    assert 23.8 <= weichai_safe[1] <= 24.2
+    assert 23.8 <= weichai_reasonable[0] <= 24.2
+    assert 26.4 <= weichai_reasonable[1] <= 27.0
 
-    luxshare_eps = 2.96
+    luxshare_eps = 2.8814
     luxshare_floor = luxshare_eps * luxshare['multiple_range'][0]
+    luxshare_safe = [luxshare_floor * x for x in luxshare['safe_to_fair_floor']]
     luxshare_reasonable = [luxshare_floor * x for x in luxshare['reasonable_to_fair_floor']]
-    assert 51.5 <= luxshare_reasonable[0] <= 52.8
-    assert 54.0 <= luxshare_reasonable[1] <= 55.0
+    assert 44.5 <= luxshare_safe[0] <= 45.5
+    assert 51.5 <= luxshare_safe[1] <= 52.2
+    assert 51.5 <= luxshare_reasonable[0] <= 52.2
+    assert 53.8 <= luxshare_reasonable[1] <= 54.5
 
 
 def test_resource_cycle_policies_are_machine_executable():
