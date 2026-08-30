@@ -5,11 +5,14 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 INDEX = ROOT / "data" / "research" / "company_industry_index.json"
+LATEST = ROOT / "data" / "latest.json"
 OUT = ROOT / "data" / "research" / "company_buckets"
 
 
 def main() -> int:
     data = json.loads(INDEX.read_text(encoding="utf-8"))
+    latest = json.loads(LATEST.read_text(encoding="utf-8"))
+    quotes = latest.get("stocks", {})
     companies = data.get("companies", {})
     buckets: dict[str, list[dict]] = {}
     for code, item in companies.items():
@@ -22,9 +25,20 @@ def main() -> int:
             "hierarchy": item.get("hierarchy", {}),
             "mapping_status": item.get("mapping_status"),
         })
+    missing_rows = []
+    for code in data.get("missing_codes", []):
+        q = quotes.get(code, {})
+        missing_rows.append({
+            "code": code,
+            "name": q.get("name"),
+            "price": q.get("price"),
+            "confidence": q.get("confidence"),
+            "mapping_status": "missing",
+        })
+    buckets["__missing__"] = missing_rows
     OUT.mkdir(parents=True, exist_ok=True)
     manifest = {
-        "schema_version": 1,
+        "schema_version": 2,
         "source_generated_at": data.get("generated_at"),
         "main_board_universe_count": data.get("main_board_universe_count"),
         "indexed_count": data.get("indexed_count"),
@@ -50,7 +64,7 @@ def main() -> int:
         if path.name != "manifest.json" and path.name not in live:
             path.unlink()
     (OUT / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(json.dumps({"status":"ok","bucket_count":len(buckets),"indexed_count":data.get("indexed_count")}, ensure_ascii=False))
+    print(json.dumps({"status":"ok","bucket_count":len(buckets),"indexed_count":data.get("indexed_count"),"missing_count":len(missing_rows)}, ensure_ascii=False))
     return 0
 
 
