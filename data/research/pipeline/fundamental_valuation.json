@@ -1,9 +1,11 @@
 {
   "schema_version": 5,
-  "generated_at": "2026-08-30T18:21:04.968219+08:00",
+  "generated_at": "2026-08-30T19:05:57.744044+08:00",
+  "reference_trade_date": "2026-08-28",
   "common_pool_count": 42,
   "fundamental_company_count": 31,
-  "deferred_cycle_codes": [
+  "deferred_to_cycle_valuation_count": 11,
+  "deferred_to_cycle_valuation_codes": [
     "000807",
     "000933",
     "002064",
@@ -16,8 +18,48 @@
     "603993",
     "605020"
   ],
-  "market_indicator_errors": [],
+  "forecast_policy": {
+    "primary_source": "akshare.stock_profit_forecast_em consensus EPS",
+    "minimum_report_count": 3,
+    "fallback_h1_annualization_formal": false,
+    "rule": "Formal PE valuation uses current-year consensus EPS as the primary low-risk earnings anchor. Next-year EPS is a durability check: positive next-year growth cannot automatically raise the current-year low-risk entry price, while weak/negative next-year growth may lower the permitted PE floor. H1 EPS times two is diagnostic fallback only and cannot by itself create a formal value anchor."
+  },
+  "low_risk_pe_policy": {
+    "primary_eps_year": "current_year",
+    "positive_next_year_growth_can_raise_entry_pe": false,
+    "growth_floor_caps": [
+      {
+        "growth_max_pct": 0,
+        "pe_floor_cap": 13
+      },
+      {
+        "growth_max_pct": 10,
+        "pe_floor_cap": 15
+      },
+      {
+        "growth_max_pct": 20,
+        "pe_floor_cap": 18
+      },
+      {
+        "growth_max_pct": 35,
+        "pe_floor_cap": 20
+      },
+      {
+        "growth_max_pct": 50,
+        "pe_floor_cap": 22
+      },
+      {
+        "growth_max_pct": 1000000,
+        "pe_floor_cap": 24
+      }
+    ],
+    "derived_range_width": 4,
+    "rule": "Business multiple_range is a theoretical fair-value reference, not automatically a low-risk entry multiple. Unless a company has an explicit low_risk_multiple_range, cap the theoretical PE floor by next-year earnings durability. Positive future growth does not lift the current-year entry PE; weak or negative future growth can compress it. The derived low-risk upper multiple is capped near the adjusted floor plus a small width and never exceeds the theoretical business upper multiple."
+  },
   "policy_coverage": {
+    "supported_count": 31,
+    "unsupported_count": 0,
+    "unsupported_codes": [],
     "noncycle_count": 31,
     "supported_policy_count": 31,
     "unsupported_policy_count": 0,
@@ -54,39 +96,40 @@
       "603659",
       "603986"
     ],
-    "unsupported_policy_codes": [],
-    "execution_counts": {
-      "valid": 26,
-      "consensus_insufficient": 4,
-      "market_data_missing": 0,
-      "normalization_required": 1,
-      "unsupported_policy": 0
-    },
-    "model_counts": {
-      "advanced_packaging_normalized_forward_pe": 1,
-      "ai_server_forward_pe": 2,
-      "battery_equipment_material_forward_pe": 1,
-      "battery_material_forward_pe": 1,
-      "broker_forward_pb_roe": 3,
-      "bus_export_forward_pe": 1,
-      "cxo_forward_pe": 1,
-      "diversified_powertrain_data_center_forward_pe": 1,
-      "equipment_forward_pe": 1,
-      "grid_equipment_company_low_risk_forward_pe": 1,
-      "grid_equipment_forward_pe": 2,
-      "heavy_truck_forward_pe": 2,
-      "insurance_forward_pb_roe_proxy": 2,
-      "marine_power_forward_pe": 1,
-      "memory_growth_forward_pe": 1,
-      "multi_engine_precision_manufacturing_forward_pe": 1,
-      "optical_forward_pe": 1,
-      "optical_infrastructure_forward_pe": 1,
-      "pcb_ccl_forward_pe": 3,
-      "semiconductor_forward_pe": 1,
-      "separator_forward_pe": 1,
-      "shipbuilding_forward_pe": 1,
-      "wind_new_material_forward_pe": 1
-    }
+    "unsupported_policy_codes": []
+  },
+  "execution_state_counts": {
+    "valid": 26,
+    "consensus_insufficient": 4,
+    "market_data_missing": 0,
+    "normalization_required": 1,
+    "unsupported_policy": 0
+  },
+  "market_indicator_errors": [],
+  "model_counts": {
+    "diversified_powertrain_data_center_forward_pe": 1,
+    "broker_forward_pb_roe": 3,
+    "heavy_truck_forward_pe": 2,
+    "ai_server_forward_pe": 2,
+    "memory_growth_forward_pe": 1,
+    "grid_equipment_forward_pe": 2,
+    "advanced_packaging_normalized_forward_pe": 1,
+    "pcb_ccl_forward_pe": 3,
+    "grid_equipment_company_low_risk_forward_pe": 1,
+    "multi_engine_precision_manufacturing_forward_pe": 1,
+    "battery_material_forward_pe": 1,
+    "separator_forward_pe": 1,
+    "bus_export_forward_pe": 1,
+    "wind_new_material_forward_pe": 1,
+    "marine_power_forward_pe": 1,
+    "optical_forward_pe": 1,
+    "shipbuilding_forward_pe": 1,
+    "insurance_forward_pb_roe_proxy": 2,
+    "optical_infrastructure_forward_pe": 1,
+    "equipment_forward_pe": 1,
+    "cxo_forward_pe": 1,
+    "battery_equipment_material_forward_pe": 1,
+    "semiconductor_forward_pe": 1
   },
   "companies": [
     {
@@ -103,10 +146,11 @@
       "consensus_eps_current_year": 1.668,
       "consensus_eps_next_year": 2.033,
       "next_year_eps_growth_pct": 21.88,
-      "market_pe_dynamic": null,
       "market_forward_pe_current_year": 16.57,
       "market_forward_pe_next_year": 13.6,
-      "forward_earnings_basis": "2026 consensus EPS=1.6680 is the low-risk earnings anchor; 2027 EPS=2.0330 is used only as durability/growth guardrail.",
+      "market_pe_dynamic": null,
+      "market_indicator_source": null,
+      "forward_earnings_basis": "2026 consensus EPS is primary low-risk anchor; 2027 EPS is a durability guard and positive growth cannot lift the 2026 entry PE.",
       "theoretical_business_multiple_range": [
         16.0,
         20.0
@@ -135,10 +179,10 @@
         26.69
       ],
       "key_sensitivities": [
-        "2026 earnings",
-        "2027 earnings durability",
-        "company-level low-risk PE",
-        "consensus revisions"
+        "current-year EPS",
+        "next-year downside durability",
+        "company/industry low-risk PE",
+        "orders/volume/margin"
       ],
       "invalidation_condition": "数据中心发电产品与大缸径发动机订单连续转弱，或重卡/发动机需求显著下行。",
       "left_conclusion": "above_buy_zone"
@@ -237,10 +281,11 @@
       "consensus_eps_current_year": 1.0231,
       "consensus_eps_next_year": 1.3401,
       "next_year_eps_growth_pct": 30.99,
-      "market_pe_dynamic": null,
       "market_forward_pe_current_year": 35.08,
       "market_forward_pe_next_year": 26.78,
-      "forward_earnings_basis": "2026 consensus EPS=1.0231 is the low-risk earnings anchor; 2027 EPS=1.3401 is used only as durability/growth guardrail.",
+      "market_pe_dynamic": null,
+      "market_indicator_source": null,
+      "forward_earnings_basis": "2026 consensus EPS is primary low-risk anchor; 2027 EPS is a durability guard and positive growth cannot lift the 2026 entry PE.",
       "theoretical_business_multiple_range": [
         20.0,
         28.0
@@ -251,7 +296,7 @@
         20.0,
         24.0
       ],
-      "multiple_rationale": "Versioned business valuation policy.",
+      "multiple_rationale": "AI算力需求支持成长估值，但订单兑现、产品结构和利润率决定实际低风险倍数。",
       "business_fair_value_range": [
         20.46,
         28.65
@@ -269,10 +314,10 @@
         20.46
       ],
       "key_sensitivities": [
-        "2026 earnings",
-        "2027 earnings durability",
-        "company-level low-risk PE",
-        "consensus revisions"
+        "current-year EPS",
+        "next-year downside durability",
+        "company/industry low-risk PE",
+        "orders/volume/margin"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone"
@@ -291,10 +336,11 @@
       "consensus_eps_current_year": 1.7214,
       "consensus_eps_next_year": 2.0564,
       "next_year_eps_growth_pct": 19.46,
-      "market_pe_dynamic": null,
       "market_forward_pe_current_year": 12.71,
       "market_forward_pe_next_year": 10.64,
-      "forward_earnings_basis": "2026 consensus EPS=1.7214 is the low-risk earnings anchor; 2027 EPS=2.0564 is used only as durability/growth guardrail.",
+      "market_pe_dynamic": null,
+      "market_indicator_source": null,
+      "forward_earnings_basis": "2026 consensus EPS is primary low-risk anchor; 2027 EPS is a durability guard and positive growth cannot lift the 2026 entry PE.",
       "theoretical_business_multiple_range": [
         13.0,
         17.0
@@ -305,7 +351,7 @@
         13.0,
         17.0
       ],
-      "multiple_rationale": "Versioned business valuation policy.",
+      "multiple_rationale": "重卡需求与更新周期较强，采用中低双位数PE并由增长守门进一步压低低风险倍数。",
       "business_fair_value_range": [
         22.38,
         29.26
@@ -323,10 +369,10 @@
         22.38
       ],
       "key_sensitivities": [
-        "2026 earnings",
-        "2027 earnings durability",
-        "company-level low-risk PE",
-        "consensus revisions"
+        "current-year EPS",
+        "next-year downside durability",
+        "company/industry low-risk PE",
+        "orders/volume/margin"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "reasonable_buy_zone"
@@ -375,10 +421,11 @@
       "consensus_eps_current_year": 5.3931,
       "consensus_eps_next_year": 7.3984,
       "next_year_eps_growth_pct": 37.18,
-      "market_pe_dynamic": null,
       "market_forward_pe_current_year": 26.55,
       "market_forward_pe_next_year": 19.35,
-      "forward_earnings_basis": "2026 consensus EPS=5.3931 is the low-risk earnings anchor; 2027 EPS=7.3984 is used only as durability/growth guardrail.",
+      "market_pe_dynamic": null,
+      "market_indicator_source": null,
+      "forward_earnings_basis": "2026 consensus EPS is primary low-risk anchor; 2027 EPS is a durability guard and positive growth cannot lift the 2026 entry PE.",
       "theoretical_business_multiple_range": [
         18.0,
         25.0
@@ -389,7 +436,7 @@
         18.0,
         22.0
       ],
-      "multiple_rationale": "Versioned business valuation policy.",
+      "multiple_rationale": "电网资本开支和订单能见度支持成长估值，但低风险倍数仍受当年盈利质量和次年耐久度约束。",
       "business_fair_value_range": [
         97.08,
         134.83
@@ -407,10 +454,10 @@
         97.08
       ],
       "key_sensitivities": [
-        "2026 earnings",
-        "2027 earnings durability",
-        "company-level low-risk PE",
-        "consensus revisions"
+        "current-year EPS",
+        "next-year downside durability",
+        "company/industry low-risk PE",
+        "orders/volume/margin"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone"
@@ -459,10 +506,11 @@
       "consensus_eps_current_year": 4.0,
       "consensus_eps_next_year": 8.3962,
       "next_year_eps_growth_pct": 109.9,
-      "market_pe_dynamic": null,
       "market_forward_pe_current_year": 48.91,
       "market_forward_pe_next_year": 23.3,
-      "forward_earnings_basis": "2026 consensus EPS=4.0000 is the low-risk earnings anchor; 2027 EPS=8.3962 is used only as durability/growth guardrail.",
+      "market_pe_dynamic": null,
+      "market_indicator_source": null,
+      "forward_earnings_basis": "2026 consensus EPS is primary low-risk anchor; 2027 EPS is a durability guard and positive growth cannot lift the 2026 entry PE.",
       "theoretical_business_multiple_range": [
         20.0,
         28.0
@@ -473,7 +521,7 @@
         20.0,
         24.0
       ],
-      "multiple_rationale": "Versioned business valuation policy.",
+      "multiple_rationale": "AI高端PCB/CCL升级支持成长，但扩产、良率和产品结构决定盈利持续性。",
       "business_fair_value_range": [
         80.0,
         112.0
@@ -491,10 +539,10 @@
         80.0
       ],
       "key_sensitivities": [
-        "2026 earnings",
-        "2027 earnings durability",
-        "company-level low-risk PE",
-        "consensus revisions"
+        "current-year EPS",
+        "next-year downside durability",
+        "company/industry low-risk PE",
+        "orders/volume/margin"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone"
@@ -513,10 +561,11 @@
       "consensus_eps_current_year": 0.8975,
       "consensus_eps_next_year": 0.783,
       "next_year_eps_growth_pct": -12.76,
-      "market_pe_dynamic": null,
       "market_forward_pe_current_year": 12.81,
       "market_forward_pe_next_year": 14.69,
-      "forward_earnings_basis": "2026 consensus EPS=0.8975 is the low-risk earnings anchor; 2027 EPS=0.7830 is used only as durability/growth guardrail.",
+      "market_pe_dynamic": null,
+      "market_indicator_source": null,
+      "forward_earnings_basis": "2026 consensus EPS is primary low-risk anchor; 2027 EPS is a durability guard and positive growth cannot lift the 2026 entry PE.",
       "theoretical_business_multiple_range": [
         18.0,
         25.0
@@ -545,10 +594,10 @@
         11.67
       ],
       "key_sensitivities": [
-        "2026 earnings",
-        "2027 earnings durability",
-        "company-level low-risk PE",
-        "consensus revisions"
+        "current-year EPS",
+        "next-year downside durability",
+        "company/industry low-risk PE",
+        "orders/volume/margin"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "reasonable_buy_zone"
@@ -567,10 +616,11 @@
       "consensus_eps_current_year": 2.8814,
       "consensus_eps_next_year": 3.7814,
       "next_year_eps_growth_pct": 31.23,
-      "market_pe_dynamic": null,
       "market_forward_pe_current_year": 19.64,
       "market_forward_pe_next_year": 14.97,
-      "forward_earnings_basis": "2026 consensus EPS=2.8814 is the low-risk earnings anchor; 2027 EPS=3.7814 is used only as durability/growth guardrail.",
+      "market_pe_dynamic": null,
+      "market_indicator_source": null,
+      "forward_earnings_basis": "2026 consensus EPS is primary low-risk anchor; 2027 EPS is a durability guard and positive growth cannot lift the 2026 entry PE.",
       "theoretical_business_multiple_range": [
         20.0,
         24.0
@@ -599,10 +649,10 @@
         54.17
       ],
       "key_sensitivities": [
-        "2026 earnings",
-        "2027 earnings durability",
-        "company-level low-risk PE",
-        "consensus revisions"
+        "current-year EPS",
+        "next-year downside durability",
+        "company/industry low-risk PE",
+        "orders/volume/margin"
       ],
       "invalidation_condition": "Q3实际业绩低于预告下沿，或数据中心/汽车电子增长显著弱于公司表述。",
       "left_conclusion": "above_buy_zone"
@@ -651,10 +701,11 @@
       "consensus_eps_current_year": 3.2101,
       "consensus_eps_next_year": 3.6891,
       "next_year_eps_growth_pct": 14.92,
-      "market_pe_dynamic": null,
       "market_forward_pe_current_year": 11.57,
       "market_forward_pe_next_year": 10.07,
-      "forward_earnings_basis": "2026 consensus EPS=3.2101 is the low-risk earnings anchor; 2027 EPS=3.6891 is used only as durability/growth guardrail.",
+      "market_pe_dynamic": null,
+      "market_indicator_source": null,
+      "forward_earnings_basis": "2026 consensus EPS is primary low-risk anchor; 2027 EPS is a durability guard and positive growth cannot lift the 2026 entry PE.",
       "theoretical_business_multiple_range": [
         20.0,
         28.0
@@ -683,10 +734,10 @@
         38.52
       ],
       "key_sensitivities": [
-        "2026 earnings",
-        "2027 earnings durability",
-        "company-level low-risk PE",
-        "consensus revisions"
+        "current-year EPS",
+        "next-year downside durability",
+        "company/industry low-risk PE",
+        "orders/volume/margin"
       ],
       "invalidation_condition": "原材料上涨快于产品提价导致单吨利润持续下滑，或Q3/Q4订单/排产低于公司反馈。",
       "left_conclusion": "reasonable_buy_zone"
@@ -705,10 +756,11 @@
       "consensus_eps_current_year": 2.3083,
       "consensus_eps_next_year": 4.0422,
       "next_year_eps_growth_pct": 75.11,
-      "market_pe_dynamic": null,
       "market_forward_pe_current_year": 23.6,
       "market_forward_pe_next_year": 13.48,
-      "forward_earnings_basis": "2026 consensus EPS=2.3083 is the low-risk earnings anchor; 2027 EPS=4.0422 is used only as durability/growth guardrail.",
+      "market_pe_dynamic": null,
+      "market_indicator_source": null,
+      "forward_earnings_basis": "2026 consensus EPS is primary low-risk anchor; 2027 EPS is a durability guard and positive growth cannot lift the 2026 entry PE.",
       "theoretical_business_multiple_range": [
         18.0,
         25.0
@@ -719,7 +771,7 @@
         18.0,
         22.0
       ],
-      "multiple_rationale": "Versioned business valuation policy.",
+      "multiple_rationale": "Versioned low-risk valuation policy: current-year consensus is the primary earnings anchor; next-year upside cannot raise the entry multiple, while downside durability can compress it.",
       "business_fair_value_range": [
         41.55,
         57.71
@@ -737,10 +789,10 @@
         41.55
       ],
       "key_sensitivities": [
-        "2026 earnings",
-        "2027 earnings durability",
-        "company-level low-risk PE",
-        "consensus revisions"
+        "current-year EPS",
+        "next-year downside durability",
+        "company/industry low-risk PE",
+        "orders/volume/margin"
       ],
       "invalidation_condition": "隔膜供需转松导致价格/单平利润快速回落，或排产显著下降。",
       "left_conclusion": "above_buy_zone"
@@ -809,10 +861,11 @@
       "consensus_eps_current_year": 2.7486,
       "consensus_eps_next_year": 3.0864,
       "next_year_eps_growth_pct": 12.29,
-      "market_pe_dynamic": null,
       "market_forward_pe_current_year": 10.94,
       "market_forward_pe_next_year": 9.74,
-      "forward_earnings_basis": "2026 consensus EPS=2.7486 is the low-risk earnings anchor; 2027 EPS=3.0864 is used only as durability/growth guardrail.",
+      "market_pe_dynamic": null,
+      "market_indicator_source": null,
+      "forward_earnings_basis": "2026 consensus EPS is primary low-risk anchor; 2027 EPS is a durability guard and positive growth cannot lift the 2026 entry PE.",
       "theoretical_business_multiple_range": [
         13.0,
         17.0
@@ -823,7 +876,7 @@
         13.0,
         17.0
       ],
-      "multiple_rationale": "Versioned business valuation policy.",
+      "multiple_rationale": "Versioned low-risk valuation policy: current-year consensus is the primary earnings anchor; next-year upside cannot raise the entry multiple, while downside durability can compress it.",
       "business_fair_value_range": [
         35.73,
         46.73
@@ -841,10 +894,10 @@
         35.73
       ],
       "key_sensitivities": [
-        "2026 earnings",
-        "2027 earnings durability",
-        "company-level low-risk PE",
-        "consensus revisions"
+        "current-year EPS",
+        "next-year downside durability",
+        "company/industry low-risk PE",
+        "orders/volume/margin"
       ],
       "invalidation_condition": "出口/新能源出口连续转弱或产品结构改善无法继续转化为扣非利润增长。",
       "left_conclusion": "safe_buy_zone"
@@ -863,10 +916,11 @@
       "consensus_eps_current_year": 2.7743,
       "consensus_eps_next_year": 4.3143,
       "next_year_eps_growth_pct": 55.51,
-      "market_pe_dynamic": null,
       "market_forward_pe_current_year": 52.5,
       "market_forward_pe_next_year": 33.76,
-      "forward_earnings_basis": "2026 consensus EPS=2.7743 is the low-risk earnings anchor; 2027 EPS=4.3143 is used only as durability/growth guardrail.",
+      "market_pe_dynamic": null,
+      "market_indicator_source": null,
+      "forward_earnings_basis": "2026 consensus EPS is primary low-risk anchor; 2027 EPS is a durability guard and positive growth cannot lift the 2026 entry PE.",
       "theoretical_business_multiple_range": [
         20.0,
         28.0
@@ -877,7 +931,7 @@
         20.0,
         24.0
       ],
-      "multiple_rationale": "Versioned business valuation policy.",
+      "multiple_rationale": "AI高端PCB/CCL升级支持成长，但扩产、良率和产品结构决定盈利持续性。",
       "business_fair_value_range": [
         55.49,
         77.68
@@ -895,10 +949,10 @@
         55.49
       ],
       "key_sensitivities": [
-        "2026 earnings",
-        "2027 earnings durability",
-        "company-level low-risk PE",
-        "consensus revisions"
+        "current-year EPS",
+        "next-year downside durability",
+        "company/industry low-risk PE",
+        "orders/volume/margin"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone"
@@ -917,10 +971,11 @@
       "consensus_eps_current_year": 1.1409,
       "consensus_eps_next_year": 1.2782,
       "next_year_eps_growth_pct": 12.03,
-      "market_pe_dynamic": null,
       "market_forward_pe_current_year": 20.17,
       "market_forward_pe_next_year": 18.0,
-      "forward_earnings_basis": "2026 consensus EPS=1.1409 is the low-risk earnings anchor; 2027 EPS=1.2782 is used only as durability/growth guardrail.",
+      "market_pe_dynamic": null,
+      "market_indicator_source": null,
+      "forward_earnings_basis": "2026 consensus EPS is primary low-risk anchor; 2027 EPS is a durability guard and positive growth cannot lift the 2026 entry PE.",
       "theoretical_business_multiple_range": [
         18.0,
         25.0
@@ -931,7 +986,7 @@
         18.0,
         22.0
       ],
-      "multiple_rationale": "Versioned business valuation policy.",
+      "multiple_rationale": "电网资本开支和订单能见度支持成长估值，但低风险倍数仍受当年盈利质量和次年耐久度约束。",
       "business_fair_value_range": [
         20.54,
         28.52
@@ -949,10 +1004,10 @@
         20.54
       ],
       "key_sensitivities": [
-        "2026 earnings",
-        "2027 earnings durability",
-        "company-level low-risk PE",
-        "consensus revisions"
+        "current-year EPS",
+        "next-year downside durability",
+        "company/industry low-risk PE",
+        "orders/volume/margin"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone"
@@ -971,10 +1026,11 @@
       "consensus_eps_current_year": 0.6916,
       "consensus_eps_next_year": 0.8644,
       "next_year_eps_growth_pct": 24.99,
-      "market_pe_dynamic": null,
       "market_forward_pe_current_year": 17.03,
       "market_forward_pe_next_year": 13.63,
-      "forward_earnings_basis": "2026 consensus EPS=0.6916 is the low-risk earnings anchor; 2027 EPS=0.8644 is used only as durability/growth guardrail.",
+      "market_pe_dynamic": null,
+      "market_indicator_source": null,
+      "forward_earnings_basis": "2026 consensus EPS is primary low-risk anchor; 2027 EPS is a durability guard and positive growth cannot lift the 2026 entry PE.",
       "theoretical_business_multiple_range": [
         16.0,
         22.0
@@ -985,7 +1041,7 @@
         16.0,
         20.0
       ],
-      "multiple_rationale": "Versioned business valuation policy.",
+      "multiple_rationale": "Versioned low-risk valuation policy: current-year consensus is the primary earnings anchor; next-year upside cannot raise the entry multiple, while downside durability can compress it.",
       "business_fair_value_range": [
         11.07,
         15.22
@@ -1003,10 +1059,10 @@
         11.07
       ],
       "key_sensitivities": [
-        "2026 earnings",
-        "2027 earnings durability",
-        "company-level low-risk PE",
-        "consensus revisions"
+        "current-year EPS",
+        "next-year downside durability",
+        "company/industry low-risk PE",
+        "orders/volume/margin"
       ],
       "invalidation_condition": "主要订单延期/取消，或交付毛利率明显恶化。",
       "left_conclusion": "above_buy_zone"
@@ -1025,10 +1081,11 @@
       "consensus_eps_current_year": 1.3343,
       "consensus_eps_next_year": 1.9261,
       "next_year_eps_growth_pct": 44.36,
-      "market_pe_dynamic": null,
       "market_forward_pe_current_year": 23.84,
       "market_forward_pe_next_year": 16.52,
-      "forward_earnings_basis": "2026 consensus EPS=1.3343 is the low-risk earnings anchor; 2027 EPS=1.9261 is used only as durability/growth guardrail.",
+      "market_pe_dynamic": null,
+      "market_indicator_source": null,
+      "forward_earnings_basis": "2026 consensus EPS is primary low-risk anchor; 2027 EPS is a durability guard and positive growth cannot lift the 2026 entry PE.",
       "theoretical_business_multiple_range": [
         18.0,
         24.0
@@ -1039,7 +1096,7 @@
         18.0,
         22.0
       ],
-      "multiple_rationale": "Versioned business valuation policy.",
+      "multiple_rationale": "Versioned low-risk valuation policy: current-year consensus is the primary earnings anchor; next-year upside cannot raise the entry multiple, while downside durability can compress it.",
       "business_fair_value_range": [
         24.02,
         32.02
@@ -1057,10 +1114,10 @@
         24.02
       ],
       "key_sensitivities": [
-        "2026 earnings",
-        "2027 earnings durability",
-        "company-level low-risk PE",
-        "consensus revisions"
+        "current-year EPS",
+        "next-year downside durability",
+        "company/industry low-risk PE",
+        "orders/volume/margin"
       ],
       "invalidation_condition": "造船新增订单显著转弱、低速机排产下降或交付毛利率恶化。",
       "left_conclusion": "above_buy_zone"
@@ -1079,10 +1136,11 @@
       "consensus_eps_current_year": 2.9792,
       "consensus_eps_next_year": 3.5492,
       "next_year_eps_growth_pct": 19.13,
-      "market_pe_dynamic": null,
       "market_forward_pe_current_year": 23.06,
       "market_forward_pe_next_year": 19.36,
-      "forward_earnings_basis": "2026 consensus EPS=2.9792 is the low-risk earnings anchor; 2027 EPS=3.5492 is used only as durability/growth guardrail.",
+      "market_pe_dynamic": null,
+      "market_indicator_source": null,
+      "forward_earnings_basis": "2026 consensus EPS is primary low-risk anchor; 2027 EPS is a durability guard and positive growth cannot lift the 2026 entry PE.",
       "theoretical_business_multiple_range": [
         22.0,
         30.0
@@ -1093,7 +1151,7 @@
         18.0,
         22.0
       ],
-      "multiple_rationale": "Versioned business valuation policy.",
+      "multiple_rationale": "高速光模块具有高成长属性，但技术迭代与客户集中度要求保留安全边际。",
       "business_fair_value_range": [
         65.54,
         89.38
@@ -1111,10 +1169,10 @@
         53.63
       ],
       "key_sensitivities": [
-        "2026 earnings",
-        "2027 earnings durability",
-        "company-level low-risk PE",
-        "consensus revisions"
+        "current-year EPS",
+        "next-year downside durability",
+        "company/industry low-risk PE",
+        "orders/volume/margin"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone"
@@ -1213,10 +1271,11 @@
       "consensus_eps_current_year": 3.0947,
       "consensus_eps_next_year": 4.2099,
       "next_year_eps_growth_pct": 36.03,
-      "market_pe_dynamic": null,
       "market_forward_pe_current_year": 20.69,
       "market_forward_pe_next_year": 15.21,
-      "forward_earnings_basis": "2026 consensus EPS=3.0947 is the low-risk earnings anchor; 2027 EPS=4.2099 is used only as durability/growth guardrail.",
+      "market_pe_dynamic": null,
+      "market_indicator_source": null,
+      "forward_earnings_basis": "2026 consensus EPS is primary low-risk anchor; 2027 EPS is a durability guard and positive growth cannot lift the 2026 entry PE.",
       "theoretical_business_multiple_range": [
         20.0,
         28.0
@@ -1227,7 +1286,7 @@
         20.0,
         24.0
       ],
-      "multiple_rationale": "Versioned business valuation policy.",
+      "multiple_rationale": "AI算力需求支持成长估值，但订单兑现、产品结构和利润率决定实际低风险倍数。",
       "business_fair_value_range": [
         61.89,
         86.65
@@ -1245,10 +1304,10 @@
         61.89
       ],
       "key_sensitivities": [
-        "2026 earnings",
-        "2027 earnings durability",
-        "company-level low-risk PE",
-        "consensus revisions"
+        "current-year EPS",
+        "next-year downside durability",
+        "company/industry low-risk PE",
+        "orders/volume/margin"
       ],
       "invalidation_condition": "对应T2细分链降级/失效，或公司后续收入、利润率、订单/产销出现与产业链方向相反的明显恶化。",
       "left_conclusion": "above_buy_zone"
@@ -1367,10 +1426,11 @@
       "consensus_eps_current_year": 8.8594,
       "consensus_eps_next_year": 12.4869,
       "next_year_eps_growth_pct": 40.95,
-      "market_pe_dynamic": null,
       "market_forward_pe_current_year": 47.67,
       "market_forward_pe_next_year": 33.82,
-      "forward_earnings_basis": "2026 consensus EPS=8.8594 is the low-risk earnings anchor; 2027 EPS=12.4869 is used only as durability/growth guardrail.",
+      "market_pe_dynamic": null,
+      "market_indicator_source": null,
+      "forward_earnings_basis": "2026 consensus EPS is primary low-risk anchor; 2027 EPS is a durability guard and positive growth cannot lift the 2026 entry PE.",
       "theoretical_business_multiple_range": [
         22.0,
         30.0
@@ -1381,7 +1441,7 @@
         22.0,
         26.0
       ],
-      "multiple_rationale": "Versioned business valuation policy.",
+      "multiple_rationale": "Versioned low-risk valuation policy: current-year consensus is the primary earnings anchor; next-year upside cannot raise the entry multiple, while downside durability can compress it.",
       "business_fair_value_range": [
         194.91,
         265.78
@@ -1399,10 +1459,10 @@
         194.91
       ],
       "key_sensitivities": [
-        "2026 earnings",
-        "2027 earnings durability",
-        "company-level low-risk PE",
-        "consensus revisions"
+        "current-year EPS",
+        "next-year downside durability",
+        "company/industry low-risk PE",
+        "orders/volume/margin"
       ],
       "invalidation_condition": "数据中心光纤需求显著降速、产品价格/毛利快速回落或客户拓展不及预期。",
       "left_conclusion": "above_buy_zone"
@@ -1421,10 +1481,11 @@
       "consensus_eps_current_year": 0.3267,
       "consensus_eps_next_year": 0.4167,
       "next_year_eps_growth_pct": 27.55,
-      "market_pe_dynamic": null,
       "market_forward_pe_current_year": 31.35,
       "market_forward_pe_next_year": 24.58,
-      "forward_earnings_basis": "2026 consensus EPS=0.3267 is the low-risk earnings anchor; 2027 EPS=0.4167 is used only as durability/growth guardrail.",
+      "market_pe_dynamic": null,
+      "market_indicator_source": null,
+      "forward_earnings_basis": "2026 consensus EPS is primary low-risk anchor; 2027 EPS is a durability guard and positive growth cannot lift the 2026 entry PE.",
       "theoretical_business_multiple_range": [
         18.0,
         24.0
@@ -1435,7 +1496,7 @@
         18.0,
         22.0
       ],
-      "multiple_rationale": "Versioned business valuation policy.",
+      "multiple_rationale": "Versioned low-risk valuation policy: current-year consensus is the primary earnings anchor; next-year upside cannot raise the entry multiple, while downside durability can compress it.",
       "business_fair_value_range": [
         5.88,
         7.84
@@ -1453,10 +1514,10 @@
         5.88
       ],
       "key_sensitivities": [
-        "2026 earnings",
-        "2027 earnings durability",
-        "company-level low-risk PE",
-        "consensus revisions"
+        "current-year EPS",
+        "next-year downside durability",
+        "company/industry low-risk PE",
+        "orders/volume/margin"
       ],
       "invalidation_condition": "海外项目验收持续延迟、订单取消或汇率/费用拖累超过收入增长。",
       "left_conclusion": "above_buy_zone"
@@ -1475,10 +1536,11 @@
       "consensus_eps_current_year": 7.3472,
       "consensus_eps_next_year": 8.9551,
       "next_year_eps_growth_pct": 21.88,
-      "market_pe_dynamic": null,
       "market_forward_pe_current_year": 21.42,
       "market_forward_pe_next_year": 17.58,
-      "forward_earnings_basis": "2026 consensus EPS=7.3472 is the low-risk earnings anchor; 2027 EPS=8.9551 is used only as durability/growth guardrail.",
+      "market_pe_dynamic": null,
+      "market_indicator_source": null,
+      "forward_earnings_basis": "2026 consensus EPS is primary low-risk anchor; 2027 EPS is a durability guard and positive growth cannot lift the 2026 entry PE.",
       "theoretical_business_multiple_range": [
         20.0,
         28.0
@@ -1489,7 +1551,7 @@
         20.0,
         24.0
       ],
-      "multiple_rationale": "Versioned business valuation policy.",
+      "multiple_rationale": "研发外包具备成长属性，但订单、海外政策和客户集中度要求低风险买点保留折价。",
       "business_fair_value_range": [
         146.94,
         205.72
@@ -1507,10 +1569,10 @@
         146.94
       ],
       "key_sensitivities": [
-        "2026 earnings",
-        "2027 earnings durability",
-        "company-level low-risk PE",
-        "consensus revisions"
+        "current-year EPS",
+        "next-year downside durability",
+        "company/industry low-risk PE",
+        "orders/volume/margin"
       ],
       "invalidation_condition": "订单增速显著下滑、监管/地缘政策冲击订单或经调整利润率明显低于指引。",
       "left_conclusion": "above_buy_zone"
@@ -1529,10 +1591,11 @@
       "consensus_eps_current_year": 1.5192,
       "consensus_eps_next_year": 1.9908,
       "next_year_eps_growth_pct": 31.04,
-      "market_pe_dynamic": null,
       "market_forward_pe_current_year": 15.68,
       "market_forward_pe_next_year": 11.97,
-      "forward_earnings_basis": "2026 consensus EPS=1.5192 is the low-risk earnings anchor; 2027 EPS=1.9908 is used only as durability/growth guardrail.",
+      "market_pe_dynamic": null,
+      "market_indicator_source": null,
+      "forward_earnings_basis": "2026 consensus EPS is primary low-risk anchor; 2027 EPS is a durability guard and positive growth cannot lift the 2026 entry PE.",
       "theoretical_business_multiple_range": [
         18.0,
         25.0
@@ -1561,10 +1624,10 @@
         25.83
       ],
       "key_sensitivities": [
-        "2026 earnings",
-        "2027 earnings durability",
-        "company-level low-risk PE",
-        "consensus revisions"
+        "current-year EPS",
+        "next-year downside durability",
+        "company/industry low-risk PE",
+        "orders/volume/margin"
       ],
       "invalidation_condition": "设备验收显著延迟/取消，或材料业务毛利率下降抵消设备增长。",
       "left_conclusion": "reasonable_buy_zone"
@@ -1583,10 +1646,11 @@
       "consensus_eps_current_year": 13.5015,
       "consensus_eps_next_year": 16.8345,
       "next_year_eps_growth_pct": 24.69,
-      "market_pe_dynamic": null,
       "market_forward_pe_current_year": 29.39,
       "market_forward_pe_next_year": 23.57,
-      "forward_earnings_basis": "2026 consensus EPS=13.5015 is the low-risk earnings anchor; 2027 EPS=16.8345 is used only as durability/growth guardrail.",
+      "market_pe_dynamic": null,
+      "market_indicator_source": null,
+      "forward_earnings_basis": "2026 consensus EPS is primary low-risk anchor; 2027 EPS is a durability guard and positive growth cannot lift the 2026 entry PE.",
       "theoretical_business_multiple_range": [
         25.0,
         32.0
@@ -1597,7 +1661,7 @@
         20.0,
         24.0
       ],
-      "multiple_rationale": "Versioned business valuation policy.",
+      "multiple_rationale": "Versioned low-risk valuation policy: current-year consensus is the primary earnings anchor; next-year upside cannot raise the entry multiple, while downside durability can compress it.",
       "business_fair_value_range": [
         337.54,
         432.05
@@ -1615,10 +1679,10 @@
         270.03
       ],
       "key_sensitivities": [
-        "2026 earnings",
-        "2027 earnings durability",
-        "company-level low-risk PE",
-        "consensus revisions"
+        "current-year EPS",
+        "next-year downside durability",
+        "company/industry low-risk PE",
+        "orders/volume/margin"
       ],
       "invalidation_condition": "利基存储价格快速回落、下游需求明显被高价抑制或晶圆供给约束出货。",
       "left_conclusion": "above_buy_zone"
@@ -1632,5 +1696,17 @@
     "600066",
     "603659"
   ],
-  "method_note": "Non-cycle PE valuation uses current-year consensus EPS as the low-risk earnings anchor. Industry/business PE ranges are theoretical fair-value references; low-risk entry PE is separately company-explicit or growth-guarded. Financial PB valuation uses current-year Forward ROE as primary; next-year ROE can only lower, never raise, the low-risk PB band. Cycle routing is driven by versioned recall tags and cycle policy registry rather than a hard-coded subchain list."
+  "deferred_cycle_codes": [
+    "000807",
+    "000933",
+    "002064",
+    "002326",
+    "600309",
+    "600362",
+    "601088",
+    "601225",
+    "601699",
+    "603993",
+    "605020"
+  ]
 }
