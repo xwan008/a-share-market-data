@@ -49,24 +49,23 @@ def main() -> int:
     for tag, row in chain_audit.items():
         cap = int(row.get("representative_cap", -1))
         selected = int(row.get("selected_count", -1))
-        weekly = row.get("weekly_deep_review_codes") or []
-        overflow = int(row.get("weekly_only_cap_overflow", 0))
+        weekly = row.get("weekly_deep_review_selected_codes") or []
         selected_codes = set(weekly) | set(row.get("selected_t2_only_codes") or [])
         if len(selected_codes) != selected:
             errors.append(f"{tag}:selected_count_mismatch")
         if selected > cap:
-            if not weekly or overflow != selected - cap:
-                errors.append(f"{tag}:cap_violation:{selected}>{cap}")
-            if len(weekly) <= cap:
-                errors.append(f"{tag}:nonweekly_caused_overflow")
-        elif overflow != 0:
-            errors.append(f"{tag}:false_overflow:{overflow}")
-        deferred_codes = set(row.get("deferred_t2_only_codes") or [])
+            errors.append(f"{tag}:cap_violation:{selected}>{cap}")
+        deferred_codes = set(row.get("deferred_codes") or [])
         if selected_codes & deferred_codes:
             errors.append(f"{tag}:selected_deferred_overlap")
+        ranked = set(row.get("ranked_all_codes") or [])
+        if selected_codes | deferred_codes != ranked:
+            errors.append(f"{tag}:ranked_partition_mismatch")
 
     if pool.get("t2_representative_policy_reviewed_at") != policy.get("reviewed_at"):
-        errors.append("representative_policy_version_mismatch")
+        errors.append("representative_policy_review_date_mismatch")
+    if pool.get("t2_representative_policy_schema_version") != policy.get("schema_version"):
+        errors.append("representative_policy_schema_mismatch")
 
     print(json.dumps({
         "status": "PASS" if not errors else "FAIL",
