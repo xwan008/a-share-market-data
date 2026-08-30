@@ -7,6 +7,8 @@ on:
     paths:
       - '.github/workflows/backfill-history.yml'
       - 'scripts/backfill_history.py'
+      - 'scripts/sharded_backfill_plan.py'
+      - 'scripts/finalize_sharded_backfill.py'
       - 'scripts/history_store.py'
       - 'scripts/build_history.py'
       - 'scripts/build_bridge.py'
@@ -22,47 +24,108 @@ permissions:
 
 concurrency:
   group: a-share-market-data-write
-  cancel-in-progress: false
+  cancel-in-progress: true
+
+env:
+  HISTORY_PARTITION_COUNT: 16
 
 jobs:
-  backfill:
+  test:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
           cache: 'pip'
-
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
           pip install pytest
-
       - name: Run tests
         run: python -m pytest -q
 
-      - name: Refresh bounded 180-session qfq history and compact 52-week summary
-        run: python scripts/backfill_history.py
+  backfill:
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        part: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - name: Install fetch dependency
+        run: pip install requests
+      - name: Refresh physical history-shard partition ${{ matrix.part }}
+        run: >-
+          python scripts/backfill_history.py
+          --partition-index ${{ matrix.part }}
+          --partition-count $HISTORY_PARTITION_COUNT
+      - name: Package only files owned by this partition
+        if: always()
+        shell: bash
+        run: |
+          rm -rf artifact
+          mkdir -p artifact/data/history_shards artifact/data/backfill_parts
+          git diff --name-only -- data/history_shards | while IFS= read -r file; do
+            if [ -n "$file" ] && [ -f "$file" ]; then
+              mkdir -p "artifact/$(dirname "$file")"
+              cp "$file" "artifact/$file"
+            fi
+          done
+          status="data/backfill_parts/part-${{ matrix.part }}.json"
+          if [ -f "$status" ]; then
+            cp "$status" "artifact/$status"
+          fi
+      - name: Upload partition result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: history-part-${{ matrix.part }}
+          path: artifact/
+          if-no-files-found: error
+          retention-days: 3
 
+  aggregate:
+    needs: [test, backfill]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Merge all successful partition artifacts into working tree
+        uses: actions/download-artifact@v4
+        with:
+          pattern: history-part-*
+          merge-multiple: true
+          path: .
+      - name: Validate partition coverage and local-history readiness
+        run: python scripts/finalize_sharded_backfill.py --partition-count $HISTORY_PARTITION_COUNT
       - name: Build 5d/20d/60d market breadth and structure summary
         run: python scripts/build_history.py
-
       - name: Rebuild compact ChatGPT bridge files
         run: python scripts/build_bridge.py
-
-      - name: Commit rolling history
+      - name: Commit bounded history only after all partitions reconcile
         shell: bash
         run: |
           if git status --porcelain -- data | grep -q .; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add -A data
-            git commit -m "data: refresh bounded 180-session qfq history"
+            git commit -m "data: refresh sharded bounded 180-session qfq history"
 
             for attempt in 1 2 3; do
               git pull --rebase origin main
@@ -73,13 +136,16 @@ jobs:
               sleep $((attempt * 2))
             done
 
-            echo "Failed to push history refresh after 3 attempts."
+            echo "Failed to push sharded history refresh after 3 attempts."
             exit 1
           else
-            echo "No backfill changes to commit."
+            echo "No sharded backfill changes to commit."
           fi
 
-# Manual/weekly maintenance workflow. Full OHLCV history remains bounded to 180
-# completed sessions. A weekly fetch reads ~one trading year only to rebuild a
-# compact 52-week high/low + weekly-pivot summary; those extra rows are not stored.
-# Partial Tencent failures retain the last good local history and summary.
+# Design invariants:
+# - physical history shard keys (code[:4]) are assigned to exactly one matrix job;
+# - at most four partitions run concurrently to limit Tencent burst pressure;
+# - fail-fast is disabled, so one partition failure does not discard completed work;
+# - artifacts are merged only after every partition job succeeds;
+# - full OHLCV storage remains bounded to 180 sessions per stock;
+# - weekly fetches read ~252 sessions only to rebuild compact 52-week summaries.
