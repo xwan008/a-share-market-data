@@ -1,0 +1,53 @@
+name: Build candidate 52-week structure
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/build_candidate_structure_260d.py'
+      - '.github/workflows/build-candidate-structure-260d.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install requests
+      - name: Build same-date multi-timeframe pressure map
+        run: python scripts/build_candidate_structure_260d.py
+      - name: Validate right-side date and fields
+        run: |
+          python - <<'PY'
+          import json,sys
+          p=json.load(open('data/research/pipeline/right_structure_scan.json'))
+          errs=[]
+          if p.get('common_pool_count') != len(p.get('companies',{})): errs.append('coverage_mismatch')
+          for c,r in p.get('companies',{}).items():
+              if r.get('conclusion')=='unavailable': continue
+              if r.get('history_points',0)<200: errs.append(f'{c}:history_lt_200')
+              if r.get('data_date')!='2026-08-28': errs.append(f'{c}:date:{r.get("data_date")}')
+              for k in ('structure_state','first_effective_resistance','support_invalidation','upside_to_first_resistance_pct','risk_reward','conclusion'):
+                  if k not in r: errs.append(f'{c}:missing:{k}')
+          print({'status':'PASS' if not errs else 'FAIL','errors':errs[:30]})
+          sys.exit(0 if not errs else 2)
+          PY
+      - name: Commit structure scan
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/research/pipeline/right_structure_scan.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "research: freeze 52-week right-side structure scan"
+          git pull --rebase origin main
+          git push
