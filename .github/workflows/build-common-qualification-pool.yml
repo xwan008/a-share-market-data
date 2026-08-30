@@ -27,8 +27,8 @@ permissions:
   contents: write
 
 concurrency:
-  group: a-share-common-qualification-pool
-  cancel-in-progress: true
+  group: a-share-research-artifact-writers-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   build:
