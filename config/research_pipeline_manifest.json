@@ -1,5 +1,5 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "pipeline": "a_share_low_risk",
   "authoritative_files": {
     "orchestrator_skill": "skills/a-share-low-risk/orchestrator/SKILL.md",
@@ -36,25 +36,53 @@
       "validator": "python scripts/validate_research_pipeline.py t2-recall data/research/pipeline/t2_company_recall.json --industry-scan data/research/pipeline/industry_scan.json"
     },
     {
-      "id": "weekly_merge",
+      "id": "weekly_opportunity_scan",
       "requires": ["industry_scan", "t2_company_recall"],
+      "skill": "skills/a-share-low-risk/weekly-opportunity-scan/SKILL.md",
+      "output": "data/research/pipeline/weekly_opportunity_scan.json",
+      "persistent_output": "data/research/weekly_fundamental_opportunity_pool.json",
+      "validator": "python scripts/validate_research_outputs.py weekly-scan data/research/pipeline/weekly_opportunity_scan.json"
+    },
+    {
+      "id": "stage_order",
+      "requires": ["industry_scan", "t2_company_recall", "weekly_opportunity_scan"],
       "run_state": "data/research/pipeline/run_state.json",
       "validator": "python scripts/validate_research_pipeline.py stage-order data/research/pipeline/run_state.json"
     },
     {
       "id": "earnings_validation",
-      "skill": "skills/a-share-low-risk/earnings-validation/SKILL.md"
+      "skill": "skills/a-share-low-risk/earnings-validation/SKILL.md",
+      "output": "data/research/pipeline/earnings_validation.json"
+    },
+    {
+      "id": "left_value_fundamental",
+      "requires": ["earnings_validation"],
+      "skill": "skills/a-share-low-risk/fundamental-valuation/SKILL.md",
+      "output": "data/research/pipeline/fundamental_valuation.json",
+      "validator": "python scripts/validate_research_outputs.py fundamental-valuation data/research/pipeline/fundamental_valuation.json"
     },
     {
       "id": "left_value_cycle",
-      "skill": "skills/a-share-low-risk/cycle-valuation/SKILL.md"
+      "requires": ["earnings_validation"],
+      "skill": "skills/a-share-low-risk/cycle-valuation/SKILL.md",
+      "output": "data/research/pipeline/cycle_valuation.json"
     },
     {
       "id": "right_structure",
-      "skill": "skills/a-share-low-risk/technical-structure/SKILL.md"
+      "requires": ["earnings_validation"],
+      "skill": "skills/a-share-low-risk/technical-structure/SKILL.md",
+      "output": "data/research/pipeline/technical_structure.json"
+    },
+    {
+      "id": "final_selection",
+      "requires": ["left_value_fundamental", "left_value_cycle", "right_structure"],
+      "skill": "skills/a-share-low-risk/final-selection/SKILL.md",
+      "output": "data/research/pipeline/final_selection.json",
+      "validator": "python scripts/validate_research_outputs.py final-selection data/research/pipeline/final_selection.json"
     }
   ],
   "hard_stop_on_validator_failure": true,
-  "weekly_pool_forbidden_before_stage": "weekly_merge",
-  "recall_principle": "LLM classifies mechanically enumerated companies; it does not recall the company universe from memory"
+  "weekly_pool_forbidden_before_stage": "weekly_opportunity_scan",
+  "recall_principle": "LLM classifies mechanically enumerated industries and companies; it does not recall the research universe from memory",
+  "selection_principle": "final selection only selects validated upstream outputs; it never repairs upstream calculations"
 }
