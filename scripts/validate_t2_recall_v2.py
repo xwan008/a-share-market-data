@@ -4,6 +4,7 @@ import argparse
 import copy
 import sys
 
+from company_index_fingerprint import company_index_fingerprint
 from validate_research_pipeline import (
     ValidationError,
     load_json,
@@ -57,14 +58,34 @@ def main() -> int:
     args = parser.parse_args()
     try:
         recall = load_json(args.recall)
+        company_index = load_json(args.company_index)
         registry = registry_with_discoveries(load_json(args.company_registry), recall)
-        errors = validate_t2_recall(
-            recall,
+
+        errors: list[str] = []
+        current_fingerprint = company_index_fingerprint(company_index)
+        recall_fingerprint = recall.get("company_index_fingerprint")
+        schema_version = int(recall.get("schema_version") or 1)
+
+        if schema_version >= 2:
+            if not recall_fingerprint:
+                errors.append("t2_recall_company_index_fingerprint_missing")
+            elif recall_fingerprint != current_fingerprint:
+                errors.append("t2_recall_points_to_wrong_company_index_content")
+
+        # validate_t2_recall already re-derives candidate-universe coverage from the
+        # current company index. For legacy schema-v1 recalls, neutralize the old
+        # generated_at equality check and rely on that semantic comparison instead.
+        # New schema-v2 recalls additionally carry the stable content fingerprint above.
+        recall_for_semantic_validation = copy.deepcopy(recall)
+        recall_for_semantic_validation["company_index_generated_at"] = company_index.get("generated_at")
+
+        errors.extend(validate_t2_recall(
+            recall_for_semantic_validation,
             load_json(args.industry_scan),
             registry,
-            load_json(args.company_index),
+            company_index,
             load_json(args.universe),
-        )
+        ))
         return print_result("t2-recall-v2", errors)
     except ValidationError as exc:
         return print_result("t2-recall-v2", [str(exc)])
