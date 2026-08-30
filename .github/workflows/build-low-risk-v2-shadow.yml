@@ -9,6 +9,7 @@ on:
       - 'config/research_pipeline_manifest.json'
       - 'scripts/build_v2_earnings_anomaly_recall.py'
       - 'scripts/build_v2_full_market_price_structure.py'
+      - 'scripts/build_v2_shadow_crosscheck.py'
       - 'scripts/validate_v2_blueprint.py'
       - '.github/workflows/build-low-risk-v2-shadow.yml'
   schedule:
@@ -48,6 +49,8 @@ jobs:
         run: python scripts/build_v2_earnings_anomaly_recall.py
       - name: Build independent full-market price structure
         run: python scripts/build_v2_full_market_price_structure.py
+      - name: Build case-free mechanical crosscheck
+        run: python scripts/build_v2_shadow_crosscheck.py
       - name: Validate V2 case-free invariants
         run: python scripts/validate_v2_blueprint.py
       - name: Print market-wide structure summary
@@ -55,11 +58,13 @@ jobs:
           python - <<'PY'
           import json
           p=json.load(open('data/research/v2/full_market_price_structure.json',encoding='utf-8'))
+          c=json.load(open('data/research/v2/shadow_crosscheck.json',encoding='utf-8'))
           print(json.dumps({
             'universe_count':p.get('universe_count'),
             'verified_count':p.get('verified_count'),
             'structure_type_counts':p.get('structure_type_counts'),
-            'right_candidate_count':len(p.get('right_candidate_codes',[]))
+            'right_candidate_count':len(p.get('right_candidate_codes',[])),
+            'crosscheck_counts':c.get('counts')
           },ensure_ascii=False,indent=2))
           PY
       - name: Commit shadow mechanical outputs
@@ -67,7 +72,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/research/v2/earnings_anomaly_recall.json data/research/v2/full_market_price_structure.json
+          git add data/research/v2/earnings_anomaly_recall.json data/research/v2/full_market_price_structure.json data/research/v2/shadow_crosscheck.json
           if git diff --cached --quiet; then exit 0; fi
           git commit -m "research-v2: refresh shadow mechanical scans"
           for attempt in 1 2 3; do
