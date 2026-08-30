@@ -5,6 +5,7 @@ on:
   push:
     branches: [main]
     paths:
+      - 'data/research/pipeline/t2_company_recall.json'
       - 'scripts/build_weekly_deep_review.py'
       - 'scripts/build_run_state.py'
       - 'config/weekly_deep_review_overrides_20260830.json'
@@ -28,7 +29,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Revalidate frozen T2 recall
+      - name: Revalidate tiered company recall
         run: python scripts/validate_t2_recall_v2.py data/research/pipeline/t2_company_recall.json --industry-scan data/research/pipeline/industry_scan.json
       - name: Build weekly deep review and migrate pool
         run: python scripts/build_weekly_deep_review.py
