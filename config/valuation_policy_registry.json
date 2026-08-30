@@ -1,11 +1,15 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "reviewed_at": "2026-08-30",
   "forecast_policy": {
     "primary_source": "akshare.stock_profit_forecast_em consensus EPS",
     "minimum_report_count": 3,
     "fallback_h1_annualization_formal": false,
     "rule": "Formal valuation should use externally formed forward earnings consensus or an explicit company-level forecast model. H1 EPS times two is diagnostic fallback only and cannot by itself create a formal value anchor."
+  },
+  "coverage_policy": {
+    "unsupported_policy_allowed": false,
+    "rule": "Every non-cycle company entering valuation must map to a versioned PE policy, a versioned financial PB/ROE policy, or an explicit normalization/data-insufficiency execution state. Missing valuation policy is a validator failure, not an unavailable shortcut."
   },
   "default_buy_band": {
     "safe_to_fair_floor": [0.75, 0.88],
@@ -19,6 +23,36 @@
     "ai_server": {"multiple_range": [20, 28]},
     "optical": {"multiple_range": [22, 30]},
     "pcb_ccl": {"multiple_range": [20, 28]}
+  },
+  "financial_policies": {
+    "broker": {
+      "valuation_model": "broker_forward_pb_roe",
+      "tag": "证券",
+      "roe_pb_bands": [
+        {"roe_max": 0.05, "pb_range": [0.75, 0.95]},
+        {"roe_max": 0.08, "pb_range": [0.85, 1.10]},
+        {"roe_max": 0.12, "pb_range": [0.95, 1.30]},
+        {"roe_max": 0.16, "pb_range": [1.10, 1.50]},
+        {"roe_max": 9.99, "pb_range": [1.25, 1.70]}
+      ],
+      "safe_to_fair_floor": [0.78, 0.90],
+      "reasonable_to_fair_floor": [0.90, 1.0],
+      "rationale": "券商利润高度受市场成交、投行与自营周期影响，正式估值采用Forward ROE对应的PB区间；PE只作交叉检查。"
+    },
+    "insurance": {
+      "valuation_model": "insurance_forward_pb_roe_proxy",
+      "tag": "保险",
+      "roe_pb_bands": [
+        {"roe_max": 0.08, "pb_range": [0.70, 0.95]},
+        {"roe_max": 0.12, "pb_range": [0.80, 1.10]},
+        {"roe_max": 0.16, "pb_range": [0.90, 1.25]},
+        {"roe_max": 0.20, "pb_range": [1.00, 1.40]},
+        {"roe_max": 9.99, "pb_range": [1.10, 1.55]}
+      ],
+      "safe_to_fair_floor": [0.78, 0.90],
+      "reasonable_to_fair_floor": [0.90, 1.0],
+      "rationale": "保险公司更完整模型应包含P/EV，但在缺少统一可机器读取EV时，使用Forward ROE-PB桥作为保守代理并显式标记proxy；PE不作为主锚。"
+    }
   },
   "company_overrides": {
     "000338": {
@@ -51,6 +85,13 @@
     "601869": {"name": "长飞光纤", "valuation_model": "optical_infrastructure_forward_pe", "multiple_range": [22, 30]},
     "001309": {"name": "德明利", "valuation_model": "memory_growth_forward_pe", "multiple_range": [22, 30]},
     "002709": {"name": "天赐材料", "valuation_model": "battery_material_forward_pe", "multiple_range": [20, 28]},
-    "002812": {"name": "恩捷股份", "valuation_model": "separator_forward_pe", "multiple_range": [18, 25]}
+    "002812": {"name": "恩捷股份", "valuation_model": "separator_forward_pe", "multiple_range": [18, 25]},
+    "002156": {
+      "name": "通富微电",
+      "valuation_model": "advanced_packaging_normalized_forward_pe",
+      "multiple_range": [22, 30],
+      "requires_normalized_earnings_bridge": true,
+      "rationale": "主营先进封装景气可使用Forward PE，但若归母利润含显著产业投资收益，必须先完成扣非/一次性收益归一化。"
+    }
   }
 }
