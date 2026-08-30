@@ -38,6 +38,7 @@ def main() -> int:
     index = json.loads(INDEX.read_text(encoding="utf-8"))
     latest = json.loads(LATEST.read_text(encoding="utf-8"))
     rule_data = json.loads(RULES.read_text(encoding="utf-8"))
+    previous = json.loads(OUTPUT.read_text(encoding="utf-8")) if OUTPUT.exists() else {}
     rule_map = {(r["broad_industry_id"], r["subchain"]): r for r in rule_data.get("chains", [])}
     required = t2_keys(scan)
     missing_rules = sorted(required - set(rule_map))
@@ -132,13 +133,20 @@ def main() -> int:
             "coverage_gap": [],
         })
 
+    semantic_unchanged = (
+        previous.get("industry_scan_frozen_at") == scan.get("industry_frozen_at")
+        and previous.get("t2_subchains") == rows
+        and bool(previous.get("t2_recall_frozen_at"))
+    )
+    frozen_at = previous.get("t2_recall_frozen_at") if semantic_unchanged else now
+
     payload = {
         "schema_version": 2,
         "industry_scan_frozen_at": scan.get("industry_frozen_at"),
         "company_index_generated_at": index.get("generated_at"),
         "company_index_fingerprint": company_index_fingerprint(index),
         "weekly_pool_read": False,
-        "t2_recall_frozen_at": now,
+        "t2_recall_frozen_at": frozen_at,
         "t2_subchains": rows,
     }
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
@@ -146,7 +154,9 @@ def main() -> int:
     print(json.dumps({
         "status":"ok",
         "schema_version": payload["schema_version"],
+        "semantic_unchanged": semantic_unchanged,
         "company_index_fingerprint": payload["company_index_fingerprint"],
+        "t2_recall_frozen_at": payload["t2_recall_frozen_at"],
         "t2_subchains":len(rows),
         "candidate_classifications":sum(r["candidate_universe_count"] for r in rows),
         "exposed_company_rows":sum(r["classification_counts"]["exposed"] for r in rows),
