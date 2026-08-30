@@ -42,20 +42,34 @@ def test_weekly_scan_cannot_precede_t2_freeze_or_modify_industry():
 
 def test_fundamental_valuation_requires_traceable_ranges():
     output = {
+        "common_pool_count": 1,
+        "deferred_cycle_codes": [],
+        "policy_coverage": {
+            "noncycle_count": 1,
+            "supported_policy_count": 1,
+            "unsupported_policy_count": 0,
+            "supported_policy_codes": ["002475"],
+            "unsupported_policy_codes": [],
+        },
         "companies": [
             {
                 "code": "002475",
                 "valuation_status": "valid",
-                "valuation_model": "forward_pe",
-                "forward_earnings_basis": "NTM normalized EPS 3.2-3.5",
+                "policy_status": "supported",
+                "valuation_model": "multi_engine_precision_manufacturing_forward_pe",
+                "valuation_basis_unit": "PE",
+                "forecast_source": "analyst_consensus",
+                "consensus_eps_current_year": 3.2,
+                "forward_earnings_basis": "2026/2027 consensus forward earnings",
                 "reasonable_multiple_range": [18, 22],
+                "multiple_rationale": "versioned business valuation policy",
                 "value_anchor_range": [57.6, 77.0],
                 "safe_buy_range": [52, 58],
                 "reasonable_buy_range": [58, 68],
                 "key_sensitivities": ["AI data-center revenue", "margin"],
                 "invalidation_condition": "forward earnings downgrade",
             }
-        ]
+        ],
     }
     assert validate_fundamental_valuation(output) == []
     output["companies"][0].pop("value_anchor_range")
