@@ -110,6 +110,18 @@ def test_financial_pb_band_is_forward_roe_driven():
     assert fund_mod.choose_pb_band(policy, 0.18) == [1.2, 1.6]
 
 
+def test_financial_next_year_upside_cannot_raise_low_risk_roe():
+    roe, method = fund_mod.choose_low_risk_forward_roe(0.10, 0.14)
+    assert roe == 0.10
+    assert method == 'current_year_primary_no_positive_next_year_uplift'
+
+
+def test_financial_next_year_downside_can_lower_low_risk_roe():
+    roe, method = fund_mod.choose_low_risk_forward_roe(0.10, 0.07)
+    assert roe == 0.07
+    assert method == 'next_year_downside_guard'
+
+
 def test_low_risk_pe_growth_guardrail_cuts_high_industry_floor_when_growth_is_weak():
     policies = {
         'low_risk_pe_policy': {
