@@ -160,39 +160,82 @@ def main() -> int:
     # T2 recall remains intentionally broad. Only after the company earnings gate do we select
     # a small number of representatives per T2 subchain for the formal common pool.
     earnings_passed_set = set(earnings_passed)
+    all_tags = sorted({tag for code in earnings_passed for tag in t2_tags.get(code, [])})
+    chain_passers = {
+        tag: sorted(code for code in earnings_passed if tag in t2_tags.get(code, []))
+        for tag in all_tags
+    }
+    chain_caps = {tag: representative_cap(len(codes), rep_policy) for tag, codes in chain_passers.items()}
+
+    # Weekly deep-review names are independently validated and remain eligible, but they consume
+    # the same subchain capacity. If weekly review alone exceeds a cap, keep them and expose the
+    # overflow in the audit instead of silently deleting a deep-reviewed company.
     selected: set[str] = {code for code in earnings_passed if code in weekly_codes}
-    selected_via: dict[str, list[str]] = {code: ["weekly_deep_review"] for code in selected}
-    chain_audit: dict[str, dict] = {}
     counts_toward_cap = bool(rep_policy.get("weekly_deep_review", {}).get("counts_toward_subchain_cap", True))
 
-    all_tags = sorted({tag for code in earnings_passed for tag in t2_tags.get(code, [])})
-    for tag in all_tags:
-        chain_passers = sorted(code for code in earnings_passed if tag in t2_tags.get(code, []))
-        weekly_in_chain = sorted(code for code in chain_passers if code in weekly_codes)
-        t2_only = [code for code in chain_passers if code not in weekly_codes]
-        cap = representative_cap(len(chain_passers), rep_policy)
-        used = len(weekly_in_chain) if counts_toward_cap else 0
-        open_slots = max(0, cap - used)
-        ranked = rank_chain_candidates(t2_only, gate, rep_policy)
-        winners = ranked[:open_slots]
-        deferred = ranked[open_slots:]
-        for code in winners:
+    def selected_count(tag: str) -> int:
+        return sum(1 for code in selected if tag in t2_tags.get(code, []))
+
+    # Process the broadest chains first so a large homogeneous chain (e.g. brokers) cannot be
+    # repopulated indirectly by multi-tag companies selected later from smaller chains.
+    processing_order = sorted(all_tags, key=lambda tag: (-len(chain_passers[tag]), tag))
+    for tag in processing_order:
+        cap = chain_caps[tag]
+        current_used = selected_count(tag) if counts_toward_cap else 0
+        open_slots = max(0, cap - current_used)
+        if open_slots <= 0:
+            continue
+        ranked = rank_chain_candidates(
+            [code for code in chain_passers[tag] if code not in selected and code not in weekly_codes],
+            gate,
+            rep_policy,
+        )
+        added = 0
+        for code in ranked:
+            if added >= open_slots:
+                break
+            # Global multi-tag guard: selecting this company must not overfill any T2 chain it
+            # belongs to. Weekly overflows are the only allowed cap exception.
+            violates_other_chain = False
+            for other_tag in t2_tags.get(code, []):
+                if other_tag not in chain_caps:
+                    continue
+                if selected_count(other_tag) >= chain_caps[other_tag]:
+                    violates_other_chain = True
+                    break
+            if violates_other_chain:
+                continue
             selected.add(code)
-            selected_via.setdefault(code, []).append(tag)
-        chain_audit[tag] = {
-            "earnings_gate_pass_count": len(chain_passers),
-            "representative_cap": cap,
-            "weekly_deep_review_codes": weekly_in_chain,
-            "ranked_t2_only_codes": ranked,
-            "selected_t2_only_codes": winners,
-            "deferred_t2_only_codes": deferred,
-            "selection_scores": {
-                code: round(representative_score(gate[code].get("metrics") or {}, rep_policy), 6)
-                for code in ranked
-            },
-        }
+            added += 1
 
     passed = sorted(selected)
+    chain_audit: dict[str, dict] = {}
+    for tag in all_tags:
+        ranked_all = rank_chain_candidates(
+            [code for code in chain_passers[tag] if code not in weekly_codes], gate, rep_policy
+        )
+        selected_in_chain = sorted(code for code in passed if tag in t2_tags.get(code, []))
+        weekly_in_chain = sorted(code for code in selected_in_chain if code in weekly_codes)
+        selected_t2_only = [code for code in selected_in_chain if code not in weekly_codes]
+        deferred = [code for code in ranked_all if code not in selected]
+        overflow = max(0, len(selected_in_chain) - chain_caps[tag])
+        chain_audit[tag] = {
+            "earnings_gate_pass_count": len(chain_passers[tag]),
+            "representative_cap": chain_caps[tag],
+            "selected_count": len(selected_in_chain),
+            "weekly_deep_review_codes": weekly_in_chain,
+            "selected_t2_only_codes": selected_t2_only,
+            "deferred_t2_only_codes": deferred,
+            "weekly_only_cap_overflow": overflow,
+            "ranked_t2_only_codes": ranked_all,
+            "selection_scores": {
+                code: round(representative_score(gate[code].get("metrics") or {}, rep_policy), 6)
+                for code in ranked_all
+            },
+        }
+        if overflow and not weekly_in_chain:
+            raise RuntimeError(f"representative cap violated without weekly exception:{tag}:{len(selected_in_chain)}>{chain_caps[tag]}")
+
     for code, row in gate.items():
         if row.get("gate_status") != "pass":
             row["representative_selection_status"] = "not_eligible"
@@ -201,9 +244,11 @@ def main() -> int:
         if code in selected:
             if code in weekly_codes:
                 row["representative_selection_status"] = "weekly_deep_review_kept"
+                selected_via = ["weekly_deep_review"] + t2_tags.get(code, [])
             else:
                 row["representative_selection_status"] = "selected_t2_representative"
-            row["selected_via"] = selected_via.get(code, [])
+                selected_via = t2_tags.get(code, [])
+            row["selected_via"] = sorted(set(selected_via))
             row["final_pool_status"] = "pass"
         else:
             row["representative_selection_status"] = rep_policy.get("output_policy", {}).get(
