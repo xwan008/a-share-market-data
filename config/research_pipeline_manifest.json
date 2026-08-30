@@ -1,5 +1,5 @@
 {
-  "schema_version": 13,
+  "schema_version": 14,
   "pipeline": "a_share_low_risk_v2",
   "mode": "shadow",
   "purpose": "从正在改善的细分盈利驱动中，寻找未来1-2季度仍有兑现预期、但股价尚未充分定价的公司；优先寻找基本面已拐、价格刚启势的机会。",
@@ -32,6 +32,7 @@
     "earnings_anomaly_recall": "data/research/v2/earnings_anomaly_recall.json",
     "earnings_driver_scan": "data/research/v2/earnings_driver_scan.json",
     "company_research": "data/research/v2/company_research.json",
+    "valuation_reference": "data/research/v2/valuation_reference.json",
     "full_market_price_structure": "data/research/v2/full_market_price_structure.json",
     "price_expectation_gap": "data/research/v2/price_expectation_gap.json",
     "opportunity_ranking": "data/research/v2/opportunity_ranking.json"
@@ -41,19 +42,22 @@
     {"id":"earnings_anomaly_recall","requires":["data_health"],"output":"data/research/v2/earnings_anomaly_recall.json","rule":"全主板宽召回；不使用价格、估值或T1/T2；风险警示仍扫描但失去低风险主榜资格"},
     {"id":"earnings_driver_scan","requires":["data_health"],"output":"data/research/v2/earnings_driver_scan.json","rule":"细分链只有在存在direct_profit_driver且有正向证据时才成为active driver；T1/T2历史字段不控制资格；confidence不进入估值公式"},
     {"id":"company_research","requires":["earnings_anomaly_recall","earnings_driver_scan"],"recall_union":["driver_exposure","earnings_anomaly","weekly_full_market_recall"],"output":"data/research/v2/company_research.json","rule":"机器先形成研究骨架；扣非/一次性/现金流/Driver/1-2Q Bridge缺口必须显式review_required；每条active driver估值前最多轻压缩到5家，周度深验继续补漏"},
-    {"id":"full_market_price_structure","requires":["data_health"],"universe":"all_mainboard_codes_with_fresh_180d_history","output":"data/research/v2/full_market_price_structure.json","rule":"与company_research独立；breakout必须量价和收盘确认；pullback必须维持相对强度；创新高不因无历史压力被判弱"},
-    {"id":"price_expectation_gap","requires":["company_research","full_market_price_structure"],"output":"data/research/v2/price_expectation_gap.json","rule":"Shadow可使用V1估值结果作为单一numeric reference，但必须忽略V1 safe/reasonable buy zone与旧准入结论；少于2个独立V2估值锚不得生成正式买点"},
+    {"id":"valuation_reference","requires":["company_research"],"output":"data/research/v2/valuation_reference.json","rule":"对估值队列建立一把可审计numeric reference；可复用已验证V1公允数值或用版本化Forward PE/PB政策重建，但禁止继承V1 safe/reasonable buy zone；周期股缺正常化锚时必须review_required"},
+    {"id":"full_market_price_structure","requires":["data_health"],"universe":"all_mainboard_codes_with_fresh_180d_history","output":"data/research/v2/full_market_price_structure.json","rule":"与company_research独立；breakout必须量价确认和收盘确认；pullback必须维持相对强度；创新高不因无历史压力被判弱"},
+    {"id":"price_expectation_gap","requires":["company_research","valuation_reference","full_market_price_structure"],"output":"data/research/v2/price_expectation_gap.json","rule":"只读取V2 valuation_reference；一把numeric reference可用于Shadow预期差研究，但少于2个独立V2估值锚不得生成正式买点"},
     {"id":"opportunity_ranking","requires":["price_expectation_gap"],"output":"data/research/v2/opportunity_ranking.json","states":["LEFT_WATCH","WAIT_BREAKOUT","PRIORITY_INFLECTION","RIGHT_PARTICIPATE","WAIT_PULLBACK","REJECT"],"rule":"分数只用于显式状态内排序，不得修复缺失证据；同一driver主榜最多2家；Shadow Top3与Production Top3分离","top3_policy":"允许少于3只或为空"}
   ],
   "economic_sanity": {
     "mandatory": true,
     "checks": [
+      "同一盈利或周期风险不得在EPS、regime、估值倍数和买入区执行重复折价",
+      "独立估值锚严重冲突必须标记valuation_divergence，不能强行合成正式买点",
+      "breakout必须完成价格、成交量与收盘位置的量价确认，未确认只能等待突破",
       "风险警示证券必须保持全市场扫描覆盖但不得进入低风险机会候选",
       "research_pass必须存在未来1-2季度forward bridge",
       "盈利异常无法映射driver时必须进入driver_review_required而不是静默删除",
       "少于两个独立V2估值锚不得输出正式buy zone",
       "V1 safe_buy_range和reasonable_buy_range不得直接泄漏为V2正式买点",
-      "breakout必须通过价格、成交量和收盘位置确认",
       "pullback必须保有不显著弱于市场的20日相对强度",
       "创新高不得因为缺少历史压力位自动判弱",
       "价格结构扫描全集不得由基本面候选池定义",
