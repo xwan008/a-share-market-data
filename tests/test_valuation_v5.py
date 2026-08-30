@@ -1,18 +1,28 @@
 from datetime import datetime
 from zoneinfo import ZoneInfo
+import importlib.util
 import json
 from pathlib import Path
-
-from scripts.build_cycle_valuation import calendar_forward_eps
-from scripts.build_forward_valuation import choose_pb_band
-from scripts.validate_research_outputs import validate_policy_audit
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def load_module(name: str, path: str):
+    spec = importlib.util.spec_from_file_location(name, ROOT / path)
+    module = importlib.util.module_from_spec(spec)
+    assert spec and spec.loader
+    spec.loader.exec_module(module)
+    return module
+
+
+cycle_mod = load_module('cycle_v5', 'scripts/build_cycle_valuation.py')
+fund_mod = load_module('fund_v5', 'scripts/build_forward_valuation.py')
+validator_mod = load_module('validator_v5', 'scripts/validate_research_outputs.py')
+
+
 def test_calendar_forward_eps_uses_next_year_at_late_august():
     now = datetime(2026, 8, 30, tzinfo=ZoneInfo('Asia/Shanghai'))
-    value, current_weight, next_weight = calendar_forward_eps(3.0, 4.0, now)
+    value, current_weight, next_weight = cycle_mod.calendar_forward_eps(3.0, 4.0, now)
     assert round(current_weight, 4) == round(4 / 12, 4)
     assert round(next_weight, 4) == round(8 / 12, 4)
     assert round(value, 4) == round(3.0 * 4 / 12 + 4.0 * 8 / 12, 4)
@@ -26,9 +36,9 @@ def test_financial_pb_band_is_forward_roe_driven():
             {'roe_max': 9.99, 'pb_range': [1.2, 1.6]},
         ]
     }
-    assert choose_pb_band(policy, 0.07) == [0.8, 1.0]
-    assert choose_pb_band(policy, 0.10) == [1.0, 1.3]
-    assert choose_pb_band(policy, 0.18) == [1.2, 1.6]
+    assert fund_mod.choose_pb_band(policy, 0.07) == [0.8, 1.0]
+    assert fund_mod.choose_pb_band(policy, 0.10) == [1.0, 1.3]
+    assert fund_mod.choose_pb_band(policy, 0.18) == [1.2, 1.6]
 
 
 def test_aluminum_regime_requires_medium_term_normalization():
@@ -56,5 +66,5 @@ def test_policy_audit_rejects_unsupported_policy():
         },
         'hard_gate': {'status': 'FAIL'}
     }
-    errors = validate_policy_audit(payload)
+    errors = validator_mod.validate_policy_audit(payload)
     assert any('unsupported_policy' in e for e in errors)
