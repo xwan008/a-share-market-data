@@ -6,60 +6,65 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_no_legacy_weekly_low_pe_table_or_h1_times_two_formal_engine():
-    text = (ROOT / 'scripts/build_forward_valuation.py').read_text(encoding='utf-8')
-    cfg = json.loads((ROOT / 'config/valuation_policy_registry.json').read_text(encoding='utf-8'))
-    assert 'WEEKLY_RANGES' not in text
-    assert "fwd=e*2" not in text
-    assert cfg['forecast_policy']['fallback_h1_annualization_formal'] is False
+def test_v2_manifest_is_shadow_and_uses_simplified_research_flow():
+    manifest = json.loads((ROOT / 'config/research_pipeline_manifest.json').read_text(encoding='utf-8'))
+    assert manifest['schema_version'] >= 10
+    assert manifest['pipeline'] == 'a_share_low_risk_v2'
+    assert manifest['mode'] == 'shadow'
+    assert set(manifest['authoritative_skills']) == {
+        'orchestrator',
+        'earnings_driver_scan',
+        'company_research',
+        'price_expectation_gap',
+        'opportunity_ranking',
+    }
+    stage_ids = [x['id'] for x in manifest['stages']]
+    assert stage_ids == [
+        'data_health',
+        'earnings_driver_scan',
+        'company_research',
+        'full_market_price_structure',
+        'price_expectation_gap',
+        'opportunity_ranking',
+    ]
+    assert all('t1' not in x.lower() and 't2' not in x.lower() for x in stage_ids)
 
 
-def test_weichai_and_luxshare_policy_regression_ranges():
-    cfg = json.loads((ROOT / 'config/valuation_policy_registry.json').read_text(encoding='utf-8'))
-    weichai = cfg['company_overrides']['000338']
-    luxshare = cfg['company_overrides']['002475']
-    assert weichai['multiple_range'] == [16, 20]
-    assert luxshare['multiple_range'] == [20, 24]
-    weichai_eps = 1.668
-    weichai_floor = weichai_eps * weichai['multiple_range'][0]
-    weichai_safe = [weichai_floor * x for x in weichai['safe_to_fair_floor']]
-    weichai_reasonable = [weichai_floor * x for x in weichai['reasonable_to_fair_floor']]
-    assert 20.5 <= weichai_safe[0] <= 21.0
-    assert 23.8 <= weichai_safe[1] <= 24.2
-    assert 23.8 <= weichai_reasonable[0] <= 24.2
-    assert 26.4 <= weichai_reasonable[1] <= 27.0
-    luxshare_eps = 2.8814
-    luxshare_floor = luxshare_eps * luxshare['multiple_range'][0]
-    luxshare_safe = [luxshare_floor * x for x in luxshare['safe_to_fair_floor']]
-    luxshare_reasonable = [luxshare_floor * x for x in luxshare['reasonable_to_fair_floor']]
-    assert 44.5 <= luxshare_safe[0] <= 45.5
-    assert 51.5 <= luxshare_safe[1] <= 52.2
-    assert 51.5 <= luxshare_reasonable[0] <= 52.2
-    assert 53.8 <= luxshare_reasonable[1] <= 54.5
-
-
-def test_resource_cycle_policies_are_machine_executable():
-    cfg = json.loads((ROOT / 'config/cycle_valuation_policy.json').read_text(encoding='utf-8'))
-    copper = cfg['subchain_policies']['nonferrous::铜矿资源']
-    aluminum = cfg['subchain_policies']['nonferrous::电解铝']
-    zijin = cfg['company_overrides']['601899']
-    assert any(x['symbol'] == 'CU0' for x in copper['anchors'])
-    assert {x['symbol'] for x in aluminum['anchors']} == {'AL0', 'AO0'}
-    assert {x['symbol'] for x in zijin['anchors']} == {'AU0', 'CU0'}
-    assert sum(x['weight'] for x in zijin['anchors']) == 1.0
-
-
-def test_manifest_requires_cycle_validator_audit_coverage_health_and_merge():
+def test_v2_right_structure_is_independent_from_company_research():
     manifest = json.loads((ROOT / 'config/research_pipeline_manifest.json').read_text(encoding='utf-8'))
     stages = {s['id']: s for s in manifest['stages']}
-    assert manifest['schema_version'] >= 8
-    assert 'validate_cycle_valuation_v2.py' in stages['left_value_cycle']['validator']
-    assert 'valuation_policy_audit' in stages
-    assert 't2_valuation_coverage_health' in stages
-    assert set(stages['left_value_merge']['requires']) == {
-        'left_value_fundamental',
-        'left_value_cycle',
-        'valuation_policy_audit',
-        't2_valuation_coverage_health',
-    }
-    assert 'left-valuation' in stages['left_value_merge']['validator']
+    right = stages['full_market_price_structure']
+    assert right['requires'] == ['data_health']
+    assert right['universe'] == 'all_mainboard_codes_with_fresh_180d_history'
+    assert 'company_research' not in right['requires']
+
+
+def test_v2_valuation_rules_forbid_repeated_haircuts_and_require_sanity():
+    manifest = json.loads((ROOT / 'config/research_pipeline_manifest.json').read_text(encoding='utf-8'))
+    stage = next(s for s in manifest['stages'] if s['id'] == 'price_expectation_gap')
+    rules = set(stage['hard_rules'])
+    assert 'industry_or_driver_confidence_never_multiplies_into_value' in rules
+    assert 'no_repeated_cycle_haircuts' in rules
+    assert 'safe_zone_requires_independent_anchor_overlap' in rules
+    assert 'valuation_divergence_blocks_formal_buy_zone' in rules
+    assert 'implied_pe_pb_sanity_is_mandatory' in rules
+
+
+def test_v2_golden_cases_cover_known_failure_modes():
+    golden = json.loads((ROOT / 'config/low_risk_v2_golden_tests.json').read_text(encoding='utf-8'))
+    values = {x['code']: x for x in golden['valuation_cases']}
+    assert '600309' in values  # Wanhua: repeated-discount regression
+    assert values['600309']['sanity']['reasonable_zone_should_not_imply_forward_pe_below'] >= 9
+    assert '002460' in values  # Ganfeng: lithium anchor / over-discount regression
+    assert values['002460']['required_anchor_hint'].startswith('LC0')
+    rights = {x['code']: x for x in golden['right_structure_cases']}
+    assert rights['601138']['must_be_scanned_even_if_not_in_company_research'] is True
+    assert 'no_resistance_map' in rights['601138']['forbidden_rejection_reasons']
+
+
+def test_v1_business_skills_are_not_authoritative_v2_skills():
+    manifest = json.loads((ROOT / 'config/research_pipeline_manifest.json').read_text(encoding='utf-8'))
+    deprecated = set(manifest['legacy_v1']['deprecated_business_skills'])
+    assert {'industry-scan', 't2-company-recall', 'fundamental-valuation', 'cycle-valuation', 'technical-structure', 'final-selection'} <= deprecated
+    for name in deprecated:
+        assert not (ROOT / 'skills/a-share-low-risk' / name / 'SKILL.md').exists()
