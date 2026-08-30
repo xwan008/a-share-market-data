@@ -47,7 +47,9 @@ def main() -> int:
             row = companies.get(code) or {}
             if row.get("low_risk_eligible") is not True: errors.append(f"risk_warning_in_right_candidates:{code}")
             if row.get("structure_type") == "breakout" and row.get("breakout_confirmed") is not True: errors.append(f"unconfirmed_breakout_candidate:{code}")
-            if row.get("structure_type") == "pullback" and float(row.get("relative_strength_20d_vs_market_pct") or -999) < -2.01: errors.append(f"weak_relative_strength_pullback:{code}")
+            if row.get("structure_type") == "pullback":
+                rs = row.get("relative_strength_20d_vs_market_pct")
+                if rs is None or float(rs) < -2.01: errors.append(f"weak_relative_strength_pullback:{code}")
 
     if EARNINGS.exists():
         e = load(EARNINGS)
