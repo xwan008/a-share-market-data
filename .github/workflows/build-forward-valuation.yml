@@ -26,6 +26,7 @@ on:
       - 'tests/test_valuation_v4.py'
       - 'tests/test_valuation_v5.py'
       - 'tests/test_cycle_coverage_v6.py'
+      - 'tests/test_t1_valuation_routes.py'
       - '.github/workflows/build-forward-valuation.yml'
 
 concurrency:
@@ -49,7 +50,7 @@ jobs:
           cache: 'pip'
       - run: pip install -r requirements-research.txt pytest
       - name: Run valuation regression tests
-        run: pytest -q tests/test_valuation_v4.py tests/test_valuation_v5.py tests/test_cycle_coverage_v6.py
+        run: pytest -q tests/test_valuation_v4.py tests/test_valuation_v5.py tests/test_cycle_coverage_v6.py tests/test_t1_valuation_routes.py
       - name: Build non-cycle forward valuation
         run: python scripts/build_forward_valuation_v5.py
       - name: Validate non-cycle valuation contract
@@ -66,7 +67,7 @@ jobs:
         run: python scripts/build_valuation_policy_audit.py
       - name: Validate valuation policy coverage audit
         run: python scripts/validate_research_outputs.py valuation-policy-audit data/research/pipeline/valuation_policy_audit.json
-      - name: Build and enforce T2 valuation coverage health
+      - name: Build and enforce recalled-chain valuation coverage health
         run: python scripts/build_t2_valuation_coverage_audit.py
       - name: Merge left valuation engines
         run: python scripts/merge_left_valuation.py
@@ -81,11 +82,11 @@ jobs:
           python - <<'PY'
           import json
           p=json.load(open('data/research/pipeline/left_valuation_scan.json',encoding='utf-8'))
-          focus={'002452','002709','600710','603659','000338','002475','000807','601600','601899','601088','601225','600160','605020','002064'}
+          focus={'002452','002709','600710','603659','000338','002475','000807','601600','601899','601088','601225','600160','605020','002064','002460','002653','601633','002074','601985'}
           rows=[r for r in p['companies'] if r['code'] in focus]
           print(json.dumps(rows,ensure_ascii=False,indent=2))
           audit=json.load(open('data/research/pipeline/t2_valuation_coverage_audit.json',encoding='utf-8'))
-          print(json.dumps({'overall_valid_ratio':audit['overall_valid_ratio'],'structural_blind_spot_tags':audit['structural_blind_spot_tags'],'coverage_warnings':audit['coverage_warnings']},ensure_ascii=False,indent=2))
+          print(json.dumps({'overall_valid_ratio':audit['overall_valid_ratio'],'recalled_chain_count':audit.get('recalled_chain_count'),'structural_blind_spot_tags':audit['structural_blind_spot_tags'],'coverage_warnings':audit['coverage_warnings']},ensure_ascii=False,indent=2))
           final=json.load(open('data/research/pipeline/final_selection.json',encoding='utf-8'))
           print(json.dumps({'left_set_codes':final['left_set_codes'],'right_set_codes':final['right_set_codes'],'intersection':final['initial_intersection_codes'],'top3':final['top3_codes']},ensure_ascii=False,indent=2))
           PY
