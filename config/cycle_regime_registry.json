@@ -1,8 +1,8 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "reviewed_at": "2026-08-30",
   "max_review_age_days": 45,
-  "purpose": "Structured 6-18 month cycle regime inputs. Short-term futures anchors quantify current conditions; this registry captures supply/demand normalization risks that cannot be inferred from a 60-day price average alone.",
+  "purpose": "Structured 6-18 month cycle regime inputs. Machine-readable commodity anchors are preferred where reliable; otherwise the registry supplies conservative supply-demand normalization factors for anchorless cycle valuation.",
   "subchains": {
     "nonferrous::电解铝": {
       "regime": "near_term_tight_medium_term_normalizing",
@@ -66,6 +66,98 @@
         "China demand weakens materially",
         "US tariff-driven inventory distortion reverses and releases metal back to global market"
       ]
+    },
+    "coal::动力煤": {
+      "regime": "price_recovery_with_policy_supply_constraint",
+      "horizon": "6-18m",
+      "bear_base_bull_earnings_factor": [0.82, 0.95, 1.05],
+      "multiple_range_by_regime": [7.0, 10.0],
+      "supply_score": 0.5,
+      "demand_score": 0.5,
+      "inventory_score": 0.0,
+      "summary": "2026年以来动力煤价格中枢抬升、煤企盈利改善，安监与反超产限制供给弹性；但煤炭仍是强政策/天气周期行业，低风险估值不把现货上涨直接外推，基准盈利继续保留折价。",
+      "evidence": [
+        {
+          "date": "2026-08-30",
+          "source": "data/research/pipeline/industry_scan.json",
+          "effect": "constructive",
+          "note": "动力煤被识别为T2 early；8月28日秦皇岛Q5500约867元/吨，1-7月煤炭开采洗选利润明显改善。"
+        },
+        {
+          "date": "2026-07-13",
+          "source": "中泰证券煤炭行业公开观点",
+          "url": "https://finance.sina.com.cn/wm/2026-07-13/doc-inihrhfn9075972.shtml",
+          "effect": "constructive_with_cycle_risk",
+          "note": "2026H1动力煤价格中枢同比上升，供给受安监与进口约束；仍需防范季节、政策和需求波动。"
+        }
+      ],
+      "invalidation_triggers": [
+        "安全监管和反超产约束明显放松导致供给快速恢复",
+        "火电及化工耗煤需求持续转弱",
+        "港口库存持续累积并推动Q5500价格显著跌破中期中枢"
+      ]
+    },
+    "chemicals::氟化工": {
+      "regime": "quota_supported_high_spread_with_demand_risk",
+      "horizon": "6-18m",
+      "bear_base_bull_earnings_factor": [0.80, 0.95, 1.05],
+      "multiple_range_by_regime": [12.0, 16.0],
+      "supply_score": 1.0,
+      "demand_score": 0.0,
+      "inventory_score": 0.0,
+      "summary": "三代制冷剂配额约束仍支撑供给纪律，2026H1价格和龙头利润继续改善；但空调等终端排产波动意味着当前高价差不能永久资本化，低风险基准盈利按95%周期因子处理。",
+      "evidence": [
+        {
+          "date": "2026-08-30",
+          "source": "data/research/pipeline/industry_scan.json",
+          "effect": "constructive",
+          "note": "氟化工为T2 mid；2026H1制冷剂均价同比约+15.6%，龙头利润已明显受益。"
+        },
+        {
+          "date": "2026-08-29",
+          "source": "巨化股份2026H1公开研报汇总",
+          "url": "https://basic.10jqka.com.cn/144/600160/worth.html",
+          "effect": "constructive",
+          "note": "H1制冷剂销售价格同比提升，Q3初主要制冷剂价格仍处高位。"
+        }
+      ],
+      "invalidation_triggers": [
+        "HFC配额约束明显放松",
+        "R32/R134a/R125价格持续显著回落",
+        "萤石/氢氟酸等成本快速上升而产品涨价无法覆盖",
+        "下游空调/汽车需求持续弱于预期"
+      ]
+    },
+    "chemicals::氨纶": {
+      "regime": "early_recovery_with_export_and_capacity_risk",
+      "horizon": "6-18m",
+      "bear_base_bull_earnings_factor": [0.75, 0.90, 1.05],
+      "multiple_range_by_regime": [10.0, 14.0],
+      "supply_score": 0.0,
+      "demand_score": 0.0,
+      "inventory_score": 0.5,
+      "summary": "氨纶价格和价差较低位修复、龙头H1盈利超预期，但出口同比偏弱且新增产能/原料波动仍在，属于早期修复而非稳定高景气；基准盈利按90%周期因子处理。",
+      "evidence": [
+        {
+          "date": "2026-08-30",
+          "source": "data/research/pipeline/industry_scan.json",
+          "effect": "constructive",
+          "note": "氨纶为T2 early；华峰化学H1氨纶收入和毛利改善，新乡化纤H1净利同比大增。"
+        },
+        {
+          "date": "2026-08-07",
+          "source": "华峰化学2026H1公开研报汇总",
+          "url": "https://basic.10jqka.com.cn/002064/worth.html",
+          "effect": "constructive_with_risk",
+          "note": "H1氨纶业务景气修复，但行业仍需观察出口、需求和新增产能。"
+        }
+      ],
+      "invalidation_triggers": [
+        "氨纶库存重新持续累积",
+        "PTMEG/MDI成本上升导致价差明显收窄",
+        "出口和纺织旺季订单持续弱于预期",
+        "新增产能投放重新造成供给压力"
+      ]
     }
   },
   "company_overrides": {
@@ -74,7 +166,7 @@
       "regime": "gold_copper_diversified_constructive",
       "bear_base_bull_earnings_factor": [0.94, 1.02, 1.10],
       "multiple_range_by_regime": [12.0, 16.0],
-      "summary": "黄金与铜双主业降低单一铜周期误判；仍需用2027盈利中枢而不是当前高商品价格直接外推。"
+      "summary": "黄金与铜双主业降低单一铜周期误判；仍需用正常化盈利中枢而不是当前高商品价格直接外推。"
     }
   }
 }
