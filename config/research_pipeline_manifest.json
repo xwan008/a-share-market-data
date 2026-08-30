@@ -1,52 +1,135 @@
 {
-  "schema_version": 9,
-  "pipeline": "a_share_low_risk",
-  "authoritative_files": {
-    "orchestrator_skill": "skills/a-share-low-risk/orchestrator/SKILL.md",
-    "industry_registry": "config/industry_scan_universe.json",
+  "schema_version": 10,
+  "pipeline": "a_share_low_risk_v2",
+  "mode": "shadow",
+  "purpose": "从正在改善的细分盈利驱动中，寻找未来1-2季度仍有兑现预期、但股价尚未充分定价的公司；优先寻找基本面已拐、价格刚启势的机会。",
+  "constitution": [
+    "先找盈利改善，不先找技术形态",
+    "研究单位是细分盈利驱动链，不是宽泛行业或T1/T2等级",
+    "召回要宽，淘汰要晚，公司级盈利验证才是真正筛选",
+    "估值使用独立交叉锚，禁止重复折价和虚假精度",
+    "价格结构必须全市场独立扫描，不能受左侧/基本面候选池限制",
+    "Validator首先检查经济合理性，其次才检查程序完整性"
+  ],
+  "authoritative_skills": {
+    "orchestrator": "skills/a-share-low-risk/orchestrator/SKILL.md",
+    "earnings_driver_scan": "skills/a-share-low-risk/earnings-driver-scan/SKILL.md",
+    "company_research": "skills/a-share-low-risk/company-research/SKILL.md",
+    "price_expectation_gap": "skills/a-share-low-risk/price-expectation-gap/SKILL.md",
+    "opportunity_ranking": "skills/a-share-low-risk/opportunity-ranking/SKILL.md"
+  },
+  "authoritative_data": {
     "company_index": "data/research/company_industry_index.json",
     "company_registry": "data/research/company_industry_registry.json",
-    "recall_exposure_rules": "config/t2_exposure_rules.json",
-    "t2_representative_policy": "config/t2_representative_policy.json",
-    "valuation_policy_registry": "config/valuation_policy_registry.json",
-    "cycle_valuation_policy": "config/cycle_valuation_policy.json",
-    "cycle_regime_registry": "config/cycle_regime_registry.json",
-    "weekly_pool": "data/research/weekly_fundamental_opportunity_pool.json",
+    "industry_coverage_hints": "config/industry_scan_universe.json",
+    "weekly_full_market_recall": "data/research/weekly_fundamental_opportunity_pool.json",
     "market_health": "data/health.json",
     "backfill_status": "data/backfill_status.json",
+    "latest_market": "data/latest.json",
     "bounded_history_store": "data/history_shards/*.json"
   },
-  "maintenance": {
-    "company_index_builder": "scripts/build_company_industry_index.py",
-    "company_index_workflow": ".github/workflows/build-company-industry-index.yml",
-    "common_pool_workflow": ".github/workflows/build-common-qualification-pool.yml",
-    "valuation_workflow": ".github/workflows/build-forward-valuation.yml",
-    "company_index_dependency_file": "requirements-research.txt",
-    "history_store": "scripts/history_store.py",
-    "history_backfill": "scripts/backfill_history.py",
-    "history_backfill_workflow": ".github/workflows/backfill-history.yml",
-    "history_policy": "full-market OHLCV is bounded to 180 completed sessions per stock; weekly refresh may fetch ~252 sessions only to rebuild compact 52-week summary and then discards those extra rows"
+  "shadow_outputs": {
+    "earnings_driver_scan": "data/research/v2/earnings_driver_scan.json",
+    "company_research": "data/research/v2/company_research.json",
+    "full_market_price_structure": "data/research/v2/full_market_price_structure.json",
+    "price_expectation_gap": "data/research/v2/price_expectation_gap.json",
+    "opportunity_ranking": "data/research/v2/opportunity_ranking.json"
   },
   "stages": [
-    {"id":"company_index_health","input":"data/research/company_industry_index.json","validator":"python scripts/validate_research_pipeline.py company-index data/research/company_industry_index.json","failure_policy":"do_not_silently_drop_missing_or_unmapped_codes; pass them into every mandatory T2 chain and use the same mechanical enumeration principle for configured conditional T1 chains"},
-    {"id":"industry_scan","skill":"skills/a-share-low-risk/industry-scan/SKILL.md","output":"data/research/pipeline/industry_scan.json","validator":"python scripts/validate_research_pipeline.py industry-scan data/research/pipeline/industry_scan.json"},
-    {"id":"t2_company_recall","requires":["company_index_health","industry_scan"],"skill":"skills/a-share-low-risk/t2-company-recall/SKILL.md","policy":"config/t2_exposure_rules.json","output":"data/research/pipeline/t2_company_recall.json","validator":"python scripts/validate_t2_recall_v2.py data/research/pipeline/t2_company_recall.json --industry-scan data/research/pipeline/industry_scan.json","policy_note":"legacy stage/file name retained for compatibility; schema v3 contains mandatory direct T2 recall plus configured conditional T1 recall","failure_policy":"all T2 chains must have complete exposure rules and direct recall; each current T1 chain must be either conditionally recalled through an explicit exposure rule or listed in t1_rule_coverage_gaps; unconfirmed chains are never auto-promoted or auto-admitted"},
-    {"id":"weekly_opportunity_scan","requires":["industry_scan","t2_company_recall"],"skill":"skills/a-share-low-risk/weekly-opportunity-scan/SKILL.md","output":"data/research/pipeline/weekly_opportunity_scan.json","persistent_output":"data/research/weekly_fundamental_opportunity_pool.json","validator":"python scripts/validate_research_outputs.py weekly-scan data/research/pipeline/weekly_opportunity_scan.json"},
-    {"id":"stage_order","requires":["industry_scan","t2_company_recall","weekly_opportunity_scan"],"run_state":"data/research/pipeline/run_state.json","validator":"python scripts/validate_research_pipeline.py stage-order data/research/pipeline/run_state.json"},
-    {"id":"earnings_validation","requires":["t2_company_recall","weekly_opportunity_scan"],"skill":"skills/a-share-low-risk/earnings-validation/SKILL.md","policy":"config/t2_representative_policy.json","runner":"python scripts/build_common_qualification_pool.py","output":"data/research/pipeline/common_qualification_pool.json","validator":"python scripts/validate_common_pool_diversification.py","failure_policy":"T2 direct names use the standard company earnings gate and dynamic representative cap. Configured T1 conditional names must pass a stricter company earnings gate and each T1 subchain may contribute at most one formal representative until independently upgraded to T2. T2 representatives are processed before T1 to prevent cross-tag crowd-out. Strong company signals in configured unconfirmed chains create review_required only; they never auto-promote the industry or auto-enter common_pool_codes. Weekly-only discoveries without an active recalled tag remain independently eligible."},
-    {"id":"left_value_fundamental","requires":["earnings_validation"],"skill":"skills/a-share-low-risk/fundamental-valuation/SKILL.md","policy":"config/valuation_policy_registry.json","runner":"python scripts/build_forward_valuation_v5.py","output":"data/research/pipeline/fundamental_valuation.json","validator":"python scripts/validate_research_outputs.py fundamental-valuation data/research/pipeline/fundamental_valuation.json","routing_policy":"cycle routing is read from config/cycle_valuation_policy.json rather than a hard-coded tag list"},
-    {"id":"left_value_cycle","requires":["earnings_validation"],"skill":"skills/a-share-low-risk/cycle-valuation/SKILL.md","policy":"config/cycle_valuation_policy.json","cycle_regime":"config/cycle_regime_registry.json","runner":"python scripts/build_cycle_valuation.py && python scripts/repair_anchorless_cycle_valuation.py","output":"data/research/pipeline/cycle_valuation.json","validator":"python scripts/validate_cycle_valuation_v2.py","failure_policy":"every common-pool company carrying a versioned cycle subchain tag must route to the cycle engine. Reliable commodity series use neutral-price normalization; anchorless cycle chains use current-year EPS primary, next-year downside guard, structural haircut, reviewed regime and 180d calibration. T1 cycle chains retain deliberately weaker regime/base assumptions until the industry independently upgrades."},
-    {"id":"valuation_policy_audit","requires":["left_value_fundamental","left_value_cycle"],"runner":"python scripts/build_valuation_policy_audit.py","output":"data/research/pipeline/valuation_policy_audit.json","validator":"python scripts/validate_research_outputs.py valuation-policy-audit data/research/pipeline/valuation_policy_audit.json","failure_policy":"unsupported_policy_count_must_equal_zero; common_pool_coverage_must_equal_100_percent"},
-    {"id":"t2_valuation_coverage_health","requires":["valuation_policy_audit"],"runner":"python scripts/build_t2_valuation_coverage_audit.py","output":"data/research/pipeline/t2_valuation_coverage_audit.json","validator":"runner_exit_code","failure_policy":"any active T2 chain represented in the common pool with zero valid valuation because of model, anchor or regime structural defects is a hard stop; consensus/data scarcity is disclosed as a coverage warning and must not be interpreted as no opportunity"},
-    {"id":"left_value_merge","requires":["left_value_fundamental","left_value_cycle","valuation_policy_audit","t2_valuation_coverage_health"],"runner":"python scripts/merge_left_valuation.py","output":"data/research/pipeline/left_valuation_scan.json","validator":"python scripts/validate_research_outputs.py left-valuation data/research/pipeline/left_valuation_scan.json"},
-    {"id":"right_structure","requires":["earnings_validation"],"skill":"skills/a-share-low-risk/technical-structure/SKILL.md","runner":"python scripts/build_candidate_structure_260d.py","history":"data/history_shards/*.json","output":"data/research/pipeline/right_structure_scan.json","data_policy":"read local bounded 180-session history; use last 120 sessions as core structure window and compact fresh 52-week summary for older pressure; do not make per-candidate live 300-day fetches"},
-    {"id":"final_selection","requires":["left_value_merge","right_structure"],"skill":"skills/a-share-low-risk/final-selection/SKILL.md","output":"data/research/pipeline/final_selection.json","validator":"python scripts/validate_research_outputs.py final-selection data/research/pipeline/final_selection.json"}
+    {
+      "id": "data_health",
+      "purpose": "确认主板全集、最新交易日、180日OHLCV与基础财务数据可用",
+      "failure_policy": "数据缺失必须显式披露；不能解释为没有机会"
+    },
+    {
+      "id": "earnings_driver_scan",
+      "skill": "skills/a-share-low-risk/earnings-driver-scan/SKILL.md",
+      "requires": ["data_health"],
+      "output": "data/research/v2/earnings_driver_scan.json",
+      "rule": "直接扫描细分盈利驱动；大行业只做导航；confidence不进入估值公式；不使用T1/T2作为准入等级"
+    },
+    {
+      "id": "company_research",
+      "skill": "skills/a-share-low-risk/company-research/SKILL.md",
+      "requires": ["earnings_driver_scan"],
+      "recall_union": ["driver_exposure", "earnings_anomaly", "weekly_full_market_recall"],
+      "output": "data/research/v2/company_research.json",
+      "rule": "召回宁宽不漏；公司级验证主营/扣非盈利、现金流、一次性收益与未来1-2季度Bridge；估值前每条driver只轻压缩到3-5家"
+    },
+    {
+      "id": "full_market_price_structure",
+      "skill": "skills/a-share-low-risk/price-expectation-gap/SKILL.md",
+      "requires": ["data_health"],
+      "universe": "all_mainboard_codes_with_fresh_180d_history",
+      "input": "data/history_shards/*.json",
+      "output": "data/research/v2/full_market_price_structure.json",
+      "rule": "与company_research独立；识别base_not_started/trend_continuation/breakout/pullback/overheated/damaged；创新高不是缺少压力"
+    },
+    {
+      "id": "price_expectation_gap",
+      "skill": "skills/a-share-low-risk/price-expectation-gap/SKILL.md",
+      "requires": ["company_research", "full_market_price_structure"],
+      "output": "data/research/v2/price_expectation_gap.json",
+      "valuation_routes": [
+        "stable_growth_forward_pe_plus_history",
+        "financial_pb_forward_roe",
+        "commodity_normalized_eps_pe",
+        "complex_cycle_pe_plus_pb_history_crosscheck"
+      ],
+      "hard_rules": [
+        "industry_or_driver_confidence_never_multiplies_into_value",
+        "no_repeated_cycle_haircuts",
+        "safe_zone_requires_independent_anchor_overlap",
+        "valuation_divergence_blocks_formal_buy_zone",
+        "implied_pe_pb_sanity_is_mandatory"
+      ]
+    },
+    {
+      "id": "opportunity_ranking",
+      "skill": "skills/a-share-low-risk/opportunity-ranking/SKILL.md",
+      "requires": ["price_expectation_gap"],
+      "output": "data/research/v2/opportunity_ranking.json",
+      "states": ["LEFT_WATCH", "WAIT_BREAKOUT", "PRIORITY_INFLECTION", "RIGHT_PARTICIPATE", "WAIT_PULLBACK", "REJECT"],
+      "priority": "earnings_improving + forward_bridge_valid + expectation_gap_remaining + price_just_starting",
+      "top3_policy": "允许少于3只或为空；不得为数量降低盈利/预期差/价格风险标准"
+    }
   ],
-  "hard_stop_on_validator_failure": true,
-  "weekly_pool_forbidden_before_stage": "weekly_opportunity_scan",
-  "recall_principle": "Industry confidence and company research eligibility are separate variables. LLM classifies mechanically enumerated industries and companies; it does not recall the research universe from memory. T2 is mandatory direct recall, configured T1 is stricter conditional recall, and unconfirmed strong-company signals reopen industry evidence review without auto-promotion.",
-  "representative_selection_principle": "T2 is a broad industry/subchain recall, not a license to send every exposed company downstream. After company-level earnings validation, each T2 subchain is compressed to a small set of representatives under a global multi-tag cap. T1 conditional companies face a stricter earnings gate and at most one representative per subchain until industry evidence upgrades. Representative ranking balances absolute profit scale with current earnings transmission so low-base growth does not crowd out established representatives. Weekly deep-review evidence has priority within a recalled chain but remains subject to the corresponding cap; only weekly discoveries without an active recalled tag remain independently eligible. Deferred peers stay auditable but do not enter the formal common pool.",
-  "valuation_principle": "Every candidate must map to a versioned valuation route. Non-cycle PE/PB uses current-year forward fundamentals as the low-risk primary anchor. Cycle routing is policy-driven from the versioned cycle registry and has two formal modes: machine-anchor normalization when reliable commodity/cost series exist, and conservative-consensus cycle valuation when they do not. In both modes next-year optimism cannot mechanically lift the current buy point, a reviewed 6-18m regime is required, and 180d market-price calibration constrains the final low-risk bands. T1 cycle chains use deliberately conservative regime factors/haircuts until independent industry evidence upgrades them. Structural valuation blind spots are hard failures; analyst-consensus scarcity is a disclosed data-coverage limitation, not evidence that the industry has no opportunity.",
-  "right_structure_principle": "Broad market structure and final candidate structure share one bounded local data store. Keep 180 full sessions per stock, derive 5/20/60 breadth views from it, use 120 sessions as the core candidate structure window, and retain only compact 52-week summary fields beyond 180 sessions. History storage rolls forward daily and never grows without bound.",
-  "selection_principle": "final selection only selects validated upstream outputs; it never repairs upstream calculations"
+  "economic_sanity": {
+    "mandatory": true,
+    "checks": [
+      "合理区反推PE/PB是否落入可解释范围",
+      "周期风险是否被重复折价",
+      "独立估值方法是否严重冲突",
+      "创新高强趋势是否因无历史压力被误杀",
+      "工业富联等非基本面候选是否仍能被全市场价格结构扫描覆盖"
+    ],
+    "failure_states": ["sanity_check_failed", "valuation_divergence"]
+  },
+  "golden_test_policy": {
+    "required_before_production": true,
+    "config": "config/low_risk_v2_golden_tests.json",
+    "historical_replay_required": true,
+    "shadow_trading_days_required_before_replacing_v1": 3
+  },
+  "legacy_v1": {
+    "status": "frozen_for_comparison_only",
+    "formal_outputs_must_not_be_overwritten_by_v2_shadow": true,
+    "deprecated_business_skills": [
+      "industry-scan",
+      "t2-company-recall",
+      "weekly-opportunity-scan",
+      "earnings-validation",
+      "fundamental-valuation",
+      "cycle-valuation",
+      "technical-structure",
+      "final-selection"
+    ],
+    "deprecated_principles": [
+      "T1/T2 controls company eligibility",
+      "T1/T2 confidence directly discounts valuation",
+      "anchorless EPS haircut times regime haircut times buy-zone haircut",
+      "right-side universe equals common fundamental pool",
+      "first resistance less than 10 percent automatically rejects breakout opportunities"
+    ]
+  }
 }
