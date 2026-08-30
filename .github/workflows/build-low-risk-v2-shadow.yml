@@ -11,6 +11,7 @@ on:
       - 'scripts/build_v2_earnings_driver_scan.py'
       - 'scripts/build_v2_company_research.py'
       - 'scripts/build_v2_valuation_reference.py'
+      - 'scripts/repair_v2_financial_pb_reference.py'
       - 'scripts/build_v2_valuation_anchors.py'
       - 'scripts/build_v2_full_market_price_structure.py'
       - 'scripts/build_v2_price_expectation_gap.py'
@@ -58,6 +59,8 @@ jobs:
         run: python scripts/build_v2_company_research.py
       - name: Build V2 first fundamental valuation anchor
         run: python scripts/build_v2_valuation_reference.py
+      - name: Repair financial PB from target-company peer table fallback
+        run: python scripts/repair_v2_financial_pb_reference.py
       - name: Build independent valuation anchors and formal buy zones
         run: python scripts/build_v2_valuation_anchors.py
       - name: Build independent full-market price structure
@@ -91,6 +94,7 @@ jobs:
             'valuation_queue_count':v.get('valuation_queue_count'),
             'first_anchor_available_count':v.get('available_count'),
             'first_anchor_source_counts':v.get('source_counts'),
+            'financial_pb_fallback_repaired_count':v.get('financial_pb_fallback_repaired_count'),
             'formal_buy_zone_counts':a.get('counts'),
             'expectation_gap_state_counts':g.get('expectation_gap_state_counts'),
             'opportunity_state_counts':r.get('state_counts'),
@@ -114,7 +118,7 @@ jobs:
             data/research/v2/opportunity_ranking.json \
             data/research/v2/shadow_crosscheck.json
           if git diff --cached --quiet; then exit 0; fi
-          git commit -m "research-v2: refresh complete anchor and buy-zone shadow"
+          git commit -m "research-v2: refresh complete confirmed-anchor shadow"
           for attempt in 1 2 3; do
             git pull --rebase origin main
             if git push origin HEAD:main; then exit 0; fi
