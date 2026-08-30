@@ -1,6 +1,6 @@
 {
-  "schema_version": 1,
-  "final_frozen_at": "2026-08-30T10:42:39.893741+08:00",
+  "schema_version": 2,
+  "final_frozen_at": "2026-08-30T13:11:14.177833+08:00",
   "market_trade_date": "2026-08-28",
   "common_pool_count": 138,
   "left_set_codes": [
@@ -33,6 +33,9 @@
     "002636",
     "603228"
   ],
+  "right_structure_complete": true,
+  "right_structure_incomplete_count": 0,
+  "right_structure_incomplete_codes": [],
   "initial_intersection_codes": [],
   "core_codes": [],
   "top3_codes": [],
@@ -43,8 +46,8 @@
     "intersection_count": 0,
     "jaccard": 0.0,
     "same_set_suspicious": false,
-    "left_engine": "forward normalized earnings + justified valuation multiple only",
-    "right_engine": "300-bar same-date daily/weekly/52-week pressure + support + R:R only"
+    "left_engine": "forward earnings + versioned PE/PB/cycle valuation only",
+    "right_engine": "local 120d core + 180d pressure + compact 52-week summary + support + R:R only"
   },
   "upstream_validator_status": {
     "industry_scan": "PASS",
@@ -55,5 +58,6 @@
     "right_structure": "PASS",
     "left_right_independence": "PASS"
   },
+  "coverage_note": "right-side review complete for every common-pool code",
   "reviews": {}
 }
