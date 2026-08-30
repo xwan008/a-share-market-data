@@ -11,6 +11,7 @@ on:
       - 'scripts/build_valuation_policy_audit.py'
       - 'scripts/merge_left_valuation.py'
       - 'scripts/validate_research_outputs.py'
+      - 'scripts/validate_pe_low_risk_contract.py'
       - 'config/valuation_policy_registry.json'
       - 'config/cycle_valuation_policy.json'
       - 'config/cycle_regime_registry.json'
@@ -47,6 +48,8 @@ jobs:
         run: python scripts/build_forward_valuation_v5.py
       - name: Validate non-cycle valuation contract
         run: python scripts/validate_research_outputs.py fundamental-valuation data/research/pipeline/fundamental_valuation.json
+      - name: Enforce low-risk PE hard gate
+        run: python scripts/validate_pe_low_risk_contract.py
       - name: Build resource and cycle valuation
         run: python scripts/build_cycle_valuation.py
       - name: Validate cycle valuation contract
@@ -64,7 +67,7 @@ jobs:
           python - <<'PY'
           import json
           p=json.load(open('data/research/pipeline/left_valuation_scan.json',encoding='utf-8'))
-          focus={'000338','002475','000807','601600','601899','600030','601318'}
+          focus={'002452','002709','600710','603659','000338','002475','000807','601600','601899'}
           rows=[r for r in p['companies'] if r['code'] in focus]
           print(json.dumps(rows,ensure_ascii=False,indent=2))
           audit=json.load(open('data/research/pipeline/valuation_policy_audit.json',encoding='utf-8'))
