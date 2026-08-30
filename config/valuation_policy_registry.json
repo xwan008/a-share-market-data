@@ -1,5 +1,5 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "reviewed_at": "2026-08-30",
   "forecast_policy": {
     "primary_source": "akshare.stock_profit_forecast_em consensus EPS",
@@ -30,13 +30,28 @@
     "rule": "Business multiple_range is a theoretical fair-value reference, not automatically a low-risk entry multiple. Unless a company has an explicit low_risk_multiple_range, cap the theoretical PE floor by next-year earnings durability. Positive future growth does not lift the current-year entry PE; weak or negative future growth can compress it. The derived low-risk upper multiple is capped near the adjusted floor plus a small width and never exceeds the theoretical business upper multiple."
   },
   "business_policies": {
-    "shipbuilding": {"multiple_range": [16, 22]},
-    "heavy_truck": {"multiple_range": [13, 17]},
-    "cxo_cdmo": {"multiple_range": [20, 28]},
-    "grid_equipment": {"multiple_range": [18, 25]},
-    "ai_server": {"multiple_range": [20, 28]},
-    "optical": {"multiple_range": [22, 30]},
-    "pcb_ccl": {"multiple_range": [20, 28]}
+    "shipbuilding": {"multiple_range": [16, 22], "rationale": "船舶订单能见度较长，但低风险买点仍以当年盈利和订单兑现为主，不能把远期订单全部资本化。"},
+    "heavy_truck": {"multiple_range": [13, 17], "rationale": "重卡需求与更新周期较强，采用中低双位数PE并由增长守门进一步压低低风险倍数。"},
+    "cxo_cdmo": {"multiple_range": [20, 28], "rationale": "研发外包具备成长属性，但订单、海外政策和客户集中度要求低风险买点保留折价。"},
+    "grid_equipment": {"multiple_range": [18, 25], "rationale": "电网资本开支和订单能见度支持成长估值，但低风险倍数仍受当年盈利质量和次年耐久度约束。"},
+    "ai_server": {"multiple_range": [20, 28], "rationale": "AI算力需求支持成长估值，但订单兑现、产品结构和利润率决定实际低风险倍数。"},
+    "optical": {"multiple_range": [22, 30], "rationale": "高速光模块具有高成长属性，但技术迭代与客户集中度要求保留安全边际。"},
+    "pcb_ccl": {"multiple_range": [20, 28], "rationale": "AI高端PCB/CCL升级支持成长，但扩产、良率和产品结构决定盈利持续性。"},
+
+    "passenger_car": {"multiple_range": [12, 18], "rationale": "乘用车整车盈利受价格竞争、产品周期与新能源渗透影响，理论估值采用中低双位数PE；正向次年增长不能抬高当年低风险买点。"},
+    "commercial_powertrain": {"multiple_range": [14, 20], "rationale": "商用车动力系统兼具更新周期、出口和高端化驱动，但仍受商用车周期与原材料影响。"},
+    "data_center_infrastructure": {"multiple_range": [18, 24], "rationale": "UPS、温控、供配电和备用电源受数据中心资本开支驱动，订单能见度支持成长但不能脱离当年盈利兑现。"},
+    "aviation_oem": {"multiple_range": [20, 28], "rationale": "航空主机订单与交付周期较长、壁垒较高，但军品节奏、交付和应收现金流要求低风险估值折价。"},
+    "semiconductor_materials": {"multiple_range": [20, 28], "rationale": "国产替代和晶圆扩产支持半导体材料成长，但验证周期、客户导入和周期波动要求以当年可验证盈利为主锚。"},
+    "semiconductor_equipment": {"multiple_range": [22, 30], "rationale": "国产半导体设备具备高成长与高壁垒，但订单验收、研发投入和资本开支周期使低风险买点不能直接采用高成长远期估值。"},
+    "high_speed_connector": {"multiple_range": [20, 28], "rationale": "高速连接器与铜互连受AI数据中心升级驱动，但产品导入、客户份额和利润率决定盈利兑现。"},
+    "construction_machinery": {"multiple_range": [12, 18], "rationale": "工程机械受国内更新、出口和地产基建周期共同影响，低风险估值采用周期折价后的中低双位数PE。"},
+    "marine_power": {"multiple_range": [16, 22], "rationale": "船舶景气和更新需求支持船机动力，但交付周期、原材料和船舶周期仍要求折价。"},
+    "innovative_drug": {"multiple_range": [20, 28], "rationale": "创新药应以已商业化产品、临床管线与授权兑现支撑估值；不把未兑现远期峰值销售直接资本化到低风险买点。"},
+    "lithium_battery": {"multiple_range": [16, 22], "rationale": "动力与储能电池需求仍有成长，但价格竞争、产能利用率和材料成本决定利润率，低风险倍数保留明显折价。"},
+    "wind_equipment": {"multiple_range": [14, 20], "rationale": "风电招标、装机与出口改善支持订单，但整机价格竞争、原材料和交付节奏使估值保持中等。"},
+    "textile_manufacturing": {"multiple_range": [8, 12], "rationale": "纺织制造受原料、汇率、订单和利用率影响，属于低倍数制造业，低风险买点不因单季利润弹性给予成长溢价。"},
+    "nuclear_utility": {"multiple_range": [14, 18], "rationale": "核电运营现金流和机组投产具备较高可见性，但资本密集、利用小时、电价与新机组爬坡约束估值。"}
   },
   "financial_policies": {
     "broker": {
@@ -73,67 +88,42 @@
       "name": "潍柴动力",
       "valuation_model": "diversified_powertrain_data_center_forward_pe",
       "multiple_range": [16, 20],
-      "safe_to_fair_floor": [0.78, 0.90],
-      "reasonable_to_fair_floor": [0.90, 1.0],
+      "safe_to_fair_floor": [0.78,0.90],
+      "reasonable_to_fair_floor": [0.90,1.0],
       "rationale": "2026盈利增长由高端大缸径发动机、数据中心发电与新能源动力共同驱动；周期属性仍要求折价，但不应按传统重卡纯周期12-16倍机械定价。",
       "review_triggers": ["2026/2027一致预期EPS变化超过10%", "数据中心发电订单趋势反转", "重卡/发动机需求趋势明显反转"]
     },
     "002452": {
       "name": "长高电气",
       "valuation_model": "grid_equipment_company_low_risk_forward_pe",
-      "multiple_range": [18, 25],
-      "low_risk_multiple_range": [13, 16],
+      "multiple_range": [18,25],
+      "low_risk_multiple_range": [13,16],
       "rationale": "行业景气可支持理论估值，但2027一致预期EPS低于2026，且2026利润含显著非经常性收益风险；低风险买点必须以2026 EPS为主锚并压低PE，不能直接套用18-25倍行业模板。",
       "review_triggers": ["2027一致预期EPS重新高于2026且主营增长得到验证", "扣非盈利/订单兑现显著改善", "非经常性收益影响消退"]
     },
     "002475": {
       "name": "立讯精密",
       "valuation_model": "multi_engine_precision_manufacturing_forward_pe",
-      "multiple_range": [20, 24],
-      "low_risk_multiple_range": [20, 24],
-      "safe_to_fair_floor": [0.78, 0.90],
-      "reasonable_to_fair_floor": [0.90, 0.94],
+      "multiple_range": [20,24],
+      "low_risk_multiple_range": [20,24],
+      "safe_to_fair_floor": [0.78,0.90],
+      "reasonable_to_fair_floor": [0.90,0.94],
       "rationale": "消费电子基本盘叠加AI数据中心互连/热管理/电源与汽车电子，多业务增长结构和明确前三季度指引支持高于传统消费电子代工的估值；同时保留整合与利润率风险折价。",
       "review_triggers": ["2026/2027一致预期EPS变化超过10%", "通信/数据中心增速明显转弱", "汽车电子整合利润率显著偏离预期"]
     },
-    "600066": {"name": "宇通客车", "valuation_model": "bus_export_forward_pe", "multiple_range": [13, 17]},
-    "600458": {"name": "时代新材", "valuation_model": "wind_new_material_forward_pe", "multiple_range": [16, 22]},
-    "600482": {"name": "中国动力", "valuation_model": "marine_power_forward_pe", "multiple_range": [18, 24]},
-    "600685": {"name": "中船防务", "valuation_model": "shipbuilding_forward_pe", "multiple_range": [18, 24]},
-    "600710": {
-      "name": "苏美达",
-      "valuation_model": "ship_supply_chain_forward_pe",
-      "multiple_range": [10, 14],
-      "low_risk_multiple_range": [10, 12],
-      "rationale": "船舶订单和供应链业务提供盈利支撑，但低风险买点按2026 EPS约10-12倍PE定价，不把2030年前订单能见度直接资本化成更高买入倍数。"
-    },
-    "603088": {"name": "宁波精达", "valuation_model": "equipment_forward_pe", "multiple_range": [18, 24]},
-    "603259": {"name": "药明康德", "valuation_model": "cxo_forward_pe", "multiple_range": [20, 28]},
-    "603659": {
-      "name": "璞泰来",
-      "valuation_model": "battery_equipment_material_forward_pe",
-      "multiple_range": [18, 25],
-      "low_risk_multiple_range": [17, 21],
-      "rationale": "设备在手订单和材料放量支持成长，但负极/隔膜/PVDF仍具有材料价格与产能周期属性；低风险买点按2026 EPS约17-21倍PE，理论成长估值与实际买点分离。"
-    },
-    "603986": {"name": "兆易创新", "valuation_model": "semiconductor_forward_pe", "multiple_range": [25, 32]},
-    "601869": {"name": "长飞光纤", "valuation_model": "optical_infrastructure_forward_pe", "multiple_range": [22, 30]},
-    "001309": {"name": "德明利", "valuation_model": "memory_growth_forward_pe", "multiple_range": [22, 30]},
-    "002709": {
-      "name": "天赐材料",
-      "valuation_model": "battery_material_forward_pe",
-      "multiple_range": [20, 28],
-      "low_risk_multiple_range": [12, 16],
-      "rationale": "2026电解液/六氟景气和盈利显著修复，但利润仍高度受产品价格、原料成本、供需与产能利用率影响；理论成长估值不能直接作为低风险买点，按2026 EPS约12-16倍PE形成低风险价值锚。",
-      "review_triggers": ["电解液单吨利润连续两个季度显著高于中枢且供给未扩张", "2027盈利增长与现金流同步上修", "原料/产品价差结构发生长期改善"]
-    },
-    "002812": {"name": "恩捷股份", "valuation_model": "separator_forward_pe", "multiple_range": [18, 25]},
-    "002156": {
-      "name": "通富微电",
-      "valuation_model": "advanced_packaging_normalized_forward_pe",
-      "multiple_range": [22, 30],
-      "requires_normalized_earnings_bridge": true,
-      "rationale": "主营先进封装景气可使用Forward PE，但若归母利润含显著产业投资收益，必须先完成扣非/一次性收益归一化。"
-    }
+    "600066": {"name":"宇通客车","valuation_model":"bus_export_forward_pe","multiple_range":[13,17]},
+    "600458": {"name":"时代新材","valuation_model":"wind_new_material_forward_pe","multiple_range":[16,22]},
+    "600482": {"name":"中国动力","valuation_model":"marine_power_forward_pe","multiple_range":[18,24]},
+    "600685": {"name":"中船防务","valuation_model":"shipbuilding_forward_pe","multiple_range":[18,24]},
+    "600710": {"name":"苏美达","valuation_model":"ship_supply_chain_forward_pe","multiple_range":[10,14],"low_risk_multiple_range":[10,12],"rationale":"船舶订单和供应链业务提供盈利支撑，但低风险买点按2026 EPS约10-12倍PE定价，不把2030年前订单能见度直接资本化成更高买入倍数。"},
+    "603088": {"name":"宁波精达","valuation_model":"equipment_forward_pe","multiple_range":[18,24]},
+    "603259": {"name":"药明康德","valuation_model":"cxo_forward_pe","multiple_range":[20,28]},
+    "603659": {"name":"璞泰来","valuation_model":"battery_equipment_material_forward_pe","multiple_range":[18,25],"low_risk_multiple_range":[17,21],"rationale":"设备在手订单和材料放量支持成长，但负极/隔膜/PVDF仍具有材料价格与产能周期属性；低风险买点按2026 EPS约17-21倍PE，理论成长估值与实际买点分离。"},
+    "603986": {"name":"兆易创新","valuation_model":"semiconductor_forward_pe","multiple_range":[25,32]},
+    "601869": {"name":"长飞光纤","valuation_model":"optical_infrastructure_forward_pe","multiple_range":[22,30]},
+    "001309": {"name":"德明利","valuation_model":"memory_growth_forward_pe","multiple_range":[22,30]},
+    "002709": {"name":"天赐材料","valuation_model":"battery_material_forward_pe","multiple_range":[20,28],"low_risk_multiple_range":[12,16],"rationale":"2026电解液/六氟景气和盈利显著修复，但利润仍高度受产品价格、原料成本、供需与产能利用率影响；理论成长估值不能直接作为低风险买点，按2026 EPS约12-16倍PE形成低风险价值锚。","review_triggers":["电解液单吨利润连续两个季度显著高于中枢且供给未扩张","2027盈利增长与现金流同步上修","原料/产品价差结构发生长期改善"]},
+    "002812": {"name":"恩捷股份","valuation_model":"separator_forward_pe","multiple_range":[18,25]},
+    "002156": {"name":"通富微电","valuation_model":"advanced_packaging_normalized_forward_pe","multiple_range":[22,30],"requires_normalized_earnings_bridge":true,"rationale":"主营先进封装景气可使用Forward PE，但若归母利润含显著产业投资收益，必须先完成扣非/一次性收益归一化。"}
   }
 }
