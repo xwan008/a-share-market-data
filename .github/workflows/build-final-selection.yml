@@ -8,6 +8,10 @@ on:
       - 'scripts/build_final_selection.py'
       - '.github/workflows/build-final-selection.yml'
 
+concurrency:
+  group: final-selection-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: write
 
@@ -24,6 +28,8 @@ jobs:
           python-version: '3.12'
       - name: Revalidate weekly scan
         run: python scripts/validate_research_outputs.py weekly-scan data/research/pipeline/weekly_opportunity_scan.json
+      - name: Revalidate valuation policy coverage
+        run: python scripts/validate_research_outputs.py valuation-policy-audit data/research/pipeline/valuation_policy_audit.json
       - name: Revalidate merged left valuation
         run: python scripts/validate_research_outputs.py left-valuation data/research/pipeline/left_valuation_scan.json
       - name: Build final intersection and hard-gate selection
