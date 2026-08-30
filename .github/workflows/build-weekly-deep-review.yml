@@ -2,6 +2,9 @@ name: Build weekly deep review
 
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows: ["Build T2 company recall"]
+    types: [completed]
   push:
     branches: [main]
     paths:
@@ -20,6 +23,7 @@ concurrency:
 
 jobs:
   build:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
