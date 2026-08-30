@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-08-30",
+  "anchor_series": {
+    "CU0": {"name": "沪铜连续", "role": "revenue_price"},
+    "AU0": {"name": "沪金连续", "role": "revenue_price"},
+    "AL0": {"name": "沪铝连续", "role": "revenue_price"},
+    "AO0": {"name": "氧化铝连续", "role": "input_cost"},
+    "ZC0": {"name": "动力煤连续", "role": "revenue_price"}
+  },
+  "subchain_policies": {
+    "nonferrous::铜矿资源": {
+      "anchors": [{"symbol": "CU0", "weight": 1.0, "direction": 1}],
+      "earnings_sensitivity": 0.75,
+      "multiple_range": [12, 16],
+      "safe_to_fair_floor": [0.75, 0.88],
+      "reasonable_to_fair_floor": [0.88, 1.0]
+    },
+    "nonferrous::电解铝": {
+      "anchors": [
+        {"symbol": "AL0", "weight": 0.7, "direction": 1},
+        {"symbol": "AO0", "weight": 0.3, "direction": -1}
+      ],
+      "earnings_sensitivity": 0.9,
+      "multiple_range": [10, 14],
+      "safe_to_fair_floor": [0.75, 0.88],
+      "reasonable_to_fair_floor": [0.88, 1.0]
+    },
+    "coal::动力煤": {
+      "anchors": [{"symbol": "ZC0", "weight": 1.0, "direction": 1}],
+      "earnings_sensitivity": 0.8,
+      "multiple_range": [7, 10],
+      "safe_to_fair_floor": [0.72, 0.85],
+      "reasonable_to_fair_floor": [0.85, 0.98]
+    }
+  },
+  "company_overrides": {
+    "601899": {
+      "name": "紫金矿业",
+      "anchors": [
+        {"symbol": "AU0", "weight": 0.55, "direction": 1},
+        {"symbol": "CU0", "weight": 0.45, "direction": 1}
+      ],
+      "earnings_sensitivity": 0.7,
+      "multiple_range": [13, 17],
+      "safe_to_fair_floor": [0.76, 0.88],
+      "reasonable_to_fair_floor": [0.88, 1.0],
+      "rationale": "2026H1黄金和铜合计贡献集团毛利约75.5%，以黄金/铜双商品锚而不是单一铜价或TTM PE决定前瞻盈利中枢。"
+    },
+    "601600": {
+      "name": "中国铝业",
+      "earnings_sensitivity": 0.9,
+      "multiple_range": [10, 14],
+      "rationale": "原铝板块为主要利润弹性来源，氧化铝同时是业务与成本变量；必须联合观察铝价和氧化铝成本方向。"
+    },
+    "000807": {
+      "name": "云铝股份",
+      "earnings_sensitivity": 0.95,
+      "multiple_range": [11, 15],
+      "rationale": "低成本水电铝与一体化优势使盈利对铝价上行/氧化铝成本回落具有高弹性，同时给予成本优势一定估值溢价。"
+    }
+  },
+  "scenario_rules": {
+    "base_anchor_ratio_clip": [0.85, 1.15],
+    "bear_shock": -0.08,
+    "bull_shock": 0.08,
+    "rule": "Anchor factor uses weighted current/60-day-average ratios; input-cost anchors enter with negative direction. Consensus forward EPS is then stress-tested by the anchor factor through company/subchain earnings sensitivity."
+  }
+}
