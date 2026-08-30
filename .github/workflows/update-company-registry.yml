@@ -1,0 +1,46 @@
+name: Update company industry registry
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/update_company_registry_from_recall.py'
+      - '.github/workflows/update-company-registry.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Revalidate T2 recall
+        run: python scripts/validate_t2_recall_v2.py data/research/pipeline/t2_company_recall.json --industry-scan data/research/pipeline/industry_scan.json
+      - name: Persist verified company mappings
+        run: python scripts/update_company_registry_from_recall.py
+      - name: Validate company registry
+        run: python scripts/validate_research_pipeline.py company-registry data/research/company_industry_registry.json
+      - name: Commit registry
+        shell: bash
+        run: |
+          if git status --porcelain -- data/research/company_industry_registry.json | grep -q .; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add data/research/company_industry_registry.json
+            git commit -m "research: persist T2 company-industry mappings"
+            for attempt in 1 2 3; do
+              git pull --rebase origin main
+              if git push; then exit 0; fi
+              sleep $((attempt * 2))
+            done
+            exit 1
+          else
+            echo "No registry changes."
+          fi
