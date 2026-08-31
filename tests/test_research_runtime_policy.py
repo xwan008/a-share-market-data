@@ -23,3 +23,13 @@ def test_no_cross_run_research_pool_and_state_schema_match():
 
 def test_authoritative_repository_data_is_small_and_explicit():
     assert set(load('config/research_pipeline_manifest.json')['authoritative_data'])=={'industry_coverage_taxonomy','company_index','full_market_price_structure','latest_market','bounded_history_store','research_state'}
+
+def test_legacy_research_pool_artifacts_stay_absent():
+    legacy_paths=[
+        'data/research/pipeline',
+        'data/research/company_buckets',
+        'data/research/company_industry_registry.json',
+        'data/research/weekly_fundamental_opportunity_pool.json',
+    ]
+    for path in legacy_paths:
+        assert not (ROOT/path).exists(), path
