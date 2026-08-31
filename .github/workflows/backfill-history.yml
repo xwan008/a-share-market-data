@@ -2,16 +2,6 @@ name: Backfill A-share rolling history
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/backfill-history.yml'
-      - 'scripts/backfill_history.py'
-      - 'scripts/sharded_backfill_plan.py'
-      - 'scripts/finalize_sharded_backfill.py'
-      - 'scripts/history_store.py'
-      - 'scripts/build_history.py'
-      - 'scripts/build_bridge.py'
   schedule:
     - cron: '20 10 * * 6'
       timezone: 'Asia/Shanghai'

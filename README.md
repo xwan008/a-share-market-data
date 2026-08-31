@@ -4,11 +4,12 @@ This repository keeps the A-share low-risk workflow deliberately small and audit
 
 ## Active architecture
 
-There are three active data workflows:
+There are **three data workflows** plus one lightweight CI workflow:
 
 1. **Update A-share market data** — weekdays at 16:10 and 16:30 Asia/Shanghai. It refreshes closed-session quotes, repairs qfq corporate-action drift, appends bounded history, rebuilds compact bridge data, and rebuilds the full-market mechanical price-structure input.
-2. **Backfill A-share rolling history** — weekly Saturday 10:20. It repairs the bounded 180-session qfq history and 52-week summaries. Per-partition status files are temporary artifacts and are not persisted in main.
+2. **Backfill A-share rolling history** — weekly Saturday 10:20 or manual only. It repairs bounded 180-session qfq history and longer-window summaries. It is deliberately not triggered by ordinary code/test pushes.
 3. **Build SW taxonomy and company industry index** — weekly Sunday 09:20. It refreshes the fixed Shenwan 2021 31/134/346 Coverage taxonomy and the main-board stock → SW level1/2/3 mapping.
+4. **CI** — tests code/config/Skill contract changes without writing market data.
 
 ## Low-risk research rule sources
 
@@ -22,7 +23,7 @@ The Manifest is intentionally small: it owns machine contracts, authoritative pa
 
 ## Authoritative research data
 
-The low-risk research task may read only the current Manifest `authoritative_data` paths:
+The low-risk research task may read only current Manifest `authoritative_data` paths:
 
 - `config/industry_scan_universe.json` — fixed SW2021 Coverage nodes (31/134/346), not an answer pool
 - `data/research/company_industry_index.json` — main-board company → SW level1/2/3 mapping
