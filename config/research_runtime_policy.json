@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "pipeline": "a_share_low_risk_v2",
+  "research_read_mode": "manifest_authoritative_only",
+  "manifest_path": "config/research_pipeline_manifest.json",
+  "active_state_path": "data/research/v2/research_state.json",
+  "active_mechanical_path": "data/research/v2/full_market_price_structure.json",
+  "forbidden_active_paths": [
+    "data/research/pipeline"
+  ],
+  "state_compatibility": {
+    "required_manifest_schema_match": true,
+    "on_manifest_schema_mismatch": "stale_state_do_not_use_as_current",
+    "on_missing_state": "no_valid_previous_research_state",
+    "morning_run_requires_valid_previous_1800_state": true
+  },
+  "read_policy": {
+    "allow_only_manifest_authoritative_data": true,
+    "do_not_scan_data_research_for_helpful_json": true,
+    "obsolete_or_legacy_outputs_are_not_research_inputs": true,
+    "git_history_is_audit_only_not_runtime_input": true
+  },
+  "write_policy": {
+    "current_research_output_only": "data/research/v2/research_state.json",
+    "never_relabel_old_state_to_new_schema": true,
+    "new_state_must_record_manifest_schema": true
+  }
+}
