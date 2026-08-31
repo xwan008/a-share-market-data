@@ -1,5 +1,5 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "pipeline": "a_share_low_risk_v2",
   "research_read_mode": "manifest_repo_data_plus_current_public_evidence",
   "manifest_path": "config/research_pipeline_manifest.json",
@@ -25,10 +25,20 @@
     "previous_state_may_not_seed_1800_discovery": true,
     "cross_run_candidate_or_opportunity_pools_forbidden": true
   },
+  "stage_execution_policy": {
+    "coverage_ledger_must_be_instantiated_before_market_discovery": true,
+    "coverage_summary_cannot_substitute_for_node_ledger": true,
+    "coverage_counts_must_be_derived_from_node_ledger": true,
+    "grouped_direction_rows_cannot_account_for_multiple_taxonomy_nodes": true,
+    "deep_status_nodes_must_be_resolved_before_completion_gate": true,
+    "peer_comparison_must_finish_before_final_valuation_when_peers_exist": true,
+    "publishable_opportunity_requires_complete_valuation_bridge": true
+  },
   "write_policy": {
     "current_research_output_only": "data/research/v2/research_state.json",
     "persistent_intermediate_research_outputs_forbidden": true,
     "never_relabel_old_state_to_new_schema": true,
-    "new_state_must_record_manifest_schema": true
+    "new_state_must_record_manifest_schema": true,
+    "new_full_state_must_include_coverage_ledger": true
   }
 }
