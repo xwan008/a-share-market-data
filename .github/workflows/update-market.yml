@@ -6,12 +6,14 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/update-market.yml'
-      - 'scripts/**'
-      - 'tests/**'
+      - 'scripts/fetch_market.py'
+      - 'scripts/repair_corporate_actions.py'
+      - 'scripts/history_store.py'
+      - 'scripts/build_history.py'
+      - 'scripts/build_bridge.py'
+      - 'scripts/build_v2_full_market_price_structure.py'
       - 'requirements.txt'
   schedule:
-    # Beijing time. Build complete closed-session data after the market close.
-    # 16:10 is the primary run; 16:30 is a retry/fallback run.
     - cron: '10 16 * * 1-5'
       timezone: 'Asia/Shanghai'
     - cron: '30 16 * * 1-5'
@@ -27,40 +29,33 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
           cache: 'pip'
-
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
           pip install pytest
-
       - name: Run tests
         run: python -m pytest -q
-
       - name: Fetch and validate closed-session quotes
         run: python scripts/fetch_market.py
-
       - name: Detect and repair corporate-action qfq drift
         run: python scripts/repair_corporate_actions.py
-
       - name: Append closed session to bounded rolling history
         run: python scripts/history_store.py
-
-      - name: Build 5d/20d/60d trend, density, volume and structure summary
+      - name: Build market history summaries
         run: python scripts/build_history.py
-
       - name: Build compact ChatGPT bridge files
         run: python scripts/build_bridge.py
-
+      - name: Build full-market low-risk price structure
+        run: python scripts/build_v2_full_market_price_structure.py
       - name: Commit updated data
         shell: bash
         run: |
@@ -69,22 +64,15 @@ jobs:
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add -A data
             git commit -m "data: update A-share snapshot and rolling history"
-
             for attempt in 1 2 3; do
               git pull --rebase origin main
-              if git push; then
-                exit 0
-              fi
-              echo "Push attempt ${attempt} failed; refreshing branch before retry."
+              if git push origin HEAD:main; then exit 0; fi
               sleep $((attempt * 2))
             done
-
-            echo "Failed to push market data after 3 attempts."
             exit 1
           else
             echo "No market-data changes to commit."
           fi
 
-# Only completed daily sessions are persisted into rolling history and structure.
-# The 06:20 analysis consumes the latest completed post-close build from the
-# previous trading day. No intraday or morning market-data workflow is required.
+# Only completed daily sessions are persisted. The same post-close workflow also
+# refreshes the mechanical full-market price-structure input consumed by research.

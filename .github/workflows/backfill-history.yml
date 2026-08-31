@@ -12,10 +12,7 @@ on:
       - 'scripts/history_store.py'
       - 'scripts/build_history.py'
       - 'scripts/build_bridge.py'
-      - 'tests/**'
   schedule:
-    # Weekly qfq refresh repairs corporate-action/adjustment drift and refreshes
-    # the compact 52-week summary while full OHLCV storage stays bounded to 180 sessions.
     - cron: '20 10 * * 6'
       timezone: 'Asia/Shanghai'
 
@@ -62,7 +59,6 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-          cache: 'pip'
       - name: Install fetch dependency
         run: pip install requests
       - name: Refresh physical history-shard partition ${{ matrix.part }}
@@ -70,7 +66,7 @@ jobs:
           python scripts/backfill_history.py
           --partition-index ${{ matrix.part }}
           --partition-count $HISTORY_PARTITION_COUNT
-      - name: Package only files owned by this partition
+      - name: Package owned files
         if: always()
         shell: bash
         run: |
@@ -83,9 +79,7 @@ jobs:
             fi
           done
           status="data/backfill_parts/part-${{ matrix.part }}.json"
-          if [ -f "$status" ]; then
-            cp "$status" "artifact/$status"
-          fi
+          [ ! -f "$status" ] || cp "$status" "artifact/$status"
       - name: Upload partition result
         if: always()
         uses: actions/upload-artifact@v4
@@ -106,19 +100,20 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Merge all successful partition artifacts into working tree
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           pattern: history-part-*
           merge-multiple: true
           path: .
-      - name: Validate partition coverage and local-history readiness
+      - name: Validate partition coverage
         run: python scripts/finalize_sharded_backfill.py --partition-count $HISTORY_PARTITION_COUNT
-      - name: Build 5d/20d/60d market breadth and structure summary
+      - name: Build history summaries
         run: python scripts/build_history.py
-      - name: Rebuild compact ChatGPT bridge files
+      - name: Rebuild compact bridge
         run: python scripts/build_bridge.py
-      - name: Commit bounded history only after all partitions reconcile
+      - name: Remove transient partition status files
+        run: rm -rf data/backfill_parts
+      - name: Commit bounded history
         shell: bash
         run: |
           if git status --porcelain -- data | grep -q .; then
@@ -126,26 +121,12 @@ jobs:
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add -A data
             git commit -m "data: refresh sharded bounded 180-session qfq history"
-
             for attempt in 1 2 3; do
               git pull --rebase origin main
-              if git push; then
-                exit 0
-              fi
-              echo "Push attempt ${attempt} failed; refreshing branch before retry."
+              if git push origin HEAD:main; then exit 0; fi
               sleep $((attempt * 2))
             done
-
-            echo "Failed to push sharded history refresh after 3 attempts."
             exit 1
           else
             echo "No sharded backfill changes to commit."
           fi
-
-# Design invariants:
-# - physical history shard keys (code[:4]) are assigned to exactly one matrix job;
-# - at most four partitions run concurrently to limit Tencent burst pressure;
-# - fail-fast is disabled, so one partition failure does not discard completed work;
-# - artifacts are merged only after every partition job succeeds;
-# - full OHLCV storage remains bounded to 180 sessions per stock;
-# - weekly fetches read ~252 sessions only to rebuild compact 52-week summaries.

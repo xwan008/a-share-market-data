@@ -1,72 +1,55 @@
 {
-  "schema_version": 23,
+  "schema_version": 24,
   "pipeline": "a_share_low_risk_v2",
   "mode": "shadow",
   "architecture": "prompt_first_research",
-  "purpose": "先用固定申万Coverage骨架保证全市场不漏扫，再开放式发现正在改善、恶化或分化的行业，把改善来源递归拆到具有共同盈利机制的细分盈利链；在链内比较直接受益公司、验证盈利、分类估值，最后用价格结构决定时机。",
-  "constitution": [
-    "申万行业分类只负责Coverage防漏和完成度验收，不负责决定当期景气答案；31个一级、134个二级、346个三级节点必须在18:00完整研究的Coverage层全部accounted_for。",
-    "Prompt负责开放式行业景气发现、盈利链因果拆解和链内公司比较；不得用预填答案表替代研究。",
-    "Skill只约束研究顺序、Coverage完成纪律、公司证据纪律、估值模型纪律和价格结构纪律。",
-    "代码只负责数据获取、机械计算、过滤、持久化与通用自洽校验；不得决定哪些行业或产业链应该景气。",
-    "先完成全行业Coverage并横向比较，再递归向下拆盈利链，再映射公司；禁止从熟悉股票倒推产业链。",
-    "行业覆盖清单只是防漏检查表，不是候选答案池；必须允许发现清单之外的新盈利链。",
-    "产业链不得因展示篇幅或最终股票数量而提前停止拆分；一个行业有多少条真实改善盈利链就保留多少条。",
-    "只有当同一链内公司共享基本相同的直接盈利Driver、关键领先变量和利润传导机制，且公司之间具有真实可比性时，才允许停止继续拆分。",
-    "如果同一宽链内存在不同原料路线、产品、工艺、应用场景、客户资本开支来源或成本结构，且这些差异会改变盈利Driver或领先变量，必须继续拆成独立盈利链。",
-    "每条重点盈利链必须先比较多个直接受益公司，再区分基本面最优与当前机会最优；二者允许不同，当前机会也允许为空。",
-    "公司是否受益必须回到业务暴露和财务科目验证，行业标签不能替代公司研究。",
-    "不建立全市场盈利异常公司闭环来追求完备召回；主要通过固定Coverage防漏和提高行业到盈利链的经济机制分辨率覆盖优质公司。",
-    "先识别盈利类型再估值；同行估值和历史价格只作sanity/reference，不参与内在价值投票。",
-    "内部Fair Value对用户统一展示为合理价格；正式估值必须同时给出当前价格、合理价格、安全价格（低风险区），并解释合理价格到安全价格的桥接。",
-    "当前价格只能用于比较估值位置和交易时机，不能反向进入合理价格计算。",
-    "价格结构只回答何时买，不回答值多少钱。",
-    "当前为Shadow研究；连续验证完成前不发布正式买点。"
-  ],
+  "production_gate": {
+    "enabled": false,
+    "label": "V2影子研究，不发布正式买点"
+  },
   "authoritative_skills": {
     "orchestrator": "skills/a-share-low-risk/orchestrator/SKILL.md",
     "company_research": "skills/a-share-low-risk/company-research/SKILL.md",
     "valuation": "skills/a-share-low-risk/valuation/SKILL.md",
     "price_structure": "skills/a-share-low-risk/price-structure/SKILL.md"
   },
-  "research_prompt_contract": {
-    "open_discovery_required": true,
-    "industry_discovery_is_not_a_skill": true,
-    "profit_chain_discovery_is_not_a_skill": true,
-    "coverage_hint": "config/industry_scan_universe.json",
-    "coverage_taxonomy": "申万行业分类标准2021版",
-    "coverage_expected_counts": {"level1":31,"level2":134,"level3":346},
-    "rules": [
-      "18:00完整研究必须先完成31/134/346 Coverage对齐：每个申万一级、二级、三级节点至少被赋予本期状态，不得无状态消失；这一步只防漏，不预设哪些行业应该景气。",
-      "完整扫描主要行业并横向比较盈利与领先变量的边际变化，不使用当前对话中的行业或股票清单作为发现起点。",
-      "Coverage节点可标记强/改善/稳定/弱/混合/未确认/不适用；弱或稳定节点可以浅扫描，改善、恶化或显著分化节点必须进入深度研究。",
-      "找到改善行业后继续按产品、生产路线/工艺、应用场景、客户需求来源和成本结构递归拆解，直到形成可直接解释收入、销量、成本或毛利率变化的盈利链。",
-      "申万三级行业不是最终盈利链的默认终点；如果内部存在不同直接盈利Driver或领先变量，必须继续拆。",
-      "每次停止拆分前必须回答三问：链内公司是否靠基本相同的直接盈利Driver赚钱；是否可用基本相同的一组领先变量持续跟踪；公司之间是否可以在业务暴露和盈利传导上真正横向比较。任一答案为否则继续拆。",
-      "不得以行业名、概念名或ETF名称作为最终盈利链；不得为了输出简洁限制每个行业的盈利链数量。",
-      "同时寻找支持证据、反向证据、未来1-2季度传导与失效条件。",
-      "重点盈利链存在多个主板直接受益公司时必须做链内横向比较，不得把首个代表股当作最佳股。",
-      "分别输出fundamental_best与current_opportunity_best，并说明差异；没有低风险当前机会时允许为空。",
-      "正式估值输出主列必须为当前价格、合理价格、安全价格（低风险区）；Fair Value仅作为内部估值概念或解释性括注。",
-      "不要求通过全市场盈利异常公司扫描证明股票召回完备性；允许少量跨行业漏网，以换取研究简单、稳定和可解释。",
-      "不得读取obsolete_v2_inputs_and_outputs中的旧文件作为当前研究答案。"
-    ]
+  "authoritative_data": {
+    "industry_coverage_taxonomy": "config/industry_scan_universe.json",
+    "company_index": "data/research/company_industry_index.json",
+    "full_market_price_structure": "data/research/v2/full_market_price_structure.json",
+    "latest_market": "data/latest.json",
+    "bounded_history_store": "data/history_shards/*.json",
+    "research_state": "data/research/v2/research_state.json"
   },
+  "stage_order": [
+    "data_health",
+    "taxonomy_coverage",
+    "market_profitability_discovery",
+    "profit_chain_decomposition",
+    "chain_company_comparison",
+    "valuation",
+    "price_structure",
+    "completion_gate_and_opportunity_synthesis"
+  ],
   "coverage_contract": {
-    "taxonomy_file": "config/industry_scan_universe.json",
-    "purpose": "Coverage只保证研究范围完整，不把分类表变成景气答案池或固定盈利链。",
-    "expected_counts": {"level1":31,"level2":134,"level3":346},
-    "accounted_for_definition": "节点已被本期公开数据检查并得到状态；不要求所有节点同等深度研究。",
-    "deep_research_trigger": "改善、恶化、显著分化或存在足以影响未来1-2季度盈利的领先变量变化。",
-    "completion_gate": [
-      "accounted_for_counts必须分别达到31/134/346",
-      "missing_level1/missing_level2/missing_level3必须为空",
-      "所有must_split或continue_split盈利链必须完成继续拆分，或因证据不足明确降级为unconfirmed并保留原因",
-      "强改善或显著分化节点不得在profit_chains中无对应研究记录",
-      "重点盈利链存在充分主板可比对象时必须完成多公司比较"
-    ],
-    "failure_behavior": "任一Coverage条件失败时，本次18:00状态必须为incomplete_research；不得生成新的当前机会，不得用不完整研究覆盖上一份有效完整研究结论。",
-    "research_state_diagnostics": [
+    "taxonomy": "申万行业分类标准2021版",
+    "expected_counts": {"level1": 31, "level2": 134, "level3": 346},
+    "purpose": "只负责防漏和完成度验收，不作为景气答案池或固定盈利链答案。",
+    "completion_gate": {
+      "all_nodes_accounted_for": true,
+      "missing_nodes_must_be_empty": true,
+      "unresolved_must_split_chains_must_be_empty": true,
+      "strong_improving_or_divergent_nodes_require_profit_chain_research": true,
+      "important_chains_require_multi_company_comparison_when_peers_exist": true
+    }
+  },
+  "research_state_contract": {
+    "path": "data/research/v2/research_state.json",
+    "manifest_schema_field": "manifest_schema",
+    "manifest_schema_must_equal_current": true,
+    "on_incomplete": "incomplete_research",
+    "incomplete_must_not_publish_new_current_opportunities": true,
+    "required_coverage_diagnostics": [
       "coverage.taxonomy",
       "coverage.expected_counts",
       "coverage.accounted_for_counts",
@@ -77,117 +60,36 @@
       "coverage.completion_gate_passed"
     ]
   },
-  "profit_chain_resolution_contract": {
-    "goal": "把宽泛行业或概念拆到共享同一经济盈利机制的一组真正可比公司，而不是追求固定层级或固定链条数量。",
-    "decomposition_dimensions": [
-      "产品/服务",
-      "生产路线或关键工艺",
-      "应用场景与终端需求",
-      "客户资本开支或订单来源",
-      "核心原料与成本结构",
-      "供需、价格、价差、产能利用率等直接利润变量"
+  "public_output": {
+    "sections": [
+      "执行状态",
+      "全市场盈利景气雷达",
+      "完整盈利产业链雷达",
+      "链内公司比较",
+      "估值与价格区间",
+      "价格结构与时机",
+      "当前机会",
+      "诊断"
     ],
-    "stop_only_if": [
-      "链内公司共享基本相同的直接盈利Driver",
-      "链内公司可由基本相同的一组领先变量持续跟踪",
-      "Driver到收入/销量/成本/毛利的利润传导路径基本一致",
-      "链内公司具备真实横向可比性"
-    ],
-    "must_split_if": [
-      "同一宽链包含不同原料路线且成本曲线不同",
-      "同一宽链包含不同产品或工艺且价格/供需驱动不同",
-      "同一宽链包含不同应用场景或客户资本开支来源且订单周期不同",
-      "无法用同一组领先变量解释主要公司盈利变化",
-      "链内公司无法进行有意义的受益程度和盈利兑现比较"
-    ],
-    "anti_over_split": "若继续拆分后只是在公司名称层面做分类，而直接盈利Driver、领先变量和利润传导没有实质变化，则停止拆分，避免为了细而细。",
-    "examples_are_not_authority": "任何案例只用于说明方法，不能形成预设产业链答案；每期必须从当期数据重新研究。"
-  },
-  "valuation_output_contract": {
-    "public_labels": {
-      "current_price": "当前价格",
-      "reasonable_price_range": "合理价格",
-      "safe_price_range": "安全价格（低风险区）"
-    },
-    "definitions": {
-      "current_price": "最近完整交易日的可靠市场价格，只作为估值位置与交易时机比较基准。",
-      "reasonable_price_range": "正常盈利假设下的内在价值区间，对应内部Fair Value。",
-      "safe_price_range": "在同一盈利基础上为预测与模型误差保留安全边际后的理想新建仓区间。"
-    },
-    "required_display_columns": [
-      "company",
-      "current_price",
-      "reasonable_price_range",
-      "safe_price_range",
-      "valuation_position",
-      "price_structure",
-      "action"
-    ],
-    "rules": [
-      "当前价格必须附对应交易日或明确价格时点。",
-      "合理价格和安全价格必须来自同一盈利基础，并能解释安全边际来源。",
-      "当前价格处于合理价格区不等于进入安全价格区。",
-      "若review_required，则合理价格和安全价格显示待复核，不制造精确数字。",
-      "当前价格与价格结构不得反向修改合理价格或安全价格。"
-    ],
-    "state_fields_preferred": [
-      "current_price",
-      "price_date",
-      "reasonable_price_range",
-      "safe_price_range",
-      "valuation_position"
-    ],
-    "legacy_read_compatibility": [
-      "fair_value_range",
-      "buy_zone"
+    "company_columns": [
+      "公司",
+      "当前价格",
+      "合理价格",
+      "安全价格（低风险区）",
+      "估值位置",
+      "价格结构",
+      "动作"
     ]
   },
-  "authoritative_data": {
-    "industry_coverage_hint": "config/industry_scan_universe.json",
-    "company_index": "data/research/company_industry_index.json",
-    "company_registry": "data/research/company_industry_registry.json",
-    "full_market_price_structure_mechanical": "data/research/v2/full_market_price_structure.json",
-    "latest_market": "data/latest.json",
-    "bounded_history_store": "data/history_shards/*.json",
-    "prompt_research_state": "data/research/v2/research_state.json"
-  },
-  "stages": [
-    {"id":"data_health","executor":"code","purpose":"确认主板范围、最新交易日、行情历史和基础财务数据可用。"},
-    {"id":"taxonomy_coverage","executor":"prompt+code","requires":["data_health"],"purpose":"按申万31/134/346固定分类骨架完成Coverage accounted_for与缺口检查；只防漏，不决定景气答案。"},
-    {"id":"market_profitability_discovery","executor":"prompt","requires":["taxonomy_coverage"],"purpose":"在完整Coverage基础上开放式横向比较全市场行业盈利和领先变量，发现真正出现改善、恶化或分化的方向。"},
-    {"id":"profit_chain_decomposition","executor":"prompt","requires":["market_profitability_discovery"],"purpose":"对改善或显著分化行业按经济盈利机制递归拆解；只有Driver、领先变量、利润传导和公司可比性基本一致时才能停止。"},
-    {"id":"chain_company_comparison","executor":"prompt+code","requires":["profit_chain_decomposition"],"purpose":"对形成的细分盈利链召回多个直接受益公司，比较业务暴露、主营/扣非兑现、现金流和Forward Bridge，区分基本面最优与当前机会最优。"},
-    {"id":"valuation","executor":"prompt+code","requires":["chain_company_comparison"],"purpose":"按盈利类型选择简洁估值模型，形成合理价格、不确定性与安全价格（低风险区），并与当前价格分层展示。"},
-    {"id":"price_structure","executor":"code+prompt","purpose":"独立扫描全主板价格结构，只判断交易时机，不进入内在价值计算。"},
-    {"id":"opportunity_synthesis","executor":"prompt","requires":["taxonomy_coverage","chain_company_comparison","valuation","price_structure"],"purpose":"Coverage通过后，综合盈利真实性、当前价格相对合理/安全价格的位置和价格时机形成研究机会，不用复杂状态机替代判断。"}
+  "runtime_forbidden_paths": [
+    "data/research/pipeline",
+    "data/research/company_buckets",
+    "data/research/company_industry_registry.json",
+    "data/research/weekly_fundamental_opportunity_pool.json"
   ],
-  "valuation_principles": {
-    "growth_or_stable": "Forward/normalized EPS × justified PE；增长持续性、盈利质量和现金转换用于解释合理倍数与不确定性。",
-    "financial": "PB-ROE为主，PE辅助。",
-    "resource_or_strong_cycle": "先正常化盈利/ROE并判断商品或价差周期，再用正常化PE/PB/资产价值交叉检查；禁止直接资本化周期顶部利润。",
-    "unreliable": "无法建立稳定盈利基础或模型敏感性过高时直接review_required。",
-    "peer_and_history": "同行估值、历史PE/PB与历史价格只作sanity/reference，不拥有投票权和买入区裁剪权。",
-    "margin_of_safety": "安全边际随估值不确定性变化，不使用未经校准的统一固定折价作为金融真理。",
-    "bridge_required": "正式展示估值时必须能从earnings_basis + fair_method/multiple解释合理价格，并从uncertainty解释安全价格（低风险区）；当前价格必须作为独立市场输入展示。"
-  },
-  "validation_policy": {
-    "case_free": true,
-    "principle": "Validator可以机械检查31/134/346 Coverage计数、缺失节点、未完成must_split、数据完整性、模型匹配、计算自洽、链内比较是否发生、三层价格是否正确分离和禁止事项；但不得替Prompt判断具体行业应当景气、具体盈利链名称或合理PE。"
-  },
-  "production_gate": {
-    "enabled": false,
-    "reason": "Prompt-first架构需完成连续Shadow验证；当前所有结果仅为V2影子研究。"
-  },
-  "obsolete_v2_inputs_and_outputs": [
-    "config/current_industry_scan_signals.json",
-    "data/research/pipeline/industry_scan.json",
-    "data/research/v2/earnings_driver_scan.json",
-    "data/research/v2/company_research.json",
-    "data/research/v2/valuation_reference.json",
-    "data/research/v2/valuation_anchors.json",
-    "data/research/v2/price_expectation_gap.json",
-    "data/research/v2/opportunity_ranking.json",
-    "data/research/v2/shadow_crosscheck.json",
-    "data/research/v2/earnings_anomaly_recall.json"
-  ]
+  "rule_ownership": {
+    "manifest": "只保存机器契约、权威路径、固定计数、阶段顺序和输出契约。",
+    "skills": "保存研究方法、盈利链拆分、公司验证、估值和价格结构的业务规则。",
+    "prompt": "执行当期开放式研究，不复制维护另一份长期规则。"
+  }
 }
