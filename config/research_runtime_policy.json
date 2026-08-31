@@ -1,5 +1,5 @@
 {
-  "schema_version": 4,
+  "schema_version": 5,
   "pipeline": "a_share_low_risk_v2",
   "research_read_mode": "manifest_repo_data_plus_current_public_evidence",
   "manifest_path": "config/research_pipeline_manifest.json",
@@ -17,28 +17,38 @@
   },
   "public_evidence_policy": {
     "allowed": true,
-    "required_for_1800_full_research": true,
+    "required_for_1800_research": true,
     "use_current_public_sources_for_fundamental_and_industry_evidence": true,
     "not_subject_to_repository_file_whitelist": true
   },
   "discovery_policy": {
-    "previous_state_may_not_seed_1800_discovery": true,
+    "weekly_industry_baseline_may_carry_forward_between_full_scans": true,
+    "previous_state_may_seed_only_industry_baseline_for_daily_incremental": true,
+    "previous_companies_chains_valuations_or_opportunities_may_not_seed_1800_discovery": true,
     "cross_run_candidate_or_opportunity_pools_forbidden": true
   },
   "stage_execution_policy": {
-    "coverage_ledger_must_be_instantiated_before_market_discovery": true,
-    "coverage_summary_cannot_substitute_for_node_ledger": true,
+    "coverage_ledger_must_be_instantiated_before_profitability_scan": true,
+    "weekly_full_scan_must_review_all_level3_nodes": true,
+    "daily_incremental_requires_valid_weekly_baseline": true,
     "coverage_counts_must_be_derived_from_node_ledger": true,
     "grouped_direction_rows_cannot_account_for_multiple_taxonomy_nodes": true,
-    "deep_status_nodes_must_be_resolved_before_completion_gate": true,
-    "peer_comparison_must_finish_before_final_valuation_when_peers_exist": true,
+    "generic_weekly_unconfirmed_placeholders_forbidden": true,
+    "deep_trigger_uses_trend_and_breadth_dimensions": true,
+    "deep_nodes_must_be_resolved_before_completion_gate": true,
+    "peer_comparison_must_finish_before_valuation_when_peers_exist": true,
+    "all_compared_companies_must_enter_valuation_set": true,
+    "every_valuation_set_company_must_be_executed": true,
+    "review_required_is_exception_not_completion_shortcut": true,
+    "important_chain_requires_non_review_complete_valuation": true,
     "publishable_opportunity_requires_complete_valuation_bridge": true
   },
   "write_policy": {
     "current_research_output_only": "data/research/v2/research_state.json",
+    "weekly_baseline_must_live_inside_research_state": true,
     "persistent_intermediate_research_outputs_forbidden": true,
     "never_relabel_old_state_to_new_schema": true,
     "new_state_must_record_manifest_schema": true,
-    "new_full_state_must_include_coverage_ledger": true
+    "new_state_must_include_coverage_ledger_and_scan_mode": true
   }
 }
