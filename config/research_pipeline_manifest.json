@@ -1,5 +1,5 @@
 {
-  "schema_version": 21,
+  "schema_version": 22,
   "pipeline": "a_share_low_risk_v2",
   "mode": "shadow",
   "architecture": "prompt_first_research",
@@ -17,7 +17,8 @@
     "公司是否受益必须回到业务暴露和财务科目验证，行业标签不能替代公司研究。",
     "不建立全市场盈利异常公司闭环来追求完备召回；主要通过提高行业到盈利链的经济机制分辨率覆盖优质公司。",
     "先识别盈利类型再估值；同行估值和历史价格只作sanity/reference，不参与内在价值投票。",
-    "Fair Value与低风险买入区必须输出可解释桥接：盈利基础、主估值方法/倍数、安全边际来源。",
+    "内部Fair Value对用户统一展示为合理价格；正式估值必须同时给出当前价格、合理价格、安全价格（低风险区），并解释合理价格到安全价格的桥接。",
+    "当前价格只能用于比较估值位置和交易时机，不能反向进入合理价格计算。",
     "价格结构只回答何时买，不回答值多少钱。",
     "当前为Shadow研究；连续验证完成前不发布正式买点。"
   ],
@@ -40,6 +41,7 @@
       "同时寻找支持证据、反向证据、未来1-2季度传导与失效条件。",
       "重点盈利链存在多个主板直接受益公司时必须做链内横向比较，不得把首个代表股当作最佳股。",
       "分别输出fundamental_best与current_opportunity_best，并说明差异；没有低风险当前机会时允许为空。",
+      "正式估值输出主列必须为当前价格、合理价格、安全价格（低风险区）；Fair Value仅作为内部估值概念或解释性括注。",
       "不要求通过全市场盈利异常公司扫描证明股票召回完备性；允许少量跨行业漏网，以换取研究简单、稳定和可解释。",
       "不得读取obsolete_v2_inputs_and_outputs中的旧文件作为当前研究答案。"
     ]
@@ -70,6 +72,45 @@
     "anti_over_split": "若继续拆分后只是在公司名称层面做分类，而直接盈利Driver、领先变量和利润传导没有实质变化，则停止拆分，避免为了细而细。",
     "examples_are_not_authority": "任何案例只用于说明方法，不能形成预设产业链答案；每期必须从当期数据重新研究。"
   },
+  "valuation_output_contract": {
+    "public_labels": {
+      "current_price": "当前价格",
+      "reasonable_price_range": "合理价格",
+      "safe_price_range": "安全价格（低风险区）"
+    },
+    "definitions": {
+      "current_price": "最近完整交易日的可靠市场价格，只作为估值位置与交易时机比较基准。",
+      "reasonable_price_range": "正常盈利假设下的内在价值区间，对应内部Fair Value。",
+      "safe_price_range": "在同一盈利基础上为预测与模型误差保留安全边际后的理想新建仓区间。"
+    },
+    "required_display_columns": [
+      "company",
+      "current_price",
+      "reasonable_price_range",
+      "safe_price_range",
+      "valuation_position",
+      "price_structure",
+      "action"
+    ],
+    "rules": [
+      "当前价格必须附对应交易日或明确价格时点。",
+      "合理价格和安全价格必须来自同一盈利基础，并能解释安全边际来源。",
+      "当前价格处于合理价格区不等于进入安全价格区。",
+      "若review_required，则合理价格和安全价格显示待复核，不制造精确数字。",
+      "当前价格与价格结构不得反向修改合理价格或安全价格。"
+    ],
+    "state_fields_preferred": [
+      "current_price",
+      "price_date",
+      "reasonable_price_range",
+      "safe_price_range",
+      "valuation_position"
+    ],
+    "legacy_read_compatibility": [
+      "fair_value_range",
+      "buy_zone"
+    ]
+  },
   "authoritative_data": {
     "industry_coverage_hint": "config/industry_scan_universe.json",
     "company_index": "data/research/company_industry_index.json",
@@ -84,9 +125,9 @@
     {"id":"market_profitability_discovery","executor":"prompt","purpose":"开放式横向比较全市场行业盈利和领先变量，发现真正出现边际改善的行业。"},
     {"id":"profit_chain_decomposition","executor":"prompt","requires":["market_profitability_discovery"],"purpose":"对改善行业按经济盈利机制递归拆解；只有Driver、领先变量、利润传导和公司可比性基本一致时才能停止。"},
     {"id":"chain_company_comparison","executor":"prompt+code","requires":["profit_chain_decomposition"],"purpose":"对形成的细分盈利链召回多个直接受益公司，比较业务暴露、主营/扣非兑现、现金流和Forward Bridge，区分基本面最优与当前机会最优。"},
-    {"id":"valuation","executor":"prompt+code","requires":["chain_company_comparison"],"purpose":"按盈利类型选择简洁估值模型，形成Fair Value、不确定性与低风险买入区，并解释两者桥接。"},
+    {"id":"valuation","executor":"prompt+code","requires":["chain_company_comparison"],"purpose":"按盈利类型选择简洁估值模型，形成合理价格、不确定性与安全价格（低风险区），并与当前价格分层展示。"},
     {"id":"price_structure","executor":"code+prompt","purpose":"独立扫描全主板价格结构，只判断交易时机，不进入内在价值计算。"},
-    {"id":"opportunity_synthesis","executor":"prompt","requires":["chain_company_comparison","valuation","price_structure"],"purpose":"综合盈利真实性、估值位置和价格时机形成研究机会，不用复杂状态机替代判断。"}
+    {"id":"opportunity_synthesis","executor":"prompt","requires":["chain_company_comparison","valuation","price_structure"],"purpose":"综合盈利真实性、当前价格相对合理/安全价格的位置和价格时机形成研究机会，不用复杂状态机替代判断。"}
   ],
   "valuation_principles": {
     "growth_or_stable": "Forward/normalized EPS × justified PE；增长持续性、盈利质量和现金转换用于解释合理倍数与不确定性。",
@@ -95,11 +136,11 @@
     "unreliable": "无法建立稳定盈利基础或模型敏感性过高时直接review_required。",
     "peer_and_history": "同行估值、历史PE/PB与历史价格只作sanity/reference，不拥有投票权和买入区裁剪权。",
     "margin_of_safety": "安全边际随估值不确定性变化，不使用未经校准的统一固定折价作为金融真理。",
-    "bridge_required": "正式展示估值时必须能从earnings_basis + fair_method/multiple解释Fair Value，并从uncertainty解释低风险买入区。"
+    "bridge_required": "正式展示估值时必须能从earnings_basis + fair_method/multiple解释合理价格，并从uncertainty解释安全价格（低风险区）；当前价格必须作为独立市场输入展示。"
   },
   "validation_policy": {
     "case_free": true,
-    "principle": "Validator只检查数据完整性、模型匹配、计算自洽、链内比较是否发生和禁止事项；不替Prompt做行业发现，不判断具体链条名称，也不决定PE。"
+    "principle": "Validator只检查数据完整性、模型匹配、计算自洽、链内比较是否发生、三层价格是否正确分离和禁止事项；不替Prompt做行业发现，不判断具体链条名称，也不决定PE。"
   },
   "production_gate": {
     "enabled": false,
