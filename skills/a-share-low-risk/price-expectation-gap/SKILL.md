@@ -1,16 +1,18 @@
 # 价格、估值锚与预期差 Skill
 
 ## 目的
-先独立完成公司价值与低风险买点，再判断基本面改善已经被股价交易多少。固定原则：**以盈利为基、以估值为锚、以历史估值分位与历史价格为参照**。公允价值、买入区间、历史参照、价格结构四者必须分层，最后才汇总为预期差状态。
+先独立完成公司价值与低风险买点，再判断基本面改善已经被股价交易多少。固定原则：**以盈利为基、以估值为锚、以历史估值分位与历史价格为参照**。公允价值、低风险估值、买入区间、历史参照、价格结构必须分层，最后才汇总为预期差状态。
 
 # A. 第一基本面估值锚：先分类，再估值
-V2不得读取V1估值数值。估值顺序固定为：`真实盈利 → 盈利类型 → Forward/正常化盈利 → 合理估值倍数 → Fair Value`。
+V2不得读取V1估值数值。估值顺序固定为：`真实盈利 → 盈利类型 → Forward/正常化盈利 → 合理估值倍数 → Fair Value → 低风险估值约束`。
 
-1. **成长/稳定经营**：Forward EPS × 合理PE。合理PE必须受未来1–2年增长持续性、盈利质量和Forward Bridge约束；输出next-year growth与PEG sanity。正向远期增长不能自动抬买点，增长转弱必须压制低风险倍数。
+1. **成长/稳定经营**：Fair Value使用当年Forward EPS × 版本化业务PE；低风险Entry PE必须另行接受次年一致预期EPS的成长持续性约束。无公司显式`low_risk_multiple_range`时，机器必须使用`low_risk_pe_policy.growth_floor_caps`压缩Entry PE，并在次年增长达到PEG有效阈值时使用PEG上限作二次sanity。PEG只能限制“最多付多少”，不能因为高增长自动抬高估值。
 2. **金融**：Forward ROE → PB合理带；PE只做辅助sanity。
 3. **商品/强周期**：先识别商品/供需Regime和周期位置，再把Forward或TTM扣非盈利还原为正常化EPS/ROE，结合PB与周期合理倍数估值。禁止直接资本化当前高商品价格对应的高利润。
 4. **周期反身性纪律**：低PE可能来自周期顶部利润暴增，并不天然便宜；高PE可能来自周期底部利润塌陷，并不天然昂贵。判断必须回到正常化盈利、资产回报与商品周期位置。
 5. 周期风险禁止重复折价：`single_cycle_factor = min(structural_factor, base_regime_factor)`；商品正常化与6–18个月regime不得重复表达同一风险。
+
+成长/稳定经营正式输出至少包含：`reference_range / consensus_eps_current_year / consensus_eps_next_year / earnings_growth_next_year_pct / reasonable_multiple_reference / effective_entry_multiple_range / low_risk_multiple_source / entry_peg_range`。缺次年一致预期EPS时不得生成正式成长股低风险Entry估值。
 
 输出第一锚：`data/research/v2/valuation_reference.json`。
 
@@ -30,17 +32,19 @@ V2不得读取V1估值数值。估值顺序固定为：`真实盈利 → 盈利�
 
 # C. 安全买入区 / 合理买入区
 ## 核心原则
-买入区不是历史成本区，而是Fair Value在不确定性约束下的Margin of Safety区间。
+买入区不是历史成本区，而是基本面低风险估值在不确定性约束下的Margin of Safety区间。
 
 - 当前价不能进入估值公式，只能在区间形成后判断位置。
 - 正式区间至少需要A + 1把有效独立基本面/可比估值确认；C不能补足门槛。
-- 无显式entry multiple时，使用版本化`safe_to_fair_floor / reasonable_to_fair_floor`从A的Fair Value下沿产生区间。
-- 有显式`low_risk_multiple_range`时直接由盈利基准×entry multiple形成买入区，禁止再叠加统一折价。
+- 成长/稳定经营若已经形成`effective_entry_multiple_range`，直接由当年Forward EPS × Entry PE生成低风险区间，不再叠加统一折价。
+- 只有没有独立Entry multiple机制的估值路线，才使用版本化`safe_to_fair_floor / reasonable_to_fair_floor`从A的Fair Value形成安全边际。
 
 ## 成长/稳定经营
-- 主锚：Forward EPS × 合理PE。
-- 合理PE必须经过成长持续性校验；PEG仅作倍数与增长是否失配的sanity，不允许机械把PEG=1当唯一真值。
-- 若次年盈利明显弱于当前年，低风险倍数必须受版本化growth cap约束；远期高增长不得自动抬升当前买点。
+- Fair主锚：当年Forward EPS × 版本化合理PE。
+- Entry主锚：当年Forward EPS × 成长持续性约束后的低风险PE。
+- 次年EPS增长用于判断当前盈利能否延续，而不是把远期乐观增长直接资本化。
+- PEG只作上限约束；不得机械使用PEG=1，也不得以PEG为理由把Entry PE抬高到行业理论PE之上。
+- 若缺次年一致预期、低风险PE无法形成或Entry PE高于理论Fair PE，则进入`review_required`。
 
 ## 金融
 - 主锚：Forward ROE-PB；PE辅助。
@@ -53,7 +57,7 @@ V2不得读取V1估值数值。估值顺序固定为：`真实盈利 → 盈利�
 - 买入区来自正常化Fair Value的安全边际，而不是从当前低PE直接推导。
 
 ## 区间Sanity
-每个正式区间必须输出：`fundamental_anchor_range / safe_buy_range / reasonable_buy_range / independent_anchor_count / history_reference / implied PE或PB / valuation_model / earnings_basis`。
+每个正式区间必须输出：`fundamental_anchor_range / safe_buy_range / reasonable_buy_range / independent_anchor_count / history_reference / implied PE或PB / valuation_model / earnings_basis`。成长股还必须能反推到`effective_entry_multiple_range`与成长持续性约束。
 
 # D. 全市场独立价格状态
 价格结构必须先扫描所有具备新鲜180日历史的主板股票，不能由基本面候选池定义。风险警示证券仍扫描，但不得进入低风险机会候选。
