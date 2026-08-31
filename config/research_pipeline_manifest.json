@@ -1,17 +1,21 @@
 {
-  "schema_version": 20,
+  "schema_version": 21,
   "pipeline": "a_share_low_risk_v2",
   "mode": "shadow",
   "architecture": "prompt_first_research",
-  "purpose": "先开放式发现全市场正在改善的行业与真实盈利链，再在链内比较直接受益公司、验证盈利、分类估值，最后用价格结构决定时机。",
+  "purpose": "先开放式发现全市场正在改善的行业，再把改善来源递归拆到具有共同盈利机制的细分盈利链；在链内比较直接受益公司、验证盈利、分类估值，最后用价格结构决定时机。",
   "constitution": [
     "Prompt负责开放式行业景气发现、盈利链因果拆解和链内公司比较；不得用预填答案表替代研究。",
     "Skill只约束研究顺序、公司证据纪律、估值模型纪律和价格结构纪律。",
-    "代码只负责数据获取、机械计算、过滤、持久化与通用自洽校验；不得决定哪些行业应该景气。",
-    "先全行业横向比较，再向下拆盈利链，再映射公司；禁止从熟悉股票倒推产业链。",
+    "代码只负责数据获取、机械计算、过滤、持久化与通用自洽校验；不得决定哪些行业或产业链应该景气。",
+    "先全行业横向比较，再递归向下拆盈利链，再映射公司；禁止从熟悉股票倒推产业链。",
     "行业覆盖清单只是防漏检查表，不是候选答案池；必须允许发现清单之外的新盈利链。",
+    "产业链不得因展示篇幅或最终股票数量而提前停止拆分；一个行业有多少条真实改善盈利链就保留多少条。",
+    "只有当同一链内公司共享基本相同的直接盈利Driver、关键领先变量和利润传导机制，且公司之间具有真实可比性时，才允许停止继续拆分。",
+    "如果同一宽链内存在不同原料路线、产品、工艺、应用场景、客户资本开支来源或成本结构，且这些差异会改变盈利Driver或领先变量，必须继续拆成独立盈利链。",
     "每条重点盈利链必须先比较多个直接受益公司，再区分基本面最优与当前机会最优；二者允许不同，当前机会也允许为空。",
     "公司是否受益必须回到业务暴露和财务科目验证，行业标签不能替代公司研究。",
+    "不建立全市场盈利异常公司闭环来追求完备召回；主要通过提高行业到盈利链的经济机制分辨率覆盖优质公司。",
     "先识别盈利类型再估值；同行估值和历史价格只作sanity/reference，不参与内在价值投票。",
     "Fair Value与低风险买入区必须输出可解释桥接：盈利基础、主估值方法/倍数、安全边际来源。",
     "价格结构只回答何时买，不回答值多少钱。",
@@ -29,29 +33,57 @@
     "profit_chain_discovery_is_not_a_skill": true,
     "coverage_hint": "config/industry_scan_universe.json",
     "rules": [
-      "完整扫描主要行业并横向比较盈利与领先变量的边际变化。",
-      "找到改善行业后继续拆到直接影响收入、销量、成本或毛利率的盈利链。",
+      "完整扫描主要行业并横向比较盈利与领先变量的边际变化，不使用当前对话中的行业或股票清单作为发现起点。",
+      "找到改善行业后继续按产品、生产路线/工艺、应用场景、客户需求来源和成本结构递归拆解，直到形成可直接解释收入、销量、成本或毛利率变化的盈利链。",
+      "每次停止拆分前必须回答三问：链内公司是否靠基本相同的直接盈利Driver赚钱；是否可用基本相同的一组领先变量持续跟踪；公司之间是否可以在业务暴露和盈利传导上真正横向比较。任一答案为否则继续拆。",
+      "不得以行业名、概念名或ETF名称作为最终盈利链；不得为了输出简洁限制每个行业的盈利链数量。",
       "同时寻找支持证据、反向证据、未来1-2季度传导与失效条件。",
       "重点盈利链存在多个主板直接受益公司时必须做链内横向比较，不得把首个代表股当作最佳股。",
       "分别输出fundamental_best与current_opportunity_best，并说明差异；没有低风险当前机会时允许为空。",
+      "不要求通过全市场盈利异常公司扫描证明股票召回完备性；允许少量跨行业漏网，以换取研究简单、稳定和可解释。",
       "不得读取obsolete_v2_inputs_and_outputs中的旧文件作为当前研究答案。"
     ]
+  },
+  "profit_chain_resolution_contract": {
+    "goal": "把宽泛行业或概念拆到共享同一经济盈利机制的一组真正可比公司，而不是追求固定层级或固定链条数量。",
+    "decomposition_dimensions": [
+      "产品/服务",
+      "生产路线或关键工艺",
+      "应用场景与终端需求",
+      "客户资本开支或订单来源",
+      "核心原料与成本结构",
+      "供需、价格、价差、产能利用率等直接利润变量"
+    ],
+    "stop_only_if": [
+      "链内公司共享基本相同的直接盈利Driver",
+      "链内公司可由基本相同的一组领先变量持续跟踪",
+      "Driver到收入/销量/成本/毛利的利润传导路径基本一致",
+      "链内公司具备真实横向可比性"
+    ],
+    "must_split_if": [
+      "同一宽链包含不同原料路线且成本曲线不同",
+      "同一宽链包含不同产品或工艺且价格/供需驱动不同",
+      "同一宽链包含不同应用场景或客户资本开支来源且订单周期不同",
+      "无法用同一组领先变量解释主要公司盈利变化",
+      "链内公司无法进行有意义的受益程度和盈利兑现比较"
+    ],
+    "anti_over_split": "若继续拆分后只是在公司名称层面做分类，而直接盈利Driver、领先变量和利润传导没有实质变化，则停止拆分，避免为了细而细。",
+    "examples_are_not_authority": "任何案例只用于说明方法，不能形成预设产业链答案；每期必须从当期数据重新研究。"
   },
   "authoritative_data": {
     "industry_coverage_hint": "config/industry_scan_universe.json",
     "company_index": "data/research/company_industry_index.json",
     "company_registry": "data/research/company_industry_registry.json",
-    "earnings_anomaly_mechanical": "data/research/v2/earnings_anomaly_recall.json",
     "full_market_price_structure_mechanical": "data/research/v2/full_market_price_structure.json",
     "latest_market": "data/latest.json",
     "bounded_history_store": "data/history_shards/*.json",
     "prompt_research_state": "data/research/v2/research_state.json"
   },
   "stages": [
-    {"id":"data_health","executor":"code","purpose":"确认主板全集、最新交易日、行情历史和基础财务数据可用。"},
+    {"id":"data_health","executor":"code","purpose":"确认主板范围、最新交易日、行情历史和基础财务数据可用。"},
     {"id":"market_profitability_discovery","executor":"prompt","purpose":"开放式横向比较全市场行业盈利和领先变量，发现真正出现边际改善的行业。"},
-    {"id":"profit_chain_decomposition","executor":"prompt","requires":["market_profitability_discovery"],"purpose":"对改善行业向下拆真实盈利链，解释直接利润变量、未来1-2季度传导和失效条件。"},
-    {"id":"chain_company_comparison","executor":"prompt+code","requires":["profit_chain_decomposition"],"purpose":"对重点链召回多个直接受益公司，比较业务暴露、主营/扣非兑现、现金流和Forward Bridge，区分基本面最优与当前机会最优。"},
+    {"id":"profit_chain_decomposition","executor":"prompt","requires":["market_profitability_discovery"],"purpose":"对改善行业按经济盈利机制递归拆解；只有Driver、领先变量、利润传导和公司可比性基本一致时才能停止。"},
+    {"id":"chain_company_comparison","executor":"prompt+code","requires":["profit_chain_decomposition"],"purpose":"对形成的细分盈利链召回多个直接受益公司，比较业务暴露、主营/扣非兑现、现金流和Forward Bridge，区分基本面最优与当前机会最优。"},
     {"id":"valuation","executor":"prompt+code","requires":["chain_company_comparison"],"purpose":"按盈利类型选择简洁估值模型，形成Fair Value、不确定性与低风险买入区，并解释两者桥接。"},
     {"id":"price_structure","executor":"code+prompt","purpose":"独立扫描全主板价格结构，只判断交易时机，不进入内在价值计算。"},
     {"id":"opportunity_synthesis","executor":"prompt","requires":["chain_company_comparison","valuation","price_structure"],"purpose":"综合盈利真实性、估值位置和价格时机形成研究机会，不用复杂状态机替代判断。"}
@@ -67,7 +99,7 @@
   },
   "validation_policy": {
     "case_free": true,
-    "principle": "Validator只检查数据完整性、模型匹配、计算自洽、链内比较是否发生和禁止事项，不替Prompt做行业发现或决定PE。"
+    "principle": "Validator只检查数据完整性、模型匹配、计算自洽、链内比较是否发生和禁止事项；不替Prompt做行业发现，不判断具体链条名称，也不决定PE。"
   },
   "production_gate": {
     "enabled": false,
@@ -82,6 +114,7 @@
     "data/research/v2/valuation_anchors.json",
     "data/research/v2/price_expectation_gap.json",
     "data/research/v2/opportunity_ranking.json",
-    "data/research/v2/shadow_crosscheck.json"
+    "data/research/v2/shadow_crosscheck.json",
+    "data/research/v2/earnings_anomaly_recall.json"
   ]
 }
