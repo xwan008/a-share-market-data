@@ -41,8 +41,6 @@ jobs:
           v['reasonable_price_assumption']='重大资产重组导致历史盈利口径不可比；此前Forward PE机械外推结果作废，需建立重组后独立盈利历史后再估值。'
           v['falsifiers']=['待重组后形成足够可比季度/年度盈利历史后重新建立Forward Bridge']
 
-          # Remove this code as an opportunity and recompute each chain's current_opportunity_best
-          # only from already-complete non-review valuations and the same timing gate.
           for comp in s.get('chain_comparisons',[]):
               eligible=[]
               for c in comp.get('compared_companies',[]):
@@ -89,7 +87,7 @@ jobs:
         env:
           PYTHONPATH: ${{ github.workspace }}
         run: |
-          python -m pip install pytest
+          python -m pip install -r requirements.txt pytest
           pytest -q
       - name: Commit and self-remove
         run: |
