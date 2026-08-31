@@ -10,32 +10,44 @@ def load(p):
 
 def test_repo_whitelist_and_public_evidence_are_separate_layers():
     p = load('config/research_runtime_policy.json')
-    assert p['schema_version'] == 4
+    assert p['schema_version'] == 5
     assert p['research_read_mode'] == 'manifest_repo_data_plus_current_public_evidence'
     assert p['repository_data_policy']['allow_only_manifest_authoritative_data'] is True
     assert p['public_evidence_policy']['allowed'] is True
-    assert p['public_evidence_policy']['required_for_1800_full_research'] is True
+    assert p['public_evidence_policy']['required_for_1800_research'] is True
     assert p['public_evidence_policy']['not_subject_to_repository_file_whitelist'] is True
 
 
-def test_ledger_first_stage_execution_is_enforced():
-    p = load('config/research_runtime_policy.json')['stage_execution_policy']
-    assert p['coverage_ledger_must_be_instantiated_before_market_discovery'] is True
-    assert p['coverage_summary_cannot_substitute_for_node_ledger'] is True
-    assert p['coverage_counts_must_be_derived_from_node_ledger'] is True
-    assert p['grouped_direction_rows_cannot_account_for_multiple_taxonomy_nodes'] is True
-    assert p['deep_status_nodes_must_be_resolved_before_completion_gate'] is True
-    assert p['peer_comparison_must_finish_before_final_valuation_when_peers_exist'] is True
-    assert p['publishable_opportunity_requires_complete_valuation_bridge'] is True
+def test_weekly_baseline_and_daily_incremental_are_enforced():
+    p = load('config/research_runtime_policy.json')
+    d = p['discovery_policy']
+    s = p['stage_execution_policy']
+    assert d['weekly_industry_baseline_may_carry_forward_between_full_scans'] is True
+    assert d['previous_state_may_seed_only_industry_baseline_for_daily_incremental'] is True
+    assert d['previous_companies_chains_valuations_or_opportunities_may_not_seed_1800_discovery'] is True
+    assert d['cross_run_candidate_or_opportunity_pools_forbidden'] is True
+    assert s['weekly_full_scan_must_review_all_level3_nodes'] is True
+    assert s['daily_incremental_requires_valid_weekly_baseline'] is True
+    assert s['generic_weekly_unconfirmed_placeholders_forbidden'] is True
+    assert s['deep_trigger_uses_trend_and_breadth_dimensions'] is True
 
 
-def test_no_cross_run_research_pool_and_state_schema_match():
+def test_company_comparison_and_valuation_cannot_shortcut():
+    s = load('config/research_runtime_policy.json')['stage_execution_policy']
+    assert s['peer_comparison_must_finish_before_valuation_when_peers_exist'] is True
+    assert s['all_compared_companies_must_enter_valuation_set'] is True
+    assert s['every_valuation_set_company_must_be_executed'] is True
+    assert s['review_required_is_exception_not_completion_shortcut'] is True
+    assert s['important_chain_requires_non_review_complete_valuation'] is True
+    assert s['publishable_opportunity_requires_complete_valuation_bridge'] is True
+
+
+def test_state_schema_match_when_present():
     p = load('config/research_runtime_policy.json')
     m = load(p['manifest_path'])
-    assert p['discovery_policy']['previous_state_may_not_seed_1800_discovery'] is True
-    assert p['discovery_policy']['cross_run_candidate_or_opportunity_pools_forbidden'] is True
     assert p['write_policy']['persistent_intermediate_research_outputs_forbidden'] is True
-    assert p['write_policy']['new_full_state_must_include_coverage_ledger'] is True
+    assert p['write_policy']['weekly_baseline_must_live_inside_research_state'] is True
+    assert p['write_policy']['new_state_must_include_coverage_ledger_and_scan_mode'] is True
     sp = ROOT / p['active_state_path']
     if sp.exists():
         assert json.loads(sp.read_text(encoding='utf-8')).get('manifest_schema') == m['schema_version']
