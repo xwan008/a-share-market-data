@@ -15780,7 +15780,7 @@
       "comparison_complete": true,
       "comparison_basis": "2026H1收入/归母利润增长、毛利率变化、利润规模 + 2025A盈利可估值性；仅使用本轮链内主板公司",
       "fundamental_best": "603268",
-      "current_opportunity_best": "603268",
+      "current_opportunity_best": null,
       "opportunity_resolution_complete": true
     },
     {
@@ -16459,7 +16459,7 @@
     "603268": {
       "current_price": 194.23,
       "price_date": "2026-08-31",
-      "earnings_type": "forward",
+      "earnings_type": "review_required",
       "earnings_basis": "2025H1占2025A归母24.4%，以2026H1按历史季节性外推FY2026",
       "primary_method": "forward_PE",
       "key_assumptions": {
@@ -16471,26 +16471,20 @@
           30.0
         ]
       },
-      "reasonable_price_assumption": "正常化/Forward EPS × 22-30x PE；当前股价不参与内在价值反推",
-      "reasonable_price_range": [
-        363.15,
-        495.21
-      ],
+      "reasonable_price_assumption": "重大资产重组导致历史盈利口径不可比；此前Forward PE机械外推结果作废，需建立重组后独立盈利历史后再估值。",
+      "reasonable_price_range": null,
       "uncertainty": "high",
       "margin_of_safety_reason": "低风险入口以合理价值下沿再折价15%-25%，吸收盈利预测、估值倍数与周期误差",
-      "safe_price_range": [
-        272.36,
-        308.68
-      ],
-      "valuation_position": "safe_zone",
+      "safe_price_range": null,
+      "valuation_position": "review_required",
       "falsifiers": [
-        "后续季度归母利润转为同比下降",
-        "毛利率/单位利润显著恶化",
-        "对应三级行业盈利趋势由improving转为deteriorating"
+        "待重组后形成足够可比季度/年度盈利历史后重新建立Forward Bridge"
       ],
       "valuation_attempt_complete": true,
-      "model_execution_status": "complete",
-      "review_required": false
+      "model_execution_status": "blocked_after_full_attempt",
+      "review_required": true,
+      "review_exception_code": "major_restructuring",
+      "blocker_evidence": "公司2025年完成重大资产重组：置出原日用陶瓷资产并置入恒力重工100%股权，主营业务由陶瓷制造切换为船舶及高端装备；2026半年报亦明确该重组及同一控制下合并/追溯调整。跨重组期2025A EPS与2026H1利润季节性不可直接机械外推，故按Manifest major_restructuring异常出口停止给出合理价/安全价。"
     },
     "600150": {
       "current_price": 34.08,
@@ -17804,8 +17798,8 @@
     "valuation": {
       "valuation_set_count": 30,
       "executed_count": 30,
-      "complete_non_review_count": 30,
-      "review_required_count": 0,
+      "complete_non_review_count": 29,
+      "review_required_count": 1,
       "valuation_gate_passed": true
     },
     "profit_chain": {
@@ -17831,29 +17825,13 @@
       "verified_count": 30,
       "gate_passed": true
     },
-    "completion_gate_passed": true
-  },
-  "current_opportunities": [
-    {
-      "code": "603268",
-      "name": "松发股份",
-      "chain_id": "L3_S650401_2026-08-31",
-      "industry": "航海装备Ⅲ",
-      "current_price": 194.23,
-      "reasonable_price_range": [
-        363.15,
-        495.21
-      ],
-      "safe_price_range": [
-        272.36,
-        308.68
-      ],
-      "valuation_position": "safe_zone",
-      "price_structure": "breakout",
-      "timing_action": "watch_breakout",
-      "action": "low_risk_candidate"
+    "completion_gate_passed": true,
+    "manual_exception_audit": {
+      "603268": "major_restructuring exception applied; prior mechanical fair/safe ranges invalidated",
+      "current_opportunities_recomputed": true
     }
-  ],
+  },
+  "current_opportunities": [],
   "incremental_review": {
     "baseline_date": "2026-08-31",
     "trigger_window_start": "2026-08-31T21:50:47+08:00",
