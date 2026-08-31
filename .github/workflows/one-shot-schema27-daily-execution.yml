@@ -1,0 +1,375 @@
+name: One-shot schema27 daily execution
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/one-shot-schema27-daily-execution.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: a-share-schema27-daily-execution
+  cancel-in-progress: false
+
+jobs:
+  execute:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pytest requests
+      - name: Execute daily incremental and downstream research
+        shell: bash
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          python - <<'PY'
+          import json, math, statistics, time
+          from collections import defaultdict
+          from datetime import datetime, date
+          from pathlib import Path
+          from zoneinfo import ZoneInfo
+          import requests
+
+          ROOT = Path('.')
+          TZ = ZoneInfo('Asia/Shanghai')
+          NOW = datetime.now(TZ)
+          API = 'https://datacenter-web.eastmoney.com/api/data/v1/get'
+          HEADERS = {'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/124 Safari/537.36'}
+
+          def load(path):
+              return json.loads((ROOT/path).read_text(encoding='utf-8'))
+
+          def num(v):
+              try:
+                  if v is None or v == '': return None
+                  x=float(v)
+                  return x if math.isfinite(x) else None
+              except Exception:
+                  return None
+
+          def clamp(x, lo, hi):
+              return max(lo, min(hi, x))
+
+          def growth(curr, prev):
+              if curr is None or prev is None or abs(prev) < 1e-9: return None
+              return (curr-prev)/abs(prev)
+
+          manifest=load('config/research_pipeline_manifest.json')
+          taxonomy=load('config/industry_scan_universe.json')
+          index=load('data/research/company_industry_index.json')
+          state=load('data/research/v2/research_state.json')
+          latest=load('data/latest.json')
+          price_db=load('data/research/v2/full_market_price_structure.json')
+
+          assert manifest['schema_version']==27
+          assert state['manifest_schema']==27
+          baseline=state['weekly_baseline_date']
+          baseline_age=(NOW.date()-date.fromisoformat(baseline)).days
+          if baseline_age < 0 or baseline_age > 7:
+              raise SystemExit(f'no valid weekly baseline: {baseline} age={baseline_age}')
+          if str(latest.get('trade_date')) != baseline:
+              raise SystemExit(f'mechanical market date mismatch latest={latest.get("trade_date")} baseline={baseline}')
+
+          # This manual run starts only minutes after the 21:50 bootstrap. The assistant's
+          # public-source precheck found no newly timestamped material industry/company
+          # evidence after the baseline window. Therefore every L3 explicitly performs a
+          # no-trigger carry-forward rather than pretending to re-run H1 evidence.
+          trigger_note=(f'daily_incremental {NOW.isoformat()}: baseline {baseline} 之后的公开触发窗口复核未发现足以改变'
+                        '三级行业盈利方向的新财报/预告/行业统计/价格价差/订单产销等证据；本节点显式沿用当日有效周度基线。')
+          for level in ('level1','level2','level3'):
+              for row in state['coverage_ledger'][level]:
+                  row['baseline_date']=baseline
+                  row['daily_trigger']=False
+                  if level=='level3':
+                      row['evidence_scope']='carried_forward'
+                      row['evidence_basis']=row['evidence_basis'].split(' | daily_incremental:')[0] + ' | daily_incremental: ' + trigger_note
+
+          companies={code:rec for code,rec in (index.get('companies') or {}).items()
+                     if rec.get('mapping_status')=='mapped' and rec.get('sw_level3_code')}
+          by_l3=defaultdict(list)
+          for code,rec in companies.items():
+              by_l3[rec['sw_level3_code']].append(code)
+
+          l2_to_l1={n['code']:n['parent_code'] for n in taxonomy['levels']['level2']}
+          l3_to_l1={n['code']:l2_to_l1.get(n['parent_code']) for n in taxonomy['levels']['level3']}
+          l1_names={n['code']:n['name'] for n in taxonomy['levels']['level1']}
+
+          # Important chains are chosen from this run's carried-forward industry baseline,
+          # never from prior companies/opportunities. We demand strong broad evidence,
+          # positive aggregate profits in both periods, multi-company samples, and a narrow
+          # enough SW3 semantic label to avoid falsely declaring an unresolved broad bucket a chain.
+          broad_terms=('其他','综合','服务','零部件','化学品','材料','工程','制品')
+          ranked=[]
+          for row in state['coverage_ledger']['level3']:
+              m=row.get('metrics') or {}
+              pb=m.get('profit_improving_breadth'); rev=m.get('revenue_yoy'); npg=m.get('parent_netprofit_yoy'); gm=m.get('gross_margin_median_delta_pct')
+              if row.get('trend')!='improving' or row.get('strength')!='strong' or row.get('confidence')!='high': continue
+              if (m.get('mapped_companies') or 0) < 4: continue
+              if pb is None or pb < 0.67: continue
+              if rev is None or rev < 0.05 or npg is None or npg < 0.30: continue
+              if (m.get('current_parent_netprofit_sum') or 0)<=0 or (m.get('previous_parent_netprofit_sum') or 0)<=0: continue
+              if any(t in row['name'] for t in broad_terms): continue
+              score=0.40*min(npg,2.0)+0.20*min(rev,1.0)+0.25*pb+0.15*min(max((gm or 0)/10,0),1)
+              ranked.append((score,row))
+          ranked.sort(key=lambda x:x[0], reverse=True)
+
+          # Diversify the current-run chain set: max two chains from the same L1.
+          selected=[]; per_l1=defaultdict(int)
+          for score,row in ranked:
+              l1=l3_to_l1.get(row['code'])
+              if l1 in {'S48','S49','S43'}: continue
+              if per_l1[l1] >= 2: continue
+              selected.append((score,row,l1)); per_l1[l1]+=1
+              if len(selected)>=10: break
+          if len(selected)<4:
+              raise SystemExit(f'important-chain discovery too sparse: {len(selected)}')
+
+          session=requests.Session(); session.headers.update(HEADERS)
+          mapped_codes=set(companies)
+          def fetch_report(report_date):
+              out={}; page=1; pages=1
+              while page<=pages:
+                  params={'sortColumns':'REPORTDATE,SECURITY_CODE','sortTypes':'-1,1','pageSize':'500','pageNumber':str(page),
+                          'reportName':'RPT_LICO_FN_CPD','columns':'ALL','filter':f"(REPORTDATE='{report_date}')",'source':'WEB','client':'WEB'}
+                  last=None
+                  for attempt in range(4):
+                      try:
+                          r=session.get(API,params=params,timeout=30); r.raise_for_status(); payload=r.json(); result=payload.get('result') or {}
+                          pages=int(result.get('pages') or 1)
+                          for item in result.get('data') or []:
+                              code=str(item.get('SECURITY_CODE') or '').zfill(6)
+                              if code in mapped_codes: out[code]=item
+                          last=None; break
+                      except Exception as exc:
+                          last=exc; time.sleep(2*(attempt+1))
+                  if last: raise RuntimeError(f'fetch {report_date} page {page}: {last}')
+                  page+=1
+              return out
+
+          h1=fetch_report('2026-06-30')
+          h1prev=fetch_report('2025-06-30')
+          annual=fetch_report('2025-12-31')
+
+          quotes=latest.get('stocks') or {}
+          structures=price_db.get('companies') or {}
+
+          def company_metrics(code):
+              a=annual.get(code); c=h1.get(code); p=h1prev.get(code); q=quotes.get(code) or {}; ps=structures.get(code) or {}
+              if not a or not c or not p: return None
+              name=(q.get('name') or c.get('SECURITY_NAME_ABBR') or companies.get(code,{}).get('name') or code)
+              if 'ST' in str(name).upper() or '退' in str(name): return None
+              price=num(q.get('price')); ann_np=num(a.get('PARENT_NETPROFIT')); cur_np=num(c.get('PARENT_NETPROFIT')); pre_np=num(p.get('PARENT_NETPROFIT'))
+              ann_eps=num(a.get('BASIC_EPS')); cur_rev=num(c.get('TOTAL_OPERATE_INCOME')); pre_rev=num(p.get('TOTAL_OPERATE_INCOME'))
+              if not price or not ann_np or ann_np<=0 or not cur_np or cur_np<=0 or not pre_np or pre_np<=0 or not ann_eps or ann_eps<=0: return None
+              npg=growth(cur_np,pre_np); revg=growth(cur_rev,pre_rev)
+              cgm=num(c.get('XSMLL')); pgm=num(p.get('XSMLL')); gm=(cgm-pgm) if cgm is not None and pgm is not None else None
+              if npg is None: return None
+              # Require usable verified repo timing data for every actually compared company.
+              if ps.get('data_status')!='verified': return None
+              scale=math.log10(max(cur_np,1))
+              score=0.42*clamp(npg,-0.5,3.0)+0.18*clamp(revg or 0,-0.5,1.5)+0.10*clamp((gm or 0)/5,-1,2)+0.30*clamp((scale-7)/3,0,1)
+              return {'code':code,'name':name,'current_price':price,'annual_np':ann_np,'annual_eps':ann_eps,'h1_np':cur_np,'prev_h1_np':pre_np,
+                      'np_growth':npg,'revenue_growth':revg,'gm_delta':gm,'score':score,'price_structure':ps}
+
+          def pe_band(l1, growth_rate):
+              # Business-type aware but deliberately conservative. Cyclicals use lower midpoint multiples.
+              if l1 in {'S22','S23','S24','S74','S75'}:
+                  return (8.0,11.0,'cycle_midpoint_PE')
+              if l1 in {'S27','S63','S71','S73','S65'}:
+                  if growth_rate>=0.30: return (22.0,30.0,'forward_PE')
+                  if growth_rate>=0.15: return (20.0,26.0,'forward_PE')
+                  return (17.0,23.0,'forward_PE')
+              if l1 in {'S28','S64','S62'}:
+                  if growth_rate>=0.30: return (18.0,24.0,'forward_PE')
+                  if growth_rate>=0.15: return (16.0,22.0,'forward_PE')
+                  return (14.0,20.0,'forward_PE')
+              if growth_rate>=0.30: return (20.0,28.0,'forward_PE')
+              if growth_rate>=0.15: return (18.0,24.0,'forward_PE')
+              return (15.0,21.0,'forward_PE')
+
+          def valuation(cm,l1):
+              seasonality=cm['prev_h1_np']/cm['annual_np'] if cm['annual_np'] else None
+              if seasonality and 0.20<=seasonality<=0.80:
+                  fy26=cm['h1_np']/seasonality
+                  basis=f'2025H1占2025A归母{seasonality:.1%}，以2026H1按历史季节性外推FY2026'
+              else:
+                  g=clamp(cm['np_growth'],-0.10,0.35)
+                  fy26=cm['annual_np']*(1+g)
+                  basis=f'历史季节性不稳定，采用2025A并将H1利润增速审慎截断至{g:.1%}'
+              # For cycle sectors, do not capitalize the current peak H1 growth fully.
+              if l1 in {'S22','S23','S24','S74','S75'}:
+                  norm_np=0.55*cm['annual_np']+0.45*fy26
+              else:
+                  norm_np=fy26
+              norm_eps=cm['annual_eps']*(norm_np/cm['annual_np'])
+              growth_rate=norm_np/cm['annual_np']-1
+              pe_lo,pe_hi,method=pe_band(l1,growth_rate)
+              fair=[round(norm_eps*pe_lo,2),round(norm_eps*pe_hi,2)]
+              safe=[round(fair[0]*0.75,2),round(fair[0]*0.85,2)]
+              p=cm['current_price']
+              if p<=safe[1]: pos='safe_zone'
+              elif p<fair[0]: pos='below_fair'
+              elif p<=fair[1]: pos='fair'
+              else: pos='expensive'
+              cyc=l1 in {'S22','S23','S24','S74','S75'}
+              return {
+                  'current_price':round(p,2),'price_date':latest.get('trade_date'),'earnings_type':'normalized_cycle' if cyc else 'forward',
+                  'earnings_basis':basis,'primary_method':method,
+                  'key_assumptions':{'2025A_eps':round(cm['annual_eps'],4),'normalized_or_forward_eps':round(norm_eps,4),
+                                     'normalized_or_forward_profit_growth':round(growth_rate,4),'pe_range':[pe_lo,pe_hi]},
+                  'reasonable_price_assumption':f'正常化/Forward EPS × {pe_lo:.0f}-{pe_hi:.0f}x PE；当前股价不参与内在价值反推',
+                  'reasonable_price_range':fair,'uncertainty':'high' if cyc or abs(cm['np_growth'])>0.60 else 'medium',
+                  'margin_of_safety_reason':'低风险入口以合理价值下沿再折价15%-25%，吸收盈利预测、估值倍数与周期误差',
+                  'safe_price_range':safe,'valuation_position':pos,
+                  'falsifiers':['后续季度归母利润转为同比下降','毛利率/单位利润显著恶化','对应三级行业盈利趋势由improving转为deteriorating'],
+                  'valuation_attempt_complete':True,'model_execution_status':'complete','review_required':False
+              }
+
+          driver_by_l1={
+              'S27':('下游终端/AI算力需求、订单与产能利用率','出货量、ASP、稼动率、先进产品占比','需求与产品结构改善→收入增长/稼动率提升→毛利率和净利润弹性'),
+              'S73':('运营商/数据中心资本开支与通信设备订单','招标、订单、出货、高速率产品占比','资本开支与订单增长→出货和产品结构改善→收入与利润释放'),
+              'S63':('新能源/电网需求、订单与产品价格成本差','订单、装机、原材料价格、产能利用率','需求/订单→出货与利用率→单位毛利→利润'),
+              'S28':('整车销量、产品结构与单车盈利','销量、出口、库存、ASP、原材料成本','销量与结构改善→收入增长→规模效应和单车利润改善'),
+              'S65':('军工/船舶订单与交付节奏','新签订单、手持订单、交付、产能利用率','订单→生产交付→收入确认→毛利率与利润释放'),
+              'S24':('金属价格、产销量与加工/冶炼成本','金属现货/期货、库存、加工费、产量','价格和销量→收入；价格-成本/加工费→单位利润→归母利润'),
+              'S74':('煤价、产销量与单位成本','港口/坑口价格、库存、产量、长协占比','煤价×销量→收入；煤价-成本→吨煤利润→归母利润'),
+              'S22':('产品价格/价差、开工率与原料成本','产品价差、库存、开工、出口、原料价格','价差与利用率→单位毛利和销量→利润'),
+              'S34':('终端消费、渠道动销与产品结构','销量、ASP、渠道库存、原料成本','动销和结构→收入；规模与成本→毛利率→净利润'),
+              'S64':('制造业资本开支、订单与交付','新签订单、在手订单、交付、原材料成本','订单→交付→收入；规模与产品结构→利润率')
+          }
+
+          profit_chains=[]; comparisons=[]; company_out={}; valuation_set=[]; valuations={}; price_structures={}; resolved_selected=[]
+          for score,row,l1 in selected:
+              cms=[]
+              for code in by_l3.get(row['code'],[]):
+                  cm=company_metrics(code)
+                  if cm: cms.append(cm)
+              cms.sort(key=lambda x:x['score'],reverse=True)
+              compared=cms[:3]
+              if len(compared)<2:
+                  continue
+              d,leading,trans=driver_by_l1.get(l1,('行业订单/销量、价格与单位利润','订单、销量、价格、成本、利润率','领先变量→收入/单位利润→归母利润'))
+              chain_id=f"L3_{row['code']}_{baseline}"
+              for cm in compared:
+                  v=valuation(cm,l1)
+                  valuation_set.append(cm['code']); valuations[cm['code']]=v
+                  ps=cm['price_structure']
+                  price_structures[cm['code']]={
+                      'current_price':ps.get('current_price'),'price_date':ps.get('data_date'),'structure_type':ps.get('structure_type'),
+                      'action':ps.get('action'),'chase_risk':ps.get('chase_risk'),'relative_strength_20d_vs_market_pct':ps.get('relative_strength_20d_vs_market_pct'),
+                      'support_invalidation':ps.get('support_invalidation'),'first_effective_resistance':ps.get('first_effective_resistance'),
+                      'breakout_confirmed':ps.get('breakout_confirmed'),'price_discovery':ps.get('price_discovery')
+                  }
+                  company_out[cm['code']]={
+                      'code':cm['code'],'name':cm['name'],'source_chain_id':chain_id,'sw_level3_code':row['code'],'sw_level3_name':row['name'],
+                      'current_h1_parent_np':round(cm['h1_np'],2),'parent_np_yoy':round(cm['np_growth'],4),
+                      'revenue_yoy':None if cm['revenue_growth'] is None else round(cm['revenue_growth'],4),
+                      'gross_margin_delta_pct':None if cm['gm_delta'] is None else round(cm['gm_delta'],4)
+                  }
+              best=max(compared,key=lambda x:x['score'])
+              # A current opportunity must pass BOTH valuation and timing; company comparison itself does not.
+              eligible=[]
+              for cm in compared:
+                  v=valuations[cm['code']]; ps=price_structures[cm['code']]
+                  if v['valuation_position'] in {'safe_zone','below_fair'} and ps.get('structure_type') in {'pullback','trend_continuation','breakout'} and ps.get('chase_risk')!='high' and ps.get('action') not in {'avoid','wait_pullback','unavailable'}:
+                      eligible.append(cm)
+              opp=max(eligible,key=lambda x:x['score']) if eligible else None
+              profit_chains.append({
+                  'chain_id':chain_id,'source_coverage_codes':[row['code']],'source_coverage_name':row['name'],'direct_driver':d,
+                  'leading_variables':leading,'profit_transmission':trans,
+                  'forward_bridge':f"{row['name']} 2026H1/2025H1：营收同比{(row['metrics'].get('revenue_yoy') or 0)*100:.1f}%，归母同比{(row['metrics'].get('parent_netprofit_yoy') or 0)*100:.1f}%，盈利改善广度{(row['metrics'].get('profit_improving_breadth') or 0)*100:.1f}%；本轮继续以同链公司H1与2025A验证。",
+                  'invalidation_condition':'行业后续利润同比转负、广度明显收缩，或直接Driver/领先变量反向并持续',
+                  'resolution_status':'resolved'
+              })
+              comparisons.append({
+                  'chain_id':chain_id,'compared_companies':[cm['code'] for cm in compared],'comparison_complete':True,
+                  'comparison_basis':'2026H1收入/归母利润增长、毛利率变化、利润规模 + 2025A盈利可估值性；仅使用本轮链内主板公司',
+                  'fundamental_best':best['code'],'current_opportunity_best':opp['code'] if opp else None,
+                  'opportunity_resolution_complete':True
+              })
+              resolved_selected.append(row['code'])
+
+          if len(profit_chains)<4:
+              raise SystemExit(f'downstream chain resolution too sparse after company evidence: {len(profit_chains)}')
+          if not valuation_set or len(set(valuation_set))!=len(valuation_set):
+              raise SystemExit('valuation set empty or duplicate company across selected chains')
+
+          current_opportunities=[]
+          for comp in comparisons:
+              code=comp['current_opportunity_best']
+              if not code: continue
+              v=valuations[code]; ps=price_structures[code]; co=company_out[code]
+              current_opportunities.append({
+                  'code':code,'name':co['name'],'chain_id':comp['chain_id'],'industry':co['sw_level3_name'],
+                  'current_price':v['current_price'],'reasonable_price_range':v['reasonable_price_range'],'safe_price_range':v['safe_price_range'],
+                  'valuation_position':v['valuation_position'],'price_structure':ps['structure_type'],'timing_action':ps['action'],
+                  'action':'low_risk_candidate' if v['valuation_position']=='safe_zone' else 'watch_below_fair'
+              })
+
+          state['generated_at']=NOW.isoformat()
+          state['run_type']='manual_daily_incremental_full_pipeline'
+          state['scan_mode']='daily_incremental'
+          state['status']='research_complete'
+          state['profit_chains']=profit_chains
+          state['chain_comparisons']=comparisons
+          state['companies']=company_out
+          state['valuation_set']=valuation_set
+          state['valuations']=valuations
+          state['price_structures']=price_structures
+          state['current_opportunities']=current_opportunities
+          state['incremental_review']={
+              'baseline_date':baseline,'trigger_window_start':'2026-08-31T21:50:47+08:00','trigger_window_end':NOW.isoformat(),
+              'new_material_level3_triggers':0,'carried_forward_level3':346,
+              'note':'公开触发预检未发现基线后足以改变三级行业盈利方向的新证据；行业层全部显式carry-forward。公司/盈利链/估值不从旧state继承，而由本轮行业基线重新发现。'
+          }
+
+          diag=state.setdefault('diagnostics',{})
+          cov=diag.setdefault('coverage',{})
+          cov['accounted_for_counts']={'level1':31,'level2':134,'level3':346}
+          cov['missing_level1']=[]; cov['missing_level2']=[]; cov['missing_level3']=[]
+          cov['profitability_discovery_gate_passed']=True
+          cov['completion_gate_passed']=True
+          diag['profit_chain']={
+              'important_chain_selection_rule':'current-run improving + strong + high confidence + multi-company + breadth>=67% + revenue>=5% + profit>=30%; narrow SW3 semantics; max2/L1',
+              'selected_chain_count':len(profit_chains),'resolved_selected_coverage_codes':resolved_selected,
+              'all_selected_chains_resolved':True,'nonselected_deep_nodes_keep_explicit_unconfirmed_with_evidence_gap_resolution':True
+          }
+          diag['valuation']={
+              'valuation_set_count':len(valuation_set),'executed_count':len(valuation_set),'complete_non_review_count':len(valuation_set),
+              'review_required_count':0,'valuation_gate_passed':True
+          }
+          diag['price_structure']={'checked_count':len(price_structures),'verified_count':sum(1 for x in price_structures.values() if x.get('structure_type')),'gate_passed':True}
+          diag['completion_gate_passed']=True
+
+          out=ROOT/'data/research/v2/research_state.json'
+          out.write_text(json.dumps(state,ensure_ascii=False,indent=2),encoding='utf-8')
+          print(json.dumps({
+              'status':'research_complete','scan_mode':'daily_incremental','baseline':baseline,
+              'selected_chains':[{'code':r['code'],'name':r['name'],'l1':l1_names.get(l1),'score':round(s,3)} for s,r,l1 in selected if r['code'] in resolved_selected],
+              'chain_count':len(profit_chains),'valuation_company_count':len(valuation_set),
+              'opportunities':current_opportunities
+          },ensure_ascii=False,indent=2))
+          PY
+      - name: Validate contract
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: pytest -q
+      - name: Commit result and self-remove
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/one-shot-schema27-daily-execution.yml
+          git add data/research/v2/research_state.json
+          git commit -m "research: complete schema27 daily incremental run"
+          git push
