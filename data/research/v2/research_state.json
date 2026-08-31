@@ -1,124 +1,128 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "mode": "shadow",
   "architecture": "prompt_first_research",
-  "status": "acceptance_run_completed",
+  "status": "formal_shadow_run_completed",
+  "generated_at": "2026-08-31T11:30:00+08:00",
   "reference_trade_date": "2026-08-28",
   "research_as_of": "2026-08-31",
-  "market_discovery": [
-    {"industry":"电子/AI硬件","direction":"strong_improving","marginal_change":"accelerating","evidence":["1-7月电子设备制造业利润同比约+105%，较1-6月约+96.9%继续加速","全球主要CSP资本开支与AI服务器出货预期保持高增"],"forward_view":"AI服务器、机柜、高速互连、高端CCL/PCB仍有订单到利润Bridge","evidence_against":["部分核心股已显著重估，当前机会弱于基本面强度"]},
-    {"industry":"有色金属","direction":"strong_improving","marginal_change":"high_but_slightly_decelerating","evidence":["1-7月有色冶炼利润约+91.8%，矿采选约+74.9%","铜金高价格中枢及矿山增量继续支撑资源端盈利"],"forward_view":"资源端仍强，但需正常化商品价格windfall并区分矿山与冶炼","evidence_against":["商品价格高位波动和冶炼加工费压力"]},
-    {"industry":"基础化工","direction":"strong_improving","marginal_change":"broad_recovery_but_decelerating","evidence":["1-7月化学原料和化学制品利润约+56.6%，仍强但低于1-6月约+67.8%","化纤利润保持高增","制冷剂价差改善已兑现到龙头利润"],"forward_view":"必须继续拆制冷剂、氨纶/化纤、磷化工、MDI/TDI等，不把化工整体当一个交易逻辑","evidence_against":["不同化工品价格、库存、开工分化显著"]},
-    {"industry":"煤炭","direction":"improving","marginal_change":"accelerating","evidence":["1-7月煤炭开采洗选利润约+50.4%，高于1-6月约+41.1%","8月下旬动力煤价格维持强势"],"forward_view":"若供给纪律、库存下降和旺季需求维持，吨煤利润仍有支撑","evidence_against":["高煤价抑制终端采购，供给恢复会削弱利润Bridge"]},
-    {"industry":"医药制造","direction":"broadly_stable","marginal_change":"weak_positive","evidence":["1-7月医药制造利润约+3.8%"],"forward_view":"不列为全行业强景气，只研究有独立订单/商业化证据的创新药、CXO等局部链","evidence_against":["整体利润改善远弱于电子、有色、化工、煤炭"]},
-    {"industry":"机械设备","direction":"mixed","marginal_change":"weak","evidence":["通用设备和专用设备全行业利润增速较低"],"forward_view":"只从工程机械、船机、机器人等细分订单独立寻找机会","evidence_against":["大行业数据不足以支持整体景气"]},
-    {"industry":"汽车制造","direction":"deteriorating","marginal_change":"negative","evidence":["1-7月汽车制造业利润约-20.4%"],"forward_view":"出口/重卡等局部链可以另行研究，整车行业不作为当前广义景气主线","evidence_against":[]},
-    {"industry":"钢铁/建材","direction":"deteriorating","marginal_change":"strong_negative","evidence":["钢铁与非金属矿物制品利润大幅下降"],"forward_view":"不作为当前广义景气主线，并构成部分焦煤/地产链的反向约束","evidence_against":[]}
+  "research_rule": "full_market_first_then_profit_chains_then_multi_company_comparison_then_valuation_then_timing",
+  "source_basis": [
+    "2026-08-27 NBS Jan-Jul industrial profits and sub-industry interpretation",
+    "2026-08-30/31 completed A-share H1 reporting summaries",
+    "company H1 reports and current consensus forecasts",
+    "GitHub mechanical earnings anomaly recall and 2026-08-28 price structure"
   ],
-  "profit_chains": [
-    {"chain":"AI服务器/机柜","industry":"电子/AI硬件","direct_profit_driver":"CSP资本开支与AI服务器/机柜出货","future_1_2q":"强","invalidation":"CSP资本开支明显下修、AI服务器订单拐点或价格竞争显著恶化"},
-    {"chain":"高端CCL/PCB","industry":"电子/AI硬件","direct_profit_driver":"AI服务器/高速交换对高层数PCB和高速CCL的需求与产品结构升级","future_1_2q":"强，但估值拥挤度高","invalidation":"高端板订单下修、扩产导致价格竞争、产品结构恶化"},
-    {"chain":"制冷剂/氟化工","industry":"基础化工","direct_profit_driver":"HFC配额约束下制冷剂售价-原料成本价差","future_1_2q":"中高","invalidation":"制冷剂价格持续回落、配额放松或原料成本快速上升"},
-    {"chain":"氨纶/化纤","industry":"基础化工","direct_profit_driver":"氨纶售价-PTMEG/MDI等原料成本价差、销量与开工","future_1_2q":"中，修复延续但最新领先变量未继续加速","invalidation":"库存累积、售价下跌且成本上升导致价差收窄"},
-    {"chain":"动力煤矿企","industry":"煤炭","direct_profit_driver":"煤炭售价-单位成本-产量","future_1_2q":"中高","invalidation":"供给恢复、库存累积、煤价连续回落"},
-    {"chain":"金铜矿山资源","industry":"有色金属","direct_profit_driver":"金/铜价格中枢-现金成本-可持续产量","future_1_2q":"强但周期敏感","invalidation":"铜金价格显著下移、产量不达预期或成本快速上升"}
+  "broad_industry_scan": [
+    {"industry":"电子","status":"strong_improving","note":"1-7月行业利润约+105%；集成电路、服务器、电子材料、电路、光纤光缆存在多条独立盈利链"},
+    {"industry":"计算机/AI基础设施","status":"strong_selective","note":"服务器/算力基础设施盈利强，软件应用需公司级验证，不能从硬件景气外推"},
+    {"industry":"通信","status":"strong_selective","note":"光模块、光纤光缆强；传统通信主设备公司盈利分化甚至承压"},
+    {"industry":"有色金属","status":"strong_improving","note":"冶炼利润约+91.8%，矿采选亦强；金铜、锂资源链需区分商品windfall与产量成本优势"},
+    {"industry":"基础化工","status":"strong_improving_with_divergence","note":"行业利润约+56.6%，化纤约+107.7%；制冷剂、煤化工、化纤、磷化工、炼化等链条状态不同"},
+    {"industry":"煤炭","status":"improving_with_divergence","note":"行业利润约+50.4%；动力煤改善更明确，焦煤受钢铁弱景气约束"},
+    {"industry":"电力设备","status":"strong_selective","note":"规上电气机械利润-7.6%，但A股H1电力设备营收增速超20%、净利润增速超35%；电网/UHV与锂电强，光伏上游仍弱"},
+    {"industry":"机械设备","status":"selective_improving","note":"通用/专用大类利润仅小幅增长，但船舶/船机、轨交等订单交付链明显强于工程机械整体"},
+    {"industry":"非银金融/券商","status":"strong_improving","note":"43家上市券商H1营收、净利润均约+45%至+49%，经纪与自营为主要驱动"},
+    {"industry":"石油天然气","status":"moderate_improving","note":"油气开采利润约+15.4%，受价格、产量和成本共同驱动"},
+    {"industry":"石油炼化","status":"turnaround","note":"规上石油煤炭燃料加工由亏转盈，但公司分化仍大"},
+    {"industry":"造纸","status":"moderate_improving","note":"行业利润改善，但公司层仍有亏损和修复并存"},
+    {"industry":"纺织服装","status":"moderate","note":"纺织利润约+7.9%；仅部分化纤/出口链值得深挖"},
+    {"industry":"医药","status":"selective","note":"医药制造整体利润约+3.8%，不能列为全行业强景气；医疗仪器、创新药/CXO等需独立证据"},
+    {"industry":"银行","status":"stable","note":"未发现类似券商的盈利加速，不作为本轮高景气主线"},
+    {"industry":"公用事业","status":"mixed_to_weak","note":"电力热力利润约-8%，燃气约+9.3%，内部方向不同"},
+    {"industry":"交通运输","status":"mixed","note":"未发现全行业一致高景气，需要航运/港口/航空分别研究"},
+    {"industry":"汽车","status":"broad_weak_selective","note":"规上汽车利润约-20.4%，出口/重卡/部分零部件可单独研究但不能升级整车大类"},
+    {"industry":"家电/消费电子","status":"mixed","note":"传统消费电子与AI电子链分化，家电未进入本轮最强盈利簇"},
+    {"industry":"食品饮料/农林牧渔","status":"weak_to_mixed","note":"农副食品加工利润约-12.3%，未发现全行业高景气"},
+    {"industry":"商贸零售/社会服务/传媒","status":"mixed_repair","note":"存在局部修复但尚缺乏与电子、有色、化工同级别的全行业盈利证据"},
+    {"industry":"房地产/建筑","status":"weak","note":"未进入本轮盈利改善主线"},
+    {"industry":"建材","status":"strong_weakness","note":"非金属矿物制品利润约-48.2%"},
+    {"industry":"钢铁","status":"strong_weakness","note":"黑色金属冶炼利润约-51.2%，并构成焦煤需求反向约束"},
+    {"industry":"国防军工","status":"selective","note":"铁路船舶航空航天大类利润约+12.2%，但主要强链集中在船舶，其他需公司级订单验证"},
+    {"industry":"环保","status":"unconfirmed","note":"本轮未发现足够强的全行业盈利加速证据"}
   ],
-  "chain_comparisons": [
-    {
-      "chain":"AI服务器/机柜",
-      "candidates":[
-        {"code":"601138","name":"工业富联","evidence":"H1 AI/云计算相关业务与利润高增；2026E/2027E EPS一致预期约3.09/4.19元","judgement":"兑现和Forward可见度最强"},
-        {"code":"603019","name":"中科曙光","evidence":"H1收入约+27%，扣非利润约+50%","judgement":"盈利改善明确，但规模/增长兑现弱于工业富联"},
-        {"code":"000977","name":"浪潮信息","evidence":"H1服务器收入规模大，但总收入增速明显弱于工业富联","judgement":"需求暴露高，盈利兑现比较优势不足"}
-      ],
-      "fundamental_best":{"code":"601138","name":"工业富联","reason":"规模、AI订单兑现、利润增长和一致预期可见度综合最强"},
-      "current_opportunity_best":null,
-      "current_opportunity_reason":"工业富联基本面最好，但8月28日64.04元已略高于本轮理想低风险区，当前更适合等回踩。"
-    },
-    {
-      "chain":"高端CCL/PCB",
-      "candidates":[
-        {"code":"600183","name":"生益科技","evidence":"H1收入约+50.1%、扣非约+111.0%、经营现金流约+53.4%","judgement":"盈利质量和现金流最强"},
-        {"code":"002463","name":"沪电股份","evidence":"H1收入约+61.2%、扣非约+70.0%，但经营现金流同比明显下降","judgement":"高端PCB兑现强，现金流弱于生益"},
-        {"code":"002916","name":"深南电路","evidence":"H1收入约+46.3%、扣非约+76.9%；2026E/2027E EPS一致预期约8.25/11.90元","judgement":"盈利增长和Forward上修很强，但估值已经很高"}
-      ],
-      "fundamental_best":{"code":"600183","name":"生益科技","reason":"扣非增速、现金流和高端材料暴露综合最好"},
-      "current_opportunity_best":null,
-      "current_opportunity_reason":"生益科技与深南电路均已显著重估；基本面强不等于当前是低风险买点。"
-    },
-    {
-      "chain":"制冷剂/氟化工",
-      "candidates":[
-        {"code":"600160","name":"巨化股份","evidence":"H1制冷剂均价约+15.6%，多项原料成本同比下降；2026E/2027E EPS约2.13/2.57元","judgement":"配额、规模、一体化与利润兑现综合最强"},
-        {"code":"603379","name":"三美股份","evidence":"H1收入约+20.7%，扣非约+5.8%","judgement":"受益明确但利润弹性明显弱于巨化"},
-        {"code":"605020","name":"永和股份","evidence":"H1收入约+28%，氟碳化学品/高分子材料均有增长","judgement":"成长较好但规模和盈利确定性不如巨化"}
-      ],
-      "fundamental_best":{"code":"600160","name":"巨化股份","reason":"制冷剂价差、配额份额、一体化成本和一致预期共同验证"},
-      "current_opportunity_best":{"code":"600160","name":"巨化股份","reason":"链内估值相对可解释，但40.54元仍略高于本轮理想低风险区，属于等待回踩型最优而非立即买入。"}
-    },
-    {
-      "chain":"氨纶/化纤",
-      "candidates":[
-        {"code":"002064","name":"华峰化学","evidence":"H1收入约+16.7%、扣非约+118.1%；2026E/2027E EPS约0.72/0.84元","judgement":"一体化和盈利兑现强"},
-        {"code":"000949","name":"新乡化纤","evidence":"H1氨纶和纤维素长丝收入均有较大规模","judgement":"受益明确，但综合盈利质量/一体化弱于华峰"}
-      ],
-      "fundamental_best":{"code":"002064","name":"华峰化学","reason":"一体化、规模和扣非盈利弹性更强"},
-      "current_opportunity_best":null,
-      "current_opportunity_reason":"11.89元已接近本轮Fair Value上部，且氨纶最新领先变量未继续加速。"
-    },
-    {
-      "chain":"动力煤矿企",
-      "candidates":[
-        {"code":"601088","name":"中国神华","evidence":"煤电运一体化、现金流与分红稳定性强","judgement":"业务质量和防御性最佳，但估值更高"},
-        {"code":"601225","name":"陕西煤业","evidence":"H1自产煤收入上升、成本下降，利润弹性强；2026E/2027E EPS约2.15/2.30元","judgement":"当前估值/盈利弹性更有吸引力"},
-        {"code":"601898","name":"中煤能源","evidence":"煤炭主业直接暴露且价格修复受益","judgement":"可比候选，但综合质量/当前吸引力居后"}
-      ],
-      "fundamental_best":{"code":"601088","name":"中国神华","reason":"一体化、现金流、资产质量和股东回报更稳定"},
-      "current_opportunity_best":{"code":"601225","name":"陕西煤业","reason":"估值与吨煤利润弹性更好，但8月28日27.07元已接近60日高位，当前动作仍是不追。"}
-    },
-    {
-      "chain":"金铜矿山资源",
-      "candidates":[
-        {"code":"601899","name":"紫金矿业","evidence":"铜金双主线、产量增量、盈利和经营现金流强；2026E/2027E EPS约3.08/3.62元","judgement":"增长、资源禀赋和估值平衡最好"},
-        {"code":"603993","name":"洛阳钼业","evidence":"H1收入约+42.8%、扣非约+78.9%、经营现金流约+36%，铜产品量价齐升","judgement":"基本面极强，但多金属商品价格敏感度高"},
-        {"code":"600362","name":"江西铜业","evidence":"H1收入约+19.5%、扣非约+73.7%、经营现金流约+102.5%","judgement":"盈利兑现强，但冶炼属性和加工费使经济暴露不如纯矿山简单"}
-      ],
-      "fundamental_best":{"code":"601899","name":"紫金矿业","reason":"铜金资源、产量成长、成本优势和资本配置综合最均衡"},
-      "current_opportunity_best":{"code":"601899","name":"紫金矿业","reason":"34.65元对应Forward估值仍可解释，但位置接近阶段高位且略高于理想低风险区，当前仍以等回踩为主。"}
-    }
+  "profit_chain_radar": [
+    {"industry":"电子","chain":"集成电路/存储芯片","status":"very_strong","driver":"AI与存储需求、价格/产品结构","evidence":"规上集成电路利润约+18.5倍"},
+    {"industry":"电子","chain":"先进封装","status":"strong","driver":"AI/高性能芯片封装需求与产能利用率","evidence":"长电科技扣非约+84.7%，通富微电扣非约+77.8%"},
+    {"industry":"电子","chain":"AI服务器/整机/机柜","status":"very_strong","driver":"CSP资本开支与AI服务器出货","evidence":"规上计算机整机利润约+3.3倍，工业富联/浪潮信息盈利兑现"},
+    {"industry":"电子","chain":"高端PCB/CCL","status":"very_strong","driver":"AI服务器/交换机高层数高速板价值量提升","evidence":"生益科技、沪电股份、深南电路H1扣非均高增长"},
+    {"industry":"通信","chain":"光模块/高速光互联","status":"strong","driver":"AI集群带宽升级与高速光模块需求","evidence":"光迅科技H1利润高增，但现金流需关注"},
+    {"industry":"通信","chain":"光纤/光缆","status":"very_strong","driver":"算力网络与通信基础设施需求","evidence":"规上光纤利润约+468.4%、光缆约+62.6%"},
+    {"industry":"通信","chain":"传统通信主设备","status":"mixed_weak","driver":"运营商资本开支","evidence":"行业统计强但中兴/烽火H1利润承压，禁止与光通信合并判断"},
+    {"industry":"电力设备","chain":"特高压/一次电网设备","status":"strong","driver":"电网投资、UHV交付、产品结构与毛利提升","evidence":"平高、思源、中国西电主营/扣非均改善"},
+    {"industry":"电力设备","chain":"电网二次/数字化","status":"stable_improving","driver":"电网数字化投资","evidence":"需求稳定但利润增速弱于一次设备"},
+    {"industry":"电力设备/有色","chain":"锂电池/锂资源修复","status":"strong_selective","driver":"电池需求增长与锂价/成本修复","evidence":"A股H1锂电产业链明显回暖，天齐/赣锋利润大幅反转"},
+    {"industry":"电力设备","chain":"光伏硅料/硅片/组件","status":"weak_watch","driver":"供需与价格","evidence":"开工偏低、利润仍承压，仅边际企稳"},
+    {"industry":"基础化工","chain":"制冷剂/氟化工","status":"strong","driver":"HFC配额约束下售价-原料价差","evidence":"巨化、三美、永和盈利改善"},
+    {"industry":"基础化工","chain":"煤制烯烃/煤化工","status":"very_strong","driver":"产能释放、烯烃价格与低成本煤制路线","evidence":"宝丰能源H1扣非约+65%，现金流强"},
+    {"industry":"基础化工","chain":"氨纶/化纤","status":"strong_but_not_accelerating","driver":"产品-原料价差、销量、开工","evidence":"行业利润约+107.7%，华峰/新乡化纤盈利大幅改善"},
+    {"industry":"基础化工","chain":"磷化工/磷肥","status":"selective_improving","driver":"磷矿/磷肥/黄磷价格与一体化成本","evidence":"兴发扣非约+30.9%，云天化利润改善，但现金流/公司分化明显"},
+    {"industry":"基础化工","chain":"炼化扭亏","status":"turnaround","driver":"油品/化工品价差与成本","evidence":"规上炼化由亏转盈"},
+    {"industry":"基础化工","chain":"氯碱/PVC/甲醇","status":"selective_repair","driver":"产品价差与产能利用率","evidence":"部分公司扭亏/修复，尚非全链强景气"},
+    {"industry":"基础化工","chain":"MDI/TDI/聚氨酯","status":"mixed","driver":"MDI/TDI价格-苯胺/能源成本","evidence":"部分产品价格改善但年内先涨后落，暂不列最强链"},
+    {"industry":"基础化工","chain":"农药/草甘膦","status":"weak_watch","driver":"产品价格、库存与开工","evidence":"当前价格未显示全链持续加速"},
+    {"industry":"有色金属","chain":"金铜矿山资源","status":"very_strong","driver":"金铜价格-现金成本-产量","evidence":"资源端利润与现金流高增"},
+    {"industry":"有色金属","chain":"铜冶炼/一体化","status":"strong_with_TC_risk","driver":"铜价、产量、冶炼加工费与副产品","evidence":"行业利润强，但低TC构成冶炼端风险"},
+    {"industry":"有色金属","chain":"锂资源","status":"strong_rebound","driver":"锂价、销量、成本与减值反转","evidence":"天齐/赣锋H1利润大幅反转"},
+    {"industry":"煤炭","chain":"动力煤矿企","status":"strong","driver":"煤价-吨煤成本-产量","evidence":"行业利润约+50.4%，矿企盈利改善"},
+    {"industry":"煤炭","chain":"焦煤","status":"mixed","driver":"焦煤价格与钢铁需求","evidence":"钢铁利润约-51.2%，对焦煤持续性形成明显约束"},
+    {"industry":"机械/军工","chain":"船舶制造","status":"very_strong","driver":"高价订单交付、产品结构、造船周期","evidence":"中国船舶H1扣非约+237%"},
+    {"industry":"机械/军工","chain":"船舶动力/船机","status":"strong","driver":"船舶订单向发动机/动力系统传导","evidence":"中国动力H1扣非约+46%"},
+    {"industry":"机械","chain":"轨交装备","status":"moderate_improving","driver":"车辆/设备订单与交付","evidence":"大类产出与中国中车盈利稳健改善"},
+    {"industry":"机械","chain":"工程机械","status":"mixed","driver":"国内更新+出口","evidence":"收入改善但三一/徐工/中联扣非表现分化，暂非强利润链"},
+    {"industry":"非银金融","chain":"证券/券商","status":"very_strong","driver":"成交活跃、经纪、自营与投行业务修复","evidence":"43家券商H1营收约+45.9%、净利润约+49.0%"},
+    {"industry":"轻工","chain":"造纸","status":"moderate_improving","driver":"纸价-浆价价差、销量","evidence":"行业利润改善但公司分化大"},
+    {"industry":"医药/仪器","chain":"医疗仪器/口腔设备","status":"selective_strong","driver":"设备需求与高技术制造升级","evidence":"规上口腔设备利润约+74.5%、部分专用仪器约+157.8%"},
+    {"industry":"石油天然气","chain":"油气开采","status":"moderate_improving","driver":"油气价格-成本-产量","evidence":"行业利润约+15.4%"}
+  ],
+  "chain_company_comparisons": [
+    {"chain":"AI服务器/整机/机柜","companies":["工业富联601138","浪潮信息000977","中科曙光603019"],"fundamental_best":"工业富联601138","current_opportunity_best":null,"reason":"工业富联盈利兑现与Forward Bridge最强，但当前价已高于低风险区"},
+    {"chain":"高端PCB/CCL","companies":["生益科技600183","沪电股份002463","深南电路002916"],"fundamental_best":"生益科技600183","current_opportunity_best":null,"reason":"三家均高增；生益扣非+111%且现金流+53%，但价格重估明显"},
+    {"chain":"先进封装","companies":["长电科技600584","通富微电002156","华天科技002185"],"fundamental_best":"长电科技600584","current_opportunity_best":null,"reason":"通富归母增速更高但含较多非经常性收益，长电扣非和现金流质量更干净"},
+    {"chain":"特高压/一次电网设备","companies":["平高电气600312","思源电气002028","中国西电601179"],"fundamental_best":"平高电气600312/思源电气002028","current_opportunity_best":"平高电气600312","reason":"思源营收与现金流更强，平高利润率提升与估值更接近理想区，但价格结构仍未确认右侧启动"},
+    {"chain":"制冷剂/氟化工","companies":["巨化股份600160","三美股份603379","永和股份605020"],"fundamental_best":"巨化股份600160","current_opportunity_best":"巨化股份600160","reason":"配额/规模/盈利传导更清晰，但当前价仍略高于低风险区"},
+    {"chain":"煤制烯烃/煤化工","companies":["宝丰能源600989","鲁西化工000830","中国神华601088(煤化工分部)"],"fundamental_best":"宝丰能源600989","current_opportunity_best":null,"reason":"宝丰H1扣非+65%、现金流+50%左右且产能释放明确，但当前价接近Fair上沿"},
+    {"chain":"氨纶/化纤","companies":["华峰化学002064","新乡化纤000949","泰和新材002254"],"fundamental_best":"华峰化学002064","current_opportunity_best":null,"reason":"华峰规模和盈利质量更稳，新乡弹性更高；领先价格变量暂未继续加速"},
+    {"chain":"磷化工/磷肥","companies":["兴发集团600141","云天化600096","湖北宜化000422"],"fundamental_best":"兴发集团600141","current_opportunity_best":null,"reason":"兴发扣非改善但经营现金流转弱；云天化更稳，湖北宜化扣非承压，链内分化明显"},
+    {"chain":"动力煤矿企","companies":["中国神华601088","陕西煤业601225","中煤能源601898"],"fundamental_best":"中国神华601088","current_opportunity_best":null,"reason":"神华一体化与现金流稳定性更优；陕西煤业估值相对更低但8月28日价格位置偏高"},
+    {"chain":"金铜矿山资源","companies":["紫金矿业601899","洛阳钼业603993","江西铜业600362"],"fundamental_best":"紫金矿业601899/洛阳钼业603993","current_opportunity_best":null,"reason":"资源与产量增长强，但商品高位需要正常化；当前价格普遍不在理想安全边际"},
+    {"chain":"船舶制造/船机","companies":["中国船舶600150","中国动力600482"],"fundamental_best":"中国船舶600150","current_opportunity_best":null,"reason":"订单交付到扣非利润的兑现最强；当前价在Fair区而非低风险区"},
+    {"chain":"证券/券商","companies":["中信证券600030","国泰海通601211","招商证券600999"],"fundamental_best":"中信证券600030","current_opportunity_best":null,"reason":"中信规模、ROE与五大业务增长最强；当前约1.40倍H1净资产，处Fair区但尚未进入保守低风险区"}
   ],
   "valuations": [
-    {
-      "code":"601138","name":"工业富联","current_price":64.04,"earnings_type":"growth_or_stable","earnings_basis":"2026E EPS约3.09，2027E约4.19","primary_method":"Forward EPS × justified PE","fair_value_bridge":{"fair_assumption":"Shadow情景Fair PE 20-24x","fair_value_range":[61.8,74.2],"entry_assumption":"在AI CapEx周期、硬件利润率和预测误差下使用更保守18-20x作为理想新建仓情景","buy_zone":[55.6,61.8]},"uncertainty":"medium","action":"等回踩","note":"20/24/18倍均为本轮模型情景，不是通用金融定律。"},
-    {
-      "code":"600160","name":"巨化股份","current_price":40.54,"earnings_type":"cycle_with_structural_supply_constraint","earnings_basis":"2026E EPS约2.13，但先考虑制冷剂配额/价格与原料成本的正常化","primary_method":"正常化盈利 × 周期合理倍数 + 价差/配额sanity","fair_value_bridge":{"fair_value_range":[38.3,46.9],"buy_zone":[34.2,38.3],"margin_of_safety_reason":"配额政策、产品价格与原料成本使盈利敏感性高于稳定成长公司"},"uncertainty":"medium_high","action":"观察/等回踩"},
-    {
-      "code":"002064","name":"华峰化学","current_price":11.89,"earnings_type":"cycle_recovery","earnings_basis":"2026E EPS约0.72，结合氨纶价差/开工和一体化成本正常化","primary_method":"正常化EPS × 周期合理倍数","fair_value_bridge":{"fair_value_range":[9.1,12.0],"buy_zone":[9.0,10.5],"margin_of_safety_reason":"化纤总行业改善但最新氨纶领先变量未继续加速"},"uncertainty":"high","action":"观察"},
-    {
-      "code":"601225","name":"陕西煤业","current_price":27.07,"earnings_type":"strong_cycle","earnings_basis":"2026E EPS约2.15，需按中性煤价/吨煤成本正常化而非直接资本化当前高煤价","primary_method":"正常化EPS/PB + 煤价/成本周期sanity","fair_value_bridge":{"fair_value_range":[23.0,29.9],"buy_zone":[22.0,25.5],"margin_of_safety_reason":"煤价、库存、供给约束对盈利中枢影响大"},"uncertainty":"high","action":"不追/等回踩"},
-    {
-      "code":"601899","name":"紫金矿业","current_price":34.65,"earnings_type":"resource_strong_cycle","earnings_basis":"2026E EPS约3.08，结合铜金中性价格、现金成本和产量正常化","primary_method":"正常化EPS/PB/资产价值交叉检查","fair_value_bridge":{"fair_value_range":[30.0,39.2],"buy_zone":[29.0,33.5],"margin_of_safety_reason":"铜金价格高位带来windfall和估值敏感性"},"uncertainty":"medium_high","action":"等回踩"},
-    {"code":"600183","name":"生益科技","current_price":145.65,"earnings_type":"growth","primary_method":"Forward EPS × justified PE","review_required":true,"review_reason":"H1大幅超预期且股价20日快速重估，最新Forward预测仍在上修；当前制造精确区间容易形成伪精度","action":"不追/估值复核"},
-    {"code":"002916","name":"深南电路","current_price":362.4,"earnings_type":"growth","earnings_basis":"2026E/2027E EPS一致预期约8.25/11.90","primary_method":"Forward EPS × justified PE","review_required":true,"review_reason":"当前价约对应44x 2026E PE，市场已经资本化很强增长预期；先观察预测继续上修能否消化估值","action":"不追/估值复核"}
+    {"code":"601138","name":"工业富联","current_price":64.04,"earnings_basis":"2026E EPS 3.09","method":"Forward PE","fair_assumption":"20-24x","fair_value":[61.8,74.2],"entry_assumption":"18-20x","low_risk_zone":[55.6,61.8],"uncertainty":"AI capex cycle, low hardware margin, forecast error","action":"wait_pullback"},
+    {"code":"600312","name":"平高电气","current_price":19.77,"earnings_basis":"2026E EPS 1.05","method":"Forward PE","fair_assumption":"18-22x","fair_value":[18.9,23.1],"entry_assumption":"16-18x","low_risk_zone":[16.8,18.9],"uncertainty":"UHV delivery cadence and project mix","action":"observe_wait_structure"},
+    {"code":"600160","name":"巨化股份","current_price":40.54,"earnings_basis":"2026E EPS 2.13 plus refrigerant cycle check","method":"cycle-aware Forward PE","fair_assumption":"18-22x","fair_value":[38.3,46.9],"entry_assumption":"16-18x","low_risk_zone":[34.1,38.3],"uncertainty":"quota policy and refrigerant/raw-material spread","action":"wait_pullback"},
+    {"code":"600989","name":"宝丰能源","current_price":24.49,"earnings_basis":"2026E EPS central scenario about 2.30","method":"normalized/cycle PE","fair_assumption":"9-11x","fair_value":[20.7,25.3],"entry_assumption":"8-9x","low_risk_zone":[18.4,20.7],"uncertainty":"olefin prices, coal cost, new capacity ramp","action":"do_not_chase"},
+    {"code":"601225","name":"陕西煤业","current_price":27.07,"earnings_basis":"2026E EPS 2.15 with coal-price normalization","method":"normalized PE/dividend cross-check","fair_assumption":"10-12x","fair_value":[21.5,25.8],"entry_assumption":"9-10x","low_risk_zone":[19.3,21.5],"uncertainty":"coal price, output, terminal demand","action":"do_not_chase"},
+    {"code":"601899","name":"紫金矿业","current_price":34.65,"earnings_basis":"normalized EPS scenario 2.75 vs 2026E consensus 3.08","method":"normalized resource PE","fair_assumption":"11-13x normalized EPS","fair_value":[30.2,35.8],"entry_assumption":"9.5-11x","low_risk_zone":[26.1,30.2],"uncertainty":"gold/copper prices, mine ramp, geopolitical execution","action":"wait_pullback"},
+    {"code":"600150","name":"中国船舶","current_price":34.78,"earnings_basis":"2026E EPS 2.51","method":"Forward PE with order-cycle check","fair_assumption":"12-15x","fair_value":[30.1,37.6],"entry_assumption":"10-12x","low_risk_zone":[25.1,30.1],"uncertainty":"delivery cadence, ship-price cycle, margin realization","action":"observe_not_low_risk"},
+    {"code":"600030","name":"中信证券","current_price":27.93,"earnings_basis":"H1 BVPS 19.94; H1 ROE 7.81%","method":"PB-ROE","fair_assumption":"1.30-1.50x BVPS","fair_value":[25.9,29.9],"entry_assumption":"1.15-1.30x BVPS","low_risk_zone":[22.9,25.9],"uncertainty":"market turnover, self-trading returns, cyclic ROE","action":"fair_value_observe"}
+  ],
+  "timing_notes": [
+    {"code":"600030","structure":"transition_with_bullish_break_confirmed","price":27.93,"ma20":27.6575,"ma60":27.7718,"position_60d_pct":61.6,"resistance":"28.6-29.8","action":"observe_not_entry_zone"},
+    {"code":"600312","structure":"bearish_transition","price":19.77,"ma20":20.10,"ma60":18.82,"support":"19.0-19.3","resistance":"20.0-20.6","action":"wait_structure_confirmation"},
+    {"code":"600150","structure":"transition_with_bullish_break_confirmed","price":34.78,"ma20":34.12,"ma60":34.45,"position_60d_pct":49.3,"resistance":"35.1-35.5","action":"observe_not_low_risk"},
+    {"code":"601899","structure":"bullish_high_position","price":34.65,"action":"wait_pullback"},
+    {"code":"601225","structure":"bullish_very_high_position","price":27.07,"action":"do_not_chase"}
   ],
   "opportunities": {
-    "low_risk_now": [],
-    "wait_for_pullback": [
-      {"code":"601138","name":"工业富联","chain":"AI服务器/机柜","reason":"链内基本面最强，当前略高于理想低风险区"},
-      {"code":"601899","name":"紫金矿业","chain":"金铜矿山资源","reason":"基本面/估值平衡好，但价格位置偏高"},
-      {"code":"600160","name":"巨化股份","chain":"制冷剂/氟化工","reason":"链内最优，当前略高于理想低风险区"},
-      {"code":"601225","name":"陕西煤业","chain":"动力煤矿企","reason":"当前估值较有吸引力，但价格已接近阶段高位"}
+    "immediate_low_risk_candidates": [],
+    "closest_watch": [
+      {"code":"600312","name":"平高电气","reason":"盈利链明确、估值仅略高于低风险上沿，但价格结构尚未确认"},
+      {"code":"600160","name":"巨化股份","reason":"制冷剂盈利传导明确，等待回到低风险区或更好的结构"},
+      {"code":"601138","name":"工业富联","reason":"基本面最强之一，等待价格回到更有安全边际的位置"},
+      {"code":"600150","name":"中国船舶","reason":"订单利润兑现强，当前位于Fair区而非低风险区"}
     ],
-    "fundamental_strong_but_not_low_risk_now": [
-      {"code":"600183","name":"生益科技","reason":"盈利质量很强但快速重估，需刷新Forward估值"},
-      {"code":"002916","name":"深南电路","reason":"盈利和预测上修强，但当前Forward PE较高"},
-      {"code":"002064","name":"华峰化学","reason":"盈利修复强但领先变量未继续加速且价格不在理想区"}
-    ]
+    "trend_watch_not_chase": ["紫金矿业601899","陕西煤业601225","生益科技600183","沪电股份002463","光迅科技002281","兆易创新603986"]
   },
-  "diagnostics": {
-    "acceptance_result":"PASS_WITH_SHADOW_LIMITS",
-    "strengths":["开放式行业发现没有漏掉化工和煤炭","重点盈利链已做多公司横向比较","基本面最优与当前机会最优已拆分","Fair Value与低风险区增加了可解释桥接","允许当前低风险机会为空而不凑数"],
-    "remaining_limits":["当前仍是单次Shadow验收，尚未证明跨期稳定性","部分高成长公司Forward预测处于快速上修阶段，估值应允许review_required","行业/商品领先变量仍需在后续18:00运行持续更新"],
-    "next_validation":"连续多期比较行业召回稳定性、链内最佳公司变化、Fair Value漂移原因和低风险区后续收益/回撤。"
-  }
+  "diagnostics": [
+    "This run intentionally ignored prior conversation sector shortlist as an answer source and rescanned broad industries.",
+    "Profit-chain radar is not truncated by final stock shortlist; weak/mixed chains are retained to make exclusions auditable.",
+    "Power equipment is a key correction: broad NBS electrical-machinery profit is weak, while listed-company grid/UHV and lithium-related subchains are strong.",
+    "Chemical industry is decomposed into multiple distinct chains rather than refrigerant/spandex only.",
+    "Some active chains such as storage chips, optical modules, lithium battery cells and paper still lack enough directly comparable main-board names for a high-confidence best-company conclusion; they remain in radar rather than being silently dropped.",
+    "All valuation multiples are Shadow model judgments, not universal finance laws; stability across repeated runs must be monitored.",
+    "No formal production buy point is published because mode remains shadow."
+  ]
 }
