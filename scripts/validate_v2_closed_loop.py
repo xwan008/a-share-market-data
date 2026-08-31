@@ -14,9 +14,11 @@ RANK=ROOT/'data/research/v2/opportunity_ranking.json'
 ENTRY_VALUE_STATES={'safe_buy_zone','reasonable_buy_zone'}
 BLOCKED_ANCHOR_STATES={'valuation_divergence','insufficient_confirming_anchors','nondegenerate_buy_zone_required','fundamental_anchor_unavailable','valuation_model_mismatch','earnings_normalization_unready','valuation_sensitivity_high','review_required'}
 
+
 def load(p): return json.loads(p.read_text(encoding='utf-8'))
 def vr(v): return isinstance(v,list) and len(v)==2 and all(isinstance(x,(int,float)) for x in v) and v[0]>0 and v[1]>=v[0]
 def nondeg(v): return vr(v) and v[1]>v[0] and (v[1]/v[0]-1)*100>=0.99
+
 
 def main():
     errors=[]; outputs=(DRIVERS,COMPANY,VALUATION,ANCHORS,PRICE,GAP,RANK)
@@ -53,12 +55,27 @@ def main():
     if set(arows)!=selected: errors.append(f'valuation_anchor_company_set_mismatch:{len(arows)}!={len(selected)}')
     if set(grows)!=selected: errors.append(f'gap_company_set_mismatch:{len(grows)}!={len(selected)}')
 
+    growth_policy=v.get('growth_valuation_policy') or {}
+    peg_growth_min=float(growth_policy.get('peg_applicable_growth_min_pct') or 12.0)
+    max_peg=float(growth_policy.get('max_low_risk_peg') or 1.25)
     for code,row in vrows.items():
         n=int(row.get('independent_anchor_count') or 0)
         if row.get('status')=='available' and (n!=1 or not vr(row.get('reference_range'))): errors.append(f'invalid_first_anchor:{code}')
         if row.get('status')!='available' and n!=0: errors.append(f'review_reference_with_nonzero_anchor:{code}:{n}')
         if row.get('route')=='cycle' and row.get('status')=='available':
             if not row.get('earnings_normalization_method') or not row.get('normalized_forward_eps'): errors.append(f'cycle_without_normalized_earnings:{code}')
+        if row.get('route')=='business' and row.get('status')=='available':
+            growth=row.get('earnings_growth_next_year_pct'); entry=row.get('effective_entry_multiple_range'); source=row.get('low_risk_multiple_source')
+            if growth is None: errors.append(f'business_available_without_next_year_growth:{code}')
+            if not vr(entry): errors.append(f'business_available_without_effective_entry_pe:{code}:{entry}')
+            if not source: errors.append(f'business_available_without_low_risk_multiple_source:{code}')
+            if row.get('explicit_entry_reference_range') is None or not vr(row.get('explicit_entry_reference_range')): errors.append(f'business_available_without_entry_reference_range:{code}')
+            theoretical=row.get('reasonable_multiple_reference')
+            if vr(theoretical) and vr(entry) and entry[1]>theoretical[1]+1e-9: errors.append(f'entry_pe_above_theoretical_fair_pe:{code}:{entry}>{theoretical}')
+            if growth is not None and float(growth)>=peg_growth_min and source!='explicit_company_low_risk_multiple':
+                peg=row.get('entry_peg_range')
+                if not vr(peg): errors.append(f'growth_business_without_peg_sanity:{code}:{peg}')
+                elif peg[1]>max_peg+0.011: errors.append(f'growth_business_peg_cap_breached:{code}:{peg[1]}>{max_peg}')
 
     for code,row in arows.items():
         ready=bool(row.get('formal_buy_zone_ready')); n=int(row.get('independent_anchor_count') or 0); status=row.get('status')
@@ -99,7 +116,7 @@ def main():
     for x in r.get('production_top3') or []:
         if not x.get('production_publish_eligible') or not x.get('formal_buy_zone') or not x.get('entry_price_eligible'): errors.append(f'production_top3_without_complete_new_entry_gate:{x.get("code")}')
 
-    status='PASS' if not errors else 'FAIL'; ac=a.get('counts') or {}; fs=c.get('financial_evidence_summary') or {}
-    print(json.dumps({'status':status,'errors':errors,'counts':{'active_drivers':len(active),'company_recall':len(cmap),'research_pass':len(c.get('research_pass_codes') or []),'statement_recurring_verified':fs.get('recurring_profit_verified_count'),'statement_production_evidence_ready':fs.get('production_evidence_ready_count'),'valuation_queue':len(selected),'first_anchor_available':v.get('available_count'),'formal_buy_zone_ready':ac.get('formal_zone_ready'),'valuation_divergence':ac.get('valuation_divergence'),'history_reference_divergence':ac.get('history_reference_divergence'),'insufficient_confirming_anchors':ac.get('insufficient_confirming_anchors'),'entry_price_eligible':r.get('entry_price_eligible_count'),'ranked':len(ranked),'production_top3':len(r.get('production_top3') or [])}},ensure_ascii=False,indent=2)); return 0 if not errors else 2
+    status='PASS' if not errors else 'FAIL'; ac=a.get('counts') or {}; fs=c.get('financial_evidence_summary') or {}; sc=v.get('source_counts') or {}
+    print(json.dumps({'status':status,'errors':errors,'counts':{'active_drivers':len(active),'company_recall':len(cmap),'research_pass':len(c.get('research_pass_codes') or []),'statement_recurring_verified':fs.get('recurring_profit_verified_count'),'statement_production_evidence_ready':fs.get('production_evidence_ready_count'),'valuation_queue':len(selected),'first_anchor_available':v.get('available_count'),'growth_adjusted_entry':sc.get('growth_adjusted_entry'),'explicit_entry':sc.get('explicit_entry'),'growth_durability_required':sc.get('growth_durability_required'),'formal_buy_zone_ready':ac.get('formal_zone_ready'),'valuation_divergence':ac.get('valuation_divergence'),'history_reference_divergence':ac.get('history_reference_divergence'),'insufficient_confirming_anchors':ac.get('insufficient_confirming_anchors'),'entry_price_eligible':r.get('entry_price_eligible_count'),'ranked':len(ranked),'production_top3':len(r.get('production_top3') or [])}},ensure_ascii=False,indent=2)); return 0 if not errors else 2
 
 if __name__=='__main__': raise SystemExit(main())
