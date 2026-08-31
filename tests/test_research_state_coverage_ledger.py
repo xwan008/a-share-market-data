@@ -9,6 +9,7 @@ def load(path: str):
 
 
 def test_persisted_state_coverage_ledger_matches_taxonomy_when_present():
+    # A valid persisted state must be a mechanically auditable projection of the taxonomy.
     state_path = ROOT / 'data/research/v2/research_state.json'
     if not state_path.exists():
         return
