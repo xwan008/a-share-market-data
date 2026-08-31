@@ -1,5 +1,5 @@
 {
-  "schema_version": 5,
+  "schema_version": 6,
   "pipeline": "a_share_low_risk_v2",
   "research_read_mode": "manifest_repo_data_plus_current_public_evidence",
   "manifest_path": "config/research_pipeline_manifest.json",
@@ -25,23 +25,33 @@
     "weekly_industry_baseline_may_carry_forward_between_full_scans": true,
     "previous_state_may_seed_only_industry_baseline_for_daily_incremental": true,
     "previous_companies_chains_valuations_or_opportunities_may_not_seed_1800_discovery": true,
-    "cross_run_candidate_or_opportunity_pools_forbidden": true
+    "cross_run_candidate_or_opportunity_pools_forbidden": true,
+    "research_admission_top_n_forbidden": true,
+    "research_admission_per_level1_chain_cap_forbidden": true
   },
   "stage_execution_policy": {
     "coverage_ledger_must_be_instantiated_before_profitability_scan": true,
     "weekly_full_scan_must_review_all_level3_nodes": true,
     "daily_incremental_requires_valid_weekly_baseline": true,
     "coverage_counts_must_be_derived_from_node_ledger": true,
-    "grouped_direction_rows_cannot_account_for_multiple_taxonomy_nodes": true,
     "generic_weekly_unconfirmed_placeholders_forbidden": true,
-    "deep_trigger_uses_trend_and_breadth_dimensions": true,
     "deep_nodes_must_be_resolved_before_completion_gate": true,
-    "peer_comparison_must_finish_before_valuation_when_peers_exist": true,
+    "every_confirmed_improving_chain_must_receive_company_light_screen": true,
+    "all_mapped_mainboard_companies_in_chain_must_be_light_screened_before_any_ranking": true,
+    "light_screen_exclusions_require_company_specific_evidence": true,
+    "all_light_screen_survivors_must_be_horizontally_compared": true,
+    "cross_chain_duplicate_company_must_preserve_all_chain_memberships": true,
+    "valuation_set_must_be_deduplicated_by_stock_code": true,
     "all_compared_companies_must_enter_valuation_set": true,
     "every_valuation_set_company_must_be_executed": true,
+    "corporate_action_check_must_precede_earnings_bridge": true,
+    "historical_eps_scaling_across_material_share_change_forbidden": true,
+    "resource_and_order_cycle_current_growth_pe_shortcut_forbidden": true,
+    "extreme_valuation_deviation_requires_independent_secondary_method": true,
     "review_required_is_exception_not_completion_shortcut": true,
-    "important_chain_requires_non_review_complete_valuation": true,
-    "publishable_opportunity_requires_complete_valuation_bridge": true
+    "every_complete_non_review_company_requires_buy_point_assessment": true,
+    "buy_point_requires_value_and_timing_intersection": true,
+    "current_opportunity_requires_buyable_now": true
   },
   "write_policy": {
     "current_research_output_only": "data/research/v2/research_state.json",
@@ -49,6 +59,6 @@
     "persistent_intermediate_research_outputs_forbidden": true,
     "never_relabel_old_state_to_new_schema": true,
     "new_state_must_record_manifest_schema": true,
-    "new_state_must_include_coverage_ledger_and_scan_mode": true
+    "new_state_must_include_coverage_ledger_company_light_screen_buy_points_and_scan_mode": true
   }
 }
