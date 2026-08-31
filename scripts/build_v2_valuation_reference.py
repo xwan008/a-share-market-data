@@ -17,6 +17,8 @@ CYCLE_REGIME = ROOT / "config/cycle_regime_registry.json"
 OUT = ROOT / "data/research/v2/valuation_reference.json"
 TZ = ZoneInfo("Asia/Shanghai")
 MAX_ANCHOR_AGE_DAYS = 7
+PEG_APPLICABLE_GROWTH_MIN_PCT = 12.0
+MAX_LOW_RISK_PEG = 1.25
 
 
 def load(path: Path):
@@ -115,7 +117,8 @@ def load_spot(ak):
         for code, row in rows.items():
             prev = out.setdefault(code, row)
             if not prev.get("pb") and row.get("pb"):
-                prev["pb"] = row["pb"]; prev["source"] = source
+                prev["pb"] = row["pb"]
+                prev["source"] = source
             if not prev.get("pe_dynamic") and row.get("pe_dynamic"):
                 prev["pe_dynamic"] = row["pe_dynamic"]
     return out, errors
@@ -151,14 +154,77 @@ def choose_pb_band(policy, roe):
     return None
 
 
+def next_year_growth_pct(eps_now, eps_next):
+    if not eps_now or eps_now <= 0 or not eps_next or eps_next <= 0:
+        return None
+    return (eps_next / eps_now - 1.0) * 100.0
+
+
+def growth_pe_floor_cap(growth_pct, pe_policy):
+    caps = pe_policy.get("growth_floor_caps") or []
+    if growth_pct is None:
+        return None
+    for row in caps:
+        mx = num(row.get("growth_max_pct")); cap = num(row.get("pe_floor_cap"))
+        if mx is not None and cap is not None and growth_pct <= mx:
+            return cap
+    return None
+
+
+def derive_low_risk_pe_range(policy, pe_policy, eps_now, eps_next):
+    theoretical = policy.get("multiple_range")
+    if not valid_range(theoretical):
+        return None
+    theory_lo, theory_hi = map(float, theoretical)
+    growth = next_year_growth_pct(eps_now, eps_next)
+    explicit = policy.get("low_risk_multiple_range")
+    if valid_range(explicit):
+        lo, hi = map(float, explicit)
+        peg = [round(lo / growth, 3), round(hi / growth, 3)] if growth and growth >= PEG_APPLICABLE_GROWTH_MIN_PCT else None
+        return {
+            "growth_pct": growth,
+            "effective_range": [lo, hi],
+            "source": "explicit_company_low_risk_multiple",
+            "growth_floor_cap": None,
+            "peg_range": peg,
+            "peg_cap_applied": False,
+        }
+    if growth is None:
+        return None
+    floor_cap = growth_pe_floor_cap(growth, pe_policy)
+    if floor_cap is None:
+        return None
+    width = float(num(pe_policy.get("derived_range_width")) or 4.0)
+    lo = min(theory_lo, float(floor_cap))
+    hi = min(theory_hi, lo + width)
+    peg_cap_applied = False
+    if growth >= PEG_APPLICABLE_GROWTH_MIN_PCT:
+        peg_upper = growth * MAX_LOW_RISK_PEG
+        if hi > peg_upper:
+            hi = peg_upper
+            peg_cap_applied = True
+    if hi <= lo:
+        hi = min(theory_hi, lo * 1.05)
+    if hi <= lo:
+        return None
+    peg = [round(lo / growth, 3), round(hi / growth, 3)] if growth > 0 else None
+    return {
+        "growth_pct": growth,
+        "effective_range": [lo, hi],
+        "source": "next_year_growth_durability_plus_peg_cap",
+        "growth_floor_cap": float(floor_cap),
+        "peg_range": peg,
+        "peg_cap_applied": peg_cap_applied,
+    }
+
+
 def cycle_policy_for(tags, code, cfg):
     sub = cfg.get("subchain_policies") or {}
     matched = next((t for t in tags if t in sub), None)
     if not matched:
         return None, None
     policy = dict(sub[matched])
-    override = (cfg.get("company_overrides") or {}).get(code) or {}
-    policy.update(override)
+    policy.update((cfg.get("company_overrides") or {}).get(code) or {})
     return matched, policy
 
 
@@ -208,29 +274,25 @@ def build_cycle_reference(code, name, price, tags, cons, cfg, regimes, reference
     eps_next = num((cons.get("eps") or {}).get(now.year + 1))
     min_reports = int((cfg.get("forward_earnings_policy") or {}).get("minimum_report_count", 3))
     if reports < min_reports or not eps_now or not eps_next:
-        return {"code": code, "name": name, "status": "review_required", "reason": f"cycle_consensus_required:reports={reports},eps_now={eps_now},eps_next={eps_next}", "route": "cycle", "cycle_tag": tag, "independent_anchor_count": 0}
+        return {"code": code, "name": name, "status": "review_required", "reason": f"cycle_consensus_required:reports={reports},eps_now={eps_now},eps_next={eps_next}", "route": "cycle", "independent_anchor_count": 0}
     regime = regime_for(tag, code, regimes)
     if not regime:
-        return {"code": code, "name": name, "status": "review_required", "reason": "cycle_regime_required", "route": "cycle", "cycle_tag": tag, "independent_anchor_count": 0}
+        return {"code": code, "name": name, "status": "review_required", "reason": "cycle_regime_required", "route": "cycle", "independent_anchor_count": 0}
     reviewed = str(regimes.get("reviewed_at") or "")[:10]
     max_age = int(regimes.get("max_review_age_days", 45))
     age = (parse_day(reference_trade_date) - parse_day(reviewed)).days if reviewed else 999
     if age > max_age or age < -7:
-        return {"code": code, "name": name, "status": "review_required", "reason": f"cycle_regime_stale:{age}", "route": "cycle", "cycle_tag": tag, "independent_anchor_count": 0}
+        return {"code": code, "name": name, "status": "review_required", "reason": f"cycle_regime_stale:{age}", "route": "cycle", "independent_anchor_count": 0}
     factors = regime.get("bear_base_bull_earnings_factor") or [0.85, 0.95, 1.05]
     mult = regime.get("multiple_range_by_regime") or policy.get("fallback_multiple_range")
     if not (isinstance(factors, list) and len(factors) == 3 and valid_range(mult)):
-        return {"code": code, "name": name, "status": "review_required", "reason": "cycle_policy_invalid", "route": "cycle", "cycle_tag": tag, "independent_anchor_count": 0}
+        return {"code": code, "name": name, "status": "review_required", "reason": "cycle_policy_invalid", "route": "cycle", "independent_anchor_count": 0}
     anchors = policy.get("anchors") or []
-    normalization = 1.0
-    anchor_rows = []
-    normalized_basis = None
+    normalization = 1.0; anchor_rows = []; normalized_basis = None
     if anchors:
         neutral_cfg = cfg.get("neutral_commodity_policy") or {}
-        neutral_window = int(neutral_cfg.get("window_sessions", 504))
-        minimum = int(neutral_cfg.get("minimum_sessions", 252))
-        weighted_delta = 0.0
-        missing = []
+        neutral_window = int(neutral_cfg.get("window_sessions", 504)); minimum = int(neutral_cfg.get("minimum_sessions", 252))
+        weighted_delta = 0.0; missing = []
         for a in anchors:
             symbol = a.get("symbol")
             if symbol not in anchor_cache and symbol not in anchor_errors:
@@ -240,73 +302,52 @@ def build_cycle_reference(code, name, price, tags, cons, cfg, regimes, reference
                     anchor_errors[symbol] = f"{type(exc).__name__}:{exc}"
             if symbol in anchor_errors:
                 missing.append(symbol); continue
-            m = anchor_cache[symbol]
-            weight = float(a.get("weight", 1.0)); direction = float(a.get("direction", 1.0))
+            m = anchor_cache[symbol]; weight = float(a.get("weight", 1.0)); direction = float(a.get("direction", 1.0))
             weighted_delta += weight * (m["current_to_neutral"] - 1.0) * direction
             anchor_rows.append({**m, "weight": weight, "direction": direction})
         if missing:
-            return {"code": code, "name": name, "status": "review_required", "reason": f"cycle_anchor_fetch_failed:{missing}", "route": "cycle", "cycle_tag": tag, "independent_anchor_count": 0}
+            return {"code": code, "name": name, "status": "review_required", "reason": f"cycle_anchor_fetch_failed:{missing}", "route": "cycle", "independent_anchor_count": 0}
         f12, w0, w1 = calendar_forward_eps(eps_now, eps_next, now)
-        sensitivity = float(policy.get("earnings_sensitivity", 0.8))
-        windfall = max(0.0, weighted_delta)
+        sensitivity = float(policy.get("earnings_sensitivity", 0.8)); windfall = max(0.0, weighted_delta)
         raw = 1.0 / (1.0 + windfall * sensitivity)
         normalization = max(float(neutral_cfg.get("min_normalization_factor", 0.70)), min(1.0, raw))
-        normalized_basis = f12 * normalization
-        base_eps = normalized_basis * float(factors[1])
-        earnings_method = "forward12m_neutral_commodity_then_regime"
-        forward_weights = {"current_year": round(w0, 4), "next_year": round(w1, 4)}
+        normalized_basis = f12 * normalization; base_eps = normalized_basis * float(factors[1])
+        earnings_method = "forward12m_neutral_commodity_then_regime"; forward_weights = {"current_year": round(w0, 4), "next_year": round(w1, 4)}
     else:
-        downside_guard = min(eps_now, eps_next)
-        structural = float(policy.get("anchorless_normalization_haircut", 1.0))
-        base_regime = float(factors[1])
-        # Single conservative cycle factor: avoid structural haircut × regime haircut double counting.
+        downside_guard = min(eps_now, eps_next); structural = float(policy.get("anchorless_normalization_haircut", 1.0)); base_regime = float(factors[1])
         single_factor = min(structural, base_regime, 1.0)
-        normalized_basis = downside_guard * single_factor
-        base_eps = normalized_basis
-        normalization = single_factor
-        earnings_method = "current_year_primary_next_year_downside_guard_single_cycle_factor"
-        forward_weights = None
-    lo, hi = float(mult[0]), float(mult[1])
-    fair = [base_eps * lo, base_eps * hi]
-    bear_eps = normalized_basis * float(factors[0])
-    bull_eps = normalized_basis * float(factors[2])
-    scenario = [bear_eps * lo, bull_eps * hi]
+        normalized_basis = downside_guard * single_factor; base_eps = normalized_basis; normalization = single_factor
+        earnings_method = "current_year_primary_next_year_downside_guard_single_cycle_factor"; forward_weights = None
+    lo, hi = float(mult[0]), float(mult[1]); fair = [base_eps * lo, base_eps * hi]
+    bear_eps = normalized_basis * float(factors[0]); bull_eps = normalized_basis * float(factors[2]); scenario = [bear_eps * lo, bull_eps * hi]
     return {
-        "code": code, "name": name, "status": "available", "reference_source": "v2_cycle_normalized_fundamental_anchor",
-        "route": "cycle", "cycle_tag": tag, "reference_range": [round(fair[0], 2), round(fair[1], 2)],
-        "scenario_fair_value_range": [round(scenario[0], 2), round(scenario[1], 2)], "valuation_model": "v2_cycle_normalized_fundamental",
-        "valuation_basis_unit": "PE", "consensus_eps_current_year": round(eps_now, 4), "consensus_eps_next_year": round(eps_next, 4),
-        "forecast_report_count": reports, "normalized_forward_eps": round(base_eps, 4), "normalization_factor": round(normalization, 4),
-        "earnings_normalization_method": earnings_method, "forward_eps_weights": forward_weights,
+        "code": code, "name": name, "status": "available", "reference_source": "v2_cycle_normalized_fundamental_anchor", "route": "cycle", "cycle_tag": tag,
+        "reference_range": [round(fair[0], 2), round(fair[1], 2)], "scenario_fair_value_range": [round(scenario[0], 2), round(scenario[1], 2)],
+        "valuation_model": "v2_cycle_normalized_fundamental", "valuation_basis_unit": "PE", "consensus_eps_current_year": round(eps_now, 4),
+        "consensus_eps_next_year": round(eps_next, 4), "forecast_report_count": reports, "normalized_forward_eps": round(base_eps, 4),
+        "normalization_factor": round(normalization, 4), "earnings_normalization_method": earnings_method, "forward_eps_weights": forward_weights,
         "reasonable_multiple_reference": [lo, hi], "market_forward_pe_current_year": round(price / eps_now, 2) if price else None,
         "commodity_anchors": anchor_rows, "cycle_regime": regime.get("regime"), "cycle_regime_summary": regime.get("summary"),
         "buy_band_policy": {"safe_to_fair_floor": policy.get("safe_to_fair_floor"), "reasonable_to_fair_floor": policy.get("reasonable_to_fair_floor")},
         "independent_anchor_count": 1,
-        "method_note": "Cycle anchor normalizes earnings first. Anchorless cycles use one conservative cycle factor=min(structural haircut, base regime factor), not multiplicative repeated haircuts."
+        "method_note": "Cycle earnings are normalized before capitalization; current commodity windfall cannot directly lift low-risk value."
     }
 
 
 def main() -> int:
     import akshare as ak
-
     company = load(COMPANY); latest = load(LATEST); health = load(HEALTH)
     policies = load(POLICY); cycle_cfg = load(CYCLE_POLICY); regimes = load(CYCLE_REGIME)
-    codes = company.get("selected_for_valuation_codes") or []
-    cmap = company.get("companies") or {}; stocks = latest.get("stocks") or {}
-    consensus = load_consensus(ak); spot, spot_errors = load_spot(ak)
-    now = datetime.now(TZ); year = now.year
+    codes = company.get("selected_for_valuation_codes") or []; cmap = company.get("companies") or {}; stocks = latest.get("stocks") or {}
+    consensus = load_consensus(ak); spot, spot_errors = load_spot(ak); now = datetime.now(TZ); year = now.year
     reference_trade_date = str(health.get("trade_date") or latest.get("trade_date") or "")[:10]
-    min_reports = int((policies.get("forecast_policy") or {}).get("minimum_report_count", 3))
+    min_reports = int((policies.get("forecast_policy") or {}).get("minimum_report_count", 3)); pe_policy = policies.get("low_risk_pe_policy") or {}
     rows = {}; anchor_cache = {}; anchor_errors = {}
-    counts = {"v2_forward_pe_reference": 0, "v2_forward_pb_reference": 0, "v2_cycle_reference": 0, "policy_required": 0, "consensus_required": 0, "market_data_required": 0, "cycle_review_required": 0}
+    counts = {"v2_forward_pe_reference": 0, "v2_forward_pb_reference": 0, "v2_cycle_reference": 0, "growth_adjusted_entry": 0, "explicit_entry": 0, "growth_durability_required": 0, "policy_required": 0, "consensus_required": 0, "market_data_required": 0, "cycle_review_required": 0}
 
     for code in codes:
-        cr = cmap.get(code) or {}
-        tags = [x.get("driver_id") for x in cr.get("driver_links", []) if x.get("driver_id")]
-        name = cr.get("name") or (stocks.get(code) or {}).get("name") or code
-        price = num((stocks.get(code) or {}).get("price"))
-        cons = consensus.get(code) or {"report_count": 0, "eps": {}}
-
+        cr = cmap.get(code) or {}; tags = [x.get("driver_id") for x in cr.get("driver_links", []) if x.get("driver_id")]
+        name = cr.get("name") or (stocks.get(code) or {}).get("name") or code; price = num((stocks.get(code) or {}).get("price")); cons = consensus.get(code) or {"report_count": 0, "eps": {}}
         cycle_row = build_cycle_reference(code, name, price, tags, cons, cycle_cfg, regimes, reference_trade_date, ak, anchor_cache, anchor_errors, now)
         if cycle_row is not None:
             rows[code] = cycle_row
@@ -314,13 +355,10 @@ def main() -> int:
             else: counts["cycle_review_required"] += 1
             continue
 
-        override = (policies.get("company_overrides") or {}).get(code)
-        text = " ".join(tags)
-        financial = None
+        override = (policies.get("company_overrides") or {}).get(code); text = " ".join(tags); financial = None
         if "证券" in text: financial = (policies.get("financial_policies") or {}).get("broker")
         elif "保险" in text: financial = (policies.get("financial_policies") or {}).get("insurance")
-        key = policy_key(tags); business = (policies.get("business_policies") or {}).get(key) if key else None
-        policy = override or financial or business
+        key = policy_key(tags); business = (policies.get("business_policies") or {}).get(key) if key else None; policy = override or financial or business
         if not policy:
             rows[code] = {"code": code, "name": name, "status": "review_required", "reason": "versioned_valuation_policy_required", "independent_anchor_count": 0}; counts["policy_required"] += 1; continue
         reports = int(cons.get("report_count") or 0); eps_now = num((cons.get("eps") or {}).get(year)); eps_next = num((cons.get("eps") or {}).get(year + 1))
@@ -333,26 +371,42 @@ def main() -> int:
             market = spot.get(code) or {}; pb = num(market.get("pb"))
             if not pb or pb <= 0:
                 rows[code] = {"code": code, "name": name, "status": "review_required", "reason": "market_pb_required", "independent_anchor_count": 0}; counts["market_data_required"] += 1; continue
-            bvps = price / pb; roe_now = eps_now / bvps; roe_next = eps_next / bvps if eps_next else None
-            low_risk_roe = min(roe_now, roe_next) if roe_next is not None else roe_now
+            bvps = price / pb; roe_now = eps_now / bvps; roe_next = eps_next / bvps if eps_next else None; low_risk_roe = min(roe_now, roe_next) if roe_next is not None else roe_now
             mult = choose_pb_band(policy, low_risk_roe)
             if not mult:
                 rows[code] = {"code": code, "name": name, "status": "review_required", "reason": "pb_band_required", "independent_anchor_count": 0}; counts["policy_required"] += 1; continue
             fair = [bvps * mult[0], bvps * mult[1]]
             rows[code] = {"code": code, "name": name, "status": "available", "reference_source": "v2_forward_pb_roe_fundamental_anchor", "route": "financial", "reference_range": [round(fair[0], 2), round(fair[1], 2)], "valuation_model": policy.get("valuation_model"), "valuation_basis_unit": "PB", "consensus_eps_current_year": round(eps_now, 4), "consensus_eps_next_year": round(eps_next, 4) if eps_next else None, "forecast_report_count": reports, "book_value_per_share_proxy": round(bvps, 4), "market_pb": round(pb, 4), "market_indicator_source": market.get("source"), "forward_roe_current_year": round(roe_now, 4), "forward_roe_next_year": round(roe_next, 4) if roe_next is not None else None, "low_risk_forward_roe": round(low_risk_roe, 4), "reasonable_multiple_reference": mult, "buy_band_policy": {"safe_to_fair_floor": policy.get("safe_to_fair_floor"), "reasonable_to_fair_floor": policy.get("reasonable_to_fair_floor")}, "independent_anchor_count": 1}
             counts["v2_forward_pb_reference"] += 1
-        else:
-            mult = policy.get("multiple_range")
-            if not valid_range(mult):
-                rows[code] = {"code": code, "name": name, "status": "review_required", "reason": "multiple_range_required", "independent_anchor_count": 0}; counts["policy_required"] += 1; continue
-            fair = [eps_now * float(mult[0]), eps_now * float(mult[1])]
-            entry_mult = policy.get("low_risk_multiple_range") if valid_range(policy.get("low_risk_multiple_range")) else None
-            entry_ref = [eps_now * float(entry_mult[0]), eps_now * float(entry_mult[1])] if entry_mult else None
-            rows[code] = {"code": code, "name": name, "status": "available", "reference_source": "v2_forward_pe_fundamental_anchor", "route": "business", "reference_range": [round(fair[0], 2), round(fair[1], 2)], "valuation_model": (override or {}).get("valuation_model") or (f"{key}_forward_pe" if key else "company_override_forward_pe"), "valuation_basis_unit": "PE", "consensus_eps_current_year": round(eps_now, 4), "consensus_eps_next_year": round(eps_next, 4) if eps_next else None, "forecast_report_count": reports, "market_forward_pe_current_year": round(price / eps_now, 2), "reasonable_multiple_reference": [float(mult[0]), float(mult[1])], "explicit_entry_multiple_range": [float(entry_mult[0]), float(entry_mult[1])] if entry_mult else None, "explicit_entry_reference_range": [round(entry_ref[0], 2), round(entry_ref[1], 2)] if entry_ref else None, "buy_band_policy": {"safe_to_fair_floor": policy.get("safe_to_fair_floor"), "reasonable_to_fair_floor": policy.get("reasonable_to_fair_floor")}, "independent_anchor_count": 1}
-            counts["v2_forward_pe_reference"] += 1
+            continue
+
+        mult = policy.get("multiple_range")
+        if not valid_range(mult):
+            rows[code] = {"code": code, "name": name, "status": "review_required", "reason": "multiple_range_required", "independent_anchor_count": 0}; counts["policy_required"] += 1; continue
+        if not eps_next or eps_next <= 0:
+            rows[code] = {"code": code, "name": name, "status": "review_required", "reason": "next_year_consensus_required_for_growth_durability", "route": "business", "independent_anchor_count": 0}; counts["growth_durability_required"] += 1; continue
+        derived = derive_low_risk_pe_range(policy, pe_policy, eps_now, eps_next)
+        if not derived or not valid_range(derived.get("effective_range")):
+            rows[code] = {"code": code, "name": name, "status": "review_required", "reason": "growth_adjusted_low_risk_pe_unavailable", "route": "business", "independent_anchor_count": 0}; counts["growth_durability_required"] += 1; continue
+        fair = [eps_now * float(mult[0]), eps_now * float(mult[1])]; entry_mult = derived["effective_range"]; entry_ref = [eps_now * float(entry_mult[0]), eps_now * float(entry_mult[1])]
+        if derived["source"].startswith("explicit_"): counts["explicit_entry"] += 1
+        else: counts["growth_adjusted_entry"] += 1
+        rows[code] = {
+            "code": code, "name": name, "status": "available", "reference_source": "v2_forward_pe_growth_durability_fundamental_anchor", "route": "business",
+            "reference_range": [round(fair[0], 2), round(fair[1], 2)], "valuation_model": (override or {}).get("valuation_model") or (f"{key}_forward_pe" if key else "company_override_forward_pe"),
+            "valuation_basis_unit": "PE", "consensus_eps_current_year": round(eps_now, 4), "consensus_eps_next_year": round(eps_next, 4), "forecast_report_count": reports,
+            "earnings_growth_next_year_pct": round(derived["growth_pct"], 2), "market_forward_pe_current_year": round(price / eps_now, 2),
+            "reasonable_multiple_reference": [float(mult[0]), float(mult[1])], "effective_entry_multiple_range": [round(entry_mult[0], 2), round(entry_mult[1], 2)],
+            "explicit_entry_multiple_range": [round(entry_mult[0], 2), round(entry_mult[1], 2)], "explicit_entry_reference_range": [round(entry_ref[0], 2), round(entry_ref[1], 2)],
+            "low_risk_multiple_source": derived["source"], "growth_floor_pe_cap": round(derived["growth_floor_cap"], 2) if derived["growth_floor_cap"] is not None else None,
+            "entry_peg_range": derived["peg_range"], "peg_cap_applied": derived["peg_cap_applied"], "peg_applicable_growth_min_pct": PEG_APPLICABLE_GROWTH_MIN_PCT, "max_low_risk_peg": MAX_LOW_RISK_PEG,
+            "buy_band_policy": {"safe_to_fair_floor": policy.get("safe_to_fair_floor"), "reasonable_to_fair_floor": policy.get("reasonable_to_fair_floor")}, "independent_anchor_count": 1,
+            "method_note": "Fair PE is the versioned business value reference. Low-risk entry PE is separately derived from current-year EPS plus next-year earnings durability; PEG only caps entry PE when growth is high enough to make PEG informative."
+        }
+        counts["v2_forward_pe_reference"] += 1
 
     available = sum(1 for x in rows.values() if x.get("status") == "available")
-    payload = {"schema_version": 2, "mode": "shadow", "generated_at": datetime.now(TZ).isoformat(), "reference_trade_date": reference_trade_date, "valuation_queue_count": len(codes), "available_count": available, "review_required_count": len(codes) - available, "source_counts": counts, "spot_source_errors": spot_errors, "commodity_anchor_errors": anchor_errors, "companies": rows, "method_note": "V2 first valuation anchor is rebuilt from V2 policies only; no V1 valuation result is consumed. Business uses forward PE, financials use forward ROE/PB, and cycle names use normalized earnings with explicit anti-double-haircut discipline."}
+    payload = {"schema_version": 3, "mode": "shadow", "generated_at": datetime.now(TZ).isoformat(), "reference_trade_date": reference_trade_date, "valuation_queue_count": len(codes), "available_count": available, "review_required_count": len(codes) - available, "source_counts": counts, "spot_source_errors": spot_errors, "commodity_anchor_errors": anchor_errors, "growth_valuation_policy": {"next_year_consensus_required_for_business": True, "peg_applicable_growth_min_pct": PEG_APPLICABLE_GROWTH_MIN_PCT, "max_low_risk_peg": MAX_LOW_RISK_PEG}, "companies": rows, "method_note": "V2 valuation now separates theoretical fair value from low-risk entry valuation. Business names use current-year Forward EPS for fair value and next-year EPS growth as a durability constraint on entry PE; PEG is an upper-bound sanity check, not a reason to pay a higher multiple. Financials use Forward ROE/PB; cycle names normalize earnings before capitalization."}
     OUT.parent.mkdir(parents=True, exist_ok=True); OUT.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps({"status": "ok", "queue": len(codes), "available": available, "review_required": len(codes)-available, "sources": counts, "anchor_errors": anchor_errors}, ensure_ascii=False))
     return 0
