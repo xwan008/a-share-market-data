@@ -3,13 +3,34 @@
 ## 目标
 稳定执行一条简单、可审计但不过度结构化的研究链：
 
-`全市场景气发现 → 盈利链递归拆解 → 链内公司比较与盈利验证 → 分类估值 → 价格结构 → 机会综合`
+`数据健康 → 固定Coverage对齐 → 全市场景气发现 → 盈利链递归拆解 → 链内公司比较与盈利验证 → 分类估值 → 价格结构 → 机会综合`
 
 本Skill只约束研究顺序和边界，不负责决定哪些行业景气，也不保存预设行业或产业链答案。
+
+## 两种“完整性”必须分开
+### Coverage完整性
+使用`config/industry_scan_universe.json`中的申万行业分类Coverage基线，负责回答：**有没有漏扫。**
+
+固定验收基线：
+- 31个一级行业；
+- 134个二级行业；
+- 346个三级行业。
+
+18:00完整研究必须让全部节点在Coverage层`accounted_for`。这里的`accounted_for`只表示本期已经检查并赋予状态，可以是强、改善、稳定、弱、混合、未确认或不适用；**不要求对346个三级行业全部做同等深度研究。**
+
+Coverage分类不是景气答案池，也不是盈利链终点。它只能防止基础化工、消费电子、公用事业、电力设备等方向在一次执行中因为Prompt提前收敛而无状态消失。
+
+### 盈利机制完整性
+由Prompt负责回答：**真正哪里在赚钱，以及为什么。**
+
+对Coverage中出现改善、恶化、显著分化或领先变量重要变化的节点，继续按产品、生产路线/工艺、应用场景、客户需求来源、成本结构等递归拆盈利链。即使已经到申万三级行业，如果内部仍有不同盈利Driver，也必须继续拆。
+
+因此固定分类负责Coverage，动态盈利链负责Resolution，两者不能互相替代。
 
 ## 三层分工
 ### Prompt
 负责开放式研究判断：
+- Coverage节点的当期状态；
 - 哪些行业正在出现盈利边际改善；
 - 为什么改善；
 - 一个宽行业内部真正赚钱的是哪些细分盈利链；
@@ -21,6 +42,7 @@
 ### Skill
 只负责长期稳定的研究纪律：
 - 研究顺序不能漂移；
+- 31/134/346 Coverage必须完成；
 - 盈利链不能因展示篇幅或熟悉公司而过早停止拆分；
 - 公司证据必须可验证；
 - 重点盈利链不能只拿一个代表股就结束研究；
@@ -29,7 +51,7 @@
 - 价格结构不能反向决定内在价值。
 
 ### Code
-只负责数据抓取与清洗、财务/估值/价格结构计算、数据持久化和case-free自洽校验。
+只负责数据抓取与清洗、财务/估值/价格结构计算、Coverage计数与缺口机械校验、数据持久化和case-free自洽校验。
 
 代码不得通过固定行业名单、预填signal、简单证据计数或全市场异常股票状态机决定“哪个行业/产业链应该景气”。
 
@@ -37,19 +59,32 @@
 ### 0. DATA HEALTH
 确认主板范围、最新交易日、行情历史、基础财务数据可用。缺失必须披露，不能解释成“没有机会”。
 
-### 1. OPEN MARKET PROFITABILITY DISCOVERY
-由Prompt开放式扫描全部主要行业并横向比较。`config/industry_scan_universe.json`只用于防漏，不是候选答案池。
+### 1. FIXED TAXONOMY COVERAGE
+在任何“重点行业”筛选之前，先按申万行业分类Coverage基线完成全市场防漏检查。
+
+必须满足：
+- `level1 accounted_for = 31`；
+- `level2 accounted_for = 134`；
+- `level3 accounted_for = 346`；
+- `missing_level1 / missing_level2 / missing_level3`均为空。
+
+这一步只回答是否检查过，不允许用行业分类表预先决定景气。弱/稳定节点可浅扫描并保留状态；改善、恶化或显著分化节点必须进入下一阶段深度研究。
+
+如果官方申万分类未来发生结构调整，应先更新Coverage基线，再执行完整研究；一次研究过程中不得临时改变分母来让验收通过。
+
+### 2. OPEN MARKET PROFITABILITY DISCOVERY
+在完整Coverage基础上，由Prompt开放式横向比较全部主要行业。`config/industry_scan_universe.json`只用于防漏，不是候选答案池。
 
 至少比较收入/利润、毛利率/利润率、产品价格与关键价差、订单/出货/销量/产量、库存/开工/产能利用率、出口/资本开支及行业特有领先变量。
 
-输出首先回答：**哪些行业正在变好、改善幅度如何、是在加速还是减速、为什么未来可能继续。**
+输出首先回答：**哪些行业正在变好、恶化或分化，幅度如何，是在加速还是减速，为什么未来可能继续。**
 
 禁止先列熟悉股票再倒推行业、只扫描热门行业、读取旧预填行业答案，或因覆盖清单没有某条链就忽略新发现。当前对话中出现过的行业、产业链或股票名称也不得作为本期发现起点。
 
-### 2. PROFIT CHAIN DECOMPOSITION
-对发现有改善迹象的行业继续向下研究，目标不是达到固定层级，而是找到**共享同一经济盈利机制的一组真正可比公司**。
+### 3. PROFIT CHAIN DECOMPOSITION
+对发现有改善、恶化或显著分化迹象的行业继续向下研究，目标不是达到固定层级，而是找到**共享同一经济盈利机制的一组真正可比公司**。
 
-优先沿以下维度继续拆：
+申万三级行业不是默认终点。优先沿以下维度继续拆：
 - 产品/服务；
 - 生产路线或关键工艺；
 - 应用场景与终端需求；
@@ -80,7 +115,13 @@
 
 一个行业有多少条真实改善盈利链就保留多少条；不得为了输出简洁限制为2条、3条或固定数量。
 
-### 3. CHAIN COMPANY COMPARISON + COMPANY RESEARCH
+任何标记为`must_split`或`continue_split`的链，在本次完整研究结束前必须：
+- 完成继续拆分；或
+- 因公开证据不足明确降级为`unconfirmed`并说明缺口。
+
+禁止出现“已判断必须拆，但研究状态直接结束”的情况。
+
+### 4. CHAIN COMPANY COMPARISON + COMPANY RESEARCH
 重点盈利链存在多个主板直接受益公司时，必须先横向比较多个公司，不能把第一家代表股直接当成最佳股。通常至少比较2家；有足够可比对象时优先比较3家或更多。若链上确实只有一个高纯度主板标的，需要明确说明。
 
 按照`company-research` Skill验证：
@@ -98,9 +139,9 @@
 - `current_opportunity_best`：加入估值与价格后，现在谁更值得关注；
 - 二者可以不同；如果都不处于低风险位置，`current_opportunity_best`允许为空。
 
-本流程不要求另外建立“全市场盈利异常公司 → 反向补产业链”的完备召回系统。主要补漏责任放在行业到盈利链的高质量拆解；允许少量跨行业公司漏网，以换取研究简单、稳定和可解释。
+本流程不要求另外建立“全市场盈利异常公司 → 反向补产业链”的完备召回系统。主要补漏责任放在固定Coverage和行业到盈利链的高质量拆解；允许少量跨行业公司漏网，以换取研究简单、稳定和可解释。
 
-### 4. VALUATION
+### 5. VALUATION
 按`valuation` Skill执行。先识别盈利类型，再选择模型。内部可以使用Fair Value概念，但**对用户正式展示统一使用：当前价格 / 合理价格 / 安全价格（低风险区）**。
 
 三者含义固定：
@@ -118,11 +159,35 @@
 
 不能只给区间而无法解释差距，也不能因为当前市场价格变化而反向修改合理价格。
 
-### 5. PRICE STRUCTURE
+### 6. PRICE STRUCTURE
 按`price-structure` Skill执行。价格结构独立于价值判断，只回答当前时机是未启动、启动、回踩、趋势延续、过热还是破坏。
 
-### 6. OPPORTUNITY SYNTHESIS
-最终只回答三件事：
+### 7. COMPLETION GATE + OPPORTUNITY SYNTHESIS
+在生成【当前机会】之前必须先通过Coverage完成门。
+
+`research_state.json -> diagnostics.coverage`至少记录：
+- `taxonomy`；
+- `expected_counts`；
+- `accounted_for_counts`；
+- `missing_level1`；
+- `missing_level2`；
+- `missing_level3`；
+- `unresolved_must_split_chains`；
+- `completion_gate_passed`。
+
+只有同时满足以下条件才允许标记18:00完整研究完成：
+1. 31/134/346全部accounted_for；
+2. 无缺失分类节点；
+3. 无未解决的`must_split/continue_split`链；
+4. 强改善或显著分化节点均已进入盈利链研究；
+5. 重点盈利链在存在充分主板可比对象时已完成多公司比较。
+
+若失败：
+- 本次状态必须标记`incomplete_research`；
+- 不生成新的【当前机会】；
+- 不得用这份不完整结果覆盖上一份有效完整研究结论。
+
+通过后最终只回答三件事：
 1. 盈利逻辑是否真实且未来1–2季度仍有Bridge；
 2. 当前价格相对合理价格、安全价格处于什么位置；
 3. 当前价格结构是否适合现在参与。
@@ -135,10 +200,15 @@
 
 若估值`review_required`，合理价格和安全价格必须显示为`待复核`，不能制造精确区间。
 
+【执行状态】必须同时报告Coverage完成情况，例如：
+`申万Coverage：31/31一级，134/134二级，346/346三级；completion_gate=PASS`。
+
+如果Coverage不通过，应优先明确本次研究不完整，而不是输出一个看似完整但实际漏扫的榜单。
+
 ## 研究与机械数据的边界
 允许长期保留的GitHub机械资产包括：公司行业映射/索引、最新行情与历史OHLCV、全市场价格结构扫描及必要的基础财务数据。
 
-Prompt研究结论统一写入`data/research/v2/research_state.json`，包括`market_discovery / profit_chains / chain_comparisons / companies / valuations / opportunities / diagnostics`，不再分散成多层Driver、锚投票和预期差状态文件。
+不新增独立Coverage结果表。Prompt研究结论仍统一写入`data/research/v2/research_state.json`，包括`market_discovery / profit_chains / chain_comparisons / companies / valuations / opportunities / diagnostics`；Coverage完成度写入现有`diagnostics.coverage`，不再分散成额外状态文件。
 
 ## Shadow纪律
 当前Manifest为Shadow。新架构完成连续验证前，所有结果都必须明确标注：**V2影子研究，不发布正式买点**。
