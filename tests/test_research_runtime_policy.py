@@ -3,6 +3,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
+# Schema28 CI checkpoint: run only against a fresh/current state, never stale schema27 output.
 
 def load(p):
     return json.loads((ROOT / p).read_text(encoding='utf-8'))
