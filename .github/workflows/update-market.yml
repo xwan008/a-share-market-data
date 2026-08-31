@@ -11,8 +11,8 @@ on:
       - 'requirements.txt'
   schedule:
     # Beijing time. Build complete closed-session data after the market close.
-    # 16:10 is the primary run; 16:30 is a retry/fallback run.
-    - cron: '10 16 * * 1-5'
+    # Temporary semantic change used to force GitHub to refresh cron registration.
+    - cron: '11 16 * * 1-5'
       timezone: 'Asia/Shanghai'
     - cron: '30 16 * * 1-5'
       timezone: 'Asia/Shanghai'
