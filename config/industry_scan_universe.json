@@ -1,13 +1,35 @@
 {
-  "schema_version": 1,
-  "purpose": "A股低风险买点榜产业景气主流程的固定覆盖骨架。它只定义扫描范围，不包含任何当前景气结论，也不得读取周度个股补漏池来修改本文件。",
+  "schema_version": 2,
+  "purpose": "A股低风险买点榜产业景气主流程的固定Coverage骨架。申万行业分类负责防漏与完成度验收，不负责决定景气答案；盈利产业链仍由Prompt按当期经济盈利机制动态发现和递归拆解。",
+  "taxonomy_reference": {
+    "name": "申万行业分类标准2021版",
+    "role": "coverage_only_not_answer_pool",
+    "expected_level1_count": 31,
+    "expected_level2_count": 134,
+    "expected_level3_count": 346,
+    "official_reference": "https://www.swsresearch.com/institute_sw/allIndex/downloadCenter/industryType",
+    "count_basis": "申万行业分类标准2021版：31个一级行业、134个二级行业、346个三级行业",
+    "rules": [
+      "31/134/346是18:00完整研究的Coverage验收基线，不是景气候选池，也不是固定盈利链答案。",
+      "每次18:00完整研究必须让全部31个一级、134个二级、346个三级分类在Coverage层被accounted_for；可以是强/改善/稳定/弱/混合/未确认/不适用，但不得无状态消失。",
+      "Coverage层只要求确认节点是否已检查及其当期状态，不要求对346个三级行业全部做同等深度公司研究；只有出现改善、恶化或显著分化的节点才进入深度盈利链研究。",
+      "申万三级行业仍可能包含不同直接盈利Driver；进入重点研究后必须继续按产品、工艺、应用场景、客户需求来源和成本结构拆盈利链。",
+      "若跨申万行业的公司共享同一真实盈利机制，可以形成跨行业盈利链，但必须保留其Coverage来源映射。",
+      "若申万官方未来调整分类数量或结构，先更新本Coverage基线，再执行完整研究；不得在一次研究中临时自行修改基线。"
+    ]
+  },
   "coverage_rules": {
     "all_broad_industries_must_be_scanned": true,
+    "all_sw_level1_nodes_must_be_accounted_for": true,
+    "all_sw_level2_nodes_must_be_accounted_for": true,
+    "all_sw_level3_nodes_must_be_accounted_for": true,
     "minimum_subchains_are_floor_not_ceiling": true,
     "dynamic_new_subchains_must_be_added_when_public_evidence_requires": true,
     "broad_industry_cannot_be_final_t2_unit": true,
     "every_minimum_subchain_requires_status_or_explicit_not_applicable_reason": true,
     "scan_complete_only_if_every_broad_industry_has_coverage_result": true,
+    "scan_complete_only_if_sw_counts_match": true,
+    "scan_complete_only_if_no_unresolved_must_split_chain": true,
     "weekly_stock_pool_must_not_influence_industry_scan": true
   },
   "broad_industries": [
@@ -44,8 +66,28 @@
     {"id":"beauty_care","name":"美容护理","minimum_subchains":["化妆品","医美","个护用品"]}
   ],
   "completion_contract": {
+    "taxonomy_counts_required": {"level1":31,"level2":134,"level3":346},
+    "required_research_state_diagnostics": [
+      "coverage.taxonomy",
+      "coverage.expected_counts",
+      "coverage.accounted_for_counts",
+      "coverage.missing_level1",
+      "coverage.missing_level2",
+      "coverage.missing_level3",
+      "coverage.unresolved_must_split_chains",
+      "coverage.completion_gate_passed"
+    ],
+    "completion_gate": [
+      "accounted_for_counts.level1必须等于31",
+      "accounted_for_counts.level2必须等于134",
+      "accounted_for_counts.level3必须等于346",
+      "missing_level1/missing_level2/missing_level3必须为空",
+      "所有被标记为must_split/continue_split的盈利链必须完成继续拆解或明确降级为unconfirmed并说明原因",
+      "所有强改善或显著分化节点必须进入盈利链拆解；弱/稳定节点允许只保留Coverage状态和简短证据",
+      "completion_gate_passed=false时，18:00研究状态只能标记incomplete_research，不得生成新的当前机会，也不得用不完整结果覆盖上一份有效完整研究结论"
+    ],
     "required_output_per_broad_industry":["broad_industry","subchains_scanned","t2_subchains","t1_subchains","t0_subchains","unconfirmed_subchains","coverage_gap"],
     "required_output_per_t2_subchain":["subchain","direct_profit_driver","leading_variables","evidence","main_value_chain_links","eligible_main_board_companies_recalled","coverage_gap"],
-    "forbidden_shortcuts":["先列熟悉公司再倒推产业链","用几个龙头财报代表整个大行业","未扫描完整大行业覆盖骨架就宣布全市场扫描完成","只扫描热门行业","因为周度补漏池出现某公司而新增或升级T2"]
+    "forbidden_shortcuts":["先列熟悉公司再倒推产业链","用几个龙头财报代表整个大行业","未完成31/134/346 Coverage对齐就宣布全市场扫描完成","只扫描热门行业","因为周度补漏池出现某公司而新增或升级T2","把申万三级行业直接当作最终盈利链而跳过盈利Driver三问"]
   }
 }
