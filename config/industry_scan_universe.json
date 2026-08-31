@@ -1,93 +1,2576 @@
 {
-  "schema_version": 2,
-  "purpose": "A股低风险买点榜产业景气主流程的固定Coverage骨架。申万行业分类负责防漏与完成度验收，不负责决定景气答案；盈利产业链仍由Prompt按当期经济盈利机制动态发现和递归拆解。",
-  "taxonomy_reference": {
-    "name": "申万行业分类标准2021版",
-    "role": "coverage_only_not_answer_pool",
-    "expected_level1_count": 31,
-    "expected_level2_count": 134,
-    "expected_level3_count": 346,
-    "official_reference": "https://www.swsresearch.com/institute_sw/allIndex/downloadCenter/industryType",
-    "count_basis": "申万行业分类标准2021版：31个一级行业、134个二级行业、346个三级行业",
-    "rules": [
-      "31/134/346是18:00完整研究的Coverage验收基线，不是景气候选池，也不是固定盈利链答案。",
-      "每次18:00完整研究必须让全部31个一级、134个二级、346个三级分类在Coverage层被accounted_for；可以是强/改善/稳定/弱/混合/未确认/不适用，但不得无状态消失。",
-      "Coverage层只要求确认节点是否已检查及其当期状态，不要求对346个三级行业全部做同等深度公司研究；只有出现改善、恶化或显著分化的节点才进入深度盈利链研究。",
-      "申万三级行业仍可能包含不同直接盈利Driver；进入重点研究后必须继续按产品、工艺、应用场景、客户需求来源和成本结构拆盈利链。",
-      "若跨申万行业的公司共享同一真实盈利机制，可以形成跨行业盈利链，但必须保留其Coverage来源映射。",
-      "若申万官方未来调整分类数量或结构，先更新本Coverage基线，再执行完整研究；不得在一次研究中临时自行修改基线。"
+  "schema_version": 3,
+  "generated_at": "2026-08-31T19:29:25.062080+08:00",
+  "taxonomy": "申万行业分类标准2021版",
+  "role": "coverage_only_not_answer_pool",
+  "expected_counts": {
+    "level1": 31,
+    "level2": 134,
+    "level3": 346
+  },
+  "accounting_rule": "18:00完整研究必须逐一accounted_for全部节点；弱/稳定节点可浅扫描，改善/恶化/显著分化节点进入深度盈利链研究。",
+  "profit_chain_rule": "申万三级行业不是盈利链默认终点；若直接盈利Driver、领先变量或利润传导不同，必须继续拆分。",
+  "levels": {
+    "level1": [
+      {
+        "code": "S11",
+        "name": "农林牧渔",
+        "parent_code": "S"
+      },
+      {
+        "code": "S22",
+        "name": "基础化工",
+        "parent_code": "S"
+      },
+      {
+        "code": "S23",
+        "name": "钢铁",
+        "parent_code": "S"
+      },
+      {
+        "code": "S24",
+        "name": "有色金属",
+        "parent_code": "S"
+      },
+      {
+        "code": "S27",
+        "name": "电子",
+        "parent_code": "S"
+      },
+      {
+        "code": "S28",
+        "name": "汽车",
+        "parent_code": "S"
+      },
+      {
+        "code": "S33",
+        "name": "家用电器",
+        "parent_code": "S"
+      },
+      {
+        "code": "S34",
+        "name": "食品饮料",
+        "parent_code": "S"
+      },
+      {
+        "code": "S35",
+        "name": "纺织服饰",
+        "parent_code": "S"
+      },
+      {
+        "code": "S36",
+        "name": "轻工制造",
+        "parent_code": "S"
+      },
+      {
+        "code": "S37",
+        "name": "医药生物",
+        "parent_code": "S"
+      },
+      {
+        "code": "S41",
+        "name": "公用事业",
+        "parent_code": "S"
+      },
+      {
+        "code": "S42",
+        "name": "交通运输",
+        "parent_code": "S"
+      },
+      {
+        "code": "S43",
+        "name": "房地产",
+        "parent_code": "S"
+      },
+      {
+        "code": "S45",
+        "name": "商贸零售",
+        "parent_code": "S"
+      },
+      {
+        "code": "S46",
+        "name": "社会服务",
+        "parent_code": "S"
+      },
+      {
+        "code": "S48",
+        "name": "银行",
+        "parent_code": "S"
+      },
+      {
+        "code": "S49",
+        "name": "非银金融",
+        "parent_code": "S"
+      },
+      {
+        "code": "S51",
+        "name": "综合",
+        "parent_code": "S"
+      },
+      {
+        "code": "S61",
+        "name": "建筑材料",
+        "parent_code": "S"
+      },
+      {
+        "code": "S62",
+        "name": "建筑装饰",
+        "parent_code": "S"
+      },
+      {
+        "code": "S63",
+        "name": "电力设备",
+        "parent_code": "S"
+      },
+      {
+        "code": "S64",
+        "name": "机械设备",
+        "parent_code": "S"
+      },
+      {
+        "code": "S65",
+        "name": "国防军工",
+        "parent_code": "S"
+      },
+      {
+        "code": "S71",
+        "name": "计算机",
+        "parent_code": "S"
+      },
+      {
+        "code": "S72",
+        "name": "传媒",
+        "parent_code": "S"
+      },
+      {
+        "code": "S73",
+        "name": "通信",
+        "parent_code": "S"
+      },
+      {
+        "code": "S74",
+        "name": "煤炭",
+        "parent_code": "S"
+      },
+      {
+        "code": "S75",
+        "name": "石油石化",
+        "parent_code": "S"
+      },
+      {
+        "code": "S76",
+        "name": "环保",
+        "parent_code": "S"
+      },
+      {
+        "code": "S77",
+        "name": "美容护理",
+        "parent_code": "S"
+      }
+    ],
+    "level2": [
+      {
+        "code": "S1101",
+        "name": "种植业",
+        "parent_code": "S11"
+      },
+      {
+        "code": "S1102",
+        "name": "渔业",
+        "parent_code": "S11"
+      },
+      {
+        "code": "S1103",
+        "name": "林业Ⅱ",
+        "parent_code": "S11"
+      },
+      {
+        "code": "S1104",
+        "name": "饲料",
+        "parent_code": "S11"
+      },
+      {
+        "code": "S1105",
+        "name": "农产品加工",
+        "parent_code": "S11"
+      },
+      {
+        "code": "S1107",
+        "name": "养殖业",
+        "parent_code": "S11"
+      },
+      {
+        "code": "S1108",
+        "name": "动物保健Ⅱ",
+        "parent_code": "S11"
+      },
+      {
+        "code": "S1109",
+        "name": "农业综合Ⅱ",
+        "parent_code": "S11"
+      },
+      {
+        "code": "S2202",
+        "name": "化学原料",
+        "parent_code": "S22"
+      },
+      {
+        "code": "S2203",
+        "name": "化学制品",
+        "parent_code": "S22"
+      },
+      {
+        "code": "S2204",
+        "name": "化学纤维",
+        "parent_code": "S22"
+      },
+      {
+        "code": "S2205",
+        "name": "塑料",
+        "parent_code": "S22"
+      },
+      {
+        "code": "S2206",
+        "name": "橡胶",
+        "parent_code": "S22"
+      },
+      {
+        "code": "S2208",
+        "name": "农化制品",
+        "parent_code": "S22"
+      },
+      {
+        "code": "S2209",
+        "name": "非金属材料Ⅱ",
+        "parent_code": "S22"
+      },
+      {
+        "code": "S2303",
+        "name": "冶钢原料",
+        "parent_code": "S23"
+      },
+      {
+        "code": "S2304",
+        "name": "普钢",
+        "parent_code": "S23"
+      },
+      {
+        "code": "S2305",
+        "name": "特钢Ⅱ",
+        "parent_code": "S23"
+      },
+      {
+        "code": "S2402",
+        "name": "金属新材料",
+        "parent_code": "S24"
+      },
+      {
+        "code": "S2403",
+        "name": "工业金属",
+        "parent_code": "S24"
+      },
+      {
+        "code": "S2404",
+        "name": "贵金属",
+        "parent_code": "S24"
+      },
+      {
+        "code": "S2405",
+        "name": "小金属",
+        "parent_code": "S24"
+      },
+      {
+        "code": "S2406",
+        "name": "能源金属",
+        "parent_code": "S24"
+      },
+      {
+        "code": "S2701",
+        "name": "半导体",
+        "parent_code": "S27"
+      },
+      {
+        "code": "S2702",
+        "name": "元件",
+        "parent_code": "S27"
+      },
+      {
+        "code": "S2703",
+        "name": "光学光电子",
+        "parent_code": "S27"
+      },
+      {
+        "code": "S2704",
+        "name": "其他电子Ⅱ",
+        "parent_code": "S27"
+      },
+      {
+        "code": "S2705",
+        "name": "消费电子",
+        "parent_code": "S27"
+      },
+      {
+        "code": "S2706",
+        "name": "电子化学品Ⅱ",
+        "parent_code": "S27"
+      },
+      {
+        "code": "S2802",
+        "name": "汽车零部件",
+        "parent_code": "S28"
+      },
+      {
+        "code": "S2803",
+        "name": "汽车服务",
+        "parent_code": "S28"
+      },
+      {
+        "code": "S2804",
+        "name": "摩托车及其他",
+        "parent_code": "S28"
+      },
+      {
+        "code": "S2805",
+        "name": "乘用车",
+        "parent_code": "S28"
+      },
+      {
+        "code": "S2806",
+        "name": "商用车",
+        "parent_code": "S28"
+      },
+      {
+        "code": "S3301",
+        "name": "白色家电",
+        "parent_code": "S33"
+      },
+      {
+        "code": "S3302",
+        "name": "黑色家电",
+        "parent_code": "S33"
+      },
+      {
+        "code": "S3303",
+        "name": "小家电",
+        "parent_code": "S33"
+      },
+      {
+        "code": "S3304",
+        "name": "厨卫电器",
+        "parent_code": "S33"
+      },
+      {
+        "code": "S3305",
+        "name": "照明设备Ⅱ",
+        "parent_code": "S33"
+      },
+      {
+        "code": "S3306",
+        "name": "家电零部件Ⅱ",
+        "parent_code": "S33"
+      },
+      {
+        "code": "S3307",
+        "name": "其他家电Ⅱ",
+        "parent_code": "S33"
+      },
+      {
+        "code": "S3404",
+        "name": "食品加工",
+        "parent_code": "S34"
+      },
+      {
+        "code": "S3405",
+        "name": "白酒Ⅱ",
+        "parent_code": "S34"
+      },
+      {
+        "code": "S3406",
+        "name": "非白酒",
+        "parent_code": "S34"
+      },
+      {
+        "code": "S3407",
+        "name": "饮料乳品",
+        "parent_code": "S34"
+      },
+      {
+        "code": "S3408",
+        "name": "休闲食品",
+        "parent_code": "S34"
+      },
+      {
+        "code": "S3409",
+        "name": "调味发酵品Ⅱ",
+        "parent_code": "S34"
+      },
+      {
+        "code": "S3501",
+        "name": "纺织制造",
+        "parent_code": "S35"
+      },
+      {
+        "code": "S3502",
+        "name": "服装家纺",
+        "parent_code": "S35"
+      },
+      {
+        "code": "S3503",
+        "name": "饰品",
+        "parent_code": "S35"
+      },
+      {
+        "code": "S3601",
+        "name": "造纸",
+        "parent_code": "S36"
+      },
+      {
+        "code": "S3602",
+        "name": "包装印刷",
+        "parent_code": "S36"
+      },
+      {
+        "code": "S3603",
+        "name": "家居用品",
+        "parent_code": "S36"
+      },
+      {
+        "code": "S3605",
+        "name": "文娱用品",
+        "parent_code": "S36"
+      },
+      {
+        "code": "S3701",
+        "name": "化学制药",
+        "parent_code": "S37"
+      },
+      {
+        "code": "S3702",
+        "name": "中药Ⅱ",
+        "parent_code": "S37"
+      },
+      {
+        "code": "S3703",
+        "name": "生物制品",
+        "parent_code": "S37"
+      },
+      {
+        "code": "S3704",
+        "name": "医药商业",
+        "parent_code": "S37"
+      },
+      {
+        "code": "S3705",
+        "name": "医疗器械",
+        "parent_code": "S37"
+      },
+      {
+        "code": "S3706",
+        "name": "医疗服务",
+        "parent_code": "S37"
+      },
+      {
+        "code": "S4101",
+        "name": "电力",
+        "parent_code": "S41"
+      },
+      {
+        "code": "S4103",
+        "name": "燃气Ⅱ",
+        "parent_code": "S41"
+      },
+      {
+        "code": "S4208",
+        "name": "物流",
+        "parent_code": "S42"
+      },
+      {
+        "code": "S4209",
+        "name": "铁路公路",
+        "parent_code": "S42"
+      },
+      {
+        "code": "S4210",
+        "name": "航空机场",
+        "parent_code": "S42"
+      },
+      {
+        "code": "S4211",
+        "name": "航运港口",
+        "parent_code": "S42"
+      },
+      {
+        "code": "S4301",
+        "name": "房地产开发",
+        "parent_code": "S43"
+      },
+      {
+        "code": "S4303",
+        "name": "房地产服务",
+        "parent_code": "S43"
+      },
+      {
+        "code": "S4502",
+        "name": "贸易Ⅱ",
+        "parent_code": "S45"
+      },
+      {
+        "code": "S4503",
+        "name": "一般零售",
+        "parent_code": "S45"
+      },
+      {
+        "code": "S4504",
+        "name": "专业连锁Ⅱ",
+        "parent_code": "S45"
+      },
+      {
+        "code": "S4506",
+        "name": "互联网电商",
+        "parent_code": "S45"
+      },
+      {
+        "code": "S4507",
+        "name": "旅游零售Ⅱ",
+        "parent_code": "S45"
+      },
+      {
+        "code": "S4606",
+        "name": "体育Ⅱ",
+        "parent_code": "S46"
+      },
+      {
+        "code": "S4607",
+        "name": "本地生活服务Ⅱ",
+        "parent_code": "S46"
+      },
+      {
+        "code": "S4608",
+        "name": "专业服务",
+        "parent_code": "S46"
+      },
+      {
+        "code": "S4609",
+        "name": "酒店餐饮",
+        "parent_code": "S46"
+      },
+      {
+        "code": "S4610",
+        "name": "旅游及景区",
+        "parent_code": "S46"
+      },
+      {
+        "code": "S4611",
+        "name": "教育",
+        "parent_code": "S46"
+      },
+      {
+        "code": "S4802",
+        "name": "国有大型银行Ⅱ",
+        "parent_code": "S48"
+      },
+      {
+        "code": "S4803",
+        "name": "股份制银行Ⅱ",
+        "parent_code": "S48"
+      },
+      {
+        "code": "S4804",
+        "name": "城商行Ⅱ",
+        "parent_code": "S48"
+      },
+      {
+        "code": "S4805",
+        "name": "农商行Ⅱ",
+        "parent_code": "S48"
+      },
+      {
+        "code": "S4806",
+        "name": "其他银行Ⅱ",
+        "parent_code": "S48"
+      },
+      {
+        "code": "S4901",
+        "name": "证券Ⅱ",
+        "parent_code": "S49"
+      },
+      {
+        "code": "S4902",
+        "name": "保险Ⅱ",
+        "parent_code": "S49"
+      },
+      {
+        "code": "S4903",
+        "name": "多元金融",
+        "parent_code": "S49"
+      },
+      {
+        "code": "S5101",
+        "name": "综合Ⅱ",
+        "parent_code": "S51"
+      },
+      {
+        "code": "S6101",
+        "name": "水泥",
+        "parent_code": "S61"
+      },
+      {
+        "code": "S6102",
+        "name": "玻璃玻纤",
+        "parent_code": "S61"
+      },
+      {
+        "code": "S6103",
+        "name": "装修建材",
+        "parent_code": "S61"
+      },
+      {
+        "code": "S6201",
+        "name": "房屋建设Ⅱ",
+        "parent_code": "S62"
+      },
+      {
+        "code": "S6202",
+        "name": "装修装饰Ⅱ",
+        "parent_code": "S62"
+      },
+      {
+        "code": "S6203",
+        "name": "基础建设",
+        "parent_code": "S62"
+      },
+      {
+        "code": "S6204",
+        "name": "专业工程",
+        "parent_code": "S62"
+      },
+      {
+        "code": "S6206",
+        "name": "工程咨询服务Ⅱ",
+        "parent_code": "S62"
+      },
+      {
+        "code": "S6301",
+        "name": "电机Ⅱ",
+        "parent_code": "S63"
+      },
+      {
+        "code": "S6303",
+        "name": "其他电源设备Ⅱ",
+        "parent_code": "S63"
+      },
+      {
+        "code": "S6305",
+        "name": "光伏设备",
+        "parent_code": "S63"
+      },
+      {
+        "code": "S6306",
+        "name": "风电设备",
+        "parent_code": "S63"
+      },
+      {
+        "code": "S6307",
+        "name": "电池",
+        "parent_code": "S63"
+      },
+      {
+        "code": "S6308",
+        "name": "电网设备",
+        "parent_code": "S63"
+      },
+      {
+        "code": "S6401",
+        "name": "通用设备",
+        "parent_code": "S64"
+      },
+      {
+        "code": "S6402",
+        "name": "专用设备",
+        "parent_code": "S64"
+      },
+      {
+        "code": "S6405",
+        "name": "轨交设备Ⅱ",
+        "parent_code": "S64"
+      },
+      {
+        "code": "S6406",
+        "name": "工程机械",
+        "parent_code": "S64"
+      },
+      {
+        "code": "S6407",
+        "name": "自动化设备",
+        "parent_code": "S64"
+      },
+      {
+        "code": "S6501",
+        "name": "航天装备Ⅱ",
+        "parent_code": "S65"
+      },
+      {
+        "code": "S6502",
+        "name": "航空装备Ⅱ",
+        "parent_code": "S65"
+      },
+      {
+        "code": "S6503",
+        "name": "地面兵装Ⅱ",
+        "parent_code": "S65"
+      },
+      {
+        "code": "S6504",
+        "name": "航海装备Ⅱ",
+        "parent_code": "S65"
+      },
+      {
+        "code": "S6505",
+        "name": "军工电子Ⅱ",
+        "parent_code": "S65"
+      },
+      {
+        "code": "S7101",
+        "name": "计算机设备",
+        "parent_code": "S71"
+      },
+      {
+        "code": "S7103",
+        "name": "IT服务Ⅱ",
+        "parent_code": "S71"
+      },
+      {
+        "code": "S7104",
+        "name": "软件开发",
+        "parent_code": "S71"
+      },
+      {
+        "code": "S7204",
+        "name": "游戏Ⅱ",
+        "parent_code": "S72"
+      },
+      {
+        "code": "S7205",
+        "name": "广告营销",
+        "parent_code": "S72"
+      },
+      {
+        "code": "S7206",
+        "name": "影视院线",
+        "parent_code": "S72"
+      },
+      {
+        "code": "S7207",
+        "name": "数字媒体",
+        "parent_code": "S72"
+      },
+      {
+        "code": "S7208",
+        "name": "社交Ⅱ",
+        "parent_code": "S72"
+      },
+      {
+        "code": "S7209",
+        "name": "出版",
+        "parent_code": "S72"
+      },
+      {
+        "code": "S7210",
+        "name": "电视广播Ⅱ",
+        "parent_code": "S72"
+      },
+      {
+        "code": "S7301",
+        "name": "通信服务",
+        "parent_code": "S73"
+      },
+      {
+        "code": "S7302",
+        "name": "通信设备",
+        "parent_code": "S73"
+      },
+      {
+        "code": "S7401",
+        "name": "煤炭开采",
+        "parent_code": "S74"
+      },
+      {
+        "code": "S7402",
+        "name": "焦炭Ⅱ",
+        "parent_code": "S74"
+      },
+      {
+        "code": "S7501",
+        "name": "油气开采Ⅱ",
+        "parent_code": "S75"
+      },
+      {
+        "code": "S7502",
+        "name": "油服工程",
+        "parent_code": "S75"
+      },
+      {
+        "code": "S7503",
+        "name": "炼化及贸易",
+        "parent_code": "S75"
+      },
+      {
+        "code": "S7601",
+        "name": "环境治理",
+        "parent_code": "S76"
+      },
+      {
+        "code": "S7602",
+        "name": "环保设备Ⅱ",
+        "parent_code": "S76"
+      },
+      {
+        "code": "S7701",
+        "name": "个护用品",
+        "parent_code": "S77"
+      },
+      {
+        "code": "S7702",
+        "name": "化妆品",
+        "parent_code": "S77"
+      },
+      {
+        "code": "S7703",
+        "name": "医疗美容",
+        "parent_code": "S77"
+      }
+    ],
+    "level3": [
+      {
+        "code": "S110101",
+        "name": "种子",
+        "parent_code": "S1101"
+      },
+      {
+        "code": "S110102",
+        "name": "粮食种植",
+        "parent_code": "S1101"
+      },
+      {
+        "code": "S110103",
+        "name": "其他种植业",
+        "parent_code": "S1101"
+      },
+      {
+        "code": "S110104",
+        "name": "食用菌",
+        "parent_code": "S1101"
+      },
+      {
+        "code": "S110201",
+        "name": "海洋捕捞",
+        "parent_code": "S1102"
+      },
+      {
+        "code": "S110202",
+        "name": "水产养殖",
+        "parent_code": "S1102"
+      },
+      {
+        "code": "S110301",
+        "name": "林业Ⅲ",
+        "parent_code": "S1103"
+      },
+      {
+        "code": "S110402",
+        "name": "畜禽饲料",
+        "parent_code": "S1104"
+      },
+      {
+        "code": "S110403",
+        "name": "水产饲料",
+        "parent_code": "S1104"
+      },
+      {
+        "code": "S110404",
+        "name": "宠物食品",
+        "parent_code": "S1104"
+      },
+      {
+        "code": "S110501",
+        "name": "果蔬加工",
+        "parent_code": "S1105"
+      },
+      {
+        "code": "S110502",
+        "name": "粮油加工",
+        "parent_code": "S1105"
+      },
+      {
+        "code": "S110504",
+        "name": "其他农产品加工",
+        "parent_code": "S1105"
+      },
+      {
+        "code": "S110702",
+        "name": "生猪养殖",
+        "parent_code": "S1107"
+      },
+      {
+        "code": "S110703",
+        "name": "肉鸡养殖",
+        "parent_code": "S1107"
+      },
+      {
+        "code": "S110704",
+        "name": "其他养殖",
+        "parent_code": "S1107"
+      },
+      {
+        "code": "S110801",
+        "name": "动物保健Ⅲ",
+        "parent_code": "S1108"
+      },
+      {
+        "code": "S110901",
+        "name": "农业综合Ⅲ",
+        "parent_code": "S1109"
+      },
+      {
+        "code": "S220201",
+        "name": "纯碱",
+        "parent_code": "S2202"
+      },
+      {
+        "code": "S220202",
+        "name": "氯碱",
+        "parent_code": "S2202"
+      },
+      {
+        "code": "S220203",
+        "name": "无机盐",
+        "parent_code": "S2202"
+      },
+      {
+        "code": "S220204",
+        "name": "其他化学原料",
+        "parent_code": "S2202"
+      },
+      {
+        "code": "S220205",
+        "name": "煤化工",
+        "parent_code": "S2202"
+      },
+      {
+        "code": "S220206",
+        "name": "钛白粉",
+        "parent_code": "S2202"
+      },
+      {
+        "code": "S220305",
+        "name": "涂料油墨",
+        "parent_code": "S2203"
+      },
+      {
+        "code": "S220307",
+        "name": "民爆制品",
+        "parent_code": "S2203"
+      },
+      {
+        "code": "S220308",
+        "name": "纺织化学制品",
+        "parent_code": "S2203"
+      },
+      {
+        "code": "S220309",
+        "name": "其他化学制品",
+        "parent_code": "S2203"
+      },
+      {
+        "code": "S220311",
+        "name": "氟化工",
+        "parent_code": "S2203"
+      },
+      {
+        "code": "S220313",
+        "name": "聚氨酯",
+        "parent_code": "S2203"
+      },
+      {
+        "code": "S220315",
+        "name": "食品及饲料添加剂",
+        "parent_code": "S2203"
+      },
+      {
+        "code": "S220316",
+        "name": "有机硅",
+        "parent_code": "S2203"
+      },
+      {
+        "code": "S220317",
+        "name": "胶黏剂及胶带",
+        "parent_code": "S2203"
+      },
+      {
+        "code": "S220401",
+        "name": "涤纶",
+        "parent_code": "S2204"
+      },
+      {
+        "code": "S220403",
+        "name": "粘胶",
+        "parent_code": "S2204"
+      },
+      {
+        "code": "S220404",
+        "name": "其他化学纤维",
+        "parent_code": "S2204"
+      },
+      {
+        "code": "S220405",
+        "name": "氨纶",
+        "parent_code": "S2204"
+      },
+      {
+        "code": "S220406",
+        "name": "锦纶",
+        "parent_code": "S2204"
+      },
+      {
+        "code": "S220501",
+        "name": "其他塑料制品",
+        "parent_code": "S2205"
+      },
+      {
+        "code": "S220503",
+        "name": "改性塑料",
+        "parent_code": "S2205"
+      },
+      {
+        "code": "S220504",
+        "name": "合成树脂",
+        "parent_code": "S2205"
+      },
+      {
+        "code": "S220505",
+        "name": "膜材料",
+        "parent_code": "S2205"
+      },
+      {
+        "code": "S220602",
+        "name": "其他橡胶制品",
+        "parent_code": "S2206"
+      },
+      {
+        "code": "S220603",
+        "name": "炭黑",
+        "parent_code": "S2206"
+      },
+      {
+        "code": "S220604",
+        "name": "橡胶助剂",
+        "parent_code": "S2206"
+      },
+      {
+        "code": "S220801",
+        "name": "氮肥",
+        "parent_code": "S2208"
+      },
+      {
+        "code": "S220802",
+        "name": "磷肥及磷化工",
+        "parent_code": "S2208"
+      },
+      {
+        "code": "S220803",
+        "name": "农药",
+        "parent_code": "S2208"
+      },
+      {
+        "code": "S220804",
+        "name": "钾肥",
+        "parent_code": "S2208"
+      },
+      {
+        "code": "S220805",
+        "name": "复合肥",
+        "parent_code": "S2208"
+      },
+      {
+        "code": "S220901",
+        "name": "非金属材料Ⅲ",
+        "parent_code": "S2209"
+      },
+      {
+        "code": "S230301",
+        "name": "铁矿石",
+        "parent_code": "S2303"
+      },
+      {
+        "code": "S230302",
+        "name": "冶钢辅料",
+        "parent_code": "S2303"
+      },
+      {
+        "code": "S230401",
+        "name": "长材",
+        "parent_code": "S2304"
+      },
+      {
+        "code": "S230402",
+        "name": "板材",
+        "parent_code": "S2304"
+      },
+      {
+        "code": "S230403",
+        "name": "钢铁管材",
+        "parent_code": "S2304"
+      },
+      {
+        "code": "S230501",
+        "name": "特钢Ⅲ",
+        "parent_code": "S2305"
+      },
+      {
+        "code": "S240201",
+        "name": "其他金属新材料",
+        "parent_code": "S2402"
+      },
+      {
+        "code": "S240202",
+        "name": "磁性材料",
+        "parent_code": "S2402"
+      },
+      {
+        "code": "S240301",
+        "name": "铝",
+        "parent_code": "S2403"
+      },
+      {
+        "code": "S240302",
+        "name": "铜",
+        "parent_code": "S2403"
+      },
+      {
+        "code": "S240303",
+        "name": "铅锌",
+        "parent_code": "S2403"
+      },
+      {
+        "code": "S240401",
+        "name": "黄金",
+        "parent_code": "S2404"
+      },
+      {
+        "code": "S240402",
+        "name": "白银",
+        "parent_code": "S2404"
+      },
+      {
+        "code": "S240501",
+        "name": "稀土",
+        "parent_code": "S2405"
+      },
+      {
+        "code": "S240502",
+        "name": "钨",
+        "parent_code": "S2405"
+      },
+      {
+        "code": "S240504",
+        "name": "其他小金属",
+        "parent_code": "S2405"
+      },
+      {
+        "code": "S240505",
+        "name": "钼",
+        "parent_code": "S2405"
+      },
+      {
+        "code": "S240601",
+        "name": "钴",
+        "parent_code": "S2406"
+      },
+      {
+        "code": "S240602",
+        "name": "镍",
+        "parent_code": "S2406"
+      },
+      {
+        "code": "S240603",
+        "name": "锂",
+        "parent_code": "S2406"
+      },
+      {
+        "code": "S270102",
+        "name": "分立器件",
+        "parent_code": "S2701"
+      },
+      {
+        "code": "S270103",
+        "name": "半导体材料",
+        "parent_code": "S2701"
+      },
+      {
+        "code": "S270104",
+        "name": "数字芯片设计",
+        "parent_code": "S2701"
+      },
+      {
+        "code": "S270105",
+        "name": "模拟芯片设计",
+        "parent_code": "S2701"
+      },
+      {
+        "code": "S270106",
+        "name": "集成电路制造",
+        "parent_code": "S2701"
+      },
+      {
+        "code": "S270107",
+        "name": "集成电路封测",
+        "parent_code": "S2701"
+      },
+      {
+        "code": "S270108",
+        "name": "半导体设备",
+        "parent_code": "S2701"
+      },
+      {
+        "code": "S270202",
+        "name": "印制电路板",
+        "parent_code": "S2702"
+      },
+      {
+        "code": "S270203",
+        "name": "被动元件",
+        "parent_code": "S2702"
+      },
+      {
+        "code": "S270301",
+        "name": "面板",
+        "parent_code": "S2703"
+      },
+      {
+        "code": "S270302",
+        "name": "LED",
+        "parent_code": "S2703"
+      },
+      {
+        "code": "S270303",
+        "name": "光学元件",
+        "parent_code": "S2703"
+      },
+      {
+        "code": "S270401",
+        "name": "其他电子Ⅲ",
+        "parent_code": "S2704"
+      },
+      {
+        "code": "S270503",
+        "name": "品牌消费电子",
+        "parent_code": "S2705"
+      },
+      {
+        "code": "S270504",
+        "name": "消费电子零部件及组装",
+        "parent_code": "S2705"
+      },
+      {
+        "code": "S270601",
+        "name": "电子化学品Ⅲ",
+        "parent_code": "S2706"
+      },
+      {
+        "code": "S280202",
+        "name": "车身附件及饰件",
+        "parent_code": "S2802"
+      },
+      {
+        "code": "S280203",
+        "name": "底盘与发动机系统",
+        "parent_code": "S2802"
+      },
+      {
+        "code": "S280204",
+        "name": "轮胎轮毂",
+        "parent_code": "S2802"
+      },
+      {
+        "code": "S280205",
+        "name": "其他汽车零部件",
+        "parent_code": "S2802"
+      },
+      {
+        "code": "S280206",
+        "name": "汽车电子电气系统",
+        "parent_code": "S2802"
+      },
+      {
+        "code": "S280302",
+        "name": "汽车经销商",
+        "parent_code": "S2803"
+      },
+      {
+        "code": "S280303",
+        "name": "汽车综合服务",
+        "parent_code": "S2803"
+      },
+      {
+        "code": "S280401",
+        "name": "其他运输设备",
+        "parent_code": "S2804"
+      },
+      {
+        "code": "S280402",
+        "name": "摩托车",
+        "parent_code": "S2804"
+      },
+      {
+        "code": "S280501",
+        "name": "电动乘用车",
+        "parent_code": "S2805"
+      },
+      {
+        "code": "S280502",
+        "name": "综合乘用车",
+        "parent_code": "S2805"
+      },
+      {
+        "code": "S280601",
+        "name": "商用载货车",
+        "parent_code": "S2806"
+      },
+      {
+        "code": "S280602",
+        "name": "商用载客车",
+        "parent_code": "S2806"
+      },
+      {
+        "code": "S330102",
+        "name": "空调",
+        "parent_code": "S3301"
+      },
+      {
+        "code": "S330106",
+        "name": "冰洗",
+        "parent_code": "S3301"
+      },
+      {
+        "code": "S330201",
+        "name": "彩电",
+        "parent_code": "S3302"
+      },
+      {
+        "code": "S330202",
+        "name": "其他黑色家电",
+        "parent_code": "S3302"
+      },
+      {
+        "code": "S330301",
+        "name": "厨房小家电",
+        "parent_code": "S3303"
+      },
+      {
+        "code": "S330302",
+        "name": "清洁小家电",
+        "parent_code": "S3303"
+      },
+      {
+        "code": "S330303",
+        "name": "个护小家电",
+        "parent_code": "S3303"
+      },
+      {
+        "code": "S330401",
+        "name": "厨房电器",
+        "parent_code": "S3304"
+      },
+      {
+        "code": "S330402",
+        "name": "卫浴电器",
+        "parent_code": "S3304"
+      },
+      {
+        "code": "S330501",
+        "name": "照明设备Ⅲ",
+        "parent_code": "S3305"
+      },
+      {
+        "code": "S330601",
+        "name": "家电零部件Ⅲ",
+        "parent_code": "S3306"
+      },
+      {
+        "code": "S330701",
+        "name": "其他家电Ⅲ",
+        "parent_code": "S3307"
+      },
+      {
+        "code": "S340401",
+        "name": "肉制品",
+        "parent_code": "S3404"
+      },
+      {
+        "code": "S340404",
+        "name": "其他食品",
+        "parent_code": "S3404"
+      },
+      {
+        "code": "S340406",
+        "name": "预加工食品",
+        "parent_code": "S3404"
+      },
+      {
+        "code": "S340407",
+        "name": "保健品",
+        "parent_code": "S3404"
+      },
+      {
+        "code": "S340501",
+        "name": "白酒Ⅲ",
+        "parent_code": "S3405"
+      },
+      {
+        "code": "S340601",
+        "name": "啤酒",
+        "parent_code": "S3406"
+      },
+      {
+        "code": "S340602",
+        "name": "其他酒类",
+        "parent_code": "S3406"
+      },
+      {
+        "code": "S340701",
+        "name": "软饮料",
+        "parent_code": "S3407"
+      },
+      {
+        "code": "S340702",
+        "name": "乳品",
+        "parent_code": "S3407"
+      },
+      {
+        "code": "S340801",
+        "name": "零食",
+        "parent_code": "S3408"
+      },
+      {
+        "code": "S340802",
+        "name": "烘焙食品",
+        "parent_code": "S3408"
+      },
+      {
+        "code": "S340803",
+        "name": "熟食",
+        "parent_code": "S3408"
+      },
+      {
+        "code": "S340901",
+        "name": "调味发酵品Ⅲ",
+        "parent_code": "S3409"
+      },
+      {
+        "code": "S350102",
+        "name": "棉纺",
+        "parent_code": "S3501"
+      },
+      {
+        "code": "S350104",
+        "name": "印染",
+        "parent_code": "S3501"
+      },
+      {
+        "code": "S350105",
+        "name": "辅料",
+        "parent_code": "S3501"
+      },
+      {
+        "code": "S350106",
+        "name": "其他纺织",
+        "parent_code": "S3501"
+      },
+      {
+        "code": "S350107",
+        "name": "纺织鞋类制造",
+        "parent_code": "S3501"
+      },
+      {
+        "code": "S350205",
+        "name": "鞋帽及其他",
+        "parent_code": "S3502"
+      },
+      {
+        "code": "S350206",
+        "name": "家纺",
+        "parent_code": "S3502"
+      },
+      {
+        "code": "S350208",
+        "name": "运动服装",
+        "parent_code": "S3502"
+      },
+      {
+        "code": "S350209",
+        "name": "非运动服装",
+        "parent_code": "S3502"
+      },
+      {
+        "code": "S350301",
+        "name": "钟表珠宝",
+        "parent_code": "S3503"
+      },
+      {
+        "code": "S350302",
+        "name": "多品类奢侈品",
+        "parent_code": "S3503"
+      },
+      {
+        "code": "S350303",
+        "name": "其他饰品",
+        "parent_code": "S3503"
+      },
+      {
+        "code": "S360102",
+        "name": "大宗用纸",
+        "parent_code": "S3601"
+      },
+      {
+        "code": "S360103",
+        "name": "特种纸",
+        "parent_code": "S3601"
+      },
+      {
+        "code": "S360202",
+        "name": "印刷",
+        "parent_code": "S3602"
+      },
+      {
+        "code": "S360203",
+        "name": "金属包装",
+        "parent_code": "S3602"
+      },
+      {
+        "code": "S360204",
+        "name": "塑料包装",
+        "parent_code": "S3602"
+      },
+      {
+        "code": "S360205",
+        "name": "纸包装",
+        "parent_code": "S3602"
+      },
+      {
+        "code": "S360206",
+        "name": "综合包装",
+        "parent_code": "S3602"
+      },
+      {
+        "code": "S360306",
+        "name": "瓷砖地板",
+        "parent_code": "S3603"
+      },
+      {
+        "code": "S360307",
+        "name": "成品家居",
+        "parent_code": "S3603"
+      },
+      {
+        "code": "S360308",
+        "name": "定制家居",
+        "parent_code": "S3603"
+      },
+      {
+        "code": "S360309",
+        "name": "卫浴制品",
+        "parent_code": "S3603"
+      },
+      {
+        "code": "S360311",
+        "name": "其他家居用品",
+        "parent_code": "S3603"
+      },
+      {
+        "code": "S360501",
+        "name": "文化用品",
+        "parent_code": "S3605"
+      },
+      {
+        "code": "S360502",
+        "name": "娱乐用品",
+        "parent_code": "S3605"
+      },
+      {
+        "code": "S370101",
+        "name": "原料药",
+        "parent_code": "S3701"
+      },
+      {
+        "code": "S370102",
+        "name": "化学制剂",
+        "parent_code": "S3701"
+      },
+      {
+        "code": "S370201",
+        "name": "中药Ⅲ",
+        "parent_code": "S3702"
+      },
+      {
+        "code": "S370302",
+        "name": "血液制品",
+        "parent_code": "S3703"
+      },
+      {
+        "code": "S370303",
+        "name": "疫苗",
+        "parent_code": "S3703"
+      },
+      {
+        "code": "S370304",
+        "name": "其他生物制品",
+        "parent_code": "S3703"
+      },
+      {
+        "code": "S370402",
+        "name": "医药流通",
+        "parent_code": "S3704"
+      },
+      {
+        "code": "S370403",
+        "name": "线下药店",
+        "parent_code": "S3704"
+      },
+      {
+        "code": "S370404",
+        "name": "互联网药店",
+        "parent_code": "S3704"
+      },
+      {
+        "code": "S370502",
+        "name": "医疗设备",
+        "parent_code": "S3705"
+      },
+      {
+        "code": "S370503",
+        "name": "医疗耗材",
+        "parent_code": "S3705"
+      },
+      {
+        "code": "S370504",
+        "name": "体外诊断",
+        "parent_code": "S3705"
+      },
+      {
+        "code": "S370602",
+        "name": "诊断服务",
+        "parent_code": "S3706"
+      },
+      {
+        "code": "S370603",
+        "name": "医疗研发外包",
+        "parent_code": "S3706"
+      },
+      {
+        "code": "S370604",
+        "name": "医院",
+        "parent_code": "S3706"
+      },
+      {
+        "code": "S370605",
+        "name": "其他医疗服务",
+        "parent_code": "S3706"
+      },
+      {
+        "code": "S410101",
+        "name": "火力发电",
+        "parent_code": "S4101"
+      },
+      {
+        "code": "S410102",
+        "name": "水力发电",
+        "parent_code": "S4101"
+      },
+      {
+        "code": "S410104",
+        "name": "热力服务",
+        "parent_code": "S4101"
+      },
+      {
+        "code": "S410106",
+        "name": "光伏发电",
+        "parent_code": "S4101"
+      },
+      {
+        "code": "S410107",
+        "name": "风力发电",
+        "parent_code": "S4101"
+      },
+      {
+        "code": "S410108",
+        "name": "核力发电",
+        "parent_code": "S4101"
+      },
+      {
+        "code": "S410109",
+        "name": "其他能源发电",
+        "parent_code": "S4101"
+      },
+      {
+        "code": "S410110",
+        "name": "电能综合服务",
+        "parent_code": "S4101"
+      },
+      {
+        "code": "S410301",
+        "name": "燃气Ⅲ",
+        "parent_code": "S4103"
+      },
+      {
+        "code": "S420802",
+        "name": "原材料供应链服务",
+        "parent_code": "S4208"
+      },
+      {
+        "code": "S420803",
+        "name": "中间产品及消费品供应链服务",
+        "parent_code": "S4208"
+      },
+      {
+        "code": "S420804",
+        "name": "快递",
+        "parent_code": "S4208"
+      },
+      {
+        "code": "S420805",
+        "name": "跨境物流",
+        "parent_code": "S4208"
+      },
+      {
+        "code": "S420806",
+        "name": "仓储物流",
+        "parent_code": "S4208"
+      },
+      {
+        "code": "S420807",
+        "name": "公路货运",
+        "parent_code": "S4208"
+      },
+      {
+        "code": "S420901",
+        "name": "高速公路",
+        "parent_code": "S4209"
+      },
+      {
+        "code": "S420902",
+        "name": "公交",
+        "parent_code": "S4209"
+      },
+      {
+        "code": "S420903",
+        "name": "铁路运输",
+        "parent_code": "S4209"
+      },
+      {
+        "code": "S421001",
+        "name": "航空运输",
+        "parent_code": "S4210"
+      },
+      {
+        "code": "S421002",
+        "name": "机场",
+        "parent_code": "S4210"
+      },
+      {
+        "code": "S421101",
+        "name": "航运",
+        "parent_code": "S4211"
+      },
+      {
+        "code": "S421102",
+        "name": "港口",
+        "parent_code": "S4211"
+      },
+      {
+        "code": "S430101",
+        "name": "住宅开发",
+        "parent_code": "S4301"
+      },
+      {
+        "code": "S430102",
+        "name": "商业地产",
+        "parent_code": "S4301"
+      },
+      {
+        "code": "S430103",
+        "name": "产业地产",
+        "parent_code": "S4301"
+      },
+      {
+        "code": "S430301",
+        "name": "物业管理",
+        "parent_code": "S4303"
+      },
+      {
+        "code": "S430302",
+        "name": "房产租赁经纪",
+        "parent_code": "S4303"
+      },
+      {
+        "code": "S430303",
+        "name": "房地产综合服务",
+        "parent_code": "S4303"
+      },
+      {
+        "code": "S450201",
+        "name": "贸易Ⅲ",
+        "parent_code": "S4502"
+      },
+      {
+        "code": "S450301",
+        "name": "百货",
+        "parent_code": "S4503"
+      },
+      {
+        "code": "S450302",
+        "name": "超市",
+        "parent_code": "S4503"
+      },
+      {
+        "code": "S450303",
+        "name": "多业态零售",
+        "parent_code": "S4503"
+      },
+      {
+        "code": "S450304",
+        "name": "商业物业经营",
+        "parent_code": "S4503"
+      },
+      {
+        "code": "S450401",
+        "name": "专业连锁Ⅲ",
+        "parent_code": "S4504"
+      },
+      {
+        "code": "S450601",
+        "name": "综合电商",
+        "parent_code": "S4506"
+      },
+      {
+        "code": "S450602",
+        "name": "跨境电商",
+        "parent_code": "S4506"
+      },
+      {
+        "code": "S450603",
+        "name": "电商服务",
+        "parent_code": "S4506"
+      },
+      {
+        "code": "S450701",
+        "name": "旅游零售Ⅲ",
+        "parent_code": "S4507"
+      },
+      {
+        "code": "S460601",
+        "name": "体育Ⅲ",
+        "parent_code": "S4606"
+      },
+      {
+        "code": "S460701",
+        "name": "本地生活服务Ⅲ",
+        "parent_code": "S4607"
+      },
+      {
+        "code": "S460801",
+        "name": "人力资源服务",
+        "parent_code": "S4608"
+      },
+      {
+        "code": "S460802",
+        "name": "检测服务",
+        "parent_code": "S4608"
+      },
+      {
+        "code": "S460803",
+        "name": "会展服务",
+        "parent_code": "S4608"
+      },
+      {
+        "code": "S460804",
+        "name": "其他专业服务",
+        "parent_code": "S4608"
+      },
+      {
+        "code": "S460901",
+        "name": "酒店",
+        "parent_code": "S4609"
+      },
+      {
+        "code": "S460902",
+        "name": "餐饮",
+        "parent_code": "S4609"
+      },
+      {
+        "code": "S461001",
+        "name": "博彩",
+        "parent_code": "S4610"
+      },
+      {
+        "code": "S461002",
+        "name": "人工景区",
+        "parent_code": "S4610"
+      },
+      {
+        "code": "S461003",
+        "name": "自然景区",
+        "parent_code": "S4610"
+      },
+      {
+        "code": "S461004",
+        "name": "旅游综合",
+        "parent_code": "S4610"
+      },
+      {
+        "code": "S461101",
+        "name": "学历教育",
+        "parent_code": "S4611"
+      },
+      {
+        "code": "S461102",
+        "name": "培训教育",
+        "parent_code": "S4611"
+      },
+      {
+        "code": "S461103",
+        "name": "教育运营及其他",
+        "parent_code": "S4611"
+      },
+      {
+        "code": "S480201",
+        "name": "国有大型银行Ⅲ",
+        "parent_code": "S4802"
+      },
+      {
+        "code": "S480301",
+        "name": "股份制银行Ⅲ",
+        "parent_code": "S4803"
+      },
+      {
+        "code": "S480401",
+        "name": "城商行Ⅲ",
+        "parent_code": "S4804"
+      },
+      {
+        "code": "S480501",
+        "name": "农商行Ⅲ",
+        "parent_code": "S4805"
+      },
+      {
+        "code": "S480601",
+        "name": "其他银行Ⅲ",
+        "parent_code": "S4806"
+      },
+      {
+        "code": "S490101",
+        "name": "证券Ⅲ",
+        "parent_code": "S4901"
+      },
+      {
+        "code": "S490201",
+        "name": "保险Ⅲ",
+        "parent_code": "S4902"
+      },
+      {
+        "code": "S490302",
+        "name": "金融控股",
+        "parent_code": "S4903"
+      },
+      {
+        "code": "S490303",
+        "name": "期货",
+        "parent_code": "S4903"
+      },
+      {
+        "code": "S490304",
+        "name": "信托",
+        "parent_code": "S4903"
+      },
+      {
+        "code": "S490305",
+        "name": "租赁",
+        "parent_code": "S4903"
+      },
+      {
+        "code": "S490306",
+        "name": "金融信息服务",
+        "parent_code": "S4903"
+      },
+      {
+        "code": "S490307",
+        "name": "资产管理",
+        "parent_code": "S4903"
+      },
+      {
+        "code": "S490308",
+        "name": "其他多元金融",
+        "parent_code": "S4903"
+      },
+      {
+        "code": "S510101",
+        "name": "综合Ⅲ",
+        "parent_code": "S5101"
+      },
+      {
+        "code": "S610101",
+        "name": "水泥制造",
+        "parent_code": "S6101"
+      },
+      {
+        "code": "S610102",
+        "name": "水泥制品",
+        "parent_code": "S6101"
+      },
+      {
+        "code": "S610201",
+        "name": "玻璃制造",
+        "parent_code": "S6102"
+      },
+      {
+        "code": "S610202",
+        "name": "玻纤制造",
+        "parent_code": "S6102"
+      },
+      {
+        "code": "S610301",
+        "name": "耐火材料",
+        "parent_code": "S6103"
+      },
+      {
+        "code": "S610302",
+        "name": "管材",
+        "parent_code": "S6103"
+      },
+      {
+        "code": "S610303",
+        "name": "其他建材",
+        "parent_code": "S6103"
+      },
+      {
+        "code": "S610304",
+        "name": "防水材料",
+        "parent_code": "S6103"
+      },
+      {
+        "code": "S610305",
+        "name": "涂料",
+        "parent_code": "S6103"
+      },
+      {
+        "code": "S620101",
+        "name": "房屋建设Ⅲ",
+        "parent_code": "S6201"
+      },
+      {
+        "code": "S620201",
+        "name": "装修装饰Ⅲ",
+        "parent_code": "S6202"
+      },
+      {
+        "code": "S620306",
+        "name": "基建市政工程",
+        "parent_code": "S6203"
+      },
+      {
+        "code": "S620307",
+        "name": "园林工程",
+        "parent_code": "S6203"
+      },
+      {
+        "code": "S620401",
+        "name": "钢结构",
+        "parent_code": "S6204"
+      },
+      {
+        "code": "S620402",
+        "name": "化学工程",
+        "parent_code": "S6204"
+      },
+      {
+        "code": "S620403",
+        "name": "国际工程",
+        "parent_code": "S6204"
+      },
+      {
+        "code": "S620404",
+        "name": "其他专业工程",
+        "parent_code": "S6204"
+      },
+      {
+        "code": "S620601",
+        "name": "工程咨询服务Ⅲ",
+        "parent_code": "S6206"
+      },
+      {
+        "code": "S630101",
+        "name": "电机Ⅲ",
+        "parent_code": "S6301"
+      },
+      {
+        "code": "S630301",
+        "name": "综合电力设备商",
+        "parent_code": "S6303"
+      },
+      {
+        "code": "S630304",
+        "name": "火电设备",
+        "parent_code": "S6303"
+      },
+      {
+        "code": "S630306",
+        "name": "其他电源设备Ⅲ",
+        "parent_code": "S6303"
+      },
+      {
+        "code": "S630501",
+        "name": "硅料硅片",
+        "parent_code": "S6305"
+      },
+      {
+        "code": "S630502",
+        "name": "光伏电池组件",
+        "parent_code": "S6305"
+      },
+      {
+        "code": "S630503",
+        "name": "逆变器",
+        "parent_code": "S6305"
+      },
+      {
+        "code": "S630504",
+        "name": "光伏辅材",
+        "parent_code": "S6305"
+      },
+      {
+        "code": "S630505",
+        "name": "光伏加工设备",
+        "parent_code": "S6305"
+      },
+      {
+        "code": "S630601",
+        "name": "风电整机",
+        "parent_code": "S6306"
+      },
+      {
+        "code": "S630602",
+        "name": "风电零部件",
+        "parent_code": "S6306"
+      },
+      {
+        "code": "S630701",
+        "name": "锂电池",
+        "parent_code": "S6307"
+      },
+      {
+        "code": "S630702",
+        "name": "电池化学品",
+        "parent_code": "S6307"
+      },
+      {
+        "code": "S630703",
+        "name": "锂电专用设备",
+        "parent_code": "S6307"
+      },
+      {
+        "code": "S630704",
+        "name": "燃料电池",
+        "parent_code": "S6307"
+      },
+      {
+        "code": "S630705",
+        "name": "蓄电池及其他电池",
+        "parent_code": "S6307"
+      },
+      {
+        "code": "S630801",
+        "name": "输变电设备",
+        "parent_code": "S6308"
+      },
+      {
+        "code": "S630802",
+        "name": "配电设备",
+        "parent_code": "S6308"
+      },
+      {
+        "code": "S630803",
+        "name": "电网自动化设备",
+        "parent_code": "S6308"
+      },
+      {
+        "code": "S630804",
+        "name": "电工仪器仪表",
+        "parent_code": "S6308"
+      },
+      {
+        "code": "S630805",
+        "name": "线缆部件及其他",
+        "parent_code": "S6308"
+      },
+      {
+        "code": "S640101",
+        "name": "机床工具",
+        "parent_code": "S6401"
+      },
+      {
+        "code": "S640103",
+        "name": "磨具磨料",
+        "parent_code": "S6401"
+      },
+      {
+        "code": "S640105",
+        "name": "制冷空调设备",
+        "parent_code": "S6401"
+      },
+      {
+        "code": "S640106",
+        "name": "其他通用设备",
+        "parent_code": "S6401"
+      },
+      {
+        "code": "S640107",
+        "name": "仪器仪表",
+        "parent_code": "S6401"
+      },
+      {
+        "code": "S640108",
+        "name": "金属制品",
+        "parent_code": "S6401"
+      },
+      {
+        "code": "S640203",
+        "name": "能源及重型设备",
+        "parent_code": "S6402"
+      },
+      {
+        "code": "S640204",
+        "name": "楼宇设备",
+        "parent_code": "S6402"
+      },
+      {
+        "code": "S640206",
+        "name": "纺织服装设备",
+        "parent_code": "S6402"
+      },
+      {
+        "code": "S640207",
+        "name": "农用机械",
+        "parent_code": "S6402"
+      },
+      {
+        "code": "S640208",
+        "name": "印刷包装机械",
+        "parent_code": "S6402"
+      },
+      {
+        "code": "S640209",
+        "name": "其他专用设备",
+        "parent_code": "S6402"
+      },
+      {
+        "code": "S640501",
+        "name": "轨交设备Ⅲ",
+        "parent_code": "S6405"
+      },
+      {
+        "code": "S640601",
+        "name": "工程机械整机",
+        "parent_code": "S6406"
+      },
+      {
+        "code": "S640602",
+        "name": "工程机械器件",
+        "parent_code": "S6406"
+      },
+      {
+        "code": "S640701",
+        "name": "机器人",
+        "parent_code": "S6407"
+      },
+      {
+        "code": "S640702",
+        "name": "工控设备",
+        "parent_code": "S6407"
+      },
+      {
+        "code": "S640703",
+        "name": "激光设备",
+        "parent_code": "S6407"
+      },
+      {
+        "code": "S640704",
+        "name": "其他自动化设备",
+        "parent_code": "S6407"
+      },
+      {
+        "code": "S650101",
+        "name": "航天装备Ⅲ",
+        "parent_code": "S6501"
+      },
+      {
+        "code": "S650201",
+        "name": "航空装备Ⅲ",
+        "parent_code": "S6502"
+      },
+      {
+        "code": "S650301",
+        "name": "地面兵装Ⅲ",
+        "parent_code": "S6503"
+      },
+      {
+        "code": "S650401",
+        "name": "航海装备Ⅲ",
+        "parent_code": "S6504"
+      },
+      {
+        "code": "S650501",
+        "name": "军工电子Ⅲ",
+        "parent_code": "S6505"
+      },
+      {
+        "code": "S710102",
+        "name": "安防设备",
+        "parent_code": "S7101"
+      },
+      {
+        "code": "S710103",
+        "name": "其他计算机设备",
+        "parent_code": "S7101"
+      },
+      {
+        "code": "S710301",
+        "name": "IT服务Ⅲ",
+        "parent_code": "S7103"
+      },
+      {
+        "code": "S710401",
+        "name": "垂直应用软件",
+        "parent_code": "S7104"
+      },
+      {
+        "code": "S710402",
+        "name": "横向通用软件",
+        "parent_code": "S7104"
+      },
+      {
+        "code": "S720401",
+        "name": "游戏Ⅲ",
+        "parent_code": "S7204"
+      },
+      {
+        "code": "S720501",
+        "name": "营销代理",
+        "parent_code": "S7205"
+      },
+      {
+        "code": "S720502",
+        "name": "广告媒体",
+        "parent_code": "S7205"
+      },
+      {
+        "code": "S720601",
+        "name": "影视动漫制作",
+        "parent_code": "S7206"
+      },
+      {
+        "code": "S720602",
+        "name": "院线",
+        "parent_code": "S7206"
+      },
+      {
+        "code": "S720701",
+        "name": "视频媒体",
+        "parent_code": "S7207"
+      },
+      {
+        "code": "S720702",
+        "name": "音频媒体",
+        "parent_code": "S7207"
+      },
+      {
+        "code": "S720703",
+        "name": "图片媒体",
+        "parent_code": "S7207"
+      },
+      {
+        "code": "S720704",
+        "name": "门户网站",
+        "parent_code": "S7207"
+      },
+      {
+        "code": "S720705",
+        "name": "文字媒体",
+        "parent_code": "S7207"
+      },
+      {
+        "code": "S720706",
+        "name": "其他数字媒体",
+        "parent_code": "S7207"
+      },
+      {
+        "code": "S720801",
+        "name": "社交Ⅲ",
+        "parent_code": "S7208"
+      },
+      {
+        "code": "S720901",
+        "name": "教育出版",
+        "parent_code": "S7209"
+      },
+      {
+        "code": "S720902",
+        "name": "大众出版",
+        "parent_code": "S7209"
+      },
+      {
+        "code": "S720903",
+        "name": "其他出版",
+        "parent_code": "S7209"
+      },
+      {
+        "code": "S721001",
+        "name": "电视广播Ⅲ",
+        "parent_code": "S7210"
+      },
+      {
+        "code": "S730102",
+        "name": "电信运营商",
+        "parent_code": "S7301"
+      },
+      {
+        "code": "S730103",
+        "name": "通信工程及服务",
+        "parent_code": "S7301"
+      },
+      {
+        "code": "S730104",
+        "name": "通信应用增值服务",
+        "parent_code": "S7301"
+      },
+      {
+        "code": "S730204",
+        "name": "通信网络设备及器件",
+        "parent_code": "S7302"
+      },
+      {
+        "code": "S730205",
+        "name": "通信线缆及配套",
+        "parent_code": "S7302"
+      },
+      {
+        "code": "S730206",
+        "name": "通信终端及配件",
+        "parent_code": "S7302"
+      },
+      {
+        "code": "S730207",
+        "name": "其他通信设备",
+        "parent_code": "S7302"
+      },
+      {
+        "code": "S740101",
+        "name": "动力煤",
+        "parent_code": "S7401"
+      },
+      {
+        "code": "S740102",
+        "name": "焦煤",
+        "parent_code": "S7401"
+      },
+      {
+        "code": "S740201",
+        "name": "焦炭Ⅲ",
+        "parent_code": "S7402"
+      },
+      {
+        "code": "S750101",
+        "name": "油气开采Ⅲ",
+        "parent_code": "S7501"
+      },
+      {
+        "code": "S750201",
+        "name": "油田服务",
+        "parent_code": "S7502"
+      },
+      {
+        "code": "S750202",
+        "name": "油气及炼化工程",
+        "parent_code": "S7502"
+      },
+      {
+        "code": "S750301",
+        "name": "炼油化工",
+        "parent_code": "S7503"
+      },
+      {
+        "code": "S750302",
+        "name": "油品石化贸易",
+        "parent_code": "S7503"
+      },
+      {
+        "code": "S750303",
+        "name": "其他石化",
+        "parent_code": "S7503"
+      },
+      {
+        "code": "S760101",
+        "name": "大气治理",
+        "parent_code": "S7601"
+      },
+      {
+        "code": "S760102",
+        "name": "水务及水治理",
+        "parent_code": "S7601"
+      },
+      {
+        "code": "S760103",
+        "name": "固废治理",
+        "parent_code": "S7601"
+      },
+      {
+        "code": "S760104",
+        "name": "综合环境治理",
+        "parent_code": "S7601"
+      },
+      {
+        "code": "S760201",
+        "name": "环保设备Ⅲ",
+        "parent_code": "S7602"
+      },
+      {
+        "code": "S770101",
+        "name": "生活用纸",
+        "parent_code": "S7701"
+      },
+      {
+        "code": "S770102",
+        "name": "洗护用品",
+        "parent_code": "S7701"
+      },
+      {
+        "code": "S770201",
+        "name": "化妆品制造及其他",
+        "parent_code": "S7702"
+      },
+      {
+        "code": "S770202",
+        "name": "品牌化妆品",
+        "parent_code": "S7702"
+      },
+      {
+        "code": "S770301",
+        "name": "医美耗材",
+        "parent_code": "S7703"
+      },
+      {
+        "code": "S770302",
+        "name": "医美服务",
+        "parent_code": "S7703"
+      }
     ]
-  },
-  "coverage_rules": {
-    "all_broad_industries_must_be_scanned": true,
-    "all_sw_level1_nodes_must_be_accounted_for": true,
-    "all_sw_level2_nodes_must_be_accounted_for": true,
-    "all_sw_level3_nodes_must_be_accounted_for": true,
-    "minimum_subchains_are_floor_not_ceiling": true,
-    "dynamic_new_subchains_must_be_added_when_public_evidence_requires": true,
-    "broad_industry_cannot_be_final_t2_unit": true,
-    "every_minimum_subchain_requires_status_or_explicit_not_applicable_reason": true,
-    "scan_complete_only_if_every_broad_industry_has_coverage_result": true,
-    "scan_complete_only_if_sw_counts_match": true,
-    "scan_complete_only_if_no_unresolved_must_split_chain": true,
-    "weekly_stock_pool_must_not_influence_industry_scan": true
-  },
-  "broad_industries": [
-    {"id":"agriculture","name":"农林牧渔","minimum_subchains":["生猪养殖","肉禽/禽苗","饲料","种业","水产养殖","农产品种植","动物保健"]},
-    {"id":"chemicals","name":"基础化工","minimum_subchains":["聚氨酯/MDI/TDI","C2/C3轻烃","煤化工","磷化工","氟化工","氯碱/PVC","纯碱/玻璃原料","农药/农化","化肥","染料","轮胎材料/炭黑","化纤","钛白粉","有机硅"]},
-    {"id":"steel","name":"钢铁","minimum_subchains":["普钢","特钢","不锈钢","钢管/板材"]},
-    {"id":"nonferrous","name":"有色金属","minimum_subchains":["铜矿/冶炼","电解铝/氧化铝","黄金","白银","铅锌","锂资源/锂盐","镍钴","稀土","钼钨锡","金属新材料"]},
-    {"id":"electronics","name":"电子","minimum_subchains":["半导体设计","晶圆制造","封装测试","半导体设备","半导体材料","PCB/CCL","消费电子组装","高速连接器/铜互连","被动元件","显示面板","LED/光电器件"]},
-    {"id":"home_appliances","name":"家用电器","minimum_subchains":["白电","黑电","厨电","小家电","家电零部件"]},
-    {"id":"food_beverage","name":"食品饮料","minimum_subchains":["白酒","啤酒","乳制品","调味品","休闲食品","饮料","食品加工"]},
-    {"id":"textile_apparel","name":"纺织服饰","minimum_subchains":["品牌服饰","纺织制造","鞋服代工","功能材料"]},
-    {"id":"light_manufacturing","name":"轻工制造","minimum_subchains":["造纸","包装印刷","家居","文娱用品","日用轻工"]},
-    {"id":"pharma","name":"医药生物","minimum_subchains":["创新药","仿制药","CXO/CDMO/CRDMO","医疗器械","IVD","中药","疫苗","血制品","医药商业","医疗服务"]},
-    {"id":"utilities","name":"公用事业","minimum_subchains":["火电","水电","核电","燃气","垃圾焚烧/固废","供热"]},
-    {"id":"transportation","name":"交通运输","minimum_subchains":["航运","港口","航空","机场","快递","物流","铁路","公路"]},
-    {"id":"real_estate","name":"房地产","minimum_subchains":["住宅开发","商业地产","物业管理","产业园区"]},
-    {"id":"retail","name":"商贸零售","minimum_subchains":["百货","超市","专业连锁","电商服务","免税"]},
-    {"id":"social_services","name":"社会服务","minimum_subchains":["酒店","旅游景区","餐饮","教育","人力服务"]},
-    {"id":"conglomerates","name":"综合","minimum_subchains":["多元综合平台"]},
-    {"id":"building_materials","name":"建筑材料","minimum_subchains":["水泥","玻璃","玻纤","防水材料","管材","耐火材料"]},
-    {"id":"construction","name":"建筑装饰","minimum_subchains":["基建施工","专业工程","装饰装修","工程咨询/设计"]},
-    {"id":"power_equipment","name":"电力设备","minimum_subchains":["电网一次设备/变压器/高压开关","电网二次设备/继保自动化","特高压","风电整机/零部件","光伏硅料/硅片","光伏电池组件","逆变器","储能系统","锂电池","负极/正极/隔膜/电解液","充电桩"]},
-    {"id":"defense","name":"国防军工","minimum_subchains":["航空主机","航空发动机","导弹/弹药","军工电子","军船","卫星/航天"]},
-    {"id":"computer","name":"计算机","minimum_subchains":["AI服务器/算力整机","数据中心基础设施","云计算","工业软件","网络安全","金融IT","信创基础软硬件","AI应用软件"]},
-    {"id":"media","name":"传媒","minimum_subchains":["游戏","影视","广告营销","出版","互联网内容"]},
-    {"id":"communication","name":"通信","minimum_subchains":["高速光模块/光器件","光纤光缆","高速铜互连/连接器","通信主设备","运营商","卫星通信"]},
-    {"id":"banking","name":"银行","minimum_subchains":["国有大行","股份行","城商行","农商行"]},
-    {"id":"nonbank_finance","name":"非银金融","minimum_subchains":["证券","保险","多元金融"]},
-    {"id":"automotive","name":"汽车","minimum_subchains":["乘用车","重卡","客车","商用车动力系统","汽车电子","智能驾驶","热管理","轮胎","底盘/传动","汽车连接器"]},
-    {"id":"machinery","name":"机械设备","minimum_subchains":["工程机械","工业机器人","机床","通用自动化","专用设备","仪器仪表","船舶制造","船机动力","轨交设备"]},
-    {"id":"coal","name":"煤炭","minimum_subchains":["动力煤","焦煤","煤化工一体化"]},
-    {"id":"oil_gas","name":"石油石化","minimum_subchains":["油气开采","油服","炼化","成品油/销售","石化材料"]},
-    {"id":"environmental","name":"环保","minimum_subchains":["水务","固废","大气治理","环境监测","资源回收"]},
-    {"id":"beauty_care","name":"美容护理","minimum_subchains":["化妆品","医美","个护用品"]}
-  ],
-  "completion_contract": {
-    "taxonomy_counts_required": {"level1":31,"level2":134,"level3":346},
-    "required_research_state_diagnostics": [
-      "coverage.taxonomy",
-      "coverage.expected_counts",
-      "coverage.accounted_for_counts",
-      "coverage.missing_level1",
-      "coverage.missing_level2",
-      "coverage.missing_level3",
-      "coverage.unresolved_must_split_chains",
-      "coverage.completion_gate_passed"
-    ],
-    "completion_gate": [
-      "accounted_for_counts.level1必须等于31",
-      "accounted_for_counts.level2必须等于134",
-      "accounted_for_counts.level3必须等于346",
-      "missing_level1/missing_level2/missing_level3必须为空",
-      "所有被标记为must_split/continue_split的盈利链必须完成继续拆解或明确降级为unconfirmed并说明原因",
-      "所有强改善或显著分化节点必须进入盈利链拆解；弱/稳定节点允许只保留Coverage状态和简短证据",
-      "completion_gate_passed=false时，18:00研究状态只能标记incomplete_research，不得生成新的当前机会，也不得用不完整结果覆盖上一份有效完整研究结论"
-    ],
-    "required_output_per_broad_industry":["broad_industry","subchains_scanned","t2_subchains","t1_subchains","t0_subchains","unconfirmed_subchains","coverage_gap"],
-    "required_output_per_t2_subchain":["subchain","direct_profit_driver","leading_variables","evidence","main_value_chain_links","eligible_main_board_companies_recalled","coverage_gap"],
-    "forbidden_shortcuts":["先列熟悉公司再倒推产业链","用几个龙头财报代表整个大行业","未完成31/134/346 Coverage对齐就宣布全市场扫描完成","只扫描热门行业","因为周度补漏池出现某公司而新增或升级T2","把申万三级行业直接当作最终盈利链而跳过盈利Driver三问"]
   }
 }
