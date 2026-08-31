@@ -1,0 +1,200 @@
+{
+  "manifest_schema": 25,
+  "pipeline": "a_share_low_risk_v2",
+  "mode": "shadow",
+  "production_label": "V2影子研究，不发布正式买点",
+  "generated_at": "2026-08-31T19:52:00+08:00",
+  "trade_date": "2026-08-31",
+  "run_type": "manual_1800_full_research",
+  "status": "incomplete_research",
+  "data_health": {
+    "passed": true,
+    "market_status": "closed",
+    "health_generated_at": "2026-08-31T19:37:35.669742+08:00",
+    "quote_usable": 3163,
+    "structure_usable": 3141,
+    "history_stocks_ge_60_points": 3177,
+    "history_confidence_high": 3134,
+    "source_status": ["sina_ok", "tencent_ok"]
+  },
+  "market_profitability_radar": [
+    {
+      "direction": "AI算力硬件/通信电子",
+      "status": "strong_improving",
+      "evidence_summary": "2026H1 A股TMT归母净利润增速接近65%，电子、电力设备、计算机净利润增速均超过35%；工业富联H1营收、归母、扣非均显著增长，AI服务器和高速网络业务为直接Driver。",
+      "next_1_2q_bridge": "全球云厂商AI资本开支仍高，服务器机架、高速网络与ASIC/GPU基础设施需求仍有延续性，但需持续验证订单和出货增速。"
+    },
+    {
+      "direction": "有色金属/铜",
+      "status": "strong_improving",
+      "evidence_summary": "A股半年报显示有色金属景气改善；江西铜业H1归母净利润同比增长106.77%、扣非增长73.73%、经营现金流增长102.49%。",
+      "next_1_2q_bridge": "核心取决于铜价中枢、矿端资源收益与冶炼加工费变化，属于强周期链，必须正常化盈利。"
+    },
+    {
+      "direction": "炼化/化工价差",
+      "status": "improving",
+      "evidence_summary": "炼化及贸易位列A股H1扣非利润增速较快行业；东方盛虹H1归母净利润约45亿元、扣非约43.16亿元，经营现金流约181.35亿元，盈利弹性显著。",
+      "next_1_2q_bridge": "当前油价与地缘供给扰动仍支撑炼化景气，但中国需求偏弱，价差持续性需要继续验证。"
+    },
+    {
+      "direction": "能源金属/半导体/航海装备",
+      "status": "strong_or_divergent_unconfirmed",
+      "evidence_summary": "A股H1扣非净利润增速居前，但本次未完成全部细分盈利链递归拆解和主板多公司比较。"
+    },
+    {
+      "direction": "地产链/部分消费/光伏",
+      "status": "weak_or_divergent",
+      "evidence_summary": "宏观需求与部分行业产能利用率仍偏弱，暂不作为低风险基本面机会主线。"
+    }
+  ],
+  "profit_chains": [
+    {
+      "chain": "AI数据中心 -> GPU/ASIC服务器机架 + 高速网络设备 -> 制造交付 -> 工业富联盈利",
+      "status": "confirmed_partial",
+      "direct_driver": "AI数据中心资本开支与服务器/网络设备出货",
+      "leading_variables": ["GPU/ASIC AI机架出货", "800G+交换机/高速网络出货", "全球云厂商AI资本开支"],
+      "comparison_complete": false
+    },
+    {
+      "chain": "铜价/矿端供需 -> 自有矿资源收益 + 冶炼加工 -> 江西铜业盈利",
+      "status": "confirmed_partial",
+      "direct_driver": "铜价中枢、矿端资源量与冶炼加工费",
+      "leading_variables": ["铜价", "TC/RC", "矿产铜产量", "副产品金银价格"],
+      "comparison_complete": false
+    },
+    {
+      "chain": "油价/原料供给 -> 炼化产品价差 -> 一体化炼化化纤 -> 东方盛虹盈利",
+      "status": "confirmed_partial",
+      "direct_driver": "炼化产品价差与原料供应",
+      "leading_variables": ["Brent油价", "炼化价差", "国内成品油/化工品需求"],
+      "comparison_complete": false
+    }
+  ],
+  "companies": {
+    "601138": {
+      "name": "工业富联",
+      "why_now": "AI服务器和高速网络需求直接兑现到收入、扣非利润与出货量。",
+      "earnings_direction": "strong_improving",
+      "evidence_for": "2026H1营收5578.61亿元同比+54.63%，归母237.40亿元同比+95.99%，扣非229.84亿元同比+96.99%，经营现金流73.91亿元同比+425.32%。",
+      "evidence_against": "收入高增后的持续性、AI资本开支回报质疑与客户资本开支节奏仍需持续验证。",
+      "confidence": "high"
+    },
+    "600362": {
+      "name": "江西铜业",
+      "why_now": "铜价高位和矿端资源收益推动盈利显著改善。",
+      "earnings_direction": "strong_improving_cyclical",
+      "evidence_for": "2026H1营收3071.55亿元同比+19.53%，归母86.32亿元同比+106.77%，扣非75.56亿元同比+73.73%，经营现金流58.14亿元同比+102.49%。",
+      "evidence_against": "应收账款/营收占比抬升，经营现金流/净利润低于1；铜价和TC变化可快速改变盈利。",
+      "confidence": "medium_high"
+    },
+    "000301": {
+      "name": "东方盛虹",
+      "why_now": "炼化价差改善通过一体化产业链显著放大盈利和现金流。",
+      "earnings_direction": "strong_improving_cyclical",
+      "evidence_for": "2026H1营收699.24亿元同比+14.79%，归母约45亿元同比+1065.10%，扣非约43.16亿元同比+1488.19%，经营现金流约181.35亿元同比+545.11%。",
+      "evidence_against": "高油价下中国需求偏弱，炼化价差具有周期性；杠杆与流动性约束需继续复核。",
+      "confidence": "medium_high"
+    }
+  },
+  "chain_comparisons": [
+    {
+      "chain": "AI服务器/高速网络",
+      "representative_company": "601138 工业富联",
+      "status": "representative_verified_but_peer_comparison_incomplete"
+    },
+    {
+      "chain": "铜矿/铜价",
+      "representative_company": "600362 江西铜业",
+      "status": "representative_verified_but_peer_comparison_incomplete"
+    },
+    {
+      "chain": "炼化价差",
+      "representative_company": "000301 东方盛虹",
+      "status": "representative_verified_but_peer_comparison_incomplete"
+    }
+  ],
+  "valuations": {
+    "601138": {
+      "current_price": 64.84,
+      "price_date": "2026-08-31",
+      "earnings_type": "growth",
+      "primary_method": "forward_or_normalized_eps_x_justified_pe",
+      "reasonable_price_range": null,
+      "safe_price_range": null,
+      "valuation_position": "review_required",
+      "review_required": true,
+      "reason": "本次未完成可审计的Forward/TTM盈利桥与justified PE独立估值，禁止用当前价格反推合理价。"
+    },
+    "600362": {
+      "current_price": 48.4,
+      "price_date": "2026-08-31",
+      "earnings_type": "resource_cyclical",
+      "primary_method": "normalized_earnings_or_roe_plus_cycle_midpoint_valuation",
+      "reasonable_price_range": null,
+      "safe_price_range": null,
+      "valuation_position": "review_required",
+      "review_required": true,
+      "reason": "必须先完成铜价/TC/矿产铜的正常化盈利，不得直接对高景气利润乘PE。"
+    },
+    "000301": {
+      "current_price": 14.6,
+      "price_date": "2026-08-31",
+      "earnings_type": "cyclical",
+      "primary_method": "normalized_spread_earnings_plus_balance_sheet_cross_check",
+      "reasonable_price_range": null,
+      "safe_price_range": null,
+      "valuation_position": "review_required",
+      "review_required": true,
+      "reason": "需先正常化炼化价差盈利并完成杠杆/流动性复核。"
+    }
+  },
+  "price_structures": {
+    "601138": {
+      "current_price": 64.84,
+      "structure_type": "transition_pullback_near_ma20",
+      "key_level": "64.19-66.18当前成本/支撑带；下一支撑60.55-61.61",
+      "ma20": 64.48,
+      "ma60": 65.3655,
+      "chase_risk": "medium",
+      "timing_action": "observe_for_hold_or_pullback_confirmation"
+    },
+    "600362": {
+      "current_price": 48.4,
+      "structure_type": "trend_continuation_above_ma20_ma60",
+      "key_level": "MA20约46.54；更强历史支撑43.37-44.08",
+      "ma20": 46.5445,
+      "ma60": 44.1875,
+      "chase_risk": "medium",
+      "timing_action": "wait_for_controlled_pullback"
+    },
+    "000301": {
+      "current_price": 14.6,
+      "structure_type": "overheated_near_60d_high",
+      "key_level": "60日高14.66；主要回踩支撑12.72-12.98",
+      "ma20": 13.173,
+      "ma60": 12.3568,
+      "chase_risk": "high",
+      "timing_action": "do_not_chase"
+    }
+  },
+  "current_opportunity_best": [],
+  "diagnostics": {
+    "coverage": {
+      "taxonomy": "申万行业分类标准2021版",
+      "expected_counts": {"level1": 31, "level2": 134, "level3": 346},
+      "accounted_for_counts": {"level1": null, "level2": null, "level3": null},
+      "missing_level1": ["CURRENT_RUN_NODE_BY_NODE_AUDIT_NOT_CERTIFIED"],
+      "missing_level2": ["CURRENT_RUN_NODE_BY_NODE_AUDIT_NOT_CERTIFIED"],
+      "missing_level3": ["CURRENT_RUN_NODE_BY_NODE_AUDIT_NOT_CERTIFIED"],
+      "unresolved_must_split_chains": ["energy_metals", "semiconductors", "naval_equipment_and_shipbuilding", "other_strong_or_divergent_subchains"],
+      "completion_gate_passed": false
+    },
+    "incomplete_reasons": [
+      "当前运行未形成可审计的31/134/346逐节点accounted_for记录。",
+      "若干强改善/显著分化节点尚未完成盈利链递归拆解。",
+      "重点链尚未全部完成充分的主板多公司横向比较。",
+      "估值桥未达到当前Skill要求的可审计完整度。"
+    ],
+    "publication_rule_applied": "Completion Gate失败，因此不生成新的当前机会/正式买点。"
+  }
+}
