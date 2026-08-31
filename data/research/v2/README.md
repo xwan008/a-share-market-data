@@ -1,10 +1,7 @@
 # Low-risk research runtime data
 
-This directory intentionally contains only current-runtime artifacts.
+This directory contains only current-runtime artifacts:
+- `full_market_price_structure.json`: mechanical full-market timing snapshot.
+- `research_state.json`: the only persisted Prompt research result; it may be absent when no valid current-schema full run exists.
 
-- `full_market_price_structure.json`: mechanical full-market price-structure snapshot, rebuilt by the normal post-close market workflow.
-- `research_state.json`: generated only by a valid 18:00 full research run. It may be absent when no current-schema baseline exists.
-
-`research_state.manifest_schema` must equal `config/research_pipeline_manifest.json.schema_version`. Old-schema states are stale and must not be relabeled or reused as current research.
-
-No legacy pipeline outputs, rankings, T2 recall caches, company buckets, weekly opportunity pools or duplicated valuation outputs belong here. Git history is the audit trail.
+Public fundamental/industry evidence is researched at run time and is not persisted here as candidate pools, weekly pools, rankings, T2 caches or duplicated valuation outputs. `research_state.manifest_schema` must equal the current Manifest schema.

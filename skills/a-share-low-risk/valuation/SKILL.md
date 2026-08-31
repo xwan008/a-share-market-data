@@ -1,108 +1,24 @@
 # 估值 Skill
 
 ## 目的
-回答三个对用户真正有用的问题：
-1. **当前价格**：最近完整交易日市场实际价格是多少；
-2. **合理价格**：公司的正常盈利能力大致值多少钱；
-3. **安全价格（低风险区）**：在估值不确定性下，什么价格区间才具有足够安全边际。
-
-本Skill只规定模型选择与估值纪律，不预设个股PE/PB答案，也不使用同行或历史价格投票决定内在价值。
+回答：当前价格、合理价格、安全价格（低风险区）。本Skill规定模型与估值纪律，不预设个股倍数答案。
 
 ## 固定顺序
-`真实盈利 → 盈利类型 → Forward/正常化盈利 → 合理估值方法 → Fair Value（内部概念）/合理价格（对外名称） → 不确定性 → Margin of Safety → 安全价格（低风险区）`
+`真实盈利 → 盈利类型 → Forward/正常化盈利 → 合理估值方法 → 合理价格 → 不确定性 → Margin of Safety → 安全价格`
 
-## 用户展示术语
-对外正式输出统一使用：
-- `当前价格`：最近完整交易日收盘价/最新可靠市场价格；
-- `合理价格`：内部Fair Value的用户可读名称，代表正常盈利假设下的价值区间；
-- `安全价格（低风险区）`：在同一盈利基础上加入安全边际后的理想新建仓价格区间。
-
-除非在解释模型时有必要，不把`Fair Value`作为表格主列名称。可以写成“合理价格（Fair Value）”解释一次，之后统一简称“合理价格”。
-
-必须避免把“合理价格”和“安全价格”混成一个概念：当前价格处于合理价格区，不等于已经进入低风险买入区。
-
-## 估值路线
-### 1. 成长/稳定经营公司
-主方法：`Forward或正常化EPS × justified PE`。
-
-合理PE需要解释来源，重点考虑未来盈利增长持续性、ROE/ROIC与增量回报、利润率稳定性、现金转换、资本强度/负债/稀释风险，以及盈利预测分歧和可见度。
-
-PEG、历史PE、同行PE可以做sanity check，但不能作为机械定价公式，也不得用固定PEG阈值伪装成普遍规律。
-
-### 2. 金融公司
-主方法：`PB-ROE`。重点判断可持续ROE、资产质量、资本充足和增长/风险。PE只作辅助。
-
-### 3. 资源/强周期公司
-禁止直接把当前高景气利润乘PE。
-
-固定顺序：
-`商品/价差/供需位置 → 正常化盈利或ROE → 周期中枢下的估值 → PB/资产价值交叉检查`
-
-必须区分当前利润中的周期windfall、可持续产量/成本优势、商品价格或价差的中期中枢、资产负债表和资源禀赋。低PE可能是周期顶部，高PE可能是周期底部。
-
-### 4. 无法可靠估值
-如果盈利基础不稳定、业务变化过快、关键数据缺失或模型对假设极端敏感，直接输出`review_required`，不要制造精确区间。
+## 路线
+- 成长/稳定：`Forward或正常化EPS × justified PE`，结合增长持续性、ROE/ROIC、利润率、现金转换、资本强度和预测可见度；历史/同行/PEG只作sanity check。
+- 金融：`PB-ROE`为主，关注可持续ROE、资产质量和资本充足。
+- 资源/强周期：`商品/价差/供需位置 → 正常化盈利或ROE → 周期中枢估值 → PB/资产价值交叉检查`，禁止把高景气利润直接乘PE。
+- 无法可靠估值：输出`review_required`，不制造精确区间。
 
 ## 合理价格与安全价格
-内部估值概念仍可以使用Fair Value；但用户展示统一称为**合理价格**。
+二者必须基于同一盈利基础。正式展示`valuation_bridge`至少包括`current_price`与交易日、`earnings_basis`、`reasonable_price_assumption`、`reasonable_price_range`、`uncertainty`、安全边际理由、`safe_price_range`、`valuation_position`。
 
-合理价格是对正常盈利能力的价值估计；安全价格（低风险区）是在**同一盈利基础**上，为预测和模型误差保留安全边际后的行动区间。
+当前价格不能进入合理价格计算。历史价格不得决定或裁剪合理/安全价格。同行估值只作可比性检查，不能与主模型机械平均。
 
-正式展示时必须输出`valuation_bridge`，至少包含：
-- `current_price`：当前价格及对应交易日；
-- `earnings_basis`：使用什么Forward/正常化盈利；
-- `reasonable_price_assumption`：合理价格使用的方法、倍数或关键假设；
-- `reasonable_price_range`：合理价格区间；
-- `uncertainty`：为什么可能估错；
-- `safety_assumption`或`margin_of_safety_reason`：为什么安全价格要更保守；
-- `safe_price_range`：安全价格（低风险区）；
-- `valuation_position`：当前价格相对合理价格和安全价格所处位置。
-
-为了兼容历史研究状态，内部可以继续读取旧字段`fair_value_range / buy_zone`，但新写入和新展示优先使用`reasonable_price_range / safe_price_range`。
-
-如果不能解释“为什么合理价格与安全价格相差这些”，就不应输出精确安全价格。
-
-安全边际随不确定性变化：盈利越稳定、预测越可靠，所需折价通常越小；周期性越强、模型越敏感、预测分歧越大，所需安全边际通常越大。Skill不规定统一固定折价比例。
-
-## 当前价格的边界
-当前价格只是比较基准和行动输入，不能进入合理价格计算公式。
-
-正确关系是：
-`基本面决定合理价格 → 不确定性决定安全价格 → 当前价格与两者比较决定估值位置 → 价格结构决定时机`
-
-禁止因为股价上涨而抬高合理价格，也禁止因为股价下跌而压低合理价格。
-
-## 同行与历史的角色
-同行估值只回答主估值是否明显脱离经济可比公司的常见定价；经济可比性优先于行业标签。同行结果只能提高/降低置信度或触发复核，不能与主模型简单平均投票。
-
-历史估值与历史价格只回答市场过去如何定价、当前位于什么历史位置。历史价格不得决定合理价格、作为独立估值锚投票，或裁剪/抬高安全价格。
-
-## 每家公司最低输出
-- `current_price`与`price_date`；
-- `earnings_type`；
-- `earnings_basis`；
-- `primary_method`；
-- `key_assumptions`；
-- `valuation_bridge`；
-- `reasonable_price_range`；
-- `safe_price_range`；
-- `valuation_position`；
-- `peer_sanity`；
-- `history_reference`；
-- `falsifiers`；
-- `review_required`及原因（如适用）。
-
-## Validator可以检查什么
-- 模型是否与盈利类型匹配；
-- 周期股是否使用了正常化盈利；
-- EPS/PE/PB计算是否自洽；
-- 当前价是否偷偷进入合理价格计算；
-- 历史价格是否被用于裁剪内在价值；
-- 是否存在无法解释的重复折价；
-- 合理价格与安全价格是否能从同一盈利基础解释；
-- 对外展示是否同时给出当前价格、合理价格、安全价格三层。
-
-Validator不能决定某家公司应该给多少PE，也不能用固定股票作为正确答案。
+## 最低输出
+`current_price/price_date`、`earnings_type`、`earnings_basis`、`primary_method`、`key_assumptions`、`valuation_bridge`、`reasonable_price_range`、`safe_price_range`、`valuation_position`、`peer_sanity`、`history_reference`、`falsifiers`、`review_required`。
 
 ## 持久化
-估值研究统一写入`data/research/v2/research_state.json`中的`valuations`部分。新状态优先使用`current_price / reasonable_price_range / safe_price_range / valuation_position`字段；旧字段仅作兼容读取。
+估值只写本次`research_state.json`的`valuations`，统一使用当前字段，不读取或兼容旧研究状态字段作为当前估值输入。

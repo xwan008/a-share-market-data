@@ -1,34 +1,34 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "pipeline": "a_share_low_risk_v2",
-  "research_read_mode": "manifest_authoritative_only",
+  "research_read_mode": "manifest_repo_data_plus_current_public_evidence",
   "manifest_path": "config/research_pipeline_manifest.json",
   "active_state_path": "data/research/v2/research_state.json",
-  "forbidden_active_paths": [
-    "data/research/pipeline",
-    "data/research/company_buckets",
-    "data/research/company_industry_registry.json",
-    "data/research/weekly_fundamental_opportunity_pool.json"
-  ],
   "state_compatibility": {
     "required_manifest_schema_match": true,
     "on_manifest_schema_mismatch": "stale_state_do_not_use_as_current",
     "on_missing_state": "no_valid_previous_research_state",
     "morning_run_requires_valid_previous_1800_state": true
   },
-  "read_policy": {
+  "repository_data_policy": {
     "allow_only_manifest_authoritative_data": true,
-    "do_not_scan_data_research_for_helpful_json": true,
+    "do_not_scan_repository_for_extra_research_json": true,
     "git_history_is_audit_only_not_runtime_input": true
+  },
+  "public_evidence_policy": {
+    "allowed": true,
+    "required_for_1800_full_research": true,
+    "use_current_public_sources_for_fundamental_and_industry_evidence": true,
+    "not_subject_to_repository_file_whitelist": true
+  },
+  "discovery_policy": {
+    "previous_state_may_not_seed_1800_discovery": true,
+    "cross_run_candidate_or_opportunity_pools_forbidden": true
   },
   "write_policy": {
     "current_research_output_only": "data/research/v2/research_state.json",
+    "persistent_intermediate_research_outputs_forbidden": true,
     "never_relabel_old_state_to_new_schema": true,
     "new_state_must_record_manifest_schema": true
-  },
-  "maintenance_policy": {
-    "derived_duplicate_research_files_are_forbidden": true,
-    "legacy_rule_registries_are_forbidden": true,
-    "rule_changes_should_update_authoritative_skill_or_manifest_owner_only": true
   }
 }

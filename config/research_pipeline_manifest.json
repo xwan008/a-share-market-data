@@ -1,12 +1,9 @@
 {
-  "schema_version": 24,
+  "schema_version": 25,
   "pipeline": "a_share_low_risk_v2",
   "mode": "shadow",
   "architecture": "prompt_first_research",
-  "production_gate": {
-    "enabled": false,
-    "label": "V2影子研究，不发布正式买点"
-  },
+  "production_gate": {"enabled": false, "label": "V2影子研究，不发布正式买点"},
   "authoritative_skills": {
     "orchestrator": "skills/a-share-low-risk/orchestrator/SKILL.md",
     "company_research": "skills/a-share-low-risk/company-research/SKILL.md",
@@ -21,16 +18,15 @@
     "bounded_history_store": "data/history_shards/*.json",
     "research_state": "data/research/v2/research_state.json"
   },
-  "stage_order": [
-    "data_health",
-    "taxonomy_coverage",
-    "market_profitability_discovery",
-    "profit_chain_decomposition",
-    "chain_company_comparison",
-    "valuation",
-    "price_structure",
-    "completion_gate_and_opportunity_synthesis"
-  ],
+  "evidence_contract": {
+    "repository_whitelist_applies_only_to_persistent_mechanical_data": true,
+    "current_public_research_evidence_allowed": true,
+    "current_public_research_evidence_required_for_1800_full_research": true,
+    "preferred_sources": ["公司公告与财报", "交易所披露", "官方统计", "行业协会与产业公开数据", "可信商品价格/价差/订单/产销数据", "必要时高质量新闻与研究资料"],
+    "evidence_uses": ["行业收入利润与利润率", "订单/出货/销量/产量", "产品价格与价差", "库存/开工/产能利用率", "公司主营/扣非/现金流", "Forward Bridge与反向证据"],
+    "public_evidence_must_not_be_persisted_as_cross_run_candidate_or_opportunity_pool": true
+  },
+  "stage_order": ["data_health", "taxonomy_coverage", "market_profitability_discovery", "profit_chain_decomposition", "chain_company_comparison", "valuation", "price_structure", "completion_gate_and_opportunity_synthesis"],
   "coverage_contract": {
     "taxonomy": "申万行业分类标准2021版",
     "expected_counts": {"level1": 31, "level2": 134, "level3": 346},
@@ -49,47 +45,22 @@
     "manifest_schema_must_equal_current": true,
     "on_incomplete": "incomplete_research",
     "incomplete_must_not_publish_new_current_opportunities": true,
-    "required_coverage_diagnostics": [
-      "coverage.taxonomy",
-      "coverage.expected_counts",
-      "coverage.accounted_for_counts",
-      "coverage.missing_level1",
-      "coverage.missing_level2",
-      "coverage.missing_level3",
-      "coverage.unresolved_must_split_chains",
-      "coverage.completion_gate_passed"
-    ]
+    "required_coverage_diagnostics": ["coverage.taxonomy", "coverage.expected_counts", "coverage.accounted_for_counts", "coverage.missing_level1", "coverage.missing_level2", "coverage.missing_level3", "coverage.unresolved_must_split_chains", "coverage.completion_gate_passed"]
+  },
+  "persistence_contract": {
+    "only_prompt_research_output": "data/research/v2/research_state.json",
+    "persistent_intermediate_research_outputs_allowed": false,
+    "cross_run_candidate_or_opportunity_caches_allowed": false,
+    "previous_state_may_not_seed_1800_discovery": true,
+    "0600_requires_valid_previous_1800_state": true
   },
   "public_output": {
-    "sections": [
-      "执行状态",
-      "全市场盈利景气雷达",
-      "完整盈利产业链雷达",
-      "链内公司比较",
-      "估值与价格区间",
-      "价格结构与时机",
-      "当前机会",
-      "诊断"
-    ],
-    "company_columns": [
-      "公司",
-      "当前价格",
-      "合理价格",
-      "安全价格（低风险区）",
-      "估值位置",
-      "价格结构",
-      "动作"
-    ]
+    "sections": ["执行状态", "全市场盈利景气雷达", "完整盈利产业链雷达", "链内公司比较", "估值与价格区间", "价格结构与时机", "当前机会", "诊断"],
+    "company_columns": ["公司", "当前价格", "合理价格", "安全价格（低风险区）", "估值位置", "价格结构", "动作"]
   },
-  "runtime_forbidden_paths": [
-    "data/research/pipeline",
-    "data/research/company_buckets",
-    "data/research/company_industry_registry.json",
-    "data/research/weekly_fundamental_opportunity_pool.json"
-  ],
   "rule_ownership": {
-    "manifest": "只保存机器契约、权威路径、固定计数、阶段顺序和输出契约。",
-    "skills": "保存研究方法、盈利链拆分、公司验证、估值和价格结构的业务规则。",
-    "prompt": "执行当期开放式研究，不复制维护另一份长期规则。"
+    "manifest": "只保存机器契约、权威仓库数据路径、公开证据边界、固定计数、阶段顺序和输出契约。",
+    "skills": "保存研究方法、盈利链拆分、公司验证、估值和价格结构业务规则。",
+    "prompt": "执行当期开放式公开研究，不维护跨期研究池。"
   }
 }
