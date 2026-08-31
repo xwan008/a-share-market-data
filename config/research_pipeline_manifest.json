@@ -3,7 +3,10 @@
   "pipeline": "a_share_low_risk_v2",
   "mode": "shadow",
   "architecture": "prompt_first_research",
-  "production_gate": {"enabled": false, "label": "V2影子研究，不发布正式买点"},
+  "production_gate": {
+    "enabled": false,
+    "label": "V2影子研究，不发布正式买点"
+  },
   "authoritative_skills": {
     "orchestrator": "skills/a-share-low-risk/orchestrator/SKILL.md",
     "company_research": "skills/a-share-low-risk/company-research/SKILL.md",
@@ -22,41 +25,126 @@
     "repository_whitelist_applies_only_to_persistent_mechanical_data": true,
     "current_public_research_evidence_allowed": true,
     "current_public_research_evidence_required_for_1800_research": true,
-    "preferred_sources": ["公司公告与财报", "交易所披露", "官方统计", "行业协会与产业公开数据", "可信商品价格/价差/订单/产销数据", "必要时高质量新闻与研究资料"],
-    "evidence_uses": ["行业收入利润与利润率", "订单/出货/销量/产量", "产品价格与价差", "库存/开工/产能利用率", "公司主营/扣非/现金流", "Forward Bridge与反向证据"],
+    "preferred_sources": [
+      "公司公告与财报",
+      "交易所披露",
+      "官方统计",
+      "行业协会与产业公开数据",
+      "可信商品价格/价差/订单/产销数据",
+      "必要时高质量新闻与研究资料"
+    ],
+    "evidence_uses": [
+      "行业收入利润与利润率",
+      "订单/出货/销量/产量",
+      "产品价格与价差",
+      "库存/开工/产能利用率",
+      "公司主营/扣非/现金流",
+      "Forward Bridge与反向证据"
+    ],
     "public_evidence_must_not_be_persisted_as_cross_run_candidate_or_opportunity_pool": true
   },
-  "stage_order": ["data_health", "taxonomy_coverage", "profitability_scan", "profit_chain_decomposition", "chain_company_comparison", "valuation", "price_structure", "completion_gate_and_opportunity_synthesis"],
+  "stage_order": [
+    "data_health",
+    "taxonomy_coverage",
+    "profitability_scan",
+    "profit_chain_decomposition",
+    "chain_company_comparison",
+    "valuation",
+    "price_structure",
+    "completion_gate_and_opportunity_synthesis"
+  ],
   "scan_cadence_contract": {
     "full_scan_unit": "level3",
     "full_scan_expected_level3_nodes": 346,
     "weekly_full_scan_interval_days": 7,
     "preferred_anchor": "Friday 18:00 Asia/Shanghai",
-    "fallback": "若锚点无有效运行，则下一次可用18:00执行全量普查",
+    "fallback": "若周五18:00全量失败或未运行，则下一次可用工作日18:00补做weekly_full",
     "bootstrap_rule": "没有当前schema有效周度基线时，下一次18:00必须立即执行全量普查，不等待周五",
     "daily_incremental_between_full_scans": true,
     "level1_level2_may_be_derived_from_level3_children": true,
     "full_scan_is_market_state_baseline_not_candidate_pool": true,
-    "daily_incremental_trigger_sources": ["新财报/业绩预告/快报", "行业统计更新", "产品价格或价差显著变化", "订单/出货/销量/产量变化", "库存/开工/产能利用率变化", "重大公司公告", "产业供需或政策事件"],
+    "daily_incremental_trigger_sources": [
+      "新财报/业绩预告/快报",
+      "行业统计更新",
+      "产品价格或价差显著变化",
+      "订单/出货/销量/产量变化",
+      "库存/开工/产能利用率变化",
+      "重大公司公告",
+      "产业供需或政策事件"
+    ],
     "daily_carry_forward_allowed_only_from_valid_weekly_baseline": true,
     "daily_carry_forward_must_record_baseline_date": true,
-    "previous_companies_chains_or_opportunities_may_not_seed_discovery": true
+    "previous_companies_chains_or_opportunities_may_not_seed_discovery": true,
+    "calendar_anchor_is_authoritative": true,
+    "interval_days_is_max_baseline_age_not_minimum_wait": true,
+    "successful_bootstrap_next_full_scan": "最近一个Friday 18:00 Asia/Shanghai，即使距离bootstrap不足7天也执行weekly_full",
+    "friday_full_scan_rule": "每周五18:00只要数据健康即执行weekly_full；其他工作日18:00执行daily_incremental，除非需要补做失败的周五全量"
   },
   "coverage_contract": {
     "taxonomy": "申万行业分类标准2021版",
-    "expected_counts": {"level1": 31, "level2": 134, "level3": 346},
+    "expected_counts": {
+      "level1": 31,
+      "level2": 134,
+      "level3": 346
+    },
     "purpose": "逐节点防漏与盈利状态审计，不作为候选池或固定盈利链答案。",
     "ledger_contract": {
       "state_path": "coverage_ledger",
       "instantiate_all_taxonomy_nodes_before_profitability_scan": true,
       "exact_node_counts_must_match_taxonomy": true,
-      "required_node_fields": ["code", "name", "level", "parent_code", "accounted_for", "trend", "strength", "breadth", "confidence", "scan_depth", "evidence_scope", "evidence_basis", "last_full_scan_date", "baseline_date", "daily_trigger", "needs_profit_chain_research", "profit_chain_resolution"],
-      "allowed_trend": ["improving", "stable", "deteriorating", "unconfirmed"],
-      "allowed_strength": ["strong", "normal", "weak", "unknown"],
-      "allowed_breadth": ["broad", "selective", "divergent", "unknown"],
-      "allowed_confidence": ["high", "medium", "low"],
-      "allowed_scan_depth": ["shallow", "deep"],
-      "allowed_evidence_scope": ["direct_node", "child_aggregate", "cross_sectional", "carried_forward", "insufficient"],
+      "required_node_fields": [
+        "code",
+        "name",
+        "level",
+        "parent_code",
+        "accounted_for",
+        "trend",
+        "strength",
+        "breadth",
+        "confidence",
+        "scan_depth",
+        "evidence_scope",
+        "evidence_basis",
+        "last_full_scan_date",
+        "baseline_date",
+        "daily_trigger",
+        "needs_profit_chain_research",
+        "profit_chain_resolution"
+      ],
+      "allowed_trend": [
+        "improving",
+        "stable",
+        "deteriorating",
+        "unconfirmed"
+      ],
+      "allowed_strength": [
+        "strong",
+        "normal",
+        "weak",
+        "unknown"
+      ],
+      "allowed_breadth": [
+        "broad",
+        "selective",
+        "divergent",
+        "unknown"
+      ],
+      "allowed_confidence": [
+        "high",
+        "medium",
+        "low"
+      ],
+      "allowed_scan_depth": [
+        "shallow",
+        "deep"
+      ],
+      "allowed_evidence_scope": [
+        "direct_node",
+        "child_aggregate",
+        "cross_sectional",
+        "carried_forward",
+        "insufficient"
+      ],
       "deep_trigger_rule": "trend为improving或deteriorating，或breadth为selective/divergent时必须deep并进入盈利链研究",
       "accounted_for_definition": "节点必须有唯一记录且四维状态、证据、扫描日期和流转字段完整；仅生成默认unconfirmed占位记录不能算周度全量扫描完成。",
       "weekly_level3_generic_unconfirmed_placeholder_forbidden": true,
@@ -87,9 +175,21 @@
   },
   "profit_chain_resolution_contract": {
     "required_for_each_deep_coverage_node": true,
-    "allowed_resolution": ["resolved", "unconfirmed_with_evidence_gap"],
+    "allowed_resolution": [
+      "resolved",
+      "unconfirmed_with_evidence_gap"
+    ],
     "must_split_or_continue_split_cannot_remain_open": true,
-    "required_chain_fields": ["chain_id", "source_coverage_codes", "direct_driver", "leading_variables", "profit_transmission", "forward_bridge", "invalidation_condition", "resolution_status"]
+    "required_chain_fields": [
+      "chain_id",
+      "source_coverage_codes",
+      "direct_driver",
+      "leading_variables",
+      "profit_transmission",
+      "forward_bridge",
+      "invalidation_condition",
+      "resolution_status"
+    ]
   },
   "company_comparison_contract": {
     "comparison_occurs_before_final_valuation": true,
@@ -97,18 +197,47 @@
     "comparison_complete_required_when_peers_exist": true,
     "single_company_chain_requires_explicit_singleton_reason": true,
     "all_actually_compared_companies_enter_valuation_set": true,
-    "required_outputs": ["compared_companies", "comparison_complete", "fundamental_best", "current_opportunity_best", "opportunity_resolution_complete"],
+    "required_outputs": [
+      "compared_companies",
+      "comparison_complete",
+      "fundamental_best",
+      "current_opportunity_best",
+      "opportunity_resolution_complete"
+    ],
     "current_opportunity_best_may_be_null": true
   },
   "valuation_resolution_contract": {
     "valuation_set_path": "valuation_set",
     "every_valuation_set_company_requires_full_execution": true,
-    "required_bridge_fields": ["current_price", "price_date", "earnings_type", "earnings_basis", "primary_method", "key_assumptions", "reasonable_price_assumption", "reasonable_price_range", "uncertainty", "margin_of_safety_reason", "safe_price_range", "valuation_position", "falsifiers", "valuation_attempt_complete", "model_execution_status"],
+    "required_bridge_fields": [
+      "current_price",
+      "price_date",
+      "earnings_type",
+      "earnings_basis",
+      "primary_method",
+      "key_assumptions",
+      "reasonable_price_assumption",
+      "reasonable_price_range",
+      "uncertainty",
+      "margin_of_safety_reason",
+      "safe_price_range",
+      "valuation_position",
+      "falsifiers",
+      "valuation_attempt_complete",
+      "model_execution_status"
+    ],
     "non_review_company_requires_non_null_reasonable_and_safe_ranges": true,
     "missing_analyst_consensus_is_not_valid_review_reason": true,
     "must_build_internal_forward_or_normalized_range_when_consensus_missing": true,
     "review_required_is_exception_not_successful_valuation": true,
-    "allowed_review_exception_codes": ["major_restructuring", "nonrecurring_earnings_dominant", "critical_public_data_unavailable", "model_instability", "business_model_break", "other_material_blocker"],
+    "allowed_review_exception_codes": [
+      "major_restructuring",
+      "nonrecurring_earnings_dominant",
+      "critical_public_data_unavailable",
+      "model_instability",
+      "business_model_break",
+      "other_material_blocker"
+    ],
     "review_required_requires_completed_research_attempt_and_blocker_evidence": true,
     "important_chain_opportunity_resolution_requires_at_least_one_complete_non_review_valuation": true,
     "publishable_opportunity_requires_complete_bridge": true,
@@ -118,12 +247,43 @@
     "path": "data/research/v2/research_state.json",
     "manifest_schema_field": "manifest_schema",
     "manifest_schema_must_equal_current": true,
-    "required_top_level_sections": ["coverage_ledger", "market_profitability_radar", "profit_chains", "chain_comparisons", "companies", "valuation_set", "valuations", "price_structures", "diagnostics"],
-    "required_run_fields": ["scan_mode", "weekly_baseline_date"],
+    "required_top_level_sections": [
+      "coverage_ledger",
+      "market_profitability_radar",
+      "profit_chains",
+      "chain_comparisons",
+      "companies",
+      "valuation_set",
+      "valuations",
+      "price_structures",
+      "diagnostics"
+    ],
+    "required_run_fields": [
+      "scan_mode",
+      "weekly_baseline_date"
+    ],
     "on_incomplete": "incomplete_research",
     "incomplete_must_not_publish_new_current_opportunities": true,
-    "required_coverage_diagnostics": ["coverage.taxonomy", "coverage.expected_counts", "coverage.accounted_for_counts", "coverage.missing_level1", "coverage.missing_level2", "coverage.missing_level3", "coverage.profitability_discovery_gate_passed", "coverage.unresolved_must_split_chains", "coverage.deep_nodes_total", "coverage.deep_nodes_resolved", "coverage.completion_gate_passed"],
-    "required_valuation_diagnostics": ["valuation.valuation_set_count", "valuation.executed_count", "valuation.complete_non_review_count", "valuation.review_required_count", "valuation.valuation_gate_passed"]
+    "required_coverage_diagnostics": [
+      "coverage.taxonomy",
+      "coverage.expected_counts",
+      "coverage.accounted_for_counts",
+      "coverage.missing_level1",
+      "coverage.missing_level2",
+      "coverage.missing_level3",
+      "coverage.profitability_discovery_gate_passed",
+      "coverage.unresolved_must_split_chains",
+      "coverage.deep_nodes_total",
+      "coverage.deep_nodes_resolved",
+      "coverage.completion_gate_passed"
+    ],
+    "required_valuation_diagnostics": [
+      "valuation.valuation_set_count",
+      "valuation.executed_count",
+      "valuation.complete_non_review_count",
+      "valuation.review_required_count",
+      "valuation.valuation_gate_passed"
+    ]
   },
   "persistence_contract": {
     "only_prompt_research_output": "data/research/v2/research_state.json",
@@ -135,8 +295,25 @@
     "0600_requires_valid_previous_1800_state": true
   },
   "public_output": {
-    "sections": ["执行状态", "全市场盈利景气雷达", "完整盈利产业链雷达", "链内公司比较", "估值与价格区间", "价格结构与时机", "当前机会", "诊断"],
-    "company_columns": ["公司", "当前价格", "合理价格", "安全价格（低风险区）", "估值位置", "价格结构", "动作"]
+    "sections": [
+      "执行状态",
+      "全市场盈利景气雷达",
+      "完整盈利产业链雷达",
+      "链内公司比较",
+      "估值与价格区间",
+      "价格结构与时机",
+      "当前机会",
+      "诊断"
+    ],
+    "company_columns": [
+      "公司",
+      "当前价格",
+      "合理价格",
+      "安全价格（低风险区）",
+      "估值位置",
+      "价格结构",
+      "动作"
+    ]
   },
   "rule_ownership": {
     "manifest": "保存机器契约、扫描节奏、Coverage与盈利发现门、估值完成门和输出契约。",

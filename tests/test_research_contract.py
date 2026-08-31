@@ -25,6 +25,9 @@ def test_scan_cadence_is_weekly_full_plus_daily_incremental_not_weekly_pool():
     assert c['full_scan_unit'] == 'level3'
     assert c['full_scan_expected_level3_nodes'] == 346
     assert c['weekly_full_scan_interval_days'] == 7
+    assert c['calendar_anchor_is_authoritative'] is True
+    assert c['interval_days_is_max_baseline_age_not_minimum_wait'] is True
+    assert 'Friday 18:00' in c['successful_bootstrap_next_full_scan']
     assert c['daily_incremental_between_full_scans'] is True
     assert c['full_scan_is_market_state_baseline_not_candidate_pool'] is True
     assert c['daily_carry_forward_allowed_only_from_valid_weekly_baseline'] is True
