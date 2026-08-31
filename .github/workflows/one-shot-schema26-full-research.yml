@@ -1,0 +1,342 @@
+name: One-shot schema26 full research
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/one-shot-schema26-full-research.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: a-share-schema26-full-research
+  cancel-in-progress: false
+
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build schema26 audited research state
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from datetime import datetime
+          from pathlib import Path
+          from zoneinfo import ZoneInfo
+
+          ROOT=Path('.')
+          TZ=ZoneInfo('Asia/Shanghai')
+          def load(p): return json.loads((ROOT/p).read_text(encoding='utf-8'))
+
+          manifest=load('config/research_pipeline_manifest.json')
+          taxonomy=load('config/industry_scan_universe.json')
+          latest=load('data/latest.json')
+          ps=load('data/research/v2/full_market_price_structure.json')
+          assert manifest['schema_version']==26
+          assert taxonomy['expected_counts']=={'level1':31,'level2':134,'level3':346}
+
+          trade_date=str(latest.get('trade_date') or '')
+          market_status=str(latest.get('market_status') or '')
+          ps_date=str(ps.get('reference_trade_date') or '')
+          stocks=latest.get('stocks') or {}
+          quote_usable=sum(1 for q in stocks.values() if (q or {}).get('confidence') in {'high','medium'})
+          ps_verified=int(ps.get('verified_count') or 0)
+
+          history_ge60=0
+          history_ge120=0
+          for path in sorted(Path('data/history_shards').glob('*.json')):
+              payload=json.loads(path.read_text(encoding='utf-8'))
+              for item in (payload.get('stocks') or {}).values():
+                  n=len(item.get('history') or [])
+                  history_ge60 += int(n>=60)
+                  history_ge120 += int(n>=120)
+
+          data_health_passed=(market_status=='closed' and bool(trade_date) and ps_date==trade_date and quote_usable>=3000 and history_ge60>=3000 and ps_verified>=3000)
+
+          # Current-run public-evidence classification. All nodes are instantiated first.
+          # Defaults mean: node was checked in the cross-sectional pass, but no sufficient
+          # node-specific evidence was found to upgrade it. This is deliberately NOT 'stable'.
+          deep={
+            # level1
+            'S22':('improving','cross_sectional','2026H1 A股半年报收官数据指向化工资源品盈利改善；但基础化工内部产品/价差Driver差异大，需继续分链。','unconfirmed_with_evidence_gap'),
+            'S24':('strong_improving','cross_sectional','2026H1 有色金属处于一级行业盈利增幅前列，铜与锂均有公司级盈利兑现。','resolved'),
+            'S27':('strong_improving','cross_sectional','2026H1 电子为31个申万一级行业中唯一归母净利润翻倍行业；内部半导体、PCB等Driver分化。','resolved'),
+            'S49':('strong_improving','cross_sectional','2026H1 非银金融盈利增幅居前；二级多元金融增速超过100%，但本次未形成足够纯度的主板盈利链。','unconfirmed_with_evidence_gap'),
+            'S65':('divergent','cross_sectional','航海装备盈利高增，但军工其他子行业盈利机制并不相同，一级国防军工按分化处理。','resolved'),
+            'S75':('improving','cross_sectional','沪市石油石化2026H1净利润同比增长约25.9%，但油气开采/油服/炼化Driver不同。','unconfirmed_with_evidence_gap'),
+            # level2
+            'S2202':('improving','cross_sectional','化学原料处于盈利修复方向，但煤化工/氯碱/纯碱等价差机制不同，本次证据不足以合并为单一可比链。','unconfirmed_with_evidence_gap'),
+            'S2403':('improving','direct_node','工业金属受价格中枢与资源端收益改善驱动；铜公司盈利兑现显著。','resolved'),
+            'S2406':('strong_improving','direct_node','申万二级能源金属2026H1盈利增速超过500%，锂价中枢抬升并兑现至龙头盈利。','resolved'),
+            'S2701':('strong_improving','direct_node','申万二级半导体2026H1盈利增速超过500%，但设备环节内部利润增速明显分化。','resolved'),
+            'S2702':('improving','direct_node','AI服务器/高速交换机需求直接拉动高端PCB收入、毛利率与利润增长。','resolved'),
+            'S2704':('strong_improving','cross_sectional','申万二级其他电子2026H1盈利增速超过100%，但本次没有完成足够细的主板可比盈利链。','unconfirmed_with_evidence_gap'),
+            'S4903':('strong_improving','cross_sectional','申万二级多元金融2026H1盈利增速超过100%，但内部期货/租赁/金融信息服务Driver不同。','unconfirmed_with_evidence_gap'),
+            'S6504':('strong_improving','direct_node','申万二级航海装备2026H1盈利增速超过100%，船舶交付量、高价值船型占比与价格改善兑现至利润。','resolved'),
+            'S7503':('improving','parent_supported','石油石化一级盈利改善，炼化链存在利润修复信号，但产品价差证据不足以给出单一主板机会链。','unconfirmed_with_evidence_gap'),
+            # level3
+            'S240302':('improving','direct_node','铜价/矿端资源收益改善，江西铜业和紫金矿业2026H1利润与经营现金流均显著增长。','resolved'),
+            'S240603':('strong_improving','direct_node','锂产品价格回升叠加销量增长，天齐锂业与赣锋锂业2026H1盈利大幅修复。','resolved'),
+            'S270108':('divergent','direct_node','27家半导体设备公司营收同比约+31%，行业利润高增，但北方华创归母仅+5%，显示明显结构分化。','unconfirmed_with_evidence_gap'),
+            'S270202':('strong_improving','direct_node','AI服务器与高速交换机订单拉动沪电股份、深南电路PCB收入和扣非利润高增长。','resolved'),
+            'S650401':('strong_improving','direct_node','中国船舶与中船防务2026H1盈利、现金流明显改善，直接受益于船舶交付与高价值船型。','resolved'),
+          }
+          weak={
+            'S43':('weak','cross_sectional','2026H1半年报汇总显示房地产板块较多亏损，需求与盈利仍偏弱。'),
+            'S62':('weak','cross_sectional','2026H1半年报汇总显示建筑装饰板块较多亏损，暂未看到足够强的盈利改善。'),
+            'S11':('weak','cross_sectional','2026H1半年报汇总显示农林牧渔板块较多亏损，整体盈利承压。'),
+          }
+
+          ledger={'level1':[],'level2':[],'level3':[]}
+          for level in ('level1','level2','level3'):
+              for node in taxonomy['levels'][level]:
+                  code=node['code']
+                  row={
+                    'code':code,'name':node['name'],'level':level,'parent_code':node['parent_code'],
+                    'accounted_for':True,'status':'unconfirmed','scan_depth':'shallow','evidence_scope':'insufficient',
+                    'evidence_basis':'本期已纳入全市场申万节点横截面检查；未获得足以把该具体节点升级为改善/恶化/分化的节点级可靠公开证据，故保留unconfirmed，不解释为稳定或没有机会。',
+                    'needs_profit_chain_research':False,'profit_chain_resolution':'not_required'
+                  }
+                  if code in weak:
+                      s,scope,basis=weak[code]
+                      row.update(status=s,evidence_scope=scope,evidence_basis=basis)
+                  if code in deep:
+                      s,scope,basis,res=deep[code]
+                      row.update(status=s,scan_depth='deep',evidence_scope=scope,evidence_basis=basis,needs_profit_chain_research=True,profit_chain_resolution=res)
+                  ledger[level].append(row)
+
+          evidence_sources={
+            'a_share_h1':'https://www.cls.cn/detail/2469547',
+            'a_share_h1_structure':'https://paper.cnstock.com/html/2026-08/31/content_2263446.htm',
+            'sse_h1':'https://paper.cnstock.com/html/2026-08/31/content_2263452.htm',
+            'semi_equipment':'https://finance.eastmoney.com/a/202608313859607178.html',
+            'north_huachuang':'https://finance.eastmoney.com/a/202608253853310020.html',
+            'hudien':'https://finance.eastmoney.com/a/202608253853519292.html',
+            'shennan':'https://data.eastmoney.com/report/info/AP202608271828552163.html',
+            'tianqi':'https://www.stcn.com/article/detail/4144291.html',
+            'ganfeng':'https://finance.eastmoney.com/a/202608293859296168.html',
+            'jiangxi_copper':'https://finance.eastmoney.com/a/202608263854307587.html',
+            'zijin':'https://finance.eastmoney.com/a/202608223850170087.html',
+            'cssc':'https://finance.eastmoney.com/a/202608313859970169.html',
+            'cssc_offshore':'https://finance.eastmoney.com/a/202608263854313076.html'
+          }
+
+          chains=[
+            {
+              'chain_id':'ai_high_speed_pcb','source_coverage_codes':['S27','S2702','S270202'],
+              'direct_driver':'AI数据中心资本开支带来的高速交换机、AI服务器/HPC高端PCB需求',
+              'leading_variables':['云厂商AI资本开支','高速交换机/AI服务器出货','高层数高频高速PCB订单与产能利用率'],
+              'profit_transmission':'高端PCB需求与产品结构升级 → 收入/毛利率提升 → 扣非利润增长',
+              'forward_bridge':'若AI服务器与800G/1.6T网络设备出货继续增长，高端PCB订单与盈利仍有1-2季度延续性。',
+              'invalidation_condition':'AI资本开支/服务器出货明显下修，或高端PCB订单、毛利率连续转弱。',
+              'resolution_status':'resolved','important':True
+            },
+            {
+              'chain_id':'lithium_price_resource_recovery','source_coverage_codes':['S24','S2406','S240603'],
+              'direct_driver':'锂盐价格中枢回升 + 锂资源/锂化合物产销量增长',
+              'leading_variables':['电池级碳酸锂价格','锂精矿价格','储能/新能源车需求','公司锂产品销量'],
+              'profit_transmission':'锂价与销量回升 → 单吨毛利/资源收益修复 → 扣非利润和现金流改善',
+              'forward_bridge':'供需紧平衡与储能需求可支撑盈利，但强周期属性要求用正常化价格而非现货高点资本化。',
+              'invalidation_condition':'锂价中枢快速回落、供给释放超预期或下游需求显著放缓。',
+              'resolution_status':'resolved','important':True
+            },
+            {
+              'chain_id':'copper_resource_price_cycle','source_coverage_codes':['S24','S2403','S240302'],
+              'direct_driver':'铜价中枢、矿产铜产量/资源收益以及冶炼加工费变化',
+              'leading_variables':['铜价','TC/RC','矿产铜产量','金银等副产品价格'],
+              'profit_transmission':'铜价/资源产量变化 → 矿端与冶炼盈利变化 → 扣非利润/现金流变化',
+              'forward_bridge':'铜需求与资源约束支持盈利，但需按周期中枢正常化，不能直接资本化当前高景气利润。',
+              'invalidation_condition':'铜价中枢显著下移、矿端成本上升或冶炼加工费恶化超预期。',
+              'resolution_status':'resolved','important':True
+            },
+            {
+              'chain_id':'shipbuilding_high_value_delivery','source_coverage_codes':['S65','S6504','S650401'],
+              'direct_driver':'船舶订单交付量、高价值船型占比与平均船价/毛利改善',
+              'leading_variables':['手持订单与交付节奏','新船价格指数','高价值船型占比','船舶业务毛利率'],
+              'profit_transmission':'高价订单进入交付 → 收入与毛利率提升 → 扣非利润和经营现金流改善',
+              'forward_bridge':'订单周期仍提供可见度，但需要跟踪新接订单价格、交付节奏与成本。',
+              'invalidation_condition':'新船价格/订单下行、交付延迟或成本上升压缩船舶毛利率。',
+              'resolution_status':'resolved','important':True
+            },
+            {
+              'chain_id':'semiconductor_equipment_structural_divergence','source_coverage_codes':['S27','S2701','S270108'],
+              'direct_driver':'国产替代与晶圆厂资本开支推动设备收入，但研发投入、产品结构和客户验收节奏造成利润分化',
+              'leading_variables':['晶圆厂资本开支','设备订单/验收','国产化率','研发费用率与毛利率'],
+              'profit_transmission':'设备需求增长 → 收入增长；但研发/产品结构/验收差异 → 利润增速显著分化',
+              'forward_bridge':'行业需求仍强，但主板可比公司证据不足以稳定确认同一低风险机会链。',
+              'invalidation_condition':'晶圆厂资本开支下调或头部设备公司订单/现金流持续转弱。',
+              'resolution_status':'unconfirmed_with_evidence_gap','evidence_gap':'主板范围内高纯度同机制可比公司不足，且行业利润增速与北方华创利润增速明显背离。','important':False
+            },
+            {
+              'chain_id':'basic_chemicals_multi_driver_gap','source_coverage_codes':['S22','S2202'],
+              'direct_driver':'化工盈利修复但不同产品依赖不同原料、价格与价差',
+              'leading_variables':['产品价格/价差','原料价格','开工率','库存'],
+              'profit_transmission':'不同子链的价差和供需变化分别影响利润，无法安全合并为一个可比链',
+              'forward_bridge':'需后续产品级证据确认煤化工/氯碱/纯碱等具体子链。',
+              'invalidation_condition':'若后续证据显示改善仅集中于少数产品，则宽行业改善判断需下修。',
+              'resolution_status':'unconfirmed_with_evidence_gap','evidence_gap':'本次未获得足以把宽化学原料拆成完整可比主板子链的产品级证据。','important':False
+            },
+            {
+              'chain_id':'nonbank_multi_driver_gap','source_coverage_codes':['S49','S4903'],
+              'direct_driver':'资本市场活跃度、利率与资产价格变化，但券商/保险/期货/租赁机制不同',
+              'leading_variables':['成交额','两融余额','利率','权益市场表现'],
+              'profit_transmission':'不同金融业务收入和投资收益对市场变量敏感度不同',
+              'forward_bridge':'需按二级/三级业务模型进一步拆分后才能比较主板公司。',
+              'invalidation_condition':'市场活跃度与投资收益明显回落。',
+              'resolution_status':'unconfirmed_with_evidence_gap','evidence_gap':'多元金融内部Driver异质，本次未完成公司级纯度拆分。','important':False
+            },
+            {
+              'chain_id':'petrochemical_multi_driver_gap','source_coverage_codes':['S75','S7503'],
+              'direct_driver':'油价、炼化价差与终端化工品需求',
+              'leading_variables':['Brent油价','炼化价差','成品油/化工品需求','开工率'],
+              'profit_transmission':'原料成本与产品价差变化影响炼化利润',
+              'forward_bridge':'行业盈利改善存在，但本次产品级价差证据不足以形成可审计低风险公司链。',
+              'invalidation_condition':'油价与价差反向、终端需求走弱。',
+              'resolution_status':'unconfirmed_with_evidence_gap','evidence_gap':'缺少足够一致的产品级价差和主板多公司可比证据。','important':False
+            },
+            {
+              'chain_id':'other_electronics_gap','source_coverage_codes':['S2704'],
+              'direct_driver':'二级行业盈利高增，但内部产品与应用差异较大',
+              'leading_variables':['订单','产品价格','出货量'],
+              'profit_transmission':'产品需求变化传导至收入利润，但当前证据无法形成单一经济机制',
+              'forward_bridge':'需进一步拆具体产品。','invalidation_condition':'后续细分证据不支持广泛改善。',
+              'resolution_status':'unconfirmed_with_evidence_gap','evidence_gap':'缺本次主板细分链证据。','important':False
+            }
+          ]
+
+          comparisons=[
+            {
+              'chain_id':'ai_high_speed_pcb','compared_companies':['002463 沪电股份','002916 深南电路'],'comparison_complete':True,
+              'fundamental_best':'002463 沪电股份','current_opportunity_best':None,'opportunity_resolution_complete':True,
+              'comparison_summary':'沪电PCB业务纯度更高、AI网络/服务器收入增速更强；深南电路扣非增速与利润率改善同样突出。两者均需完成独立Forward估值桥后才能成为低风险当前机会。'
+            },
+            {
+              'chain_id':'lithium_price_resource_recovery','compared_companies':['002466 天齐锂业','002460 赣锋锂业'],'comparison_complete':True,
+              'fundamental_best':'002466 天齐锂业','current_opportunity_best':None,'opportunity_resolution_complete':True,
+              'comparison_summary':'天齐对上游资源和锂化工价格弹性更直接；赣锋一体化更广、锂电池贡献更高。强周期利润必须先正常化。'
+            },
+            {
+              'chain_id':'copper_resource_price_cycle','compared_companies':['601899 紫金矿业','600362 江西铜业'],'comparison_complete':True,
+              'fundamental_best':'601899 紫金矿业','current_opportunity_best':None,'opportunity_resolution_complete':True,
+              'comparison_summary':'紫金资源端盈利与现金流更强，但金铜锂多矿种使纯铜可比性下降；江西铜业铜链更直接但冶炼/贸易占比更高。两者均需铜价周期中枢正常化。'
+            },
+            {
+              'chain_id':'shipbuilding_high_value_delivery','compared_companies':['600150 中国船舶','600685 中船防务'],'comparison_complete':True,
+              'fundamental_best':'600150 中国船舶','current_opportunity_best':None,'opportunity_resolution_complete':True,
+              'comparison_summary':'中国船舶规模、利润增速与船舶业务兑现更强；中船防务盈利和现金流也明显改善。订单周期与交付利润率需要正常化估值。'
+            }
+          ]
+
+          company_evidence={
+            '002463':{'name':'沪电股份','chain_id':'ai_high_speed_pcb','why_now':'AI服务器、高速交换机需求直接兑现至高端PCB收入与利润。','driver_links':['AI服务器PCB','高速交换机PCB'],'exposure_purity':'high','revenue_change':'2026H1营收136.89亿元，同比+61.17%','net_profit_change':'归母29.23亿元，同比+73.72%','deduct_profit_change':'扣非27.95亿元，同比+70.00%','margin_quality':'PCB业务毛利率40.52%，同比+4.06pct','cashflow_quality':'经营现金流11.51亿元，同比-45.14%，订单扩张期营运资金占用需关注','one_off_risk':'low_to_medium','forward_bridge':'AI服务器与高速交换机需求若延续，高端PCB产品结构仍可支撑盈利。','evidence_for':'数据通讯PCB收入113.30亿元，同比+73.46%，1.6T交换机产品已批量出货。','evidence_against':'现金流增速显著落后利润，且高景气资本开支若下修会影响订单。','invalidation_condition':'AI资本开支/高端PCB订单明显下修或毛利率连续下降','earnings_direction':'strong_improving','confidence':'high'},
+            '002916':{'name':'深南电路','chain_id':'ai_high_speed_pcb','why_now':'AI算力基础设施需求推动PCB/封装基板产品结构和产能利用率。','driver_links':['高端PCB','封装基板'],'exposure_purity':'medium_high','revenue_change':'2026H1营收152.96亿元，同比+46.33%','net_profit_change':'归母22.51亿元，同比+65.55%','deduct_profit_change':'扣非增长约+76.94%','margin_quality':'综合毛利率31.01%，同比+4.73pct','cashflow_quality':'经营现金流保持正向，增长弱于利润','one_off_risk':'low','forward_bridge':'AI算力扩产与高端PCB/封装基板需求延续。','evidence_for':'利润增速显著高于营收，Q2盈利能力进一步提升。','evidence_against':'业务较沪电更分散，封装基板周期与PCB并不完全一致。','invalidation_condition':'AI算力需求下修或高端产能利用率回落','earnings_direction':'strong_improving','confidence':'high'},
+            '002466':{'name':'天齐锂业','chain_id':'lithium_price_resource_recovery','why_now':'锂产品价格提升及产销量增长推动业绩强反弹。','driver_links':['锂精矿','锂化合物'],'exposure_purity':'high','revenue_change':'2026H1营收122.42亿元，同比+153.32%','net_profit_change':'归母42.42亿元，同比大幅增长','deduct_profit_change':'扣非42.00亿元，大幅增长','margin_quality':'上游资源端毛利弹性高','cashflow_quality':'经营现金流22.12亿元，同比+21.51%','one_off_risk':'medium','forward_bridge':'锂价中枢和销量若维持，盈利延续；但必须正常化周期价格。','evidence_for':'锂价中枢较2025明显抬升，资源与化工产销改善。','evidence_against':'利润对锂价高度敏感，当前高增含低基数和价格反弹效应。','invalidation_condition':'碳酸锂/锂精矿价格显著下行或需求放缓','earnings_direction':'strong_improving_cyclical','confidence':'high'},
+            '002460':{'name':'赣锋锂业','chain_id':'lithium_price_resource_recovery','why_now':'锂系列产品量价齐升并叠加锂电池销量增长。','driver_links':['锂盐','锂资源','锂电池'],'exposure_purity':'medium_high','revenue_change':'2026H1营收230.97亿元，同比+175.75%','net_profit_change':'归母42.57亿元，同比+901.36%','deduct_profit_change':'扣非38.48亿元，同比+521.56%','margin_quality':'一体化改善但业务结构较分散','cashflow_quality':'经营现金流显著改善','one_off_risk':'medium','forward_bridge':'锂价与储能需求支持，但资源/锂盐/电池三段盈利需分别跟踪。','evidence_for':'锂系列售价回升、锂电池销量增加共同推动盈利。','evidence_against':'业务更分散，锂价周期和电池竞争共同影响利润。','invalidation_condition':'锂价下行或电池业务毛利明显恶化','earnings_direction':'strong_improving_cyclical','confidence':'high'},
+            '601899':{'name':'紫金矿业','chain_id':'copper_resource_price_cycle','why_now':'金铜锂矿产品量价提升带来强盈利和现金流。','driver_links':['矿产铜','黄金','锂'],'exposure_purity':'medium','revenue_change':'2026H1营收1941.78亿元，同比+15.78%','net_profit_change':'归母391.70亿元，同比+68.17%','deduct_profit_change':'扣非盈利高增','margin_quality':'矿产品毛利率显著提升','cashflow_quality':'经营现金流554.72亿元，同比+92.41%','one_off_risk':'low_to_medium','forward_bridge':'资源产量与金属价格共同支撑，但铜链判断需剥离金/锂贡献。','evidence_for':'铜业务贡献集团毛利约33.8%，资源端现金流强。','evidence_against':'多矿种结构降低纯铜可比性，金属价格均有周期风险。','invalidation_condition':'铜/金价格中枢显著下移或矿山成本上升','earnings_direction':'strong_improving_cyclical','confidence':'high'},
+            '600362':{'name':'江西铜业','chain_id':'copper_resource_price_cycle','why_now':'铜价与资源收益改善直接推动利润及现金流。','driver_links':['铜矿','冶炼','铜加工'],'exposure_purity':'high_copper_but_mixed_business','revenue_change':'2026H1营收3071.55亿元，同比+19.53%','net_profit_change':'归母86.32亿元，同比+106.77%','deduct_profit_change':'扣非75.56亿元，同比+73.73%','margin_quality':'盈利显著改善但贸易/冶炼业务压低整体利润率','cashflow_quality':'经营现金流58.14亿元，同比+102.49%','one_off_risk':'medium','forward_bridge':'铜价、矿产量与TC/RC共同决定后续盈利。','evidence_for':'利润与经营现金流同步高增。','evidence_against':'冶炼加工费和铜价周期均可能快速反转。','invalidation_condition':'铜价中枢下移或TC/RC恶化、矿端贡献下降','earnings_direction':'strong_improving_cyclical','confidence':'high'},
+            '600150':{'name':'中国船舶','chain_id':'shipbuilding_high_value_delivery','why_now':'高价值船型和订单交付进入利润兑现期。','driver_links':['船舶建造','修船','海洋工程'],'exposure_purity':'high','revenue_change':'2026H1营收915.30亿元，同比+26.01%','net_profit_change':'归母99.54亿元，同比+163.51%','deduct_profit_change':'扣非97.42亿元，同比+237.03%','margin_quality':'高价值船型/交付结构改善带来利润弹性','cashflow_quality':'经营现金流109.18亿元，由负转正','one_off_risk':'low_to_medium','forward_bridge':'手持订单与高价订单交付提供可见度。','evidence_for':'船舶造修及海工收入815.25亿元，同比+30.39%。','evidence_against':'船价/成本与长交付周期会影响后续利润率。','invalidation_condition':'新船价/订单明显转弱或交付成本超预期','earnings_direction':'strong_improving','confidence':'high'},
+            '600685':{'name':'中船防务','chain_id':'shipbuilding_high_value_delivery','why_now':'船舶景气兑现至利润与现金流。','driver_links':['船舶建造','海工相关'],'exposure_purity':'high','revenue_change':'2026H1营收111.20亿元，同比+9.31%','net_profit_change':'归母8.37亿元，同比+58.94%','deduct_profit_change':'扣非7.82亿元，同比+59.28%','margin_quality':'盈利增长快于收入','cashflow_quality':'经营现金流52.53亿元，同比+243.11%','one_off_risk':'low_to_medium','forward_bridge':'订单交付与船型结构继续决定利润。','evidence_for':'扣非与现金流同步改善。','evidence_against':'规模与盈利弹性弱于中国船舶。','invalidation_condition':'交付或船价转弱、成本上升','earnings_direction':'improving','confidence':'high'},
+            '002371':{'name':'北方华创','chain_id':'semiconductor_equipment_structural_divergence','why_now':'国产替代与AI需求拉动设备收入，但利润增速显著低于行业。','driver_links':['刻蚀','薄膜沉积','清洗等半导体设备'],'exposure_purity':'high','revenue_change':'2026H1营收201.61亿元，同比+24.90%','net_profit_change':'归母33.70亿元，同比+5.05%','deduct_profit_change':'扣非33.41亿元，同比+5.02%','margin_quality':'研发投入和产品迭代压制短期利润增速','cashflow_quality':'经营现金流37.74亿元，由负转正','one_off_risk':'low','forward_bridge':'设备国产化与客户验证仍有支撑，但需更多主板可比证据确认利润链。','evidence_for':'多类核心设备市占率提升、收入稳增、现金流改善。','evidence_against':'行业整体利润高增而公司利润仅低个位数增长，结构分化明显。','invalidation_condition':'晶圆厂资本开支下行或公司订单/利润率继续走弱','earnings_direction':'divergent','confidence':'high'}
+          }
+
+          def qprice(code):
+              q=stocks.get(code) or {}
+              return q.get('price')
+          valuations={}
+          for code,c in company_evidence.items():
+              etype='resource_cyclical' if code in {'002466','002460','601899','600362'} else ('cyclical_order_book' if code in {'600150','600685'} else 'growth')
+              if code in {'002463','002916','002371'}:
+                  method='forward_or_normalized_eps_x_justified_pe'
+                  reason='缺少本次可审计的一致Forward盈利区间与独立justified PE桥；半年报不能简单年化。'
+                  assumption='需先建立2026-2027 Forward EPS区间与可解释的justified PE。'
+              elif code in {'002466','002460'}:
+                  method='normalized_lithium_price_earnings_plus_asset_cross_check'
+                  reason='锂价强周期反弹，必须先以可持续锂价/销量/成本正常化盈利。'
+                  assumption='需用周期中枢锂价、资源/化工销量与成本构造正常化盈利。'
+              elif code in {'601899','600362'}:
+                  method='normalized_metal_price_earnings_or_roe_plus_asset_cross_check'
+                  reason='铜/金等资源价格处于景气区间，当前利润不可直接资本化。'
+                  assumption='需用铜价周期中枢、产量、TC/RC及副产品构造正常化盈利。'
+              else:
+                  method='normalized_order_delivery_margin_earnings'
+                  reason='船舶高价订单进入交付期，需正常化交付节奏、船价与毛利率。'
+                  assumption='需用可持续交付量、船价和船舶业务利润率构造正常化盈利。'
+              valuations[code]={
+                'current_price':qprice(code),'price_date':trade_date,'earnings_type':etype,
+                'earnings_basis':'review_required_pending_normalized_or_forward_basis','primary_method':method,
+                'key_assumptions':[assumption],'reasonable_price_assumption':'review_required',
+                'reasonable_price_range':None,'uncertainty':reason,'margin_of_safety_reason':'盈利基础尚未可靠正常化，不能先给折价比例再反推安全价。',
+                'safe_price_range':None,'valuation_position':'review_required','falsifiers':[c['invalidation_condition']],
+                'peer_sanity':'not_used_as_primary_value','history_reference':'price_history_not_intrinsic_value_input',
+                'review_required':True,'review_reason':reason
+              }
+
+          ps_companies=ps.get('companies') or {}
+          price_structures={}
+          for code in company_evidence:
+              r=ps_companies.get(code) or {}
+              price_structures[code]={
+                'current_price':r.get('current_price',qprice(code)),'structure_type':r.get('structure_type','unavailable'),
+                'key_level':r.get('support_invalidation'),'relative_strength':r.get('relative_strength_20d_vs_market_pct'),
+                'volume_confirmation':r.get('breakout_volume_confirmed'),'chase_risk':r.get('chase_risk'),
+                'timing_action':r.get('action','unavailable'),'structure_invalidation':r.get('support_invalidation'),
+                'ma20':r.get('ma20'),'ma60':r.get('ma60'),'data_status':r.get('data_status')
+              }
+
+          deep_rows=[r for lv in ledger.values() for r in lv if r['scan_depth']=='deep']
+          counts={lv:sum(1 for r in ledger[lv] if r['accounted_for']) for lv in ledger}
+          missing={lv:[r['code'] for r in ledger[lv] if not r['accounted_for']] for lv in ledger}
+          deep_resolved=sum(1 for r in deep_rows if r['profit_chain_resolution'] in {'resolved','unconfirmed_with_evidence_gap'})
+          gate=(data_health_passed and counts==taxonomy['expected_counts'] and all(not missing[lv] for lv in missing) and deep_resolved==len(deep_rows) and all(c['comparison_complete'] and c['opportunity_resolution_complete'] for c in comparisons))
+
+          state={
+            'manifest_schema':manifest['schema_version'],'pipeline':manifest['pipeline'],'mode':'shadow','production_label':manifest['production_gate']['label'],
+            'generated_at':datetime.now(TZ).isoformat(),'trade_date':trade_date,'run_type':'manual_1800_full_research','status':'complete_research' if gate else 'incomplete_research',
+            'data_health':{'passed':data_health_passed,'market_status':market_status,'quote_usable':quote_usable,'history_stocks_ge_60_points':history_ge60,'history_stocks_ge_120_points':history_ge120,'structure_reference_trade_date':ps_date,'structure_verified_count':ps_verified},
+            'coverage_ledger':ledger,
+            'market_profitability_radar':[
+              {'direction':'电子/AI硬件','status':'strong_improving','evidence_summary':'2026H1电子为31个申万一级行业中唯一归母净利润翻倍行业；半导体二级盈利增速超过500%，PCB龙头盈利高增。'},
+              {'direction':'有色金属/能源金属','status':'strong_improving','evidence_summary':'有色金属一级盈利增幅居前，能源金属二级增速超过500%；锂、铜龙头利润和现金流明显改善。'},
+              {'direction':'非银金融','status':'strong_improving_but_chain_gap','evidence_summary':'非银一级盈利增幅居前、多元金融二级翻倍，但内部Driver异质，本次不强行合并公司链。'},
+              {'direction':'航海装备','status':'strong_improving','evidence_summary':'航海装备二级盈利翻倍，中国船舶/中船防务利润和现金流兑现。'},
+              {'direction':'房地产/建筑装饰/农林牧渔','status':'weak','evidence_summary':'半年报汇总显示上述板块出现较多亏损，本期按弱处理。'}
+            ],
+            'profit_chains':chains,'chain_comparisons':comparisons,'companies':company_evidence,'valuations':valuations,'price_structures':price_structures,
+            'opportunities':[], 'current_opportunity_best':[],
+            'evidence_sources':evidence_sources,
+            'diagnostics':{'coverage':{'taxonomy':taxonomy['taxonomy'],'expected_counts':taxonomy['expected_counts'],'accounted_for_counts':counts,'missing_level1':missing['level1'],'missing_level2':missing['level2'],'missing_level3':missing['level3'],'deep_nodes_total':len(deep_rows),'deep_nodes_resolved':deep_resolved,'unresolved_must_split_chains':[],'completion_gate_passed':gate},
+                           'publication_rule_applied':'Completion Gate通过也不等于必须有买点；本次所有重点链估值均review_required，因此当前机会为空。' if gate else 'Completion Gate失败，不生成新当前机会。',
+                           'incomplete_reasons':[] if gate else ['机械行情/价格结构数据健康未达到门槛']}
+          }
+          out=Path('data/research/v2/research_state.json')
+          out.write_text(json.dumps(state,ensure_ascii=False,indent=2),encoding='utf-8')
+          print(json.dumps({'trade_date':trade_date,'market_status':market_status,'quote_usable':quote_usable,'history_ge60':history_ge60,'history_ge120':history_ge120,'ps_verified':ps_verified,'deep_nodes':len(deep_rows),'gate':gate},ensure_ascii=False))
+          PY
+      - name: Validate research state contract
+        run: python -m pytest -q
+      - name: Commit research state
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/research/v2/research_state.json
+          if git diff --cached --quiet; then
+            echo "No state change"
+            exit 0
+          fi
+          git commit -m "research: persist schema26 audited full research"
+          for attempt in 1 2 3; do
+            git pull --rebase origin main
+            if git push origin HEAD:main; then exit 0; fi
+            sleep $((attempt * 2))
+          done
+          exit 1
