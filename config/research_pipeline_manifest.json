@@ -1,19 +1,21 @@
 {
-  "schema_version": 19,
+  "schema_version": 20,
   "pipeline": "a_share_low_risk_v2",
   "mode": "shadow",
   "architecture": "prompt_first_research",
-  "purpose": "先用开放式研究发现全市场正在改善的行业与真实盈利链，再映射公司、验证盈利、分类估值，最后用价格结构决定时机。",
+  "purpose": "先开放式发现全市场正在改善的行业与真实盈利链，再在链内比较直接受益公司、验证盈利、分类估值，最后用价格结构决定时机。",
   "constitution": [
-    "Prompt负责开放式行业景气发现与产业链因果拆解；不得用预填答案表替代研究。",
-    "Skill只约束长期稳定的研究顺序、公司证据纪律、估值模型纪律和价格结构纪律。",
+    "Prompt负责开放式行业景气发现、盈利链因果拆解和链内公司比较；不得用预填答案表替代研究。",
+    "Skill只约束研究顺序、公司证据纪律、估值模型纪律和价格结构纪律。",
     "代码只负责数据获取、机械计算、过滤、持久化与通用自洽校验；不得决定哪些行业应该景气。",
     "先全行业横向比较，再向下拆盈利链，再映射公司；禁止从熟悉股票倒推产业链。",
     "行业覆盖清单只是防漏检查表，不是候选答案池；必须允许发现清单之外的新盈利链。",
+    "每条重点盈利链必须先比较多个直接受益公司，再区分基本面最优与当前机会最优；二者允许不同，当前机会也允许为空。",
     "公司是否受益必须回到业务暴露和财务科目验证，行业标签不能替代公司研究。",
     "先识别盈利类型再估值；同行估值和历史价格只作sanity/reference，不参与内在价值投票。",
+    "Fair Value与低风险买入区必须输出可解释桥接：盈利基础、主估值方法/倍数、安全边际来源。",
     "价格结构只回答何时买，不回答值多少钱。",
-    "当前为Shadow研究；新架构完成连续验证前不发布正式买点。"
+    "当前为Shadow研究；连续验证完成前不发布正式买点。"
   ],
   "authoritative_skills": {
     "orchestrator": "skills/a-share-low-risk/orchestrator/SKILL.md",
@@ -30,7 +32,9 @@
       "完整扫描主要行业并横向比较盈利与领先变量的边际变化。",
       "找到改善行业后继续拆到直接影响收入、销量、成本或毛利率的盈利链。",
       "同时寻找支持证据、反向证据、未来1-2季度传导与失效条件。",
-      "不得读取current_industry_scan_signals或旧industry_scan作为当前研究答案。"
+      "重点盈利链存在多个主板直接受益公司时必须做链内横向比较，不得把首个代表股当作最佳股。",
+      "分别输出fundamental_best与current_opportunity_best，并说明差异；没有低风险当前机会时允许为空。",
+      "不得读取obsolete_v2_inputs_and_outputs中的旧文件作为当前研究答案。"
     ]
   },
   "authoritative_data": {
@@ -44,45 +48,13 @@
     "prompt_research_state": "data/research/v2/research_state.json"
   },
   "stages": [
-    {
-      "id": "data_health",
-      "executor": "code",
-      "purpose": "确认主板全集、最新交易日、行情历史和基础财务数据可用。"
-    },
-    {
-      "id": "market_profitability_discovery",
-      "executor": "prompt",
-      "purpose": "开放式横向比较全市场行业盈利、价格/价差、订单、库存、产销、开工、出口和资本开支，发现真正出现边际改善的行业。"
-    },
-    {
-      "id": "profit_chain_decomposition",
-      "executor": "prompt",
-      "requires": ["market_profitability_discovery"],
-      "purpose": "对改善行业向下拆解真实盈利链，解释直接利润变量、未来1-2季度传导和失效条件。"
-    },
-    {
-      "id": "company_research",
-      "executor": "prompt+code",
-      "requires": ["profit_chain_decomposition"],
-      "purpose": "映射直接受益公司并用扣非/主营、现金流、一次性因素和Forward Bridge验证真实盈利。"
-    },
-    {
-      "id": "valuation",
-      "executor": "prompt+code",
-      "requires": ["company_research"],
-      "purpose": "按盈利类型选择简洁估值模型，形成Fair Value、估值不确定性与低风险买入区；同行和历史仅作sanity/reference。"
-    },
-    {
-      "id": "price_structure",
-      "executor": "code+prompt",
-      "purpose": "独立扫描全主板价格结构，只判断交易时机，不进入内在价值计算。"
-    },
-    {
-      "id": "opportunity_synthesis",
-      "executor": "prompt",
-      "requires": ["company_research", "valuation", "price_structure"],
-      "purpose": "综合盈利真实性、估值位置和价格时机形成研究机会，不用复杂状态机替代判断。"
-    }
+    {"id":"data_health","executor":"code","purpose":"确认主板全集、最新交易日、行情历史和基础财务数据可用。"},
+    {"id":"market_profitability_discovery","executor":"prompt","purpose":"开放式横向比较全市场行业盈利和领先变量，发现真正出现边际改善的行业。"},
+    {"id":"profit_chain_decomposition","executor":"prompt","requires":["market_profitability_discovery"],"purpose":"对改善行业向下拆真实盈利链，解释直接利润变量、未来1-2季度传导和失效条件。"},
+    {"id":"chain_company_comparison","executor":"prompt+code","requires":["profit_chain_decomposition"],"purpose":"对重点链召回多个直接受益公司，比较业务暴露、主营/扣非兑现、现金流和Forward Bridge，区分基本面最优与当前机会最优。"},
+    {"id":"valuation","executor":"prompt+code","requires":["chain_company_comparison"],"purpose":"按盈利类型选择简洁估值模型，形成Fair Value、不确定性与低风险买入区，并解释两者桥接。"},
+    {"id":"price_structure","executor":"code+prompt","purpose":"独立扫描全主板价格结构，只判断交易时机，不进入内在价值计算。"},
+    {"id":"opportunity_synthesis","executor":"prompt","requires":["chain_company_comparison","valuation","price_structure"],"purpose":"综合盈利真实性、估值位置和价格时机形成研究机会，不用复杂状态机替代判断。"}
   ],
   "valuation_principles": {
     "growth_or_stable": "Forward/normalized EPS × justified PE；增长持续性、盈利质量和现金转换用于解释合理倍数与不确定性。",
@@ -90,22 +62,26 @@
     "resource_or_strong_cycle": "先正常化盈利/ROE并判断商品或价差周期，再用正常化PE/PB/资产价值交叉检查；禁止直接资本化周期顶部利润。",
     "unreliable": "无法建立稳定盈利基础或模型敏感性过高时直接review_required。",
     "peer_and_history": "同行估值、历史PE/PB与历史价格只作sanity/reference，不拥有投票权和买入区裁剪权。",
-    "margin_of_safety": "安全边际随估值不确定性变化，不使用未经校准的统一固定折价作为金融真理。"
+    "margin_of_safety": "安全边际随估值不确定性变化，不使用未经校准的统一固定折价作为金融真理。",
+    "bridge_required": "正式展示估值时必须能从earnings_basis + fair_method/multiple解释Fair Value，并从uncertainty解释低风险买入区。"
   },
   "validation_policy": {
     "case_free": true,
-    "principle": "Validator只检查数据完整性、模型匹配、计算自洽和禁止事项，不替Prompt做行业发现或产业链判断。"
+    "principle": "Validator只检查数据完整性、模型匹配、计算自洽、链内比较是否发生和禁止事项，不替Prompt做行业发现或决定PE。"
   },
   "production_gate": {
     "enabled": false,
-    "reason": "新Prompt-first架构需先完成Shadow验证；当前所有结果仅为V2影子研究。"
+    "reason": "Prompt-first架构需完成连续Shadow验证；当前所有结果仅为V2影子研究。"
   },
   "obsolete_v2_inputs_and_outputs": [
     "config/current_industry_scan_signals.json",
     "data/research/pipeline/industry_scan.json",
     "data/research/v2/earnings_driver_scan.json",
+    "data/research/v2/company_research.json",
+    "data/research/v2/valuation_reference.json",
     "data/research/v2/valuation_anchors.json",
     "data/research/v2/price_expectation_gap.json",
+    "data/research/v2/opportunity_ranking.json",
     "data/research/v2/shadow_crosscheck.json"
   ]
 }
