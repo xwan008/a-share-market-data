@@ -1,55 +1,86 @@
 # 公司盈利研究 Skill
 
 ## 目的
-把本期已完成盈利链拆解的节点映射到真正受益的主板公司，验证改善是否来自主营、是否有现金流支持、未来1–2季度是否仍有Forward Bridge。本Skill不发现景气行业，也不维护跨期公司名单。
+把本期所有**已确认盈利改善的产业链**映射到真正受益的主板公司，通过“全链轻筛 → 排除不匹配 → 横向比较 → 跨链去重 → 估值”逐层收敛。计算成本靠轻筛淘汰解决，禁止靠Top-N、每行业配额或先验代表股截断研究准入。
 
 ## 输入
-1. 本期`coverage_ledger`中进入deep并完成盈利链resolution的节点；
-2. 本期确认的细分盈利链及直接利润变量；
-3. Manifest指定的`data/research/company_industry_index.json`，仅用于股票与申万层级映射；
-4. 本次实时获取的公司财报、公告、交易所披露、业绩预告/快报、订单/产销/价格/成本等公开经营证据。
+1. 本期`coverage_ledger`及全部盈利链resolution；
+2. 本期所有满足Manifest `confirmed_improving_chain_definition`的盈利链；
+3. Manifest指定的`data/research/company_industry_index.json`，仅用于公司与申万节点映射；
+4. 本轮实时获取的公司财报、公告、交易所披露、业绩预告/快报、订单/产销/价格/成本等公开证据。
 
-公司识别必须从本期盈利链出发，不得先读取上一期公司名单、估值或历史机会名单再反向决定研究对象。
+不得读取上一期公司、估值或机会名单作为召回起点。
 
-## 链内公司识别
-优先研究对盈利链有直接实质业务暴露、Driver可传导至核心产品/业务，且产业地位、纯度、产能、订单、销量或成本优势可能形成主要受益的主板公司。
+## 1. 全链公司轻筛：必须全集进入
+对**每一条 confirmed improving chain**，先召回该链对应的全部已映射主板公司，再逐只执行轻量筛选。不得在轻筛前按市值、利润增速、知名度、评分或任何Top-N规则截断。
 
-若同链存在2家及以上经济机制真正可比的主板公司，必须至少横向比较2家；有3家以上高可比对象时优先覆盖更多。不得因为第一家代表股证据完整就停止召回。
+例如铝盈利链若映射到中国铝业、云铝股份、天山铝业、神火股份等，必须先全部进入轻筛；最终谁被排除只能由公司级证据决定，而不是因为没进“前三名”。
 
-若确实只有1家高纯度主板可比公司，必须记录`singleton_reason`。
+每家公司轻筛至少记录：
+- `code / name / source_chain_ids`；
+- `business_exposure_match`：主营是否对该Driver有足够实质暴露；
+- `profit_driver_match`：本期盈利改善是否确实来自该链Driver，而非其他业务；
+- `earnings_quality_match`：扣非、现金流、一次性收益是否支持；
+- `comparability`：是否与同链其他公司具有相近经济机制；
+- `screen_decision = survive / exclude`；
+- `exclusion_reason`；
+- `evidence_basis`。
 
-## 真正受益证据链
-每家公司至少建立：
-`盈利Driver → 具体业务/产品 → 收入/销量/价格/成本/毛利 → 扣非盈利/现金流 → Forward Bridge`
+允许排除的原因只使用Manifest列举的公司级原因，并必须有具体证据。不能写“排名靠后”“不是龙头”“暂不关注”。
 
-必查：收入与主营变化、归母净利润、扣非净利润/扣非EPS、可得时同比/环比、毛利率/利润率、经营现金流、一次性收益、与Driver直接相关的订单/出货/产销/价格/成本/业务量、Forward Bridge和失效条件。
+## 2. 轻筛判断重点
+轻筛只回答“有没有资格进入深比较”，不做完整估值。优先检查：
+- 主营收入/利润中该产业链暴露是否足够；
+- 2026H1/TTM扣非利润是否和行业Driver同向；
+- 毛利率/单位利润/产销量是否支持；
+- 盈利增长是否主要来自一次性项目；
+- 公司是否处于重大重组、主营切换或口径不可比；
+- 是否只是概念相关而没有实际利润贡献。
 
-## TTM纪律
-缺一致预期时可用TTM扣非盈利作为构造Forward/正常化盈利的一个保守锚，但禁止半年报简单乘2。累计口径：`TTM = 上年全年 + 本年累计 - 上年同期累计`。周期/资源公司必须先判断是否需正常化。
+## 3. 横向比较：所有survivor都比较
+轻筛后所有`survive`公司必须进入链内横向比较。不得再截Top3或只选代表股。
 
-## 链内比较完成定义
-每条重点链必须输出：
-- `compared_companies`：实际比较的主板公司；
+横向比较维度至少包括：
+`业务纯度 / Driver敏感度 / 盈利兑现 / 扣非质量 / 现金流 / 毛利率与成本优势 / 订单或产能可见度 / 持续性 / 资本强度 / 重大口径风险 / 可估值性`。
+
+链内输出：
+- `screened_companies`：轻筛全集；
+- `excluded_companies`：公司与明确排除原因；
+- `compared_companies`：全部survivor；
 - `comparison_complete`；
-- `fundamental_best`：只看业务纯度、盈利兑现、现金流与持续性；
-- `current_opportunity_best`：加入完整估值和价格结构后的当前最优，可为空；
+- `fundamental_best`；
+- `current_opportunity_best`：加入估值与结构后才确定，可为空；
 - `opportunity_resolution_complete`；
-- `singleton_reason`：仅单公司链需要。
+- `singleton_reason`：轻筛后只剩1家时说明原因。
 
-存在2家及以上可比主板公司时，`comparison_complete=false`不得进入最终机会发布。
+## 4. 跨链去重：去重工作量，不丢失链关系
+同一公司可能同时属于多个盈利链，例如资源+加工、消费电子+AI终端。横向比较先保留其全部链内身份，之后进入估值前按股票代码去重：
+- 一家公司在`valuation_set`只出现一次；
+- 必须保留完整`source_chain_ids`；
+- 估值只执行一次；
+- 估值结果可回填到多个链的机会解析。
 
-## valuation_set
-**所有列入`compared_companies`且完成公司证据验证的公司，必须进入本次`valuation_set`。**
+去重不能被用来删除某条链的公司覆盖证明。
 
-不再采用“比较很多公司、最后只估值最代表的一只”的捷径。进入公司层后对象数量已经有限，应逐只完成估值，才能判断：
-- fundamental_best是否也是价值最好；
-- 是否存在基本面次优但估值更有安全边际的公司；
-- 当前机会是否因为价格而发生排序变化。
+## 5. valuation_set
+所有实际进入`compared_companies`且公司证据验证完成的公司都进入`valuation_set`；按股票代码去重后逐只估值。
 
-只有因业务暴露验证失败而被明确淘汰的公司可以不进入valuation_set，并必须写明淘汰原因。
+轻筛是唯一允许显著降低公司数量的阶段。进入横向比较以后，不得再因为“数量太多”“已有代表股”“计算成本高”跳过估值。
 
-## 每家公司最低输出
+## 6. 守恒诊断
+每轮必须能机械回答：
+- confirmed improving chain 有多少条；
+- 其中多少条完成公司轻筛；
+- 未轻筛的盈利链代码/ID是什么；
+- 轻筛一共覆盖多少公司；
+- 排除多少；
+- survivor多少；
+- 去重后valuation_set多少。
+
+`unscreened_confirmed_improving_chains`非空时Completion Gate必须失败。
+
+## 7. 每家公司深比较最低证据
 `why_now`、`driver_links`与暴露纯度、收入/归母/扣非变化、`margin_quality`、`cashflow_quality`、`one_off_risk`、`forward_bridge`、`evidence_for/evidence_against`、`invalidation_condition`、盈利方向与置信度。
 
 ## 持久化
-公司研究只写本次`research_state.json`中的`companies`、`chain_comparisons`与`valuation_set`，不写独立公司池或候选文件。
+公司研究只写本次`research_state.json`中的`company_light_screen`、`companies`、`chain_comparisons`与`valuation_set`，不建立独立公司池、候选池或Top榜。
