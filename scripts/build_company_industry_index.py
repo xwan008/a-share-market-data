@@ -10,10 +10,11 @@ from zoneinfo import ZoneInfo
 ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data"
 LATEST_PATH = DATA_DIR / "latest.json"
-UNIVERSE_PATH = ROOT / "config" / "industry_scan_universe.json"
+TAXONOMY_OUTPUT_PATH = ROOT / "config" / "industry_scan_universe.json"
 OUTPUT_PATH = DATA_DIR / "research" / "company_industry_index.json"
 TZ = ZoneInfo("Asia/Shanghai")
 MAIN_BOARD_PREFIXES = ("600", "601", "603", "605", "000", "001", "002", "003")
+EXPECTED_COUNTS = {1: 31, 2: 134, 3: 346}
 
 
 def read_json(path: Path, default: dict) -> dict:
@@ -36,56 +37,132 @@ def iso_date(value) -> str | None:
     return text[:10]
 
 
-def load_sw_taxonomy():
+def load_sw_taxonomy() -> dict[str, dict]:
     import akshare as ak
 
     df = ak.stock_industry_category_cninfo(symbol="申银万国行业分类标准")
     if df is None or df.empty:
         raise RuntimeError("empty_sw_taxonomy")
+
     nodes: dict[str, dict] = {}
     for _, row in df.iterrows():
         code = str(row.get("类目编码") or "").strip()
         if not code:
             continue
-        level_raw = row.get("分级")
         try:
-            level = int(level_raw)
+            level = int(row.get("分级"))
         except (TypeError, ValueError):
-            level = -1
+            continue
         nodes[code] = {
+            "code": code,
             "name": str(row.get("类目名称") or "").strip(),
-            "parent": str(row.get("父类编码") or "").strip(),
+            "parent_code": str(row.get("父类编码") or "").strip() or None,
             "level": level,
         }
     return nodes
 
 
-def level1_from_code(industry_code: str | None, taxonomy: dict[str, dict]) -> tuple[str | None, str | None]:
+def build_taxonomy_snapshot(nodes: dict[str, dict], now_iso: str) -> dict:
+    levels: dict[str, list[dict]] = {}
+    counts: dict[str, int] = {}
+    for level in (1, 2, 3):
+        key = f"level{level}"
+        rows = [
+            {
+                "code": node["code"],
+                "name": node["name"],
+                "parent_code": node["parent_code"],
+            }
+            for node in nodes.values()
+            if node["level"] == level
+        ]
+        rows.sort(key=lambda item: item["code"])
+        levels[key] = rows
+        counts[key] = len(rows)
+
+    expected = {f"level{k}": v for k, v in EXPECTED_COUNTS.items()}
+    if counts != expected:
+        raise RuntimeError(f"unexpected_sw_taxonomy_counts:{counts}:expected:{expected}")
+
+    return {
+        "schema_version": 3,
+        "generated_at": now_iso,
+        "taxonomy": "申万行业分类标准2021版",
+        "role": "coverage_only_not_answer_pool",
+        "expected_counts": expected,
+        "accounting_rule": "18:00完整研究必须逐一accounted_for全部节点；弱/稳定节点可浅扫描，改善/恶化/显著分化节点进入深度盈利链研究。",
+        "profit_chain_rule": "申万三级行业不是盈利链默认终点；若直接盈利Driver、领先变量或利润传导不同，必须继续拆分。",
+        "levels": levels,
+    }
+
+
+def resolve_sw_levels(industry_code: str | None, taxonomy: dict[str, dict]) -> dict[str, str | None]:
     code = str(industry_code or "").strip()
+    by_level: dict[int, dict] = {}
     visited: set[str] = set()
     while code and code not in visited:
         visited.add(code)
         node = taxonomy.get(code)
         if not node:
-            return None, None
-        if node.get("level") == 1:
-            return code, node.get("name") or None
-        code = node.get("parent") or ""
-    return None, None
+            break
+        level = int(node.get("level") or 0)
+        if level in (1, 2, 3):
+            by_level[level] = node
+        code = str(node.get("parent_code") or "")
+
+    result: dict[str, str | None] = {}
+    for level in (1, 2, 3):
+        node = by_level.get(level)
+        result[f"sw_level{level}_code"] = node.get("code") if node else None
+        result[f"sw_level{level}_name"] = node.get("name") if node else None
+    return result
 
 
-def fetch_company_classification(code: str, name: str, taxonomy: dict[str, dict], broad_name_to_id: dict[str, str], now_iso: str) -> tuple[str, dict | None, str | None]:
+def normalize_entry(item: dict, taxonomy: dict[str, dict]) -> dict:
+    levels = resolve_sw_levels(item.get("industry_code"), taxonomy)
+    normalized = {
+        "name": item.get("name"),
+        "source": item.get("source") or "cninfo_sw_industry_via_akshare",
+        "classification_standard": item.get("classification_standard") or "申银万国行业分类标准",
+        "industry_code": item.get("industry_code"),
+        **levels,
+        "classification_change_date": item.get("classification_change_date"),
+        "last_verified_at": item.get("last_verified_at"),
+    }
+    normalized["mapping_status"] = (
+        "mapped"
+        if all(normalized.get(f"sw_level{level}_code") for level in (1, 2, 3))
+        else "unmapped"
+    )
+    return normalized
+
+
+def fetch_company_classification(
+    code: str,
+    name: str,
+    taxonomy: dict[str, dict],
+    now_iso: str,
+) -> tuple[str, dict | None, str | None]:
     import akshare as ak
 
     try:
-        df = ak.stock_industry_change_cninfo(symbol=code, start_date="19900101", end_date=now_iso[:10].replace("-", ""))
+        df = ak.stock_industry_change_cninfo(
+            symbol=code,
+            start_date="19900101",
+            end_date=now_iso[:10].replace("-", ""),
+        )
         if df is None or df.empty:
             return code, None, "empty_industry_history"
 
-        sw = df[
-            df.get("分类标准", "").astype(str).str.contains("申银万国", na=False)
-            | (df.get("分类标准编码", "").astype(str) == "008003")
-        ].copy()
+        if "分类标准" not in df.columns and "分类标准编码" not in df.columns:
+            return code, None, "missing_classification_standard_columns"
+
+        standard = df["分类标准"].astype(str) if "分类标准" in df.columns else ""
+        standard_code = df["分类标准编码"].astype(str) if "分类标准编码" in df.columns else ""
+        mask = standard.str.contains("申银万国", na=False) if hasattr(standard, "str") else False
+        if hasattr(standard_code, "__eq__"):
+            mask = mask | (standard_code == "008003")
+        sw = df[mask].copy()
         if sw.empty:
             return code, None, "no_sw_classification"
 
@@ -93,34 +170,28 @@ def fetch_company_classification(code: str, name: str, taxonomy: dict[str, dict]
             sw = sw.sort_values("变更日期")
         row = sw.iloc[-1]
         industry_code = str(row.get("行业编码") or "").strip() or None
-        level1_code, level1_name = level1_from_code(industry_code, taxonomy)
-        broad_id = broad_name_to_id.get(level1_name or "")
-
+        levels = resolve_sw_levels(industry_code, taxonomy)
         item = {
             "name": name or str(row.get("新证券简称") or "").strip(),
             "source": "cninfo_sw_industry_via_akshare",
             "classification_standard": str(row.get("分类标准") or "申银万国行业分类标准"),
             "industry_code": industry_code,
-            "sw_level1_code": level1_code,
-            "sw_level1_name": level1_name,
-            "registry_broad_industry_id": broad_id,
-            "hierarchy": {
-                "门类": None if str(row.get("行业门类")) == "nan" else row.get("行业门类"),
-                "次类": None if str(row.get("行业次类")) == "nan" else row.get("行业次类"),
-                "大类": None if str(row.get("行业大类")) == "nan" else row.get("行业大类"),
-                "中类": None if str(row.get("行业中类")) == "nan" else row.get("行业中类"),
-            },
+            **levels,
             "classification_change_date": iso_date(row.get("变更日期")),
             "last_verified_at": now_iso,
-            "mapping_status": "mapped" if broad_id else "unmapped",
         }
+        item["mapping_status"] = (
+            "mapped"
+            if all(item.get(f"sw_level{level}_code") for level in (1, 2, 3))
+            else "unmapped"
+        )
         return code, item, None
     except Exception as exc:
         return code, None, f"{type(exc).__name__}:{exc}"
 
 
 def is_stale(item: dict | None, now: datetime, refresh_days: int) -> bool:
-    if not item:
+    if not item or item.get("mapping_status") != "mapped":
         return True
     value = item.get("last_verified_at")
     if not value:
@@ -135,7 +206,7 @@ def is_stale(item: dict | None, now: datetime, refresh_days: int) -> bool:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Build persistent main-board SW industry index")
+    parser = argparse.ArgumentParser(description="Build persistent main-board SW 2021 industry index")
     parser.add_argument("--refresh-days", type=int, default=60)
     parser.add_argument("--limit", type=int, default=0, help="0 means all missing/stale codes")
     parser.add_argument("--workers", type=int, default=6)
@@ -153,21 +224,25 @@ def main() -> int:
         print(json.dumps({"status": "error", "reason": "no_main_board_stocks"}, ensure_ascii=False))
         return 2
 
-    universe = read_json(UNIVERSE_PATH, {})
-    broad_name_to_id = {
-        str(item.get("name")): str(item.get("id"))
-        for item in universe.get("broad_industries", [])
-        if item.get("name") and item.get("id")
-    }
-
-    old = read_json(OUTPUT_PATH, {"companies": {}})
-    existing: dict[str, dict] = old.get("companies", {}) if isinstance(old.get("companies"), dict) else {}
-
     try:
         taxonomy = load_sw_taxonomy()
+        taxonomy_snapshot = build_taxonomy_snapshot(taxonomy, now_iso)
     except Exception as exc:
         print(json.dumps({"status": "error", "reason": f"taxonomy_failed:{type(exc).__name__}:{exc}"}, ensure_ascii=False))
         return 2
+
+    TAXONOMY_OUTPUT_PATH.write_text(
+        json.dumps(taxonomy_snapshot, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+
+    old = read_json(OUTPUT_PATH, {"companies": {}})
+    old_companies = old.get("companies", {}) if isinstance(old.get("companies"), dict) else {}
+    existing = {
+        code: normalize_entry(item, taxonomy)
+        for code, item in old_companies.items()
+        if code in stocks and isinstance(item, dict)
+    }
 
     refresh_codes = [
         code for code in sorted(stocks)
@@ -187,7 +262,6 @@ def main() -> int:
                 code,
                 str(stocks[code].get("name") or ""),
                 taxonomy,
-                broad_name_to_id,
                 now_iso,
             ): code
             for code in refresh_codes
@@ -200,23 +274,22 @@ def main() -> int:
             else:
                 failures[code] = error or "unknown"
 
-    # Never keep delisted/non-universe codes in the live index.
     updated = {code: item for code, item in updated.items() if code in stocks}
-
     indexed_count = len(updated)
-    mapped_count = sum(1 for item in updated.values() if item.get("registry_broad_industry_id"))
+    mapped_count = sum(1 for item in updated.values() if item.get("mapping_status") == "mapped")
     missing_codes = sorted(set(stocks) - set(updated))
     unmapped_codes = sorted(
         code for code, item in updated.items()
-        if not item.get("registry_broad_industry_id")
+        if item.get("mapping_status") != "mapped"
     )
     coverage_pct = indexed_count / len(stocks) * 100 if stocks else 0.0
     mapped_pct = mapped_count / indexed_count * 100 if indexed_count else 0.0
 
     payload = {
-        "schema_version": 1,
+        "schema_version": 2,
         "generated_at": now_iso,
         "source": "cninfo_sw_industry_via_akshare",
+        "taxonomy": "申万行业分类标准2021版",
         "trade_date_reference": latest.get("trade_date"),
         "refresh_days": args.refresh_days,
         "main_board_universe_count": len(stocks),
@@ -224,7 +297,7 @@ def main() -> int:
         "successful_refresh_count": successes,
         "failed_refresh_count": len(failures),
         "indexed_count": indexed_count,
-        "mapped_to_registry_broad_count": mapped_count,
+        "mapped_to_sw_level3_count": mapped_count,
         "coverage_pct": round(coverage_pct, 2),
         "mapped_pct": round(mapped_pct, 2),
         "status": "healthy" if not missing_codes and not unmapped_codes else ("degraded" if coverage_pct >= 80 else "building"),
@@ -236,8 +309,6 @@ def main() -> int:
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT_PATH.write_text(json.dumps(payload, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
     print(json.dumps({k: v for k, v in payload.items() if k != "companies"}, ensure_ascii=False))
-    # Partial data is persisted deliberately. Downstream T2 recall must explicitly
-    # classify missing/unmapped codes before it can claim complete coverage.
     return 0
 
 
