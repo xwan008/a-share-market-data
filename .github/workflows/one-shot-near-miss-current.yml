@@ -1,0 +1,123 @@
+name: Derive current near-miss top10
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/one-shot-near-miss-current.yml']
+permissions:
+  contents: write
+jobs:
+  rank:
+    if: github.event.head_commit.message == 'derive current near-miss top10'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Derive ranking from current state
+        run: |
+          python - <<'PY'
+          import json, math
+          from pathlib import Path
+          s=json.loads(Path('data/research/v2/research_state.json').read_text(encoding='utf-8'))
+          vals=s.get('valuations',{})
+          bps=s.get('buy_point_assessments',{})
+          companies=s.get('companies',{})
+          ps=s.get('price_structures',{})
+          chains={x.get('chain_id'):x for x in s.get('profit_chains',[]) if isinstance(x,dict)}
+
+          def rng(v):
+              if isinstance(v,(list,tuple)) and len(v)>=2:
+                  try: return (float(v[0]),float(v[1]))
+                  except: return None
+              return None
+          def pctdist(x,r):
+              if x is None or not r or x<=0:return None
+              lo,hi=sorted(r)
+              if lo<=x<=hi:return 0.0
+              d=(lo-x) if x<lo else (x-hi)
+              return max(0.0,d/x*100)
+          def gap(r1,r2,price):
+              if not r1 or not r2:return None
+              a,b=sorted(r1); c,d=sorted(r2)
+              if max(a,c)<=min(b,d):return 0.0
+              dist=(c-b) if b<c else (a-d)
+              den=price if price and price>0 else max(abs(a),abs(b),abs(c),abs(d),1)
+              return max(0.0,dist/den*100)
+          rows=[]
+          for code,v in vals.items():
+              if not isinstance(v,dict) or v.get('valuation_position')=='review_required' or v.get('model_execution_status')=='blocked_after_full_attempt':
+                  continue
+              bp=bps.get(code) or {}
+              price=v.get('current_price')
+              try: price=float(price)
+              except: continue
+              safe=rng(v.get('safe_price_range'))
+              er=rng(bp.get('structure_entry_range'))
+              if er is None:
+                  er=rng((ps.get(code) or {}).get('structure_entry_range'))
+              inter=None
+              if safe and er:
+                  lo=max(min(safe),min(er)); hi=min(max(safe),max(er))
+                  if lo<=hi: inter=(lo,hi)
+              value=bool(bp.get('value_eligible'))
+              timing=bool(bp.get('timing_eligible'))
+              status=bp.get('buy_point_status')
+              avoid=1 if status=='avoid' else 0
+              missing=(0 if value else 1)+(0 if timing else 1)+(0 if inter else 1)
+              if inter and not (inter[0]<=price<=inter[1]):missing+=1
+              missing+=avoid
+              vg=0.0 if (safe and price<=max(safe)) else ((price/max(safe)-1)*100 if safe and max(safe)>0 else None)
+              sg=pctdist(price,er)
+              rg=gap(safe,er,price)
+              ig=pctdist(price,inter)
+              co=companies.get(code) or {}
+              score=co.get('comparison_score')
+              try: score=float(score)
+              except: score=-1e18
+              source=co.get('source_chain_ids') or []
+              chain_names=[]
+              for cid in source[:3]:
+                  ch=chains.get(cid) or {}
+                  chain_names.append(ch.get('direct_driver') or cid)
+              if not chain_names:
+                  chain_names=[co.get('sw_level3_name') or co.get('sw_level2_name') or '']
+              reasons=[]; triggers=[]
+              if not value:
+                  reasons.append('价值条件未满足')
+                  if safe: triggers.append(f'价格降至安全价上沿≤{max(safe):.2f}')
+              if not timing:
+                  st=(ps.get(code) or {}).get('structure_type') or (ps.get(code) or {}).get('structure_status')
+                  reasons.append(f'结构时机未满足({st or "无有效入场结构"})')
+                  if er: triggers.append(f'价格进入结构区{er[0]:.2f}-{er[1]:.2f}')
+                  else: triggers.append('形成pullback/breakout/trend_continuation有效结构')
+              if safe and er and not inter:
+                  reasons.append('安全价区与结构入场区无交集')
+                  triggers.append('等待安全价区与结构区间重叠')
+              if inter and not (inter[0]<=price<=inter[1]):
+                  reasons.append('已有交集但当前价不在交集内')
+                  triggers.append(f'价格进入交集{inter[0]:.2f}-{inter[1]:.2f}')
+              if avoid:
+                  reasons.append('存在avoid风险门')
+                  triggers.append('风险门解除')
+              rows.append({
+                  'code':code,'name':co.get('name',code),'industry_chain':' / '.join(chain_names),
+                  'current_price':price,'safe_price_range':safe,'structure_status':(ps.get(code) or {}).get('structure_type') or (ps.get(code) or {}).get('structure_status'),
+                  'structure_entry_range':er,'missing_hard_conditions':missing,'avoid_penalty':avoid,
+                  'value_gap_pct':vg,'structure_gap_pct':sg,'safe_structure_range_gap_pct':rg,'current_to_intersection_pct':ig,
+                  'blocking_reason':'；'.join(reasons) or '仅等待当前价进入可执行区','next_trigger':'；'.join(dict.fromkeys(triggers)) or '价格进入可执行交集',
+                  'fundamental_score':score,'buy_point_status':status
+              })
+          INF=1e18
+          rows.sort(key=lambda x:(x['avoid_penalty'],x['missing_hard_conditions'], INF if x['safe_structure_range_gap_pct'] is None else x['safe_structure_range_gap_pct'], INF if x['current_to_intersection_pct'] is None else x['current_to_intersection_pct'], INF if (x['value_gap_pct'] is None or x['structure_gap_pct'] is None) else x['value_gap_pct']+x['structure_gap_pct'], -x['fundamental_score'], x['code']))
+          top=rows[:10]
+          for i,r in enumerate(top,1):r['rank']=i
+          print('NEAR_MISS_TOP10_JSON')
+          print(json.dumps({'eligible_count':len(rows),'top10':top},ensure_ascii=False,indent=2))
+          PY
+      - name: Self remove
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/one-shot-near-miss-current.yml
+          git commit -m "chore: remove near-miss derivation workflow"
+          git push
