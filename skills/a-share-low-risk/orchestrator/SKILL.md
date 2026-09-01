@@ -74,18 +74,14 @@ weekly_full直接基于当前公开证据做一次全市场搜索，回答：**�
 
 `unscreened_confirmed_improving_chains`非空时直接fail closed。
 
-## 8. VALUATION：经济价值驱动优先
-valuation_set每家公司执行 Valuation Engine V2。
+## 8. VALUATION：默认简单，异常升级
+valuation_set每家公司执行 Valuation Engine V3。
 
-硬门：
-1. 先识别 `valuation_archetype`，申万一级行业不能单独决定模型；
-2. 非review公司必须有 `base_case + downside_case + base_fair_value + safe_price_ceiling`；
-3. resource_asset 禁止固定低PE单模型，必须使用NAV/DCF、正常化EV/EBITDA、FCF/股息能力等资产/现金流方法；
-4. spread_cyclical 必须显式研究产品-原料价差、开工与正常化利润率；
-5. financial 必须执行PB-ROE或Residual Income；
-6. 正常化必须反映已发生的产能、资源量、产品结构变化，不能机械回归旧年度利润；
-7. 极端偏离的第二模型必须更换价值驱动家族，同一EPS换另一个PE倍数不算独立模型；
-8. 安全价硬边界是 `safe_price_ceiling`，MOS只作用一次，禁止“压盈利+低倍数+再折合理价下沿”的重复保守化。
+正常盈利公司默认使用：`Forward扣非EPS × 合理PE`，合理PE由当前/动态PE、同三级行业PE中位数、核心盈利增速共同决定，并用PB/ROE与180日市场位置交叉验证。禁止正常公司默认进入NAV/DCF重模型。
+
+只有PE失真、重大重组、一次性污染、金融资产负债表业务、极端周期、PE/PB/同行严重冲突、模型与180日市场严重冲突等异常才升级PB-ROE/EV-EBITDA/NAV/DCF等Exception Path。
+
+安全价只做一次MOS：`safe_price_ceiling = base_fair_value × (1-MOS)`。
 
 ## 9. PRICE STRUCTURE：独立生成入场区间
 价格结构只回答WHEN。对每家非review估值公司输出独立的`structure_entry_range`和`structure_invalidation`，不得参考合理/安全价值调整技术区间。
@@ -128,27 +124,17 @@ Gate前必须满足：
 固定输出：执行状态、全市场盈利景气雷达、完整盈利产业链雷达、链内公司轻筛与横向比较、估值与价格区间、价格结构与时机、当前买点、诊断。
 
 
-## 接近买点榜（Near-miss Ranking V2）
+## 接近买点榜（Near-miss Ranking V3）
 
-【当前低风险买点】仍只允许 `buyable_now`，绝不为了凑榜降低价值或结构门槛。
+正式买点仍只允许 `buyable_now`，绝不为了凑榜降低买点门槛。即使当前买点为0，Top10仍必须输出。
 
-Near-miss 的含义改为：**距离成为可执行买点还需要多大实际变化**，而不是旧版按区间字段字典序排序。
+排序只回答“离可执行买点还有多远”：
+- `missing_hard_conditions`：价值不合格 +1；结构不合格 +1；avoid排除；
+- `value_gap_pct`：当前价降到safe_price_ceiling所需幅度，已满足为0；
+- `structure_gap_pct`：当前价到有效structure_entry_range最近边界距离，位于区间内为0；无有效结构区记不可测；
+- `action_distance_pct = max(value_gap_pct, structure_gap_pct)`（两者均可测时）。
 
-对所有完整非review且非avoid公司计算：
-- `value_gap_pct`：当前价下降到 `safe_price_ceiling` 所需幅度；已价值合格为0；
-- `structure_gap_pct`：当前价到有效结构入场区最近边界的距离；
-- `ceiling_structure_gap_pct`：结构入场区整体高于安全上限时，两者最近边界距离；若结构区已有部分位于安全上限以内则为0；
-- `current_to_actionable_range_pct`：有效可执行区存在时，当前价到该区最近边界距离；
-- `action_distance_pct = max(上述可测硬距离)`，表示当前最大的阻塞距离；
-- `valuation_confidence_penalty`：估值不确定性越高，排序越靠后。
+标签：near≤5%，watch 5%–15%，far>15%。
+排序：`missing_hard_conditions → distance_band → action_distance_pct → 基本面得分 → 股票代码`。结构距离不可测者在同缺失条件内排在可测者之后。
 
-距离标签：
-- `near`：<=5%；
-- `watch`：>5%且<=15%；
-- `far`：>15%。
-
-排序：`near_miss_tier → action_distance_pct → valuation_confidence_penalty → 基本面得分 → 股票代码`。
-
-Top10仍必须输出；如果最接近的公司也超过15%，必须明确写“相对最接近，但仍远离买点”，不能把35%、60%的价值缺口包装成“接近买点”。
-
-该榜只做当期展示，不得持久化为候选池或下一轮发现种子。
+Top10每只必须写【还缺什么】和【下一触发条件】；第1名若仍>15%，明确写“相对最接近，但仍远离买点”。榜单只当期展示，不得持久化为候选池，也不得作为下一轮发现种子。

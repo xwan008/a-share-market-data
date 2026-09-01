@@ -11,7 +11,7 @@ def load(p):
 
 def test_repo_whitelist_and_public_evidence_are_separate_layers():
     p = load('config/research_runtime_policy.json')
-    assert p['schema_version'] == 11
+    assert p['schema_version'] == 12
     assert p['research_read_mode'] == 'manifest_repo_data_plus_current_public_evidence'
     assert p['repository_data_policy']['allow_only_manifest_authoritative_data'] is True
     assert p['public_evidence_policy']['allowed'] is True

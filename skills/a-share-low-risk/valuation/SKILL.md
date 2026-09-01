@@ -1,189 +1,88 @@
-# 估值 Skill — Valuation Engine V2
+# 估值 Skill — Valuation Engine V3（交易筛选估值）
 
 ## 目的
-回答 `valuation_set` 中每家公司的真实内在价值、安全价格上限与估值位置，为最终买点提供独立价值基础。
+本任务不是给企业做投行级绝对估值，而是回答：**当前价格相对公司的核心盈利能力、三级同行和自身近180日市场定价，贵不贵；合理区间大概在哪；有没有足够安全边际。**
 
-本 Skill 的核心纪律不是“尽量保守”，而是：**模型必须和公司的经济价值驱动匹配；保守性只能通过明确的情景与 Margin of Safety 表达，不能通过多轮重复压低盈利、倍数和价格来叠加。**
+核心原则：**默认简单，异常升级。** 正常盈利公司禁止默认使用NAV/DCF等重模型。
 
-固定主线：
-`真实核心盈利 → 公司行动/股本审计 → 价值驱动类型 → Forward/正常化经营情景 → 主模型 → 真独立第二模型/异常审计 → Base Fair Value → Reasonable Range → Downside Scenario → Margin of Safety → Safe Price Ceiling → 估值位置`
+## 1. Normal Valuation Path（默认路径）
+适用于扣非/核心盈利为正、主营口径可比、没有重大重组/一次性污染、PE仍有经济意义的绝大多数公司。
 
-## 1. 公司行动、股本与核心盈利先行
-Forward/正常化盈利前必须检查：
-- 当前总股本/稀释股本及对比期变化；
-- 换股吸收合并、重大资产重组、定增、拆并股；
-- 历史利润是否追溯调整；
-- 主营是否切换；
-- 归母净利润是否被非经常损益污染。
+固定顺序：
+`核心盈利 → Forward核心EPS → 当前PE/TTM PE/动态PE → 同三级行业PE横比 → 盈利增速调整 → PB/ROE交叉验证 → 180日市场sanity → 合理PE区间 → 合理价格区 → 一次MOS → Safe Price Ceiling`
 
-股本变化达到 Manifest 阈值时，禁止“历史EPS × 增长率”。使用总扣非/核心盈利除以当前或 Forward 稀释股本重建每股盈利。
+### 1.1 Forward核心EPS
+优先使用扣非/核心盈利。半年报只有在季节性较稳定时才可合理年化；否则结合Q1/Q2边际、公司指引、订单/销量等构造Forward区间。股本发生重大变化时必须用当前/Forward稀释股本重算EPS。
 
-非经常损益占归母净利润达到 30% 及以上时，受污染归母利润不得进入 Forward Bridge；必须改用扣非/核心盈利。无法取得足够核心盈利证据才允许 `review_required:nonrecurring_earnings_dominant`。
+### 1.2 PE主锚
+必须获取并记录：
+- 当前/TTM PE；
+- 动态PE（可得时）；
+- 同三级行业可比公司PE中位数与分位；
+- 公司核心盈利增速。
 
-## 2. 先识别 Valuation Archetype，不能只看申万一级行业
-每家公司必须输出 `valuation_archetype` 与 `archetype_basis`。允许的主要类型：
+合理PE不是固定行业表，而是从“三级同行中位数 + 公司自身动态PE + 盈利增长/质量”构造并解释。
 
-1. `resource_asset`：矿山、油气、煤炭等价值主要来自资源储量、产量、商品价格、成本与资产寿命；
-2. `spread_cyclical`：化工、冶炼、部分材料，价值主要来自产品-原料价差、开工、产量与正常化利润率；
-3. `order_backlog`：船舶、重型装备、部分工程资本品，价值主要来自订单、交付、价格、产能与毛利率；
-4. `growth_compounder`：电子、通信、软件及其他具有可验证增长、ROIC/现金流支撑的成长公司；
-5. `stable_cashflow`：消费、公用事业、交通、成熟制造等稳定现金流业务；
-6. `financial`：银行、券商、保险等资产负债表驱动业务；
-7. `special_situation`：重大重组、业务切换、资产处置主导等特殊情形。
+基本原则：
+- 盈利增速、ROE/现金质量明显优于同行，可允许合理溢价；
+- 盈利增速低于同行或现金质量差，应折价；
+- 当前PE只是参考，不能直接把当前估值复制成合理估值。
 
-申万分类只能帮助路由，**不得单独决定估值模型**。同一行业不同公司可以属于不同 archetype。
+### 1.3 PB/ROE交叉验证
+PB不是正常公司的主模型，但必须作为第二视角。比较公司PB与三级同行PB中位数，并结合ROE/资产质量解释溢价或折价。
 
-## 3. 不同 Archetype 必须使用不同价值驱动
+典型异常：PE看起来很便宜，但PB很高且ROE不支持；或PE很贵，但PB/ROE与高质量资产明显支持。出现明显冲突时进入Exception Path，而不是机械平均。
 
-### 3.1 resource_asset
-禁止把资源股统一套“6–10x PE”。必须显式研究：
-- 核心商品价格锚：当前价格、近年中枢/成本曲线、供需与合理正常化区间；
-- 可销售产量/权益产量及未来1–2年增量；
-- 单位现金成本/完全成本；
-- 资本开支、净债务、资源寿命/储量质量；
-- 税费、少数股东及重要权益矿影响。
+### 1.4 180日市场sanity check
+必须读取最近180个交易日：价格low/median/high、当前价格percentile，最好同时使用可得的历史估值分位。
 
-主模型优先：`NAV/DCF` 或 `normalized EV/EBITDA`。
-独立第二模型：另一价值驱动家族，例如 `NAV/DCF ↔ normalized EV/EBITDA`、`FCF/dividend capacity ↔ EV/EBITDA`、必要时 `PB/ROE` sanity。
+用途是检查模型是否明显脱离市场现实：
+- 如果模型合理价长期远低于过去180日主要交易区，而盈利又在改善且没有结构性恶化，优先怀疑模型；
+- 如果基本面发生结构性变化，历史价格只能参考，不能强行把合理价拉回历史区间。
 
-像紫金矿业这类多金属、产量仍在扩张的公司，必须把铜/金/锂等产量增长与项目投产纳入 Forward 资产/现金流，而不能用“上一年利润70% + 当期30%”简单压回历史中枢。
+180日市场数据是sanity，不是“市场永远正确”。
 
-### 3.2 spread_cyclical
-化工、冶炼等必须研究：
-`产品价格 - 原料成本 = 价差 → 开工率/销量 → 正常化毛利/EBITDA`。
+### 1.5 合理价与安全价
+先形成 `fair_pe_low/mid/high`，再用Forward核心EPS得到 `reasonable_price_range` 与 `base_fair_value`。
 
-主模型优先：`normalized EV/EBITDA` 或价差情景 DCF；
-第二模型：正常化核心盈利 PE / ROIC sanity。
-不得仅因为属于“周期行业”统一使用固定低PE。
+MOS只应用一次：
+`safe_price_ceiling = base_fair_value × (1 - MOS)`
 
-### 3.3 order_backlog
-必须研究：
-`在手订单 → 未来交付 → 单价 → 毛利率 → 产能利用率 → 未来1–2年核心盈利`。
+参考：高置信10%–15%，中等15%–20%，低置信20%–25%。不得再对合理价下沿重复打折。
 
-主模型可用 `forward EV/EBIT / forward PE`；第二模型使用订单覆盖下的正常化现金流或 ROE/PB。短期利润高增不能直接永久资本化，但已锁定订单也不能被机械压回旧周期低谷。
+## 2. Exception Path（仅异常公司）
+只有以下情况才升级复杂模型：
+- PE为负或没有经济意义；
+- 重大重组/主营切换；
+- 一次性收益显著污染；
+- 银行/保险等资产负债表业务；
+- 极端周期顶部/底部导致TTM PE失真；
+- PE与PB/同行出现无法解释的重大冲突；
+- 模型与180日市场定价严重冲突且简单复核不能解释；
+- 商业模式发生断裂。
 
-### 3.4 growth_compounder
-至少构造未来1–2年核心 EPS/FCF，并检查：
-- 收入增长与订单/出货；
-- 毛利率/费用率；
-- ROIC/ROE；
-- 现金转换；
-- 资本强度；
-- 增长可见度。
+异常模型可使用 PB-ROE、Residual Income、EV/EBITDA、NAV/DCF、FCF/DCF 或 case-specific。必须记录 `exception_trigger`，没有触发不得升级复杂模型。
 
-主模型：`justified forward PE / EV-EBIT`；第二模型：`DCF/FCF yield/PEG sanity`。PE 倍数不能只由行业标签决定。
+## 3. 极端偏离审计
+若合理价与当前价偏离达到Manifest阈值，先做简单复核：
+1. Forward核心EPS是否错；
+2. 股本/重组/一次性收益是否错；
+3. 三级同行PE/PB是否取错；
+4. 盈利增速与现金质量调整是否合理；
+5. 180日市场sanity是否出现强冲突。
 
-### 3.5 stable_cashflow
-主模型根据业务采用 `DCF / dividend capacity / EV-EBITDA / justified PE`，重点看现金流稳定性、资本开支、定价权与可持续增长。
+只有上述仍无法解释，才升级复杂模型。禁止为了证明极端估值而直接堆NAV/DCF。
 
-### 3.6 financial
-必须使用 `PB-ROE / residual income` 等资产负债表模型；缺少一致预期不能直接 review，必须用公开ROE、净资产、资产质量、资本约束自行构造区间。
+## 4. 必须输出
+正常公司至少输出：
+`current_price / price_date / current_pe / dynamic_pe / pb / core_profit_growth / peer_pe_median / peer_pb_median / fair_pe_low-mid-high / pe_basis / pb_cross_check / peer_valuation_check / market_180d_sanity_check / reasonable_price_range / base_fair_value / margin_of_safety_pct / safe_price_ceiling / valuation_position / falsifiers / valuation_path=normal_relative`。
 
-## 4. 情景先于倍数：必须有 Base 与 Downside
-每家非 review 公司至少构造：
-- `base_case`：当前公开证据下最可能的未来1–2年经营情景；
-- `downside_case`：关键 Driver 回到保守但仍合理水平时的情景；
-- 可选 `upside_case`，只能用于不确定性描述，不能用于降低安全边际。
+异常公司必须额外输出：
+`valuation_path=exception / exception_trigger / exception_method / exception_evidence`。
 
-资源/周期公司必须让商品价格、价差、产量、成本等在情景中显式出现；成长公司必须让收入、利润率、ROIC/现金流出现。
-
-**正常化不是自动回归旧年度利润。** 如果产能、资源量、产品结构或竞争优势发生结构性提升，正常化基础必须反映新的经营能力。
-
-## 5. 真独立第二模型
-“同一EPS × 8倍PE”与“同一EPS × 10倍PE”不算两个独立模型。
-
-独立第二模型必须至少改变一个核心价值驱动家族：
-- earnings multiple ↔ DCF/FCF；
-- resource NAV ↔ normalized EV/EBITDA；
-- PB-ROE ↔ residual income；
-- order-forward PE ↔ normalized cash flow。
-
-触发极端估值偏离时必须有真独立第二模型。若两个模型都只依赖同一盈利基数和不同倍数，审计视为失败。
-
-## 6. Base Fair Value 与 Reasonable Range
-每个执行成功的模型必须输出自己的 `model_value_low / model_value_base / model_value_high / key_inputs / confidence`。
-
-最终：
-- `base_fair_value`：来自主模型与独立模型的证据加权中枢；
-- `reasonable_price_range`：围绕 Base Case 的模型/情景合理区间，而不是悲观情景到乐观情景的无限大包络；
-- `downside_value`：单独保存，不和 reasonable range 混为一谈。
-
-当前市场价格只能用于判断位置和触发审计，**不得反向把 Base Fair Value 调到接近市价**。
-
-## 7. Margin of Safety：只折一次
-旧做法“先把盈利压低 → 再给低倍数 → 再对合理价下沿打75%–85%”属于重复保守化，禁止使用。
-
-新的核心字段是：`safe_price_ceiling`。
-
-原则：
-`Safe Price Ceiling = Base Fair Value × (1 - MOS)`，并结合 downside case 做一致性检查。
-
-MOS 根据：
-- 经营不确定性；
-- 周期敏感度；
-- 资本强度/杠杆；
-- 模型间稳定性；
-- 数据质量。
-
-默认参考区间而非机械常数：
-- low uncertainty：约10%–15%；
-- medium：约15%–25%；
-- high：约25%–35%。
-
-若模型本身已经显式采用很保守的 downside 经营假设，不得再次无解释叠加极端 MOS。
-
-`safe_price_range` 可作为展示性的偏好入场带，但**价值硬条件只看 current_price <= safe_price_ceiling**。价格低于展示带下沿不能因此变成“不满足价值”；极低价格应触发基本面/模型复核。
-
-## 8. 极端偏离与市场现实审计
-满足 Manifest 极端偏离条件时必须：
-1. 复核股本、重组与核心盈利；
-2. 复核 archetype 是否选错；
-3. 复核正常化/Forward 情景是否忽略结构性产量、成本或业务变化；
-4. 执行真独立第二模型；
-5. 比较模型中枢差异。
-
-若 Safe Price Ceiling 与当前价差距极大，也必须输出 `market_reality_audit`：说明市场当前隐含的盈利/倍数假设与模型差异在哪里。它是 sanity check，不允许直接用市价修改内在价值。
-
-无法解释的巨大偏离必须 `review_required:model_instability`，而不是制造一个看似精确但经济上荒谬的安全价。
-
-## 9. 必须输出的估值桥
-至少包括：
-- `current_price / price_date`；
-- `valuation_archetype / archetype_basis`；
-- `earnings_type / earnings_basis`；
-- `current_share_count / share_count_basis`；
-- `corporate_action_check / earnings_bridge_integrity`；
-- `scenario_analysis`（至少base/downside）；
-- `primary_method / primary_model_output`；
-- `secondary_method / secondary_model_output`（按规则要求时）；
-- `base_fair_value`；
-- `reasonable_price_range`；
-- `downside_value`；
-- `uncertainty / margin_of_safety_pct / margin_of_safety_reason`；
-- `safe_price_ceiling`；
-- `safe_price_range`（仅展示带，可选下沿意义必须说明）；
-- `valuation_position`；
-- `falsifiers`；
-- `valuation_quality_flags`；
-- `valuation_attempt_complete / model_execution_status`。
-
-## 10. valuation_position
-至少使用：
-`below_safe / in_safe_zone / fair / above_fair / materially_overvalued / review_required`。
-
-其中 `below_safe / in_safe_zone` 的价值资格以 `safe_price_ceiling` 为核心，而不是展示带下沿。
-
-## 11. review_required 是异常出口，不是偷懒出口
-只允许重大重组口径断裂、核心盈利无法剥离、关键数据不可得、模型严重不稳定、商业模式断裂等实质异常。
-
-缺一致预期、缺现成Forward EPS、需要自己构造商品价格/价差/订单情景，都不是 review 理由。
-
-## Completion纪律
-- valuation_set每家公司必须先完成 archetype 识别；
-- 非review公司必须有 base/downside、Base Fair Value、合理价与 Safe Price Ceiling；
-- resource_asset / spread_cyclical / financial 等不能只使用单一PE法；
-- 所有极端偏离必须有真独立第二模型或转review；
-- 估值完成不代表可以买，最终仍由价值资格与独立价格结构共同决定。
-
-## 持久化
-只写本次 `research_state.json` 的 `valuations`。旧估值不能作为本期内在价值输入，不写独立估值缓存。
+## 5. Completion纪律
+- valuation_set逐只执行；
+- 正常公司必须完成PE主锚、PB/ROE交叉验证、三级同行比较和180日sanity；
+- 异常公司必须有明确异常触发，不得默认走复杂模型；
+- Safe Price Ceiling只应用一次MOS；
+- 估值完成不代表可买，最终仍与独立价格结构结合。

@@ -10,7 +10,7 @@ def manifest():
 
 def test_manifest_schema31_and_stage_order():
     m = manifest()
-    assert m['schema_version'] == 31
+    assert m['schema_version'] == 32
     assert m['mode'] == 'shadow'
     assert m['stage_order'] == [
         'data_health', 'taxonomy_coverage', 'market_prosperity_search',

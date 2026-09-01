@@ -1,5 +1,5 @@
 {
-  "schema_version": 11,
+  "schema_version": 12,
   "pipeline": "a_share_low_risk_v2",
   "research_read_mode": "manifest_repo_data_plus_current_public_evidence",
   "manifest_path": "config/research_pipeline_manifest.json",
@@ -86,23 +86,30 @@
     "every_selected_direction_must_map_to_relevant_level3": true,
     "every_mapped_relevant_level3_must_be_profitability_verified": true,
     "daily_incremental_uses_prompt_search_for_new_or_changed_prosperity_evidence": true,
-    "valuation_archetype_required_before_model_execution": true,
+    "valuation_archetype_required_before_model_execution": false,
     "sw_level1_only_valuation_model_selection_forbidden": true,
-    "resource_asset_fixed_pe_only_valuation_forbidden": true,
-    "spread_cyclical_fixed_pe_only_valuation_forbidden": true,
-    "base_and_downside_scenarios_required_for_non_review_valuation": true,
+    "resource_asset_fixed_pe_only_valuation_forbidden": false,
+    "spread_cyclical_fixed_pe_only_valuation_forbidden": false,
+    "base_and_downside_scenarios_required_for_non_review_valuation": false,
     "safe_price_ceiling_required_for_value_eligibility": true,
     "fixed_discount_from_reasonable_lower_bound_forbidden": true,
-    "extreme_deviation_secondary_method_must_use_independent_value_driver_family": true,
-    "same_eps_different_pe_is_not_independent_secondary_method": true,
+    "extreme_deviation_secondary_method_must_use_independent_value_driver_family": false,
+    "same_eps_different_pe_is_not_independent_secondary_method": false,
     "near_miss_action_distance_is_primary_sort_metric": true,
     "near_miss_far_names_must_be_labeled_far": true,
     "legacy_safe_upper_bound_value_eligibility_forbidden": true,
-    "required_archetype_input_completeness_must_be_audited": true,
-    "generic_pe_fallback_when_archetype_inputs_missing_forbidden": true,
-    "primary_secondary_model_family_independence_must_be_audited": true,
+    "required_archetype_input_completeness_must_be_audited": false,
+    "generic_pe_fallback_when_archetype_inputs_missing_forbidden": false,
+    "primary_secondary_model_family_independence_must_be_audited": false,
     "near_miss_missing_hard_conditions_must_be_retained_as_step_count": true,
-    "near_miss_unmeasurable_structure_distance_must_not_be_fabricated": true
+    "near_miss_unmeasurable_structure_distance_must_not_be_fabricated": true,
+    "normal_profitable_company_uses_simple_relative_valuation_by_default": true,
+    "default_valuation_requires_pe_dynamic_pe_pb_core_growth_level3_peers": true,
+    "default_valuation_requires_180d_market_sanity": true,
+    "complex_absolute_valuation_is_exception_only": true,
+    "exception_trigger_required_before_complex_model": true,
+    "single_margin_of_safety_application_required": true,
+    "near_miss_uses_value_gap_and_structure_gap": true
   },
   "write_policy": {
     "current_research_output_only": "data/research/v2/research_state.json",
@@ -113,6 +120,7 @@
     "new_state_must_include_coverage_ledger_company_light_screen_buy_points_and_scan_mode": true,
     "new_state_must_include_near_miss_ranking": true,
     "new_state_must_include_market_prosperity_search_and_level3_verification": true,
-    "new_state_must_include_valuation_engine_v2_fields": true
+    "new_state_must_include_valuation_engine_v2_fields": true,
+    "new_state_must_include_valuation_engine_v3_fields": true
   }
 }

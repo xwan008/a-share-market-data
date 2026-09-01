@@ -1,5 +1,5 @@
 {
-  "schema_version": 31,
+  "schema_version": 32,
   "pipeline": "a_share_low_risk_v2",
   "mode": "shadow",
   "architecture": "prompt_first_research",
@@ -266,7 +266,21 @@
       "valuation_quality_flags",
       "valuation_input_completeness",
       "primary_model_family",
-      "market_reality_audit"
+      "market_reality_audit",
+      "fair_pe_low",
+      "fair_pe_mid",
+      "fair_pe_high",
+      "pe_basis",
+      "current_pe",
+      "dynamic_pe",
+      "pb",
+      "peer_pe_median",
+      "peer_pb_median",
+      "core_profit_growth",
+      "pb_cross_check",
+      "peer_valuation_check",
+      "market_180d_sanity_check",
+      "valuation_path"
     ],
     "corporate_action_check_required_before_earnings_bridge": true,
     "historical_eps_direct_scaling_across_material_share_count_change_forbidden": true,
@@ -301,14 +315,16 @@
       "max_method_midpoint_divergence_pct_before_model_instability": 30.0,
       "if_audit_fails": "review_required:model_instability",
       "requires_independent_value_driver_family": true,
-      "same_eps_different_pe_fails_independence_test": true
+      "same_eps_different_pe_fails_independence_test": true,
+      "default_response": "recheck_forward_eps_peer_pe_pb_and_180d_sanity_before_any_complex_model",
+      "complex_secondary_method_only_if_simple_rechecks_do_not_resolve": true
     },
     "core_earnings_preferred_over_parent_netprofit_when_nonrecurring_dominant": true,
     "nonrecurring_dominance_threshold_of_parent_netprofit": 0.3,
     "parent_netprofit_contaminated_by_material_nonrecurring_items_cannot_feed_forward_bridge": true,
     "missing_required_core_earnings_evidence_after_light_screen_means_review_required": "nonrecurring_earnings_dominant",
-    "valuation_engine_version": 2,
-    "valuation_archetype_required": true,
+    "valuation_engine_version": 3,
+    "valuation_archetype_required": false,
     "valuation_archetypes": [
       "resource_asset",
       "spread_cyclical",
@@ -319,8 +335,8 @@
       "special_situation"
     ],
     "sw_level1_alone_cannot_determine_valuation_archetype": true,
-    "base_case_required": true,
-    "downside_case_required": true,
+    "base_case_required": false,
+    "downside_case_required": false,
     "base_fair_value_required": true,
     "safe_price_ceiling_required": true,
     "safe_price_ceiling_is_value_eligibility_boundary": true,
@@ -331,21 +347,21 @@
     "market_reality_audit_required_when_safe_ceiling_gap_is_extreme": true,
     "resource_asset_requires_asset_or_cashflow_model": true,
     "resource_asset_single_fixed_pe_forbidden": true,
-    "spread_cyclical_requires_spread_or_margin_normalization": true,
+    "spread_cyclical_requires_spread_or_margin_normalization": false,
     "financial_requires_pb_roe_or_residual_income": true,
     "normalization_must_reflect_structural_capacity_or_mix_change": true,
     "mos_reference_ranges": {
-      "low": [
+      "high_confidence": [
         0.1,
         0.15
       ],
-      "medium": [
+      "medium_confidence": [
         0.15,
-        0.25
+        0.2
       ],
-      "high": [
-        0.25,
-        0.35
+      "low_confidence": [
+        0.2,
+        0.25
       ]
     },
     "archetype_model_contract": {
@@ -486,7 +502,93 @@
       "no_repeated_conservatism",
       "model_independence_passed_or_not_required",
       "market_reality_audit_passed_or_not_required"
-    ]
+    ],
+    "default_path": "relative_earnings_valuation",
+    "default_path_principle": "normal profitable companies use PE/dynamic PE + PB/ROE + level3 peers + earnings growth, with 180d market sanity; complex absolute valuation is exception-only",
+    "complex_model_is_exception_not_default": true,
+    "default_path_required_inputs": [
+      "core_forward_eps",
+      "current_pe_or_ttm_pe",
+      "dynamic_pe_if_available",
+      "pb",
+      "roe_if_available",
+      "core_profit_growth",
+      "level3_peer_pe_median",
+      "level3_peer_pb_median",
+      "price_180d_low",
+      "price_180d_median",
+      "price_180d_high",
+      "price_180d_percentile"
+    ],
+    "default_path_required_outputs": [
+      "fair_pe_low",
+      "fair_pe_mid",
+      "fair_pe_high",
+      "pe_basis",
+      "pb_cross_check",
+      "peer_valuation_check",
+      "market_180d_sanity_check",
+      "base_fair_value",
+      "reasonable_price_range",
+      "margin_of_safety_pct",
+      "safe_price_ceiling"
+    ],
+    "fair_pe_construction_contract": {
+      "primary_anchor": "level3_peer_pe_median_and_company_dynamic_pe",
+      "growth_adjustment_required": true,
+      "profit_quality_adjustment_required": true,
+      "pb_roe_cross_check_required": true,
+      "peer_comparison_required": true,
+      "company_current_pe_is_reference_not_automatic_fair_pe": true,
+      "market_180d_is_sanity_check_not_sole_intrinsic_value_input": true,
+      "fair_pe_must_be_explained_not_fixed_by_level1_industry": true
+    },
+    "forward_eps_contract": {
+      "use_deducted_or_core_earnings": true,
+      "annualize_only_when_seasonality_is_reasonably_stable": true,
+      "otherwise_use_internal_forward_range_from_recent_quarters_and_guidance": true,
+      "material_share_change_requires_current_or_forward_diluted_share_count": true
+    },
+    "pb_cross_check_contract": {
+      "pb_is_secondary_for_normal_companies": true,
+      "compare_with_level3_peers": true,
+      "roe_or_asset_quality_should_explain_material_pb_premium_or_discount": true,
+      "material_pe_pb_conflict_triggers_exception_review": true
+    },
+    "market_sanity_contract": {
+      "history_window_trading_days": 180,
+      "required_statistics": [
+        "low",
+        "median",
+        "high",
+        "percentile"
+      ],
+      "if_model_value_is_far_outside_180d_range_and_fundamentals_have_not_structurally_changed_trigger_audit": true,
+      "historical_price_cannot_override_clear_earnings_or_business_structural_change": true,
+      "market_price_is_sanity_check_not_truth": true
+    },
+    "exception_path_triggers": [
+      "negative_or_unusable_pe",
+      "major_restructuring",
+      "nonrecurring_earnings_dominant",
+      "financial_balance_sheet_business",
+      "extreme_cycle_peak_or_trough",
+      "pe_pb_peer_conflict",
+      "model_vs_180d_market_conflict",
+      "business_model_break"
+    ],
+    "exception_path_models": [
+      "pb_roe",
+      "residual_income",
+      "ev_ebitda",
+      "nav_dcf",
+      "fcf_dcf",
+      "case_specific"
+    ],
+    "resource_asset_fixed_pe_only_valuation_forbidden": false,
+    "normal_company_complex_archetype_forbidden_as_default": true,
+    "single_mos_application_required": true,
+    "safe_price_ceiling_formula": "base_fair_value * (1 - margin_of_safety_pct)"
   },
   "buy_point_contract": {
     "purpose": "买点必须是价值安全边际与价格结构时机的交集，不能由任一单独维度替代。",
@@ -531,15 +633,11 @@
       "ranking_is_display_only_not_candidate_pool": true,
       "cross_run_persistence_as_pool_forbidden": true,
       "required_metrics": [
-        "near_miss_tier",
-        "distance_band",
         "missing_hard_conditions",
         "value_gap_pct",
         "structure_gap_pct",
-        "ceiling_structure_gap_pct",
-        "current_to_actionable_range_pct",
         "action_distance_pct",
-        "valuation_confidence_penalty",
+        "distance_band",
         "current_missing",
         "next_trigger"
       ],
@@ -560,10 +658,10 @@
         "stock_code ascending final deterministic tie-breaker"
       ],
       "interpretation": "rank 1 means closest to satisfying the existing low-risk buy-point rules, not highest expected return and not a recommendation to buy now.",
-      "ranking_version": 2,
+      "ranking_version": 3,
       "avoid_excluded_from_primary_near_miss_ranking": true,
       "action_distance_is_primary_metric": true,
-      "action_distance_formula": "max(value_gap_pct, structure_gap_pct, ceiling_structure_gap_pct, current_to_actionable_range_pct)",
+      "action_distance_formula": "max(value_gap_pct, structure_gap_pct) when both measurable; if structure unavailable, rank after measurable names within same missing_hard_conditions",
       "near_threshold_pct": 5.0,
       "watch_threshold_pct": 15.0,
       "distance_bands": {
@@ -574,9 +672,9 @@
       "far_names_must_be_labeled_relative_closest_not_near": true,
       "safe_structure_range_gap_pct_deprecated": true,
       "sort_order": [
-        "near_miss_tier by missing_hard_conditions asc",
-        "measurable action_distance_pct asc",
-        "valuation_confidence_penalty asc",
+        "missing_hard_conditions asc",
+        "distance_band asc",
+        "action_distance_pct asc",
         "fundamental_score desc",
         "stock_code asc"
       ],
@@ -588,7 +686,8 @@
         "buyable_now": "separate current-opportunity list, not near-miss"
       },
       "qualitative_structure_wait_allowed_when_value_eligible": true,
-      "unmeasurable_structure_distance_must_not_be_fabricated": true
+      "unmeasurable_structure_distance_must_not_be_fabricated": true,
+      "primary_definition": "distance to executable buy point using only value gap and structure gap"
     },
     "value_eligible_requires_current_price_at_or_below_safe_price_ceiling": true,
     "safe_price_ceiling_is_hard_value_boundary": true,
@@ -662,12 +761,16 @@
     "no_prosperity_search_top_n_truncation": true,
     "all_selected_directions_have_taxonomy_mapping": true,
     "all_mapped_relevant_level3_profitability_verified": true,
-    "all_non_review_valuations_have_archetype": true,
-    "all_non_review_valuations_have_base_and_downside_cases": true,
+    "all_non_review_valuations_have_archetype": false,
+    "all_non_review_valuations_have_base_and_downside_cases": false,
     "all_non_review_valuations_have_base_fair_value_and_safe_price_ceiling": true,
-    "resource_and_spread_cyclical_valuations_use_archetype_specific_models": true,
-    "extreme_deviation_secondary_models_pass_independent_driver_test": true,
-    "near_miss_action_distance_complete_when_eligible_universe_nonempty": true
+    "resource_and_spread_cyclical_valuations_use_archetype_specific_models": false,
+    "extreme_deviation_secondary_models_pass_independent_driver_test": false,
+    "near_miss_action_distance_complete_when_eligible_universe_nonempty": true,
+    "all_normal_non_review_valuations_have_simple_relative_inputs": true,
+    "all_normal_non_review_valuations_have_peer_and_pb_cross_checks": true,
+    "all_normal_non_review_valuations_have_180d_market_sanity": true,
+    "exception_companies_have_explicit_exception_trigger_and_model": true
   },
   "persistence_contract": {
     "only_prompt_research_output": "data/research/v2/research_state.json",
