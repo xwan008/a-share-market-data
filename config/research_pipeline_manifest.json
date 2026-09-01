@@ -78,6 +78,9 @@
   "level3_state_contract": {
     "taxonomy": "申万行业分类标准2021版",
     "expected_counts": {"level1": 31, "level2": 134, "level3": 346},
+    "bootstrap_full_refresh_required_when_state_missing_invalid_or_requires_full_refresh": true,
+    "bootstrap_ignores_weekly_anchor": true,
+    "bootstrap_must_complete_before_daily_incremental_mode": true,
     "weekly_full_refresh_anchor": "Friday 18:00 Asia/Shanghai",
     "weekly_full_refresh_fallback": "next available weekday 18:00",
     "daily_incremental_refresh": true,

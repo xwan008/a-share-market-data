@@ -34,13 +34,18 @@
 
 一级/二级只做路由，不保存长期景气标签。真正的跨期产业状态只存在于三级行业。
 
+### Bootstrap硬规则
+每次完成Data Gate后先检查 `industry_state.json`。若文件不存在、状态无效，或明确标记 `requires_full_refresh`，则本次运行**必须立即执行一次完整三级盈利基线重建**，不能因为当天不是周五而进入日度增量模式。Bootstrap从本次全市场Prompt发现结果出发，对映射出的全部相关三级行业完成盈利验证；只有Bootstrap通过Completion Gate并写出有效基线后，后续运行才允许进入正常“周度全量 + 日度增量”节奏。
+
+Bootstrap失败时，本轮为 `incomplete_research`，不得发布正式买点，也不得把半成品写成有效行业基线。
+
 ### 周度与日度的边界
 - Prompt全市场轻召回：**每次运行都做**。
-- 三级行业深度盈利刷新：周度全量、日度增量。
+- 三级行业深度盈利刷新：已有有效基线后，周度全量、日度增量。
 - 周五18:00对本轮发现方向映射出的全部相关三级行业重新验证；失败则下一个可用工作日18:00补做。
 - 其他运行读取最近有效 `industry_state.json`，只对存在新证据、新方向、失效或实质变化的三级节点做深度增量刷新。
 
-因此“每日增量”只限制三级深研工作量，**不能限制Prompt发现范围**。
+因此“每日增量”只限制三级深研工作量，**不能限制Prompt发现范围，也不能绕过首次Bootstrap**。
 
 三级状态至少记录：`trend / strength / breadth / confidence / evidence_basis / leading_variables / profit_driver / falsifiers / last_verified_at`。
 
@@ -82,7 +87,7 @@
 
 `核心盈利 → Forward核心EPS → 当前/TTM PE + 动态PE → 三级同行PE → 核心盈利增速调整 → PB/ROE交叉验证 → 180日市场sanity → fair PE区间 → reasonable price → base fair value → 一次MOS → safe_price_ceiling`
 
-只有Manifest规定的异常触发条件出现时才进入 PB-ROE / Residual Income / EV-EBITDA / NAV/DCF / FCF/DCF 等Exception Path，并必须记录 `exception_trigger`。
+只有Manifest规定的异常触发条件出现时才进入 PB-ROE / Residual Income / EV/EBITDA / NAV/DCF / FCF/DCF 等Exception Path，并必须记录 `exception_trigger`。
 
 MOS只应用一次：`safe_price_ceiling = base_fair_value × (1-MOS)`。
 
@@ -117,6 +122,7 @@ MOS只应用一次：`safe_price_ceiling = base_fair_value × (1-MOS)`。
 ## 12. COMPLETION GATE 与正式发布
 正式发布前必须机械确认：
 - Data Gate通过；
+- 若无有效三级基线，本轮Bootstrap已完整通过；
 - 本轮Prompt全市场轻召回完整，无Top-N截断；
 - 所有发现方向完成taxonomy映射；
 - 所有需要刷新的三级行业盈利状态完成；
