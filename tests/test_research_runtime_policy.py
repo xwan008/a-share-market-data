@@ -40,6 +40,13 @@ def test_every_run_has_full_market_prompt_recall_while_level3_is_incremental():
     assert l3["daily_incremental_rechecks_level3_only_when_new_or_changed_evidence_exists"] is True
 
 
+def test_runtime_bootstraps_before_incremental_when_no_valid_industry_baseline():
+    l3 = load("config/research_runtime_policy.json")["level3_refresh_policy"]
+    assert l3["bootstrap_full_refresh_required_when_state_missing_invalid_or_requires_full_refresh"] is True
+    assert l3["bootstrap_ignores_weekly_anchor"] is True
+    assert l3["bootstrap_must_complete_before_daily_incremental_mode"] is True
+
+
 def test_company_admission_and_mapping_are_hard_runtime_gates():
     s = load("config/research_runtime_policy.json")["stage_execution_policy"]
     assert s["company_admission_accepts_improving"] is True
