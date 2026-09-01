@@ -1,12 +1,7 @@
 {
-  "schema_version": 32,
-  "pipeline": "a_share_low_risk_v2",
-  "mode": "shadow",
-  "architecture": "prompt_first_research",
-  "production_gate": {
-    "enabled": false,
-    "label": "V2影子研究，不发布正式买点"
-  },
+  "contract_id": "a-share-low-risk-production",
+  "pipeline": "a_share_low_risk",
+  "mode": "production",
   "authoritative_skills": {
     "orchestrator": "skills/a-share-low-risk/orchestrator/SKILL.md",
     "company_research": "skills/a-share-low-risk/company-research/SKILL.md",
@@ -16,502 +11,157 @@
   "authoritative_data": {
     "industry_coverage_taxonomy": "config/industry_scan_universe.json",
     "company_index": "data/research/company_industry_index.json",
-    "full_market_price_structure": "data/research/v2/full_market_price_structure.json",
+    "full_market_price_structure": "data/research/full_market_price_structure.json",
     "latest_market": "data/latest.json",
+    "market_health": "data/health.json",
     "bounded_history_store": "data/history_shards/*.json",
-    "research_state": "data/research/v2/research_state.json"
-  },
-  "evidence_contract": {
-    "repository_whitelist_applies_only_to_persistent_mechanical_data": true,
-    "current_public_research_evidence_allowed": true,
-    "current_public_research_evidence_required_for_1800_research": true,
-    "preferred_sources": [
-      "公司公告与财报",
-      "交易所披露",
-      "官方统计",
-      "行业协会与产业公开数据",
-      "可信商品价格/价差/订单/产销数据",
-      "必要时高质量新闻与研究资料"
-    ],
-    "evidence_uses": [
-      "行业收入利润与利润率",
-      "订单/出货/销量/产量",
-      "产品价格与价差",
-      "库存/开工/产能利用率",
-      "公司主营/扣非/现金流",
-      "Forward Bridge与反向证据"
-    ],
-    "public_evidence_must_not_be_persisted_as_cross_run_candidate_or_opportunity_pool": true
+    "industry_state": "data/research/industry_state.json",
+    "research_state": "data/research/research_state.json"
   },
   "stage_order": [
-    "data_health",
-    "taxonomy_coverage",
-    "market_prosperity_search",
-    "level3_profitability_verification",
-    "profit_chain_decomposition",
-    "chain_company_light_screen",
-    "chain_company_comparison_and_dedup",
+    "data_gate",
+    "prompt_full_market_discovery",
+    "taxonomy_mapping",
+    "level3_profitability_refresh",
+    "company_admission_gate",
+    "profit_chain_resolution",
+    "company_mapping_gate",
+    "company_light_screen",
+    "company_comparison_and_dedup",
     "valuation",
     "price_structure",
     "buy_point_synthesis",
-    "completion_gate"
+    "completion_gate",
+    "publish"
   ],
-  "scan_cadence_contract": {
-    "full_scan_unit": "prompt_full_market_prosperity_search",
-    "weekly_full_scan_interval_days": 7,
-    "preferred_anchor": "Friday 18:00 Asia/Shanghai",
-    "fallback": "若周五18:00全量失败或未运行，则下一次可用工作日18:00补做weekly_full",
-    "bootstrap_rule": "没有当前schema有效基线时，先通过Prompt基于当前公开证据做一次全市场景气搜索；将所有识别出的景气方向映射到相关申万三级行业并完成盈利验证，再进入公司层。",
-    "daily_incremental_between_full_scans": true,
-    "full_scan_is_market_state_baseline_not_candidate_pool": true,
-    "daily_incremental_trigger_sources": [
-      "新财报/业绩预告/快报",
-      "行业统计更新",
-      "产品价格或价差显著变化",
-      "订单/出货/销量/产量变化",
-      "库存/开工/产能利用率变化",
-      "重大公司公告",
-      "产业供需或政策事件"
-    ],
-    "daily_carry_forward_allowed_only_from_valid_weekly_baseline": true,
-    "daily_carry_forward_must_record_baseline_date": true,
-    "previous_companies_chains_or_opportunities_may_not_seed_discovery": true,
-    "calendar_anchor_is_authoritative": true,
-    "interval_days_is_max_baseline_age_not_minimum_wait": true,
-    "successful_bootstrap_next_full_scan": "bootstrap可立即生成有效基线；最近一个Friday 18:00仍按正式锚点重新做全市场景气搜索。",
-    "friday_full_scan_rule": "每周五18:00重新从当前公开证据做Prompt全市场景气搜索，不从上周方向名单起步；对本周识别出的所有景气方向映射到相关三级行业并重验盈利状态。",
-    "full_346_level3_profitability_review_required": false,
-    "selected_prosperity_directions_may_not_be_top_n_capped": true,
-    "level3_verification_scope": "Prompt全市场景气搜索识别出的全部景气方向，经taxonomy映射后覆盖的相关三级行业；未映射到景气方向的三级节点只做taxonomy routing。",
-    "daily_incremental_discovery_scope": "基于最近有效周度景气方向/三级盈利基线，Prompt搜索过去约24小时新增产业证据；只对新增、移除或实质变化的景气方向及其三级行业更新。",
-    "weekly_full_prompt_search_required": true,
-    "weekly_full_does_not_require_level1_level2_status_matrix": true,
-    "persistent_level1_level2_prosperity_labels_forbidden": true,
-    "selected_prosperity_directions_expand_all_relevant_level3": true
+  "data_gate_contract": {
+    "fail_closed": true,
+    "expected_trade_date_must_equal_health_trade_date": true,
+    "market_status_must_be_closed": true,
+    "source_errors_must_be_empty": true,
+    "quote_coverage_must_not_be_materially_degraded": true,
+    "history_must_cover_expected_trade_date": true,
+    "price_structure_must_cover_expected_trade_date": true,
+    "on_failure": "data_stale_or_incomplete",
+    "publish_on_failure": false,
+    "mutate_valid_state_on_failure": false
   },
-  "coverage_contract": {
+  "discovery_contract": {
+    "method": "prompt_full_market_light_recall_every_run",
+    "previous_focus_list_may_not_seed_or_bound_discovery": true,
+    "previous_companies_chains_valuations_or_opportunities_may_not_seed_discovery": true,
+    "top_n_or_fixed_count_selection_forbidden": true,
+    "must_cover_major_economic_domains": [
+      "资源能源",
+      "化工材料",
+      "制造设备",
+      "科技",
+      "消费",
+      "医药",
+      "金融地产",
+      "公用事业交通运输",
+      "农业"
+    ],
+    "primary_evidence": [
+      "行业收入利润与利润率",
+      "产品价格与价差",
+      "库存与开工率或产能利用率",
+      "订单出货销量产量",
+      "进出口与供需",
+      "代表性公司经营数据",
+      "改变供需或成本的政策"
+    ],
+    "market_price_or_sector_return_cannot_be_primary_evidence": true,
+    "taxonomy_is_routing_after_discovery": true,
+    "persistent_level1_level2_prosperity_labels_forbidden": true
+  },
+  "level3_state_contract": {
     "taxonomy": "申万行业分类标准2021版",
-    "expected_counts": {
-      "level1": 31,
-      "level2": 134,
-      "level3": 346
-    },
-    "ledger_contract": {
-      "state_path": "coverage_ledger",
-      "exact_node_counts_must_match_taxonomy": true,
-      "required_node_fields": [
-        "code",
-        "name",
-        "level",
-        "parent_code",
-        "accounted_for",
-        "routing_status",
-        "routing_reason"
-      ],
-      "accounted_for_definition": "Coverage只证明31/134/346 taxonomy节点可被路由；一级/二级不维护景气状态。三级真实盈利状态只存在于level3_profitability_verification中。",
-      "grouped_placeholder_rows_forbidden": true,
-      "null_accounted_for_counts_forbidden": true,
-      "missing_arrays_must_contain_actual_taxonomy_codes": true,
-      "counts_must_be_derived_from_ledger_not_manually_asserted": true,
-      "taxonomy_coverage_and_profitability_verification_are_separate": true,
-      "unselected_level3_may_be_taxonomy_only": true,
-      "allowed_routing_status": [
-        "taxonomy_reference",
-        "selected_for_level3_verification",
-        "not_selected_by_prosperity_search",
-        "verified_level3"
-      ],
-      "level1_level2_are_routing_only_not_prosperity_state": true,
-      "instantiate_all_taxonomy_nodes_before_market_prosperity_search": true
-    },
-    "prosperity_search_and_level3_gate": {
-      "weekly_full_requires_prompt_full_market_search": true,
-      "weekly_full_does_not_require_31_134_status_rows": true,
-      "selected_direction_count_may_be_zero_but_must_not_be_top_n_capped": true,
-      "every_selected_direction_must_have_taxonomy_mapping": true,
-      "every_mapped_relevant_level3_must_be_evidence_reviewed": true,
-      "unselected_level3_need_only_complete_taxonomy_routing": true,
-      "daily_incremental_requires_valid_baseline_not_older_than_days": 7
-    }
-  },
-  "profit_chain_resolution_contract": {
-    "required_for_each_deep_coverage_node": false,
-    "allowed_resolution": [
-      "resolved",
-      "unconfirmed_with_evidence_gap"
-    ],
-    "must_split_or_continue_split_cannot_remain_open": true,
-    "research_admission_top_n_forbidden": true,
-    "per_level1_chain_cap_forbidden": true,
-    "confirmed_improving_chain_definition": "由本期已完成三级盈利验证且trend=improving的三级节点拆出，resolution_status=resolved、Driver与利润传导已确认的盈利链",
-    "every_confirmed_improving_chain_requires_company_light_screen": true,
-    "non_improving_deep_chain_may_resolve_for_diagnostics_without_company_screen": true,
-    "required_chain_fields": [
-      "chain_id",
-      "source_coverage_codes",
-      "direct_driver",
+    "expected_counts": {"level1": 31, "level2": 134, "level3": 346},
+    "weekly_full_refresh_anchor": "Friday 18:00 Asia/Shanghai",
+    "weekly_full_refresh_fallback": "next available weekday 18:00",
+    "daily_incremental_refresh": true,
+    "prompt_discovery_is_full_market_even_on_daily_incremental_runs": true,
+    "daily_refresh_only_deep_rechecks_level3_nodes_with_new_or_changed_evidence": true,
+    "weekly_refresh_revalidates_all_level3_nodes_mapped_from_current_discovered_directions": true,
+    "unselected_level3_may_remain_taxonomy_only": true,
+    "required_profitability_fields": [
+      "code",
+      "name",
+      "trend",
+      "strength",
+      "breadth",
+      "confidence",
+      "evidence_basis",
       "leading_variables",
-      "profit_transmission",
-      "forward_bridge",
-      "invalidation_condition",
-      "resolution_status"
+      "profit_driver",
+      "falsifiers",
+      "last_verified_at"
     ],
-    "required_for_each_verified_level3_trigger_node": true
+    "allowed_trend": ["improving", "stable", "deteriorating", "unconfirmed"],
+    "allowed_breadth": ["broad", "divergent", "narrow", "unconfirmed"]
+  },
+  "company_admission_contract": {
+    "admit_if": [
+      "trend=improving",
+      "trend=stable AND breadth=divergent"
+    ],
+    "exclude_if": [
+      "trend=deteriorating",
+      "trend=stable AND breadth!=divergent",
+      "trend=unconfirmed"
+    ],
+    "stable_divergent_only_broadens_research_eligibility": true,
+    "stable_divergent_does_not_lower_valuation_structure_or_buy_point_thresholds": true,
+    "admitted_chain_requires_resolved_driver_and_profit_transmission": true,
+    "research_admission_top_n_forbidden": true,
+    "per_level1_chain_cap_forbidden": true
+  },
+  "company_mapping_gate": {
+    "company_index_may_be_globally_degraded": true,
+    "all_missing_or_unmapped_codes_must_be_checked_against_admitted_level3_scope": true,
+    "unresolved_in_scope_mapping_forbidden": true,
+    "out_of_scope_missing_mapping_may_be_documented_and_continue": true,
+    "on_unresolved_in_scope_mapping": "incomplete_research",
+    "silent_omission_forbidden": true
   },
   "company_comparison_contract": {
     "company_light_screen": {
-      "all_mapped_mainboard_companies_in_confirmed_improving_chain_must_be_screened": true,
+      "all_mapped_mainboard_companies_in_admitted_chain_must_be_screened": true,
       "top_n_or_score_cutoff_before_screen_forbidden": true,
-      "required_screen_fields": [
-        "code",
-        "name",
-        "source_chain_ids",
-        "business_exposure_match",
-        "profit_driver_match",
-        "earnings_quality_match",
-        "comparability",
-        "screen_decision",
-        "exclusion_reason",
-        "evidence_basis",
-        "core_earnings_evidence",
-        "core_earnings_trend",
-        "nonrecurring_dominance_check",
-        "valuation_earnings_basis_requirement"
-      ],
-      "allowed_screen_decision": [
-        "survive",
-        "exclude"
-      ],
-      "allowed_exclusion_reasons": [
-        "insufficient_business_exposure",
-        "profit_not_from_chain_driver",
-        "earnings_deteriorating",
-        "nonrecurring_earnings_dominant",
-        "not_economically_comparable",
-        "data_unavailable"
-      ],
       "exclusion_requires_company_specific_evidence": true,
       "all_survivors_enter_horizontal_comparison": true,
       "core_earnings_evidence_required_for_survive": true,
       "deducted_netprofit_or_equivalent_core_earnings_must_be_checked": true,
       "missing_core_earnings_evidence_cannot_default_to_earnings_quality_match_true": true,
       "missing_core_earnings_requires_current_public_evidence_supplement_or_data_unavailable": true,
-      "nonrecurring_dominance_threshold_of_parent_netprofit": 0.3,
-      "nonrecurring_dominance_with_improving_core_earnings_may_survive_but_valuation_must_use_core_earnings": true,
-      "nonrecurring_dominance_with_weak_or_unconfirmed_core_earnings_must_exclude": true
+      "nonrecurring_dominance_threshold_of_parent_netprofit": 0.30,
+      "allowed_exclusion_reasons": [
+        "business_exposure_mismatch",
+        "profit_driver_mismatch",
+        "earnings_quality_mismatch",
+        "nonrecurring_earnings_dominant",
+        "major_business_change",
+        "not_economically_comparable",
+        "data_unavailable"
+      ]
     },
-    "comparison_occurs_before_final_valuation": true,
     "horizontal_comparison_must_cover_all_screen_survivors": true,
-    "comparison_complete_required_when_survivors_exist": true,
-    "single_company_chain_requires_explicit_singleton_reason": true,
     "cross_chain_dedup_after_comparison": true,
     "dedup_key": "stock_code",
     "dedup_must_preserve_all_source_chain_ids": true,
-    "all_actually_compared_companies_enter_valuation_set": true,
-    "valuation_set_must_be_deduplicated_by_stock_code": true,
-    "same_company_valued_once_even_if_multiple_chain_memberships": true,
-    "required_outputs": [
-      "screened_companies",
-      "excluded_companies",
-      "compared_companies",
-      "comparison_complete",
-      "fundamental_best",
-      "current_opportunity_best",
-      "opportunity_resolution_complete",
-      "singleton_reason"
-    ],
-    "current_opportunity_best_may_be_null": true,
-    "required_diagnostics": [
-      "confirmed_improving_chain_count",
-      "company_screened_chain_count",
-      "unscreened_confirmed_improving_chains",
-      "light_screen_universe_company_count",
-      "light_screen_excluded_count",
-      "horizontal_comparison_survivor_count",
-      "deduplicated_valuation_set_count"
-    ],
-    "completion_requires_no_unscreened_confirmed_improving_chains": true
+    "valuation_set_must_be_deduplicated_by_stock_code": true
   },
-  "valuation_resolution_contract": {
-    "valuation_set_path": "valuation_set",
-    "every_valuation_set_company_requires_full_execution": true,
-    "required_bridge_fields": [
-      "current_price",
-      "price_date",
-      "earnings_type",
-      "earnings_basis",
-      "primary_method",
-      "key_assumptions",
-      "current_share_count",
-      "share_count_basis",
-      "corporate_action_check",
-      "earnings_bridge_integrity",
-      "reasonable_price_assumption",
-      "reasonable_price_range",
-      "uncertainty",
-      "margin_of_safety_reason",
-      "safe_price_range",
-      "valuation_position",
-      "falsifiers",
-      "valuation_attempt_complete",
-      "model_execution_status",
-      "valuation_archetype",
-      "archetype_basis",
-      "scenario_analysis",
-      "primary_model_output",
-      "base_fair_value",
-      "downside_value",
-      "margin_of_safety_pct",
-      "safe_price_ceiling",
-      "valuation_quality_flags",
-      "valuation_input_completeness",
-      "primary_model_family",
-      "market_reality_audit",
-      "fair_pe_low",
-      "fair_pe_mid",
-      "fair_pe_high",
-      "pe_basis",
-      "current_pe",
-      "dynamic_pe",
-      "pb",
-      "peer_pe_median",
-      "peer_pb_median",
-      "core_profit_growth",
-      "pb_cross_check",
-      "peer_valuation_check",
-      "market_180d_sanity_check",
-      "valuation_path"
-    ],
-    "corporate_action_check_required_before_earnings_bridge": true,
-    "historical_eps_direct_scaling_across_material_share_count_change_forbidden": true,
-    "material_share_count_change_threshold_pct": 5.0,
-    "when_share_count_changes_use_aggregate_earnings_and_current_or_forward_diluted_share_count": true,
-    "major_restructuring_requires_comparability_audit": true,
-    "resource_and_order_cycle_companies_cannot_use_growth_pe_from_current_profit_growth": true,
-    "resource_and_order_cycle_require_normalized_or_scenario_earnings": true,
-    "non_review_company_requires_non_null_reasonable_and_safe_ranges": true,
-    "missing_analyst_consensus_is_not_valid_review_reason": true,
-    "must_build_internal_forward_or_normalized_range_when_consensus_missing": true,
-    "review_required_is_exception_not_successful_valuation": true,
-    "allowed_review_exception_codes": [
-      "major_restructuring",
-      "nonrecurring_earnings_dominant",
-      "critical_public_data_unavailable",
-      "model_instability",
-      "business_model_break",
-      "other_material_blocker"
-    ],
-    "review_required_requires_completed_research_attempt_and_blocker_evidence": true,
-    "important_chain_opportunity_resolution_requires_at_least_one_complete_non_review_valuation": true,
-    "publishable_opportunity_requires_complete_bridge": true,
-    "current_price_must_not_feed_intrinsic_value": true,
-    "extreme_valuation_deviation_audit": {
-      "required": true,
-      "trigger_if_reasonable_lower_bound_is_at_least_multiple_of_current_price": 1.5,
-      "trigger_if_current_price_is_at_least_multiple_of_reasonable_upper_bound": 1.5,
-      "requires_independent_secondary_method": true,
-      "requires_share_count_and_corporate_action_recheck": true,
-      "requires_cycle_or_growth_persistence_recheck": true,
-      "max_method_midpoint_divergence_pct_before_model_instability": 30.0,
-      "if_audit_fails": "review_required:model_instability",
-      "requires_independent_value_driver_family": true,
-      "same_eps_different_pe_fails_independence_test": true,
-      "default_response": "recheck_forward_eps_peer_pe_pb_and_180d_sanity_before_any_complex_model",
-      "complex_secondary_method_only_if_simple_rechecks_do_not_resolve": true
-    },
-    "core_earnings_preferred_over_parent_netprofit_when_nonrecurring_dominant": true,
-    "nonrecurring_dominance_threshold_of_parent_netprofit": 0.3,
-    "parent_netprofit_contaminated_by_material_nonrecurring_items_cannot_feed_forward_bridge": true,
-    "missing_required_core_earnings_evidence_after_light_screen_means_review_required": "nonrecurring_earnings_dominant",
-    "valuation_engine_version": 3,
-    "valuation_archetype_required": false,
-    "valuation_archetypes": [
-      "resource_asset",
-      "spread_cyclical",
-      "order_backlog",
-      "growth_compounder",
-      "stable_cashflow",
-      "financial",
-      "special_situation"
-    ],
-    "sw_level1_alone_cannot_determine_valuation_archetype": true,
-    "base_case_required": false,
-    "downside_case_required": false,
-    "base_fair_value_required": true,
-    "safe_price_ceiling_required": true,
-    "safe_price_ceiling_is_value_eligibility_boundary": true,
-    "fixed_discount_from_reasonable_lower_bound_forbidden": true,
-    "repeat_conservatism_across_earnings_multiple_and_mos_forbidden": true,
-    "secondary_method_must_use_independent_value_driver_family": true,
-    "same_earnings_basis_with_different_multiple_is_not_independent_method": true,
-    "market_reality_audit_required_when_safe_ceiling_gap_is_extreme": true,
-    "resource_asset_requires_asset_or_cashflow_model": true,
-    "resource_asset_single_fixed_pe_forbidden": true,
-    "spread_cyclical_requires_spread_or_margin_normalization": false,
-    "financial_requires_pb_roe_or_residual_income": true,
-    "normalization_must_reflect_structural_capacity_or_mix_change": true,
-    "mos_reference_ranges": {
-      "high_confidence": [
-        0.1,
-        0.15
-      ],
-      "medium_confidence": [
-        0.15,
-        0.2
-      ],
-      "low_confidence": [
-        0.2,
-        0.25
-      ]
-    },
-    "archetype_model_contract": {
-      "resource_asset": {
-        "required_inputs": [
-          "commodity_price_anchor",
-          "production_or_equity_volume",
-          "unit_cost",
-          "capex",
-          "net_debt",
-          "asset_life_or_reserve_quality"
-        ],
-        "primary_methods": [
-          "nav_dcf",
-          "normalized_ev_ebitda",
-          "fcf_dividend_capacity"
-        ],
-        "independent_secondary_families": [
-          "nav_dcf",
-          "normalized_ev_ebitda",
-          "pb_roe",
-          "fcf_dividend_capacity"
-        ]
-      },
-      "spread_cyclical": {
-        "required_inputs": [
-          "product_price",
-          "feedstock_cost",
-          "spread",
-          "utilization_or_volume",
-          "normalized_margin"
-        ],
-        "primary_methods": [
-          "normalized_ev_ebitda",
-          "spread_scenario_dcf"
-        ],
-        "independent_secondary_families": [
-          "normalized_core_pe",
-          "roic_sanity",
-          "spread_scenario_dcf"
-        ]
-      },
-      "order_backlog": {
-        "required_inputs": [
-          "order_backlog",
-          "delivery_schedule",
-          "pricing",
-          "margin",
-          "capacity"
-        ],
-        "primary_methods": [
-          "forward_ev_ebit",
-          "forward_pe"
-        ],
-        "independent_secondary_families": [
-          "normalized_cashflow",
-          "pb_roe"
-        ]
-      },
-      "growth_compounder": {
-        "required_inputs": [
-          "forward_revenue",
-          "forward_core_earnings",
-          "margin",
-          "roic_or_roe",
-          "cash_conversion"
-        ],
-        "primary_methods": [
-          "justified_forward_pe",
-          "forward_ev_ebit"
-        ],
-        "independent_secondary_families": [
-          "dcf",
-          "fcf_yield",
-          "peg_sanity"
-        ]
-      },
-      "stable_cashflow": {
-        "required_inputs": [
-          "normalized_cashflow",
-          "capex",
-          "growth",
-          "capital_structure"
-        ],
-        "primary_methods": [
-          "dcf",
-          "dividend_capacity",
-          "ev_ebitda",
-          "justified_pe"
-        ],
-        "independent_secondary_families": [
-          "dcf",
-          "dividend_capacity",
-          "ev_ebitda",
-          "justified_pe"
-        ]
-      },
-      "financial": {
-        "required_inputs": [
-          "book_value",
-          "sustainable_roe",
-          "asset_quality",
-          "capital_constraint"
-        ],
-        "primary_methods": [
-          "pb_roe",
-          "residual_income"
-        ],
-        "independent_secondary_families": [
-          "pb_roe",
-          "residual_income"
-        ]
-      },
-      "special_situation": {
-        "required_inputs": [
-          "post_transaction_business",
-          "comparable_earnings_basis"
-        ],
-        "primary_methods": [
-          "case_specific"
-        ],
-        "independent_secondary_families": [
-          "case_specific"
-        ]
-      }
-    },
-    "required_archetype_inputs_must_be_present_or_explicitly_supplemented": true,
-    "missing_archetype_critical_input_cannot_be_replaced_by_generic_pe": true,
-    "missing_archetype_critical_input_after_public_evidence_search_requires_review_or_explicit_low_confidence_blocker": true,
-    "primary_model_family_required": true,
-    "secondary_model_family_required_when_secondary_model_runs": true,
-    "primary_and_secondary_model_family_must_differ_when_independence_required": true,
-    "market_reality_audit_trigger_multiple": 1.5,
-    "market_reality_audit_must_report_market_implied_assumption_gap_not_reanchor_value": true,
-    "valuation_quality_flags_required": [
-      "archetype_inputs_complete",
-      "core_earnings_clean",
-      "no_repeated_conservatism",
-      "model_independence_passed_or_not_required",
-      "market_reality_audit_passed_or_not_required"
-    ],
+  "valuation_contract": {
     "default_path": "relative_earnings_valuation",
-    "default_path_principle": "normal profitable companies use PE/dynamic PE + PB/ROE + level3 peers + earnings growth, with 180d market sanity; complex absolute valuation is exception-only",
     "complex_model_is_exception_not_default": true,
+    "normal_company_complex_model_forbidden_as_default": true,
     "default_path_required_inputs": [
       "core_forward_eps",
       "current_pe_or_ttm_pe",
       "dynamic_pe_if_available",
       "pb",
-      "roe_if_available",
+      "roe",
       "core_profit_growth",
       "level3_peer_pe_median",
       "level3_peer_pb_median",
@@ -520,401 +170,113 @@
       "price_180d_high",
       "price_180d_percentile"
     ],
-    "default_path_required_outputs": [
-      "fair_pe_low",
-      "fair_pe_mid",
-      "fair_pe_high",
-      "pe_basis",
-      "pb_cross_check",
-      "peer_valuation_check",
-      "market_180d_sanity_check",
-      "base_fair_value",
-      "reasonable_price_range",
-      "margin_of_safety_pct",
-      "safe_price_ceiling"
-    ],
-    "fair_pe_construction_contract": {
-      "primary_anchor": "level3_peer_pe_median_and_company_dynamic_pe",
-      "growth_adjustment_required": true,
-      "profit_quality_adjustment_required": true,
-      "pb_roe_cross_check_required": true,
-      "peer_comparison_required": true,
-      "company_current_pe_is_reference_not_automatic_fair_pe": true,
-      "market_180d_is_sanity_check_not_sole_intrinsic_value_input": true,
-      "fair_pe_must_be_explained_not_fixed_by_level1_industry": true
+    "corporate_action_check_required_before_earnings_bridge": true,
+    "material_share_count_change_threshold_pct": 5.0,
+    "historical_eps_direct_scaling_across_material_share_count_change_forbidden": true,
+    "when_share_count_changes_use_aggregate_earnings_and_current_or_forward_diluted_share_count": true,
+    "core_earnings_preferred_over_parent_netprofit_when_nonrecurring_dominant": true,
+    "parent_netprofit_contaminated_by_material_nonrecurring_items_cannot_feed_forward_bridge": true,
+    "fair_pe_construction": {
+      "level3_peer_pe_is_primary_relative_anchor": true,
+      "dynamic_pe_is_reference_not_fair_value_copy": true,
+      "core_profit_growth_adjustment_required": true,
+      "pb_roe_cross_check_required": true
     },
-    "forward_eps_contract": {
-      "use_deducted_or_core_earnings": true,
-      "annualize_only_when_seasonality_is_reasonably_stable": true,
-      "otherwise_use_internal_forward_range_from_recent_quarters_and_guidance": true,
-      "material_share_change_requires_current_or_forward_diluted_share_count": true
-    },
-    "pb_cross_check_contract": {
-      "pb_is_secondary_for_normal_companies": true,
-      "compare_with_level3_peers": true,
-      "roe_or_asset_quality_should_explain_material_pb_premium_or_discount": true,
-      "material_pe_pb_conflict_triggers_exception_review": true
-    },
-    "market_sanity_contract": {
+    "market_sanity": {
       "history_window_trading_days": 180,
-      "required_statistics": [
-        "low",
-        "median",
-        "high",
-        "percentile"
-      ],
-      "if_model_value_is_far_outside_180d_range_and_fundamentals_have_not_structurally_changed_trigger_audit": true,
-      "historical_price_cannot_override_clear_earnings_or_business_structural_change": true,
-      "market_price_is_sanity_check_not_truth": true
+      "sanity_only_not_reverse_engineering": true
     },
     "exception_path_triggers": [
       "negative_or_unusable_pe",
       "major_restructuring",
-      "nonrecurring_earnings_dominant",
-      "financial_balance_sheet_business",
-      "extreme_cycle_peak_or_trough",
-      "pe_pb_peer_conflict",
-      "model_vs_180d_market_conflict",
+      "material_one_off_contamination",
+      "bank_or_insurer_balance_sheet_model",
+      "extreme_cycle_distortion",
+      "unresolved_pe_pb_peer_conflict",
+      "unresolved_model_market_sanity_conflict",
       "business_model_break"
     ],
-    "exception_path_models": [
-      "pb_roe",
-      "residual_income",
-      "ev_ebitda",
-      "nav_dcf",
-      "fcf_dcf",
-      "case_specific"
-    ],
-    "resource_asset_fixed_pe_only_valuation_forbidden": false,
-    "normal_company_complex_archetype_forbidden_as_default": true,
+    "exception_path_models": ["pb_roe", "residual_income", "ev_ebitda", "nav_dcf", "fcf_dcf", "case_specific"],
+    "exception_trigger_required": true,
     "single_mos_application_required": true,
     "safe_price_ceiling_formula": "base_fair_value * (1 - margin_of_safety_pct)",
-    "pb_fallback_contract": {
-      "vendor_pb_missing_must_not_force_review_when_financial_statement_equity_available": true,
-      "fallback_formula": "completed_session_market_cap / latest_reported_total_equity",
-      "fallback_equity_basis": "latest H1 TOTAL_EQUITY; consistency cross-check only, note minority-interest approximation",
-      "same_basis_required_for_level3_peer_pb": true
-    }
+    "fixed_discount_from_reasonable_lower_bound_forbidden": true
+  },
+  "price_structure_contract": {
+    "independent_from_valuation": true,
+    "full_market_scan_required": true,
+    "allowed_structure_types": ["base_not_started", "transition", "breakout", "pullback", "trend_continuation", "overheated", "damaged", "unavailable"],
+    "timing_eligible_types": ["breakout", "pullback", "trend_continuation"],
+    "damaged_or_overheated_cannot_be_timing_eligible": true,
+    "structure_entry_range_must_not_reference_fair_value": true
   },
   "buy_point_contract": {
-    "purpose": "买点必须是价值安全边际与价格结构时机的交集，不能由任一单独维度替代。",
-    "required_for_every_complete_non_review_valuation": true,
-    "required_fields": [
-      "code",
-      "value_eligible",
-      "timing_eligible",
-      "buy_point_status",
-      "buy_price_range",
-      "buy_point_basis",
-      "structure_entry_range",
-      "invalidation_price"
-    ],
-    "allowed_buy_point_status": [
-      "buyable_now",
-      "watch_value",
-      "watch_structure",
-      "avoid",
-      "review_required"
-    ],
-    "value_eligible_requires_current_price_at_or_below_safe_upper_bound": false,
-    "timing_eligible_structure_types": [
-      "pullback",
-      "breakout",
-      "trend_continuation"
-    ],
-    "timing_eligible_forbids_high_chase_risk": true,
-    "buy_price_range_must_equal_intersection_of_safe_price_range_and_structure_entry_range": false,
+    "hard_value_gate": "current_price <= safe_price_ceiling",
+    "buy_price_range_formula": "structure_entry_range intersect (-infinity, safe_price_ceiling]",
     "empty_intersection_means_not_buyable_now": true,
     "damaged_or_overheated_cannot_be_buyable_now": true,
     "buyable_now_requires_value_and_timing_true": true,
     "price_structure_must_not_modify_intrinsic_value": true,
     "near_miss_ranking_contract": {
-      "purpose": "在不降低buyable_now硬门槛的前提下，对所有完成估值且非review_required公司计算距可执行买点的可审计距离，避免当前买点为0时输出空白。",
-      "eligible_universe": "all complete non-review valuations with buy_point_assessment",
-      "review_required_excluded_from_distance_ranking": true,
       "buyable_now_stays_separate": true,
       "must_output_when_eligible_universe_nonempty": true,
-      "default_display_limit": 10,
-      "research_admission_top_n_forbidden": true,
+      "review_required_excluded_from_distance_ranking": true,
       "ranking_is_display_only_not_candidate_pool": true,
       "cross_run_persistence_as_pool_forbidden": true,
-      "required_metrics": [
-        "missing_hard_conditions",
-        "value_gap_pct",
-        "structure_gap_pct",
-        "action_distance_pct",
-        "distance_band",
-        "current_missing",
-        "next_trigger"
-      ],
-      "missing_hard_conditions_definition": [
-        "value_eligible=false adds 1",
-        "timing_eligible=false adds 1",
-        "safe_price_range and structure_entry_range do not intersect adds 1",
-        "if the ranges intersect but current price is outside their intersection adds 1",
-        "avoid status adds 1 risk-gate penalty"
-      ],
-      "ranking_order": [
-        "avoid_penalty ascending",
-        "missing_hard_conditions ascending",
-        "safe_structure_range_gap_pct ascending; unavailable sorts last",
-        "current_to_intersection_pct ascending; unavailable sorts last",
-        "value_gap_pct plus structure_gap_pct ascending; unavailable component sorts last",
-        "fundamental comparison score descending only as final tie-breaker",
-        "stock_code ascending final deterministic tie-breaker"
-      ],
-      "interpretation": "rank 1 means closest to satisfying the existing low-risk buy-point rules, not highest expected return and not a recommendation to buy now.",
-      "ranking_version": 3,
-      "avoid_excluded_from_primary_near_miss_ranking": true,
-      "action_distance_is_primary_metric": true,
-      "action_distance_formula": "max(value_gap_pct, structure_gap_pct) when both measurable; if structure unavailable, rank after measurable names within same missing_hard_conditions",
-      "near_threshold_pct": 5.0,
-      "watch_threshold_pct": 15.0,
-      "distance_bands": {
-        "near": "<=5%",
-        "watch": ">5% and <=15%",
-        "far": ">15%"
-      },
-      "far_names_must_be_labeled_relative_closest_not_near": true,
-      "safe_structure_range_gap_pct_deprecated": true,
-      "sort_order": [
-        "missing_hard_conditions asc",
-        "distance_band asc",
-        "action_distance_pct asc",
-        "fundamental_score desc",
-        "stock_code asc"
-      ],
-      "missing_hard_conditions_is_step_count_not_primary_numeric_distance": true,
-      "near_miss_tier_definition": {
-        "one_step": "exactly one hard condition remains",
-        "two_step": "exactly two hard conditions remain",
-        "multi_step": "three or more hard conditions remain",
-        "buyable_now": "separate current-opportunity list, not near-miss"
-      },
-      "qualitative_structure_wait_allowed_when_value_eligible": true,
-      "unmeasurable_structure_distance_must_not_be_fabricated": true,
-      "primary_definition": "distance to executable buy point using only value gap and structure gap"
-    },
-    "value_eligible_requires_current_price_at_or_below_safe_price_ceiling": true,
-    "safe_price_ceiling_is_hard_value_boundary": true,
-    "safe_price_range_lower_bound_is_not_hard_eligibility_floor": true,
-    "buy_price_range_must_equal_structure_entry_range_capped_by_safe_price_ceiling": true,
-    "legacy_safe_upper_bound_value_eligibility_deprecated": true
-  },
-  "research_state_contract": {
-    "path": "data/research/v2/research_state.json",
-    "manifest_schema_field": "manifest_schema",
-    "manifest_schema_must_equal_current": true,
-    "required_top_level_sections": [
-      "coverage_ledger",
-      "market_profitability_radar",
-      "market_prosperity_search",
-      "level3_profitability_verification",
-      "profit_chains",
-      "company_light_screen",
-      "chain_comparisons",
-      "companies",
-      "valuation_set",
-      "valuations",
-      "price_structures",
-      "buy_point_assessments",
-      "near_miss_ranking",
-      "diagnostics"
-    ],
-    "required_run_fields": [
-      "scan_mode",
-      "weekly_baseline_date"
-    ],
-    "on_incomplete": "incomplete_research",
-    "incomplete_must_not_publish_new_current_opportunities": true,
-    "required_coverage_diagnostics": [
-      "coverage.taxonomy",
-      "coverage.expected_counts",
-      "coverage.accounted_for_counts",
-      "coverage.missing_level1",
-      "coverage.missing_level2",
-      "coverage.missing_level3",
-      "coverage.profitability_discovery_gate_passed",
-      "coverage.unresolved_must_split_chains",
-      "coverage.deep_nodes_total",
-      "coverage.deep_nodes_resolved",
-      "coverage.completion_gate_passed"
-    ],
-    "required_valuation_diagnostics": [
-      "valuation.valuation_set_count",
-      "valuation.executed_count",
-      "valuation.complete_non_review_count",
-      "valuation.review_required_count",
-      "valuation.extreme_deviation_audit_count",
-      "valuation.valuation_gate_passed"
-    ]
+      "default_display_limit": 10,
+      "research_admission_top_n_forbidden": true,
+      "required_metrics": ["missing_hard_conditions", "value_gap_pct", "structure_gap_pct", "action_distance_pct", "distance_band", "current_missing", "next_trigger"],
+      "action_distance_formula": "max(value_gap_pct, structure_gap_pct) when both are measurable",
+      "distance_bands": {"near": "<=5%", "watch": ">5% and <=15%", "far": ">15%"},
+      "sort_order": ["missing_hard_conditions", "distance_band", "action_distance_pct", "fundamental_score", "stock_code"],
+      "unmeasurable_structure_gap_after_measurable_in_same_bucket": true
+    }
   },
   "completion_gate_contract": {
-    "coverage_exact_and_complete": true,
-    "all_deep_nodes_resolved": true,
-    "all_confirmed_improving_chains_company_screened": true,
-    "no_research_admission_top_n_truncation": true,
+    "data_gate_passed": true,
+    "prompt_full_market_discovery_complete": true,
+    "no_discovery_top_n_truncation": true,
+    "all_discovered_directions_taxonomy_mapped": true,
+    "all_required_level3_refreshes_complete": true,
+    "all_admitted_chains_resolved": true,
+    "all_admitted_chains_company_screened": true,
+    "company_mapping_gate_passed": true,
     "all_light_screen_survivors_compared": true,
     "valuation_set_dedup_complete": true,
-    "all_valuation_set_companies_executed": true,
-    "all_triggered_extreme_valuation_audits_pass_or_review": true,
+    "all_valuation_set_companies_fully_valued_or_explicit_review": true,
+    "all_complete_non_review_companies_have_price_structure": true,
     "all_complete_non_review_companies_have_buy_point_assessment": true,
-    "current_opportunities_must_come_only_from_buyable_now": true,
     "near_miss_ranking_complete_when_eligible_universe_nonempty": true,
-    "all_selected_directions_fully_expanded_to_level3": true,
-    "all_expanded_level3_profitability_verified": true,
-    "market_prosperity_prompt_search_complete": true,
-    "no_prosperity_search_top_n_truncation": true,
-    "all_selected_directions_have_taxonomy_mapping": true,
-    "all_mapped_relevant_level3_profitability_verified": true,
-    "all_non_review_valuations_have_archetype": false,
-    "all_non_review_valuations_have_base_and_downside_cases": false,
-    "all_non_review_valuations_have_base_fair_value_and_safe_price_ceiling": true,
-    "resource_and_spread_cyclical_valuations_use_archetype_specific_models": false,
-    "extreme_deviation_secondary_models_pass_independent_driver_test": false,
-    "near_miss_action_distance_complete_when_eligible_universe_nonempty": true,
-    "all_normal_non_review_valuations_have_simple_relative_inputs": true,
-    "all_normal_non_review_valuations_have_peer_and_pb_cross_checks": true,
-    "all_normal_non_review_valuations_have_180d_market_sanity": true,
-    "exception_companies_have_explicit_exception_trigger_and_model": true,
-    "nonempty_valuation_set_requires_at_least_one_complete_non_review_valuation": true,
-    "all_review_outcome_for_nonempty_valuation_set_forbidden": true
+    "current_opportunities_must_come_only_from_buyable_now": true,
+    "on_failure": "incomplete_research",
+    "publish_on_failure": false,
+    "mutate_previous_valid_state_on_failure": false
   },
   "persistence_contract": {
-    "only_prompt_research_output": "data/research/v2/research_state.json",
-    "persistent_intermediate_research_outputs_allowed": false,
-    "cross_run_candidate_or_opportunity_caches_allowed": false,
-    "weekly_profitability_baseline_is_allowed_only_inside_research_state": true,
-    "previous_state_may_seed_daily_industry_baseline_only": true,
-    "previous_companies_chains_valuations_opportunities_may_not_seed_1800_discovery": true,
-    "0600_requires_valid_previous_1800_state": false,
-    "0600_requires_valid_current_schema_market_baseline": true
+    "industry_state_path": "data/research/industry_state.json",
+    "research_state_path": "data/research/research_state.json",
+    "industry_state_is_only_cross_run_fundamental_memory": true,
+    "research_state_contains_latest_valid_formal_run_only": true,
+    "persistent_candidate_or_opportunity_pools_forbidden": true,
+    "standalone_valuation_cache_forbidden": true,
+    "failed_or_stale_run_must_not_overwrite_valid_state": true,
+    "old_v2_state_is_legacy_and_not_runtime_input": true
   },
   "public_output": {
+    "formal_publish_enabled": true,
     "sections": [
-      "执行状态",
-      "全市场景气搜索",
-      "完整盈利产业链雷达",
-      "链内公司轻筛与横向比较",
-      "估值与价格区间",
-      "价格结构与时机",
-      "当前买点",
-      "接近买点榜",
-      "诊断"
-    ],
-    "company_columns": [
-      "公司",
-      "当前价格",
-      "合理价格",
-      "安全价格（低风险区）",
-      "估值位置",
-      "价格结构",
-      "当前买入区间",
-      "动作"
+      "【执行状态】",
+      "【全市场景气发现】",
+      "【三级行业盈利状态】",
+      "【产业链与公司轻筛】",
+      "【估值与安全价】",
+      "【价格结构与时机】",
+      "【当前买点】",
+      "【接近买点榜】",
+      "【诊断与失效条件】"
     ],
     "near_miss_section_title": "【接近买点榜】",
-    "near_miss_limit": 10,
     "near_miss_must_be_nonempty_when_eligible_universe_nonempty": true,
-    "near_miss_columns": [
-      "rank",
-      "code",
-      "name",
-      "industry_chain",
-      "current_price",
-      "safe_price_range",
-      "structure_status",
-      "structure_entry_range",
-      "missing_hard_conditions",
-      "value_gap_pct",
-      "structure_gap_pct",
-      "safe_structure_range_gap_pct",
-      "current_to_intersection_pct",
-      "blocking_reason",
-      "next_trigger"
-    ],
-    "near_miss_must_be_output_even_when_current_opportunities_empty": true,
-    "prosperity_search_must_show_all_selected_directions": true,
-    "level3_verification_must_be_grouped_under_prosperity_directions": true
-  },
-  "rule_ownership": {
-    "manifest": "保存机器契约、扫描节奏、全盈利链公司轻筛守恒、估值异常审计、买点交集与输出契约。",
-    "skills": "保存盈利研究、公司轻筛/横比/去重、估值和价格结构业务规则。",
-    "prompt": "执行周度全量或日度增量研究，不维护候选池，不做研究准入Top-N截断。"
-  },
-  "level3_profitability_verification_contract": {
-    "purpose": "只在景气发现后的相关三级行业中验证真实盈利状态，并决定是否形成可进入公司层的盈利链。",
-    "every_expanded_level3_requires_real_evidence_review": true,
-    "expanded_level3_generic_unconfirmed_placeholder_forbidden": true,
-    "unselected_level3_not_required_for_weekly_profitability_review": true,
-    "unselected_level3_must_record_routing_reason": "not_selected_by_prosperity_search",
-    "required_verified_fields": [
-      "code",
-      "name",
-      "parent_code",
-      "trend",
-      "strength",
-      "breadth",
-      "confidence",
-      "evidence_basis",
-      "leading_variables",
-      "profit_driver",
-      "needs_profit_chain_research",
-      "profit_chain_resolution"
-    ],
-    "profit_chain_trigger_rule": "三级行业trend=improving时必须进入盈利链拆解；deteriorating或明显divergent可进入诊断拆解，但不得直接进入机会公司筛选。",
-    "company_layer_entry_requires": "verified level3 trend=improving + resolved profit chain + confirmed profit transmission",
-    "prosperity_direction_must_map_to_taxonomy_before_company_research": true,
-    "every_mapped_relevant_level3_requires_real_evidence_review": true,
-    "mapping_rule": "每个景气方向必须通过taxonomy_refs映射到相关一级/二级/三级节点；若映射到一级或二级，则展开其与该景气逻辑相关的全部三级子行业，禁止只挑最强几个。"
-  },
-  "market_prosperity_search_contract": {
-    "purpose": "用Prompt和当前公开证据广泛、轻量地回答“最近哪些A股对应产业正在出现真实经营景气改善”，只输出有研究价值的景气方向；不维护31一级+134二级逐项状态矩阵。",
-    "method": "prompt_full_market_search",
-    "full_market_search_required_each_weekly_full": true,
-    "full_market_search_does_not_require_level1_level2_status_rows": true,
-    "persistent_level1_level2_status_rows_forbidden": true,
-    "taxonomy_is_routing_after_search_not_search_state_machine": true,
-    "search_must_not_start_from_previous_focus_list": true,
-    "search_must_not_start_from_previous_companies_or_opportunities": true,
-    "search_coverage_discipline": [
-      "资源品/能源",
-      "基础化工/材料",
-      "制造/设备",
-      "科技/电子/通信/计算机",
-      "消费",
-      "医药",
-      "金融地产",
-      "公用事业/交通运输",
-      "农业及其他可能出现盈利拐点的产业"
-    ],
-    "preferred_evidence": [
-      "行业利润/利润率",
-      "产品价格或价差",
-      "库存",
-      "开工率/产能利用率",
-      "订单/出货/销量/产量",
-      "进出口/供需",
-      "代表性公司经营数据",
-      "真实改变供需或成本的政策"
-    ],
-    "market_price_or_sector_return_cannot_be_primary_evidence": true,
-    "top_n_or_fixed_count_selection_forbidden": true,
-    "required_direction_fields": [
-      "direction_id",
-      "direction_name",
-      "taxonomy_refs",
-      "recent_change_window",
-      "why_now",
-      "leading_variables",
-      "evidence_basis",
-      "falsifiers",
-      "selected_for_level3_verification"
-    ],
-    "selection_rule": "凡当前证据足以支持真实经营景气改善或明确值得三级拆分验证的方向全部输出；不得因已发现若干方向而停止搜索。",
-    "weekly_baseline_contents": [
-      "selected_prosperity_directions",
-      "verified_level3_profitability_states"
-    ],
-    "daily_incremental_rule": "搜索自基线/上次运行以来新增公开证据；允许新增方向、移除已失效方向或更新既有方向，不要求重新给全市场一级/二级行业逐项打标签。"
+    "no_buyable_now_may_be_reported_as_zero_without_lowering_thresholds": true
   }
 }
