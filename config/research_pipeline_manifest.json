@@ -170,6 +170,20 @@
     "cross_chain_dedup_after_comparison": true,
     "dedup_key": "stock_code",
     "dedup_must_preserve_all_source_chain_ids": true,
+    "valuation_admission_gate": {
+      "applies_after_horizontal_comparison": true,
+      "admit_only_if": [
+        "company_level_driver_clear",
+        "core_earnings_improving",
+        "cashflow_and_earnings_quality_acceptable",
+        "sustainability_sufficient"
+      ],
+      "financial_companies_use_industry_appropriate_balance_sheet_and_earnings_quality_metrics": true,
+      "top_n_or_fixed_quota_forbidden": true,
+      "failure_means_not_enter_valuation_set": true,
+      "admission_or_exclusion_reason_required": true
+    },
+    "valuation_set_contains_only_valuation_admitted_companies": true,
     "valuation_set_must_be_deduplicated_by_stock_code": true
   },
   "valuation_contract": {
@@ -262,6 +276,8 @@
     "all_admitted_chains_company_screened": true,
     "company_mapping_gate_passed": true,
     "all_light_screen_survivors_compared": true,
+    "all_compared_companies_have_valuation_admission_decision": true,
+    "valuation_set_contains_only_valuation_admitted_companies": true,
     "valuation_set_dedup_complete": true,
     "all_valuation_set_companies_fully_valued_or_explicit_review": true,
     "all_complete_non_review_companies_have_price_structure": true,
