@@ -13,5 +13,6 @@ x=x.replace('assert "missing_hard_conditions" in c["required_metrics"]','assert 
 x=x.replace('assert "safe_structure_range_gap_pct" in c["required_metrics"]','assert "ceiling_structure_gap_pct" in c["required_metrics"]')
 x=x.replace('assert "## 接近买点榜（Near-miss Ranking）" in text','assert "## 接近买点榜（Near-miss Ranking V2）" in text')
 x=x.replace('assert "不得为了凑榜降低" in text','assert "绝不为了凑榜降低" in text')
+x=x.replace('assert "即使当前买点为0" in text','assert "Top10仍必须输出" in text')
 p.write_text(x,encoding='utf-8')
 print('schema31 test migration fixed')
