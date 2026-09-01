@@ -28,25 +28,47 @@ def is_main_board(code: str) -> bool:
     return code.startswith(MAIN_BOARD_PREFIXES)
 
 
+def positive_number(value) -> float | None:
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return None
+    return number if number > 0 else None
+
+
 def is_research_eligible_quote(item: dict | None, trade_date: str | None) -> bool:
     """Return whether a quote belongs to the current actionable research universe.
 
-    Raw market snapshots may retain delisted, merged, stale, or otherwise non-tradable
-    symbols. Those rows are useful for audit/history, but they must not create false
-    Company Mapping Gate failures. Only quotes validated against the current trade
-    date (high/medium confidence) are part of the company-research universe.
+    Raw market snapshots may retain delisted, merged, stale, suspended, or otherwise
+    non-tradable symbols. Those rows remain useful for audit/history, but they must
+    not create false Company Mapping Gate failures. A research-eligible symbol must
+    have a validated current-session quote and actual current-session trading fields.
     """
     if not isinstance(item, dict):
         return False
     if str(item.get("confidence") or "").lower() not in {"high", "medium"}:
         return False
-    if not trade_date:
-        return True
-    source_dates = item.get("source_dates")
-    if not isinstance(source_dates, dict):
-        return True
-    verified_dates = {str(value) for value in source_dates.values() if value}
-    return not verified_dates or trade_date in verified_dates
+
+    if trade_date:
+        source_dates = item.get("source_dates")
+        if isinstance(source_dates, dict):
+            verified_dates = {str(value) for value in source_dates.values() if value}
+            if verified_dates and trade_date not in verified_dates:
+                return False
+
+    # Vendors can occasionally stamp a current date on a delisted/merged/suspended
+    # residue while returning a frozen last price and zero intraday trading fields.
+    # Such a symbol is not actionable for the current low-risk research run. It will
+    # automatically re-enter on a future rebuild if it trades again.
+    if positive_number(item.get("open")) is None:
+        return False
+    if positive_number(item.get("high")) is None:
+        return False
+    if positive_number(item.get("low")) is None:
+        return False
+    if positive_number(item.get("volume")) is None:
+        return False
+    return True
 
 
 def iso_date(value) -> str | None:
@@ -324,7 +346,7 @@ def main() -> int:
         "refresh_days": args.refresh_days,
         "raw_main_board_snapshot_count": len(raw_stocks),
         "main_board_universe_count": len(stocks),
-        "research_universe_rule": "main-board quote confidence must be high/medium and, when source dates exist, include trade_date_reference",
+        "research_universe_rule": "main-board quote must be current-session high/medium confidence with positive open/high/low/volume",
         "excluded_inactive_or_untradable_count": len(excluded_codes),
         "excluded_inactive_or_untradable_codes": excluded_codes,
         "attempted_refresh_count": len(refresh_codes),
