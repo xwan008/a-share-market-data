@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import json
+import math
 from collections import Counter
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
+
+import requests
 
 from validate import normalize_quote_date, parse_quote_time, validate_price, validate_quote_fields
 
@@ -15,6 +18,14 @@ LATEST_PATH = DATA_DIR / "latest.json"
 
 SH_MAIN_PREFIXES = ("600", "601", "603", "605")
 SZ_MAIN_PREFIXES = ("000", "001", "002", "003")
+
+EASTMONEY_HEADERS = {
+    "User-Agent": "Mozilla/5.0",
+    "Referer": "https://quote.eastmoney.com/",
+}
+EASTMONEY_UT = "bd1d9ddb04089700cf9c27f6f7426281"
+EASTMONEY_BATCH_URL = "https://push2.eastmoney.com/api/qt/ulist.np/get"
+EASTMONEY_FINANCE_URL = "https://datacenter-web.eastmoney.com/api/data/v1/get"
 
 
 def is_main_board(code: str) -> bool:
@@ -44,6 +55,24 @@ def positive_number(value) -> float | None:
     except (TypeError, ValueError):
         return None
     return number if number > 0 else None
+
+
+def metric_number(value) -> float | None:
+    if value in (None, "", "-", "--"):
+        return None
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return None
+    return number if math.isfinite(number) else None
+
+
+def first_metric(item: dict, *keys: str) -> float | None:
+    for key in keys:
+        value = metric_number(item.get(key))
+        if value is not None:
+            return value
+    return None
 
 
 def calculate_change_pct(price, prev_close) -> float | None:
@@ -91,6 +120,181 @@ def safe_fetch(fn, label: str) -> tuple[dict[str, dict], str | None]:
         return fn(), None
     except Exception as exc:
         return {}, f"{label}:{type(exc).__name__}:{exc}"
+
+
+def eastmoney_secid(code: str) -> str:
+    return f"1.{code}" if code.startswith("6") else f"0.{code}"
+
+
+def chunked(values: list[str], size: int) -> list[list[str]]:
+    return [values[i : i + size] for i in range(0, len(values), size)]
+
+
+def fetch_eastmoney_valuation_snapshot(codes: list[str]) -> dict[str, dict]:
+    """Fetch daily valuation fields in batches; failure never invalidates quote data."""
+    out: dict[str, dict] = {}
+    for batch in chunked(codes, 300):
+        response = requests.get(
+            EASTMONEY_BATCH_URL,
+            params={
+                "fltt": 2,
+                "invt": 2,
+                "ut": EASTMONEY_UT,
+                "secids": ",".join(eastmoney_secid(code) for code in batch),
+                "fields": "f12,f14,f162,f164,f167,f116",
+            },
+            headers=EASTMONEY_HEADERS,
+            timeout=15,
+        )
+        response.raise_for_status()
+        payload = response.json()
+        diff = ((payload.get("data") or {}).get("diff") or [])
+        for item in diff:
+            code = normalize_code(item.get("f12"))
+            if code not in batch:
+                continue
+            out[code] = {
+                "pe_dynamic": metric_number(item.get("f162")),
+                "pe_ttm": metric_number(item.get("f164")),
+                "pb": metric_number(item.get("f167")),
+                "market_cap": metric_number(item.get("f116")),
+            }
+    return out
+
+
+def completed_quarter_ends(as_of: date, count: int = 2) -> list[str]:
+    candidates: list[date] = []
+    for year in range(as_of.year - 2, as_of.year + 1):
+        for month, day in ((3, 31), (6, 30), (9, 30), (12, 31)):
+            qend = date(year, month, day)
+            if qend <= as_of:
+                candidates.append(qend)
+    return [d.isoformat() for d in sorted(candidates, reverse=True)[:count]]
+
+
+def parse_financial_row(item: dict) -> dict:
+    report_date = item.get("REPORTDATE") or item.get("REPORT_DATE") or item.get("QDATE")
+    if report_date:
+        report_date = str(report_date)[:10]
+    notice_date = item.get("NOTICE_DATE") or item.get("UPDATE_DATE")
+    if notice_date:
+        notice_date = str(notice_date)[:10]
+    return {
+        "report_date": report_date,
+        "notice_date": notice_date,
+        "roe": first_metric(item, "WEIGHTAVG_ROE", "ROEJQ"),
+        "revenue_yoy": first_metric(item, "YSTZ", "TOTALOPERATEREVETZ"),
+        "net_profit_yoy": first_metric(item, "SJLTZ", "PARENTNETPROFITTZ"),
+        "deduct_net_profit_yoy": first_metric(
+            item,
+            "KCFJCXSYJLRTZ",
+            "DEDUCT_NETPROFIT_YOY",
+        ),
+        "operating_cashflow_per_share": first_metric(item, "MGJYXJJE"),
+        "gross_margin": first_metric(item, "XSMLL"),
+        "revenue": first_metric(item, "TOTAL_OPERATE_INCOME"),
+        "net_profit": first_metric(item, "PARENT_NETPROFIT"),
+        "basic_eps": first_metric(item, "BASIC_EPS"),
+        "deduct_basic_eps": first_metric(item, "DEDUCT_BASIC_EPS"),
+    }
+
+
+def fetch_eastmoney_financial_snapshot(codes: list[str], as_of: date) -> dict[str, dict]:
+    """Fetch the latest available quarterly summary for each current main-board code."""
+    wanted = set(codes)
+    out: dict[str, dict] = {}
+
+    for report_date in completed_quarter_ends(as_of, count=2):
+        page = 1
+        pages = 1
+        while page <= pages:
+            response = requests.get(
+                EASTMONEY_FINANCE_URL,
+                params={
+                    "sortColumns": "REPORTDATE,SECURITY_CODE",
+                    "sortTypes": "-1,1",
+                    "pageSize": 500,
+                    "pageNumber": page,
+                    "reportName": "RPT_LICO_FN_CPD",
+                    "columns": "ALL",
+                    "filter": f"(REPORTDATE='{report_date}')",
+                    "source": "WEB",
+                    "client": "WEB",
+                },
+                headers=EASTMONEY_HEADERS,
+                timeout=20,
+            )
+            response.raise_for_status()
+            payload = response.json()
+            result = payload.get("result") or {}
+            pages = int(result.get("pages") or 0)
+            rows = result.get("data") or []
+            if not rows:
+                break
+            for item in rows:
+                code = normalize_code(item.get("SECURITY_CODE") or item.get("CODE") or "")
+                if code not in wanted or code in out:
+                    continue
+                out[code] = parse_financial_row(item)
+            page += 1
+
+        if len(out) >= len(wanted):
+            break
+
+    return out
+
+
+def build_fundamentals(
+    codes: list[str],
+    *,
+    trade_date: str | None,
+    now: datetime,
+) -> tuple[dict[str, dict], dict]:
+    valuation, valuation_error = safe_fetch(
+        lambda: fetch_eastmoney_valuation_snapshot(codes),
+        "eastmoney_valuation",
+    )
+    financials, financial_error = safe_fetch(
+        lambda: fetch_eastmoney_financial_snapshot(codes, now.date()),
+        "eastmoney_financial",
+    )
+
+    out: dict[str, dict] = {}
+    for code in codes:
+        v = valuation.get(code) or {}
+        f = financials.get(code) or {}
+        warnings = []
+        if not v:
+            warnings.append("valuation_unavailable")
+        if not f:
+            warnings.append("financial_unavailable")
+        out[code] = {
+            "valuation_date": trade_date,
+            "pe_dynamic": v.get("pe_dynamic"),
+            "pe_ttm": v.get("pe_ttm"),
+            "pb": v.get("pb"),
+            "market_cap": v.get("market_cap"),
+            **f,
+            "sources": {
+                "valuation": "eastmoney_push2" if v else None,
+                "financial": "eastmoney_RPT_LICO_FN_CPD" if f else None,
+            },
+            "warnings": warnings,
+        }
+
+    stats = {
+        "valuation_usable": len(valuation),
+        "financial_usable": len(financials),
+        "pe_dynamic_usable": sum(1 for x in out.values() if x.get("pe_dynamic") is not None),
+        "pe_ttm_usable": sum(1 for x in out.values() if x.get("pe_ttm") is not None),
+        "pb_usable": sum(1 for x in out.values() if x.get("pb") is not None),
+        "roe_usable": sum(1 for x in out.values() if x.get("roe") is not None),
+        "deduct_profit_growth_usable": sum(
+            1 for x in out.values() if x.get("deduct_net_profit_yoy") is not None
+        ),
+        "errors": [x for x in (valuation_error, financial_error) if x],
+    }
+    return out, stats
 
 
 def clock_market_status(now: datetime) -> str:
@@ -148,6 +352,12 @@ def main() -> int:
         status = "closed_or_no_trade"
 
     codes = sorted(set(sina) | set(tencent))
+    fundamentals, fundamental_stats = build_fundamentals(
+        codes,
+        trade_date=trade_date,
+        now=now,
+    )
+
     stocks: dict[str, dict] = {}
     stats = {"high": 0, "medium": 0, "invalid": 0}
 
@@ -205,6 +415,7 @@ def main() -> int:
             },
             "confidence": validation.confidence,
             "warnings": sorted(set(warnings)),
+            "fundamentals": fundamentals.get(code),
         }
         stocks[code] = quote
         stats[validation.confidence] += 1
@@ -221,6 +432,7 @@ def main() -> int:
             "errors": [x for x in (sina_error, tencent_error) if x],
         },
         "validation_stats": stats,
+        "fundamental_stats": fundamental_stats,
         "stocks": stocks,
     }
     DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -234,6 +446,7 @@ def main() -> int:
                 "market_status": status,
                 "stocks": len(stocks),
                 "stats": stats,
+                "fundamental_stats": fundamental_stats,
                 "source_status": payload["source_status"],
             },
             ensure_ascii=False,
