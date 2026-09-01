@@ -10,6 +10,15 @@ LEGACY_COMMIT = "065e7727cba447159767eaaf67c32dc5a0f85dca"
 LEGACY_PATH = "data/research/v2/research_state.json"
 
 
+def load_json(path: Path) -> dict:
+    if not path.exists():
+        return {}
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
 def load_legacy() -> dict:
     raw = subprocess.check_output(
         ["git", "show", f"{LEGACY_COMMIT}:{LEGACY_PATH}"],
@@ -21,10 +30,7 @@ def load_legacy() -> dict:
 
 
 def normalize_breadth(value):
-    # Old research used `selective`; production uses the same meaning under `narrow`.
-    if value == "selective":
-        return "narrow"
-    return value
+    return "narrow" if value == "selective" else value
 
 
 def migrate() -> dict:
@@ -33,12 +39,12 @@ def migrate() -> dict:
     if not rows:
         raise RuntimeError("legacy level3_profitability_verification is empty")
 
-    state = {}
+    level3 = {}
     for row in rows:
         code = row.get("code")
         if not code:
             continue
-        state[code] = {
+        level3[code] = {
             "code": code,
             "name": row.get("name"),
             "trend": row.get("trend"),
@@ -71,11 +77,20 @@ def migrate() -> dict:
             "legacy_company_valuation_buy_state_reused": False,
             "breadth_normalization": {"selective": "narrow"},
         },
-        "level3_profitability": state,
+        "level3_profitability": level3,
     }
 
 
 def main():
+    current = load_json(OUT)
+    if current.get("status") == "valid" and current.get("level3_profitability"):
+        print(json.dumps({
+            "status": "noop",
+            "reason": "valid_level3_state_already_exists",
+            "level3_count": len(current["level3_profitability"]),
+        }, ensure_ascii=False))
+        return
+
     payload = migrate()
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
