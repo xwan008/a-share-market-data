@@ -70,11 +70,11 @@ jobs:
           replace=" and all(x['screen_complete'] for x in screens.values()) and (not valuation_set or len(nonreview)>0) and (not nonreview or len(near_top)>0)\n and all(v.get('safe_price_ceiling')"
           if target not in s: raise RuntimeError('schema32 gate patch target missing')
           s=s.replace(target,replace,1)
-          Path('/tmp/schema32_pb_fixed.py').write_text(s,encoding='utf-8')
+          Path('scripts/_schema32_pb_fixed_runtime.py').write_text(s,encoding='utf-8')
           PY
       - name: Execute corrected schema32 bootstrap
         env: {PYTHONPATH: '${{ github.workspace }}'}
-        run: python /tmp/schema32_pb_fixed.py
+        run: python scripts/_schema32_pb_fixed_runtime.py
       - name: Contract tests
         env: {PYTHONPATH: '${{ github.workspace }}'}
         run: pytest -q
@@ -98,9 +98,10 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f scripts/_schema32_pb_fixed_runtime.py
           git add config/research_pipeline_manifest.json config/research_runtime_policy.json skills/a-share-low-risk/valuation/SKILL.md data/research/v2/research_state.json
           git rm scripts/one_shot_schema32_pb_fix.py .github/workflows/one-shot-schema32-pb-fix-rerun.yml
           git commit -m "research: rerun schema32 with PB fallback"
           git pull --rebase origin main
           git push
-# runtime-patch historical proven runner
+# runtime file lives under scripts so ROOT resolves to repository
