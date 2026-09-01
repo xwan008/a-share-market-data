@@ -141,11 +141,14 @@ def write_history_shards(
                 item.get("long_term_summary") or {},
                 rows,
             )
+            incoming_fundamentals = item.get("fundamentals") or {}
+            fundamentals = incoming_fundamentals if incoming_fundamentals else old.get("fundamentals")
             current_stocks[code] = {
                 "name": item.get("name") or old.get("name"),
                 "history_basis": _basis_after_merge(old.get("history_basis"), item, replace),
                 "last_full_refresh": item.get("last_full_refresh") or old.get("last_full_refresh"),
                 "long_term_summary": summary,
+                "fundamentals": fundamentals,
                 "history": rows,
             }
 
@@ -209,6 +212,7 @@ def append_latest_snapshot() -> tuple[int, int]:
             continue
         updates[code] = {
             "name": quote.get("name"),
+            "fundamentals": quote.get("fundamentals"),
             "history": [compact_row(trade_date, quote)],
         }
 
