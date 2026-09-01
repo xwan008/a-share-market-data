@@ -1,5 +1,5 @@
 {
-  "schema_version": 28,
+  "schema_version": 29,
   "pipeline": "a_share_low_risk_v2",
   "mode": "shadow",
   "architecture": "prompt_first_research",
@@ -46,7 +46,8 @@
   "stage_order": [
     "data_health",
     "taxonomy_coverage",
-    "profitability_scan",
+    "market_prosperity_discovery",
+    "level3_profitability_verification",
     "profit_chain_decomposition",
     "chain_company_light_screen",
     "chain_company_comparison_and_dedup",
@@ -56,14 +57,12 @@
     "completion_gate"
   ],
   "scan_cadence_contract": {
-    "full_scan_unit": "level3",
-    "full_scan_expected_level3_nodes": 346,
+    "full_scan_unit": "level1_level2_prosperity_discovery",
     "weekly_full_scan_interval_days": 7,
     "preferred_anchor": "Friday 18:00 Asia/Shanghai",
     "fallback": "若周五18:00全量失败或未运行，则下一次可用工作日18:00补做weekly_full",
-    "bootstrap_rule": "没有当前schema有效周度基线时，下一次18:00必须立即执行全量普查，不等待周五",
+    "bootstrap_rule": "没有当前schema有效景气基线时，下一次可执行研究必须先完成31一级+134二级全市场景气发现，并完成所有被选中方向的三级盈利验证",
     "daily_incremental_between_full_scans": true,
-    "level1_level2_may_be_derived_from_level3_children": true,
     "full_scan_is_market_state_baseline_not_candidate_pool": true,
     "daily_incremental_trigger_sources": [
       "新财报/业绩预告/快报",
@@ -79,8 +78,18 @@
     "previous_companies_chains_or_opportunities_may_not_seed_discovery": true,
     "calendar_anchor_is_authoritative": true,
     "interval_days_is_max_baseline_age_not_minimum_wait": true,
-    "successful_bootstrap_next_full_scan": "最近一个Friday 18:00 Asia/Shanghai，即使距离bootstrap不足7天也执行weekly_full",
-    "friday_full_scan_rule": "每周五18:00只要数据健康即执行weekly_full；其他工作日18:00执行daily_incremental，除非需要补做失败的周五全量"
+    "successful_bootstrap_next_full_scan": "bootstrap可立即生成有效基线；最近一个Friday 18:00仍按正式锚点重做全市场景气发现",
+    "friday_full_scan_rule": "每周五18:00重做31一级+134二级全市场景气发现，并重验所有被选中方向的三级行业；其他工作日18:00做全市场景气触发增量与必要的新增三级下钻",
+    "weekly_full_market_discovery_expected_counts": {
+      "level1": 31,
+      "level2": 134
+    },
+    "weekly_full_market_discovery_reviews_all_level1_level2": true,
+    "full_346_level3_profitability_review_required": false,
+    "selected_prosperity_directions_expand_all_descendant_level3": true,
+    "selected_prosperity_directions_may_not_be_top_n_capped": true,
+    "level3_verification_scope": "全部被景气发现层选中的一级/二级方向所覆盖的三级行业；未选中三级仅做taxonomy routing，不要求当期盈利深研",
+    "daily_incremental_discovery_scope": "31个一级+134个二级全部检查新增景气触发；新进入景气方向时立即展开其全部三级行业验证"
   },
   "coverage_contract": {
     "taxonomy": "申万行业分类标准2021版",
@@ -91,7 +100,6 @@
     },
     "ledger_contract": {
       "state_path": "coverage_ledger",
-      "instantiate_all_taxonomy_nodes_before_profitability_scan": true,
       "exact_node_counts_must_match_taxonomy": true,
       "required_node_fields": [
         "code",
@@ -137,35 +145,43 @@
       ],
       "allowed_scan_depth": [
         "shallow",
-        "deep"
+        "deep",
+        "not_selected"
       ],
       "allowed_evidence_scope": [
         "direct_node",
         "child_aggregate",
         "cross_sectional",
         "carried_forward",
-        "insufficient"
+        "insufficient",
+        "not_selected_by_prosperity_discovery"
       ],
-      "deep_trigger_rule": "trend为improving或deteriorating，或breadth为selective/divergent时必须deep并进入盈利链研究",
-      "accounted_for_definition": "节点必须有唯一记录且四维状态、证据、扫描日期和流转字段完整；默认unconfirmed占位不能算周度全量完成。",
-      "weekly_level3_generic_unconfirmed_placeholder_forbidden": true,
-      "weekly_level3_each_node_requires_real_evidence_review": true,
+      "deep_trigger_rule": "仅对已进入三级盈利验证的节点应用：trend=improving/deteriorating，或breadth=selective/divergent时deep；未被景气发现层选中的三级节点scan_depth=not_selected。",
+      "accounted_for_definition": "所有31/134/346节点必须在taxonomy ledger中有唯一routing记录；accounted_for表示已被发现层路由，不等于该三级节点已做当期盈利深研。被景气层选中的三级节点才必须有真实盈利证据。",
       "daily_no_trigger_node_may_carry_forward_valid_baseline": true,
       "grouped_placeholder_rows_forbidden": true,
       "null_accounted_for_counts_forbidden": true,
       "missing_arrays_must_contain_actual_taxonomy_codes": true,
-      "counts_must_be_derived_from_ledger_not_manually_asserted": true
+      "counts_must_be_derived_from_ledger_not_manually_asserted": true,
+      "instantiate_all_taxonomy_nodes_before_market_prosperity_discovery": true,
+      "taxonomy_coverage_and_profitability_verification_are_separate": true,
+      "selected_level3_each_node_requires_real_evidence_review": true,
+      "selected_level3_generic_unconfirmed_placeholder_forbidden": true,
+      "unselected_level3_may_be_taxonomy_only": true
     },
-    "profitability_discovery_gate": {
-      "weekly_full_scan_requires_all_346_level3_reviewed": true,
-      "weekly_full_scan_requires_last_full_scan_date_on_all_level3": true,
+    "prosperity_and_level3_gate": {
+      "weekly_full_requires_all_31_level1_reviewed": true,
+      "weekly_full_requires_all_134_level2_reviewed": true,
+      "selected_direction_count_may_be_zero_but_must_not_be_top_n_capped": true,
+      "every_selected_direction_must_expand_all_required_level3": true,
+      "every_expanded_level3_must_be_evidence_reviewed": true,
+      "unselected_level3_need_only_complete_taxonomy_routing": true,
       "daily_incremental_requires_valid_baseline_not_older_than_days": 7,
-      "daily_incremental_requires_trigger_check_or_explicit_carry_forward_for_every_level3": true,
-      "level1_level2_aggregation_must_be_auditable": true
+      "daily_incremental_requires_trigger_check_for_all_level1_level2": true
     }
   },
   "profit_chain_resolution_contract": {
-    "required_for_each_deep_coverage_node": true,
+    "required_for_each_deep_coverage_node": false,
     "allowed_resolution": [
       "resolved",
       "unconfirmed_with_evidence_gap"
@@ -173,7 +189,7 @@
     "must_split_or_continue_split_cannot_remain_open": true,
     "research_admission_top_n_forbidden": true,
     "per_level1_chain_cap_forbidden": true,
-    "confirmed_improving_chain_definition": "由本期trend=improving节点拆出且resolution_status=resolved、Driver与利润传导已确认的盈利链",
+    "confirmed_improving_chain_definition": "由本期已完成三级盈利验证且trend=improving的三级节点拆出，resolution_status=resolved、Driver与利润传导已确认的盈利链",
     "every_confirmed_improving_chain_requires_company_light_screen": true,
     "non_improving_deep_chain_may_resolve_for_diagnostics_without_company_screen": true,
     "required_chain_fields": [
@@ -185,7 +201,8 @@
       "forward_bridge",
       "invalidation_condition",
       "resolution_status"
-    ]
+    ],
+    "required_for_each_verified_level3_trigger_node": true
   },
   "company_comparison_contract": {
     "company_light_screen": {
@@ -399,6 +416,8 @@
     "required_top_level_sections": [
       "coverage_ledger",
       "market_profitability_radar",
+      "market_prosperity_discovery",
+      "level3_profitability_verification",
       "profit_chains",
       "company_light_screen",
       "chain_comparisons",
@@ -449,7 +468,11 @@
     "all_triggered_extreme_valuation_audits_pass_or_review": true,
     "all_complete_non_review_companies_have_buy_point_assessment": true,
     "current_opportunities_must_come_only_from_buyable_now": true,
-    "near_miss_ranking_complete_when_eligible_universe_nonempty": true
+    "near_miss_ranking_complete_when_eligible_universe_nonempty": true,
+    "all_level1_level2_prosperity_discovery_complete": true,
+    "no_prosperity_discovery_top_n_truncation": true,
+    "all_selected_directions_fully_expanded_to_level3": true,
+    "all_expanded_level3_profitability_verified": true
   },
   "persistence_contract": {
     "only_prompt_research_output": "data/research/v2/research_state.json",
@@ -463,6 +486,7 @@
   "public_output": {
     "sections": [
       "执行状态",
+      "全市场景气发现",
       "全市场盈利景气雷达",
       "完整盈利产业链雷达",
       "链内公司轻筛与横向比较",
@@ -502,11 +526,99 @@
       "blocking_reason",
       "next_trigger"
     ],
-    "near_miss_must_be_output_even_when_current_opportunities_empty": true
+    "near_miss_must_be_output_even_when_current_opportunities_empty": true,
+    "prosperity_discovery_must_show_all_selected_directions": true,
+    "level3_verification_must_be_grouped_under_selected_prosperity_directions": true
   },
   "rule_ownership": {
     "manifest": "保存机器契约、扫描节奏、全盈利链公司轻筛守恒、估值异常审计、买点交集与输出契约。",
     "skills": "保存盈利研究、公司轻筛/横比/去重、估值和价格结构业务规则。",
     "prompt": "执行周度全量或日度增量研究，不维护候选池，不做研究准入Top-N截断。"
+  },
+  "market_prosperity_discovery_contract": {
+    "purpose": "先回答最近哪些大行业/二级行业的盈利景气正在改善，再决定三级研究范围；禁止直接从公司或旧机会名单反推行业。",
+    "scope": {
+      "level1": 31,
+      "level2": 134
+    },
+    "all_level1_level2_must_be_reviewed_each_weekly_full": true,
+    "daily_incremental_checks_all_level1_level2_triggers": true,
+    "required_fields": [
+      "code",
+      "name",
+      "level",
+      "parent_code",
+      "trend",
+      "strength",
+      "breadth",
+      "confidence",
+      "leading_variables",
+      "evidence_basis",
+      "recent_change_window",
+      "selected_for_level3_verification",
+      "selection_reason"
+    ],
+    "allowed_trend": [
+      "improving",
+      "stable",
+      "deteriorating",
+      "unconfirmed"
+    ],
+    "allowed_strength": [
+      "strong",
+      "normal",
+      "weak",
+      "unknown"
+    ],
+    "allowed_breadth": [
+      "broad",
+      "selective",
+      "divergent",
+      "unknown"
+    ],
+    "allowed_confidence": [
+      "high",
+      "medium",
+      "low"
+    ],
+    "preferred_evidence": [
+      "行业利润/利润率",
+      "产品价格或价差",
+      "库存",
+      "开工率/产能利用率",
+      "订单/出货/销量/产量",
+      "进出口/供需",
+      "代表性公司经营数据",
+      "政策对真实供需或成本的影响"
+    ],
+    "market_price_or_sector_return_cannot_be_primary_evidence": true,
+    "selection_rule": "二级行业trend=improving，或breadth=selective/divergent需要向三级拆分时，进入三级验证；若一级行业improving/selective/divergent但二级证据不足以定位，则该一级行业下全部三级行业进入验证，防止遗漏。",
+    "top_n_or_fixed_count_selection_forbidden": true,
+    "previous_period_focus_list_cannot_replace_current_full_discovery": true
+  },
+  "level3_profitability_verification_contract": {
+    "purpose": "只在景气发现后的相关三级行业中验证真实盈利状态，并决定是否形成可进入公司层的盈利链。",
+    "selected_level2_expands_all_child_level3": true,
+    "selected_level1_without_resolved_level2_expands_all_descendant_level3": true,
+    "every_expanded_level3_requires_real_evidence_review": true,
+    "expanded_level3_generic_unconfirmed_placeholder_forbidden": true,
+    "unselected_level3_not_required_for_weekly_profitability_review": true,
+    "unselected_level3_must_record_routing_reason": "parent_not_selected_by_current_prosperity_discovery",
+    "required_verified_fields": [
+      "code",
+      "name",
+      "parent_code",
+      "trend",
+      "strength",
+      "breadth",
+      "confidence",
+      "evidence_basis",
+      "leading_variables",
+      "profit_driver",
+      "needs_profit_chain_research",
+      "profit_chain_resolution"
+    ],
+    "profit_chain_trigger_rule": "三级行业trend=improving时必须进入盈利链拆解；deteriorating或明显divergent可进入诊断拆解，但不得直接进入机会公司筛选。",
+    "company_layer_entry_requires": "verified level3 trend=improving + resolved profit chain + confirmed profit transmission"
   }
 }

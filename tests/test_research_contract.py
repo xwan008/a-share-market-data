@@ -8,38 +8,47 @@ def manifest():
     return json.loads((ROOT / 'config/research_pipeline_manifest.json').read_text(encoding='utf-8'))
 
 
-def test_manifest_schema28_and_stage_order():
+def test_manifest_schema29_and_stage_order():
     m = manifest()
-    assert m['schema_version'] == 28
+    assert m['schema_version'] == 29
     assert m['mode'] == 'shadow'
     assert m['stage_order'] == [
-        'data_health', 'taxonomy_coverage', 'profitability_scan',
-        'profit_chain_decomposition', 'chain_company_light_screen',
-        'chain_company_comparison_and_dedup', 'valuation', 'price_structure',
-        'buy_point_synthesis', 'completion_gate'
+        'data_health', 'taxonomy_coverage', 'market_prosperity_discovery',
+        'level3_profitability_verification', 'profit_chain_decomposition',
+        'chain_company_light_screen', 'chain_company_comparison_and_dedup',
+        'valuation', 'price_structure', 'buy_point_synthesis', 'completion_gate'
     ]
     assert m['coverage_contract']['expected_counts'] == {'level1': 31, 'level2': 134, 'level3': 346}
 
 
-def test_scan_cadence_is_weekly_full_plus_daily_incremental_not_weekly_pool():
+def test_scan_cadence_is_prosperity_first_then_selected_level3_verification():
     c = manifest()['scan_cadence_contract']
-    assert c['full_scan_unit'] == 'level3'
-    assert c['full_scan_expected_level3_nodes'] == 346
-    assert c['calendar_anchor_is_authoritative'] is True
-    assert c['interval_days_is_max_baseline_age_not_minimum_wait'] is True
-    assert 'Friday 18:00' in c['successful_bootstrap_next_full_scan']
+    assert c['full_scan_unit'] == 'level1_level2_prosperity_discovery'
+    assert c['weekly_full_market_discovery_expected_counts'] == {'level1': 31, 'level2': 134}
+    assert c['weekly_full_market_discovery_reviews_all_level1_level2'] is True
+    assert c['full_346_level3_profitability_review_required'] is False
+    assert c['selected_prosperity_directions_expand_all_descendant_level3'] is True
+    assert c['selected_prosperity_directions_may_not_be_top_n_capped'] is True
     assert c['daily_incremental_between_full_scans'] is True
-    assert c['full_scan_is_market_state_baseline_not_candidate_pool'] is True
     assert c['previous_companies_chains_or_opportunities_may_not_seed_discovery'] is True
 
 
-def test_coverage_uses_four_dimensions_and_no_generic_weekly_placeholder():
-    c = manifest()['coverage_contract']['ledger_contract']
-    assert c['instantiate_all_taxonomy_nodes_before_profitability_scan'] is True
-    assert set(c['allowed_trend']) == {'improving', 'stable', 'deteriorating', 'unconfirmed'}
-    assert c['weekly_level3_generic_unconfirmed_placeholder_forbidden'] is True
-    assert c['weekly_level3_each_node_requires_real_evidence_review'] is True
-    assert c['counts_must_be_derived_from_ledger_not_manually_asserted'] is True
+def test_prosperity_discovery_and_level3_verification_are_separate():
+    m = manifest()
+    d = m['market_prosperity_discovery_contract']
+    v = m['level3_profitability_verification_contract']
+    c = m['coverage_contract']['ledger_contract']
+    assert d['scope'] == {'level1': 31, 'level2': 134}
+    assert d['all_level1_level2_must_be_reviewed_each_weekly_full'] is True
+    assert d['market_price_or_sector_return_cannot_be_primary_evidence'] is True
+    assert d['top_n_or_fixed_count_selection_forbidden'] is True
+    assert v['selected_level2_expands_all_child_level3'] is True
+    assert v['selected_level1_without_resolved_level2_expands_all_descendant_level3'] is True
+    assert v['every_expanded_level3_requires_real_evidence_review'] is True
+    assert v['unselected_level3_not_required_for_weekly_profitability_review'] is True
+    assert c['taxonomy_coverage_and_profitability_verification_are_separate'] is True
+    assert c['selected_level3_each_node_requires_real_evidence_review'] is True
+    assert c['unselected_level3_may_be_taxonomy_only'] is True
 
 
 def test_profit_chain_research_admission_cannot_use_top_n():
@@ -108,6 +117,10 @@ def test_completion_gate_guards_research_depth_not_just_formal_sections():
     assert g['all_complete_non_review_companies_have_buy_point_assessment'] is True
     assert g['current_opportunities_must_come_only_from_buyable_now'] is True
     assert g['near_miss_ranking_complete_when_eligible_universe_nonempty'] is True
+    assert g['all_level1_level2_prosperity_discovery_complete'] is True
+    assert g['no_prosperity_discovery_top_n_truncation'] is True
+    assert g['all_selected_directions_fully_expanded_to_level3'] is True
+    assert g['all_expanded_level3_profitability_verified'] is True
 
 
 def test_public_evidence_is_required_but_candidate_pools_remain_forbidden():

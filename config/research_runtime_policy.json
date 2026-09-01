@@ -1,5 +1,5 @@
 {
-  "schema_version": 8,
+  "schema_version": 9,
   "pipeline": "a_share_low_risk_v2",
   "research_read_mode": "manifest_repo_data_plus_current_public_evidence",
   "manifest_path": "config/research_pipeline_manifest.json",
@@ -13,8 +13,10 @@
     "morning_run_requires_valid_current_schema_industry_baseline": true,
     "valid_industry_baseline_conditions": [
       "manifest schema matches current schema",
-      "coverage ledger contains exact 31/134/346 taxonomy nodes",
-      "profitability discovery gate passed",
+      "taxonomy coverage contains exact 31/134/346 nodes",
+      "all 31 level1 and 134 level2 prosperity discovery rows are complete",
+      "every selected prosperity direction has fully expanded and verified required level3 descendants",
+      "prosperity and level3 gate passed",
       "weekly baseline age is within manifest freshness limit",
       "baseline data cutoff and latest completed trade date are explicit"
     ],
@@ -38,16 +40,16 @@
     "previous_companies_chains_valuations_or_opportunities_may_not_seed_manual_or_morning_company_discovery": true,
     "cross_run_candidate_or_opportunity_pools_forbidden": true,
     "research_admission_top_n_forbidden": true,
-    "research_admission_per_level1_chain_cap_forbidden": true
+    "research_admission_per_level1_chain_cap_forbidden": true,
+    "current_full_market_level1_level2_discovery_cannot_be_replaced_by_previous_focus_list": true,
+    "prosperity_selection_top_n_forbidden": true,
+    "selected_direction_level3_expansion_cap_forbidden": true
   },
   "stage_execution_policy": {
-    "coverage_ledger_must_be_instantiated_before_profitability_scan": true,
-    "weekly_full_scan_must_review_all_level3_nodes": true,
     "daily_incremental_requires_valid_weekly_baseline": true,
     "valid_weekly_baseline_may_be_generated_by_bootstrap_manual_or_scheduled_full_scan": true,
     "company_research_may_start_from_valid_industry_baseline_regardless_of_baseline_generation_time": true,
     "coverage_counts_must_be_derived_from_node_ledger": true,
-    "generic_weekly_unconfirmed_placeholders_forbidden": true,
     "deep_nodes_must_be_resolved_before_completion_gate": true,
     "every_confirmed_improving_chain_must_receive_company_light_screen": true,
     "all_mapped_mainboard_companies_in_chain_must_be_light_screened_before_any_ranking": true,
@@ -70,7 +72,17 @@
     "material_nonrecurring_parent_profit_cannot_feed_valuation_bridge": true,
     "every_complete_non_review_company_requires_near_miss_distance": true,
     "near_miss_top10_must_be_output_when_eligible_universe_nonempty": true,
-    "empty_current_opportunities_does_not_allow_empty_near_miss_output": true
+    "empty_current_opportunities_does_not_allow_empty_near_miss_output": true,
+    "coverage_ledger_must_be_instantiated_before_market_prosperity_discovery": true,
+    "weekly_full_scan_must_review_all_level1_level2_for_prosperity": true,
+    "weekly_full_scan_does_not_require_all_346_level3_profitability_reviews": true,
+    "prosperity_discovery_must_precede_level3_profitability_verification": true,
+    "prosperity_discovery_top_n_forbidden": true,
+    "selected_level2_must_expand_all_child_level3": true,
+    "selected_unresolved_level1_must_expand_all_descendant_level3": true,
+    "every_expanded_level3_must_be_profitability_verified": true,
+    "unselected_level3_may_remain_taxonomy_only": true,
+    "daily_incremental_requires_all_level1_level2_trigger_checks": true
   },
   "write_policy": {
     "current_research_output_only": "data/research/v2/research_state.json",
@@ -79,6 +91,7 @@
     "never_relabel_old_state_to_new_schema": true,
     "new_state_must_record_manifest_schema": true,
     "new_state_must_include_coverage_ledger_company_light_screen_buy_points_and_scan_mode": true,
-    "new_state_must_include_near_miss_ranking": true
+    "new_state_must_include_near_miss_ranking": true,
+    "new_state_must_include_market_prosperity_discovery_and_level3_verification": true
   }
 }

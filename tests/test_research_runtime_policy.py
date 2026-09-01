@@ -3,7 +3,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
-# Schema28 CI checkpoint: run only against a fresh/current state, never stale schema27 output.
+# Schema29 CI checkpoint: run only against a fresh/current state, never stale schema27 output.
 
 def load(p):
     return json.loads((ROOT / p).read_text(encoding='utf-8'))
@@ -11,7 +11,7 @@ def load(p):
 
 def test_repo_whitelist_and_public_evidence_are_separate_layers():
     p = load('config/research_runtime_policy.json')
-    assert p['schema_version'] == 8
+    assert p['schema_version'] == 9
     assert p['research_read_mode'] == 'manifest_repo_data_plus_current_public_evidence'
     assert p['repository_data_policy']['allow_only_manifest_authoritative_data'] is True
     assert p['public_evidence_policy']['allowed'] is True
@@ -41,9 +41,15 @@ def test_weekly_baseline_and_daily_incremental_are_enforced():
     assert d['cross_run_candidate_or_opportunity_pools_forbidden'] is True
     assert d['research_admission_top_n_forbidden'] is True
     assert d['research_admission_per_level1_chain_cap_forbidden'] is True
-    assert s['weekly_full_scan_must_review_all_level3_nodes'] is True
+    assert s['weekly_full_scan_must_review_all_level1_level2_for_prosperity'] is True
+    assert s['weekly_full_scan_does_not_require_all_346_level3_profitability_reviews'] is True
+    assert s['prosperity_discovery_must_precede_level3_profitability_verification'] is True
+    assert s['prosperity_discovery_top_n_forbidden'] is True
+    assert s['selected_level2_must_expand_all_child_level3'] is True
+    assert s['selected_unresolved_level1_must_expand_all_descendant_level3'] is True
+    assert s['every_expanded_level3_must_be_profitability_verified'] is True
     assert s['daily_incremental_requires_valid_weekly_baseline'] is True
-    assert s['generic_weekly_unconfirmed_placeholders_forbidden'] is True
+    assert s['daily_incremental_requires_all_level1_level2_trigger_checks'] is True
 
 
 def test_full_improving_chain_to_company_flow_cannot_shortcut():
