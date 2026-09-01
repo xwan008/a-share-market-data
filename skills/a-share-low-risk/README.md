@@ -1,11 +1,39 @@
-# A股低风险研究 V2 Skills
+# A股低风险研究 Skills
 
-V2采用Prompt-first：Prompt做当期开放式公开研究，Skill保留长期纪律，代码维护机械数据。
+这是正式生产研究链，不使用 shadow，也不通过递增数字 schema 管理研究规则。
 
-核心链：`固定Coverage → 全市场景气发现 → 盈利链拆解 → 链内公司验证/比较 → 分类估值 → 价格结构 → Completion Gate → 当前机会`。
+唯一主链：
 
-18:00从当前全市场重新开始，不存在周度机会池、候选池、T2池或跨期公司池。研究过程中的行业/盈利链/公司集合只属于本次执行，最终只写一个`research_state.json`。
+`Data Gate → 每次全市场Prompt轻召回 → taxonomy映射 → 三级行业周度全量/日度增量 → 公司准入 → 盈利链 → Company Mapping Gate → 公司全集轻筛 → survivor比较/去重 → 估值 → 独立价格结构 → 买点交集 → Near-miss → Completion Gate → 正式发布`
 
-Manifest `authoritative_data`是**仓库持久化机械数据白名单**，不是全部证据来源。18:00必须实时使用公开基本面证据：公司公告/财报、交易所、官方统计、行业协会/产业数据、订单/产销、产品价格/价差、库存/开工/利用率等。公开证据不另存成跨期研究缓存。
+## 状态边界
+跨期只允许保留两类正式研究状态：
+- `data/research/industry_state.json`：紧凑的三级行业盈利基线，是唯一跨期基本面记忆；
+- `data/research/research_state.json`：最近一次通过全部Gate的完整正式研究结果。
 
-四个Skill：orchestrator负责研究顺序/Coverage/完成门；company-research负责公司盈利证据；valuation负责估值；price-structure负责时机。
+机械价格结构独立保存为 `data/research/full_market_price_structure.json`。
+
+上一期公司、估值、当前买点和Near-miss不得成为下一轮景气发现种子。禁止周度机会池、候选池、T2池、独立公司池和估值缓存。
+
+## 发现与刷新不是一回事
+Prompt景气发现**每次运行都从全市场做轻召回**，不能被上一期方向限制。
+
+周度/日度差异只作用于三级行业深度盈利研究：周度重建/重验当前发现方向下的三级行业基线；日度只对有新增或变化证据的三级节点做深度刷新。
+
+## 公司准入
+允许进入公司层的三级状态：
+- `trend=improving`；
+- `trend=stable AND breadth=divergent`。
+
+后者只扩大研究资格，不降低估值、安全边际、价格结构或买点门槛。
+
+## 证据
+Manifest `authoritative_data` 是仓库机械数据白名单，不是全部证据来源。正式研究必须使用当前公开基本面证据：公司公告/财报、交易所、官方统计、行业协会/产业数据、订单/产销、产品价格/价差、库存/开工/利用率等。
+
+## 四个 Skill
+- `orchestrator`：总流程、Data Gate、三级状态、Company Mapping Gate、Completion Gate、发布；
+- `company-research`：盈利链公司全集召回、轻筛、横向比较、去重；
+- `valuation`：核心盈利、三级同行相对估值、安全价；
+- `price-structure`：独立技术结构、入场区间、失效条件。
+
+规则契约由 `config/research_runtime_policy.json` 与 `config/research_pipeline_manifest.json` 共同定义；修改规则时应同步更新相关Skill与契约测试，而不是增加 schema 序号。
