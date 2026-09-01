@@ -11,11 +11,23 @@ def load(p):
 
 def test_repo_whitelist_and_public_evidence_are_separate_layers():
     p = load('config/research_runtime_policy.json')
-    assert p['schema_version'] == 6
+    assert p['schema_version'] == 7
     assert p['research_read_mode'] == 'manifest_repo_data_plus_current_public_evidence'
     assert p['repository_data_policy']['allow_only_manifest_authoritative_data'] is True
     assert p['public_evidence_policy']['allowed'] is True
     assert p['public_evidence_policy']['required_for_1800_research'] is True
+
+
+def test_valid_industry_baseline_does_not_depend_on_1800_generation_time():
+    p = load('config/research_runtime_policy.json')
+    c = p['state_compatibility']
+    s = p['stage_execution_policy']
+    assert c['valid_industry_baseline_is_independent_of_generation_clock'] is True
+    assert c['morning_run_requires_valid_previous_1800_state'] is False
+    assert c['morning_run_requires_valid_current_schema_industry_baseline'] is True
+    assert c['scheduled_1800_is_refresh_anchor_not_baseline_eligibility_requirement'] is True
+    assert s['valid_weekly_baseline_may_be_generated_by_bootstrap_manual_or_scheduled_full_scan'] is True
+    assert s['company_research_may_start_from_valid_industry_baseline_regardless_of_baseline_generation_time'] is True
 
 
 def test_weekly_baseline_and_daily_incremental_are_enforced():
@@ -25,6 +37,7 @@ def test_weekly_baseline_and_daily_incremental_are_enforced():
     assert d['weekly_industry_baseline_may_carry_forward_between_full_scans'] is True
     assert d['previous_state_may_seed_only_industry_baseline_for_daily_incremental'] is True
     assert d['previous_companies_chains_valuations_or_opportunities_may_not_seed_1800_discovery'] is True
+    assert d['previous_companies_chains_valuations_or_opportunities_may_not_seed_manual_or_morning_company_discovery'] is True
     assert d['cross_run_candidate_or_opportunity_pools_forbidden'] is True
     assert d['research_admission_top_n_forbidden'] is True
     assert d['research_admission_per_level1_chain_cap_forbidden'] is True
