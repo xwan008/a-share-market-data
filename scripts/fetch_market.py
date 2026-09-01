@@ -24,7 +24,10 @@ EASTMONEY_HEADERS = {
     "Referer": "https://quote.eastmoney.com/",
 }
 EASTMONEY_UT = "bd1d9ddb04089700cf9c27f6f7426281"
-EASTMONEY_BATCH_URL = "https://push2.eastmoney.com/api/qt/ulist.np/get"
+EASTMONEY_LIST_URLS = (
+    "https://push2delay.eastmoney.com/api/qt/clist/get",
+    "https://push2.eastmoney.com/api/qt/clist/get",
+)
 EASTMONEY_FINANCE_URL = "https://datacenter-web.eastmoney.com/api/data/v1/get"
 
 
@@ -122,43 +125,122 @@ def safe_fetch(fn, label: str) -> tuple[dict[str, dict], str | None]:
         return {}, f"{label}:{type(exc).__name__}:{exc}"
 
 
-def eastmoney_secid(code: str) -> str:
-    return f"1.{code}" if code.startswith("6") else f"0.{code}"
+def fetch_eastmoney_list_page(market_filter: str, page: int) -> dict:
+    last_error: Exception | None = None
+    for url in EASTMONEY_LIST_URLS:
+        try:
+            response = requests.get(
+                url,
+                params={
+                    "pn": page,
+                    "pz": 100,
+                    "po": 1,
+                    "np": 1,
+                    "ut": EASTMONEY_UT,
+                    "fltt": 2,
+                    "invt": 2,
+                    "fid": "f12",
+                    "fs": market_filter,
+                    "fields": "f12,f14,f9,f23,f20",
+                },
+                headers=EASTMONEY_HEADERS,
+                timeout=15,
+            )
+            response.raise_for_status()
+            payload = response.json()
+            if payload.get("data") is not None:
+                return payload
+        except Exception as exc:
+            last_error = exc
+    if last_error:
+        raise last_error
+    raise RuntimeError("eastmoney list returned no data")
 
 
-def chunked(values: list[str], size: int) -> list[list[str]]:
-    return [values[i : i + size] for i in range(0, len(values), size)]
-
-
-def fetch_eastmoney_valuation_snapshot(codes: list[str]) -> dict[str, dict]:
-    """Fetch daily valuation fields in batches; failure never invalidates quote data."""
+def fetch_eastmoney_pe_ttm(codes: set[str], trade_date: str | None) -> dict[str, dict]:
+    if not trade_date:
+        return {}
     out: dict[str, dict] = {}
-    for batch in chunked(codes, 300):
+    page = 1
+    pages = 1
+    while page <= pages:
         response = requests.get(
-            EASTMONEY_BATCH_URL,
+            EASTMONEY_FINANCE_URL,
             params={
-                "fltt": 2,
-                "invt": 2,
-                "ut": EASTMONEY_UT,
-                "secids": ",".join(eastmoney_secid(code) for code in batch),
-                "fields": "f12,f14,f162,f164,f167,f116",
+                "sortColumns": "SECURITY_CODE",
+                "sortTypes": "1",
+                "pageSize": 500,
+                "pageNumber": page,
+                "reportName": "RPT_VALUEANALYSIS_DET",
+                "columns": "SECURITY_CODE,TRADE_DATE,PE_TTM,PB_MRQ,TOTAL_MARKET_CAP",
+                "filter": f"(TRADE_DATE='{trade_date}')",
+                "source": "WEB",
+                "client": "WEB",
             },
             headers=EASTMONEY_HEADERS,
-            timeout=15,
+            timeout=20,
         )
         response.raise_for_status()
-        payload = response.json()
-        diff = ((payload.get("data") or {}).get("diff") or [])
-        for item in diff:
-            code = normalize_code(item.get("f12"))
-            if code not in batch:
+        result = (response.json().get("result") or {})
+        pages = int(result.get("pages") or 0)
+        rows = result.get("data") or []
+        if not rows:
+            break
+        for item in rows:
+            code = normalize_code(item.get("SECURITY_CODE") or "")
+            if code not in codes:
                 continue
+            row_date = item.get("TRADE_DATE")
             out[code] = {
-                "pe_dynamic": metric_number(item.get("f162")),
-                "pe_ttm": metric_number(item.get("f164")),
-                "pb": metric_number(item.get("f167")),
-                "market_cap": metric_number(item.get("f116")),
+                "valuation_date": str(row_date)[:10] if row_date else trade_date,
+                "pe_ttm": metric_number(item.get("PE_TTM")),
+                "pb": metric_number(item.get("PB_MRQ")),
+                "market_cap": metric_number(item.get("TOTAL_MARKET_CAP")),
             }
+        page += 1
+    return out
+
+
+def fetch_eastmoney_valuation_snapshot(codes: list[str], trade_date: str | None) -> dict[str, dict]:
+    """Fetch main-board valuation cross-section without per-stock requests."""
+    wanted = set(codes)
+    out: dict[str, dict] = {}
+
+    for market_filter in ("m:0+t:6", "m:1+t:2"):
+        page = 1
+        total = 1
+        while (page - 1) * 100 < total:
+            payload = fetch_eastmoney_list_page(market_filter, page)
+            data = payload.get("data") or {}
+            total = int(data.get("total") or 0)
+            rows = data.get("diff") or []
+            if not rows:
+                break
+            for item in rows:
+                code = normalize_code(item.get("f12") or "")
+                if code not in wanted:
+                    continue
+                out[code] = {
+                    "valuation_date": trade_date,
+                    "pe_dynamic": metric_number(item.get("f9")),
+                    "pe_ttm": None,
+                    "pb": metric_number(item.get("f23")),
+                    "market_cap": metric_number(item.get("f20")),
+                }
+            page += 1
+
+    try:
+        ttm = fetch_eastmoney_pe_ttm(wanted, trade_date)
+    except Exception:
+        ttm = {}
+    for code, item in ttm.items():
+        base = out.setdefault(code, {})
+        base["valuation_date"] = item.get("valuation_date") or base.get("valuation_date")
+        base["pe_ttm"] = item.get("pe_ttm")
+        if base.get("pb") is None:
+            base["pb"] = item.get("pb")
+        if base.get("market_cap") is None:
+            base["market_cap"] = item.get("market_cap")
     return out
 
 
@@ -170,6 +252,11 @@ def completed_quarter_ends(as_of: date, count: int = 2) -> list[str]:
             if qend <= as_of:
                 candidates.append(qend)
     return [d.isoformat() for d in sorted(candidates, reverse=True)[:count]]
+
+
+def year_ago(report_date: str) -> str:
+    d = date.fromisoformat(report_date)
+    return date(d.year - 1, d.month, d.day).isoformat()
 
 
 def parse_financial_row(item: dict) -> dict:
@@ -199,48 +286,72 @@ def parse_financial_row(item: dict) -> dict:
     }
 
 
-def fetch_eastmoney_financial_snapshot(codes: list[str], as_of: date) -> dict[str, dict]:
-    """Fetch the latest available quarterly summary for each current main-board code."""
-    wanted = set(codes)
+def fetch_financial_period(report_date: str, wanted: set[str]) -> dict[str, dict]:
     out: dict[str, dict] = {}
-
-    for report_date in completed_quarter_ends(as_of, count=2):
-        page = 1
-        pages = 1
-        while page <= pages:
-            response = requests.get(
-                EASTMONEY_FINANCE_URL,
-                params={
-                    "sortColumns": "REPORTDATE,SECURITY_CODE",
-                    "sortTypes": "-1,1",
-                    "pageSize": 500,
-                    "pageNumber": page,
-                    "reportName": "RPT_LICO_FN_CPD",
-                    "columns": "ALL",
-                    "filter": f"(REPORTDATE='{report_date}')",
-                    "source": "WEB",
-                    "client": "WEB",
-                },
-                headers=EASTMONEY_HEADERS,
-                timeout=20,
-            )
-            response.raise_for_status()
-            payload = response.json()
-            result = payload.get("result") or {}
-            pages = int(result.get("pages") or 0)
-            rows = result.get("data") or []
-            if not rows:
-                break
-            for item in rows:
-                code = normalize_code(item.get("SECURITY_CODE") or item.get("CODE") or "")
-                if code not in wanted or code in out:
-                    continue
-                out[code] = parse_financial_row(item)
-            page += 1
-
-        if len(out) >= len(wanted):
+    page = 1
+    pages = 1
+    while page <= pages:
+        response = requests.get(
+            EASTMONEY_FINANCE_URL,
+            params={
+                "sortColumns": "REPORTDATE,SECURITY_CODE",
+                "sortTypes": "-1,1",
+                "pageSize": 500,
+                "pageNumber": page,
+                "reportName": "RPT_LICO_FN_CPD",
+                "columns": "ALL",
+                "filter": f"(REPORTDATE='{report_date}')",
+                "source": "WEB",
+                "client": "WEB",
+            },
+            headers=EASTMONEY_HEADERS,
+            timeout=20,
+        )
+        response.raise_for_status()
+        result = (response.json().get("result") or {})
+        pages = int(result.get("pages") or 0)
+        rows = result.get("data") or []
+        if not rows:
             break
+        for item in rows:
+            code = normalize_code(item.get("SECURITY_CODE") or item.get("CODE") or "")
+            if code in wanted:
+                out[code] = parse_financial_row(item)
+        page += 1
+    return out
 
+
+def fetch_eastmoney_financial_snapshot(codes: list[str], as_of: date) -> dict[str, dict]:
+    """Fetch latest available quarter plus same-period prior-year core-EPS comparison."""
+    wanted = set(codes)
+    current_periods = completed_quarter_ends(as_of, count=2)
+    all_periods = [*current_periods, *(year_ago(x) for x in current_periods)]
+    period_data = {period: fetch_financial_period(period, wanted) for period in all_periods}
+
+    out: dict[str, dict] = {}
+    for code in codes:
+        for period in current_periods:
+            current = period_data.get(period, {}).get(code)
+            if not current:
+                continue
+            item = dict(current)
+            previous = period_data.get(year_ago(period), {}).get(code) or {}
+            previous_deduct_eps = previous.get("deduct_basic_eps")
+            item["deduct_basic_eps_prev_year"] = previous_deduct_eps
+            current_deduct_eps = item.get("deduct_basic_eps")
+            if (
+                item.get("deduct_net_profit_yoy") is None
+                and current_deduct_eps is not None
+                and previous_deduct_eps is not None
+                and previous_deduct_eps > 0
+            ):
+                item["deduct_basic_eps_yoy"] = (
+                    current_deduct_eps / previous_deduct_eps - 1
+                ) * 100
+            else:
+                item["deduct_basic_eps_yoy"] = None
+            out[code] = item
+            break
     return out
 
 
@@ -251,7 +362,7 @@ def build_fundamentals(
     now: datetime,
 ) -> tuple[dict[str, dict], dict]:
     valuation, valuation_error = safe_fetch(
-        lambda: fetch_eastmoney_valuation_snapshot(codes),
+        lambda: fetch_eastmoney_valuation_snapshot(codes, trade_date),
         "eastmoney_valuation",
     )
     financials, financial_error = safe_fetch(
@@ -269,14 +380,14 @@ def build_fundamentals(
         if not f:
             warnings.append("financial_unavailable")
         out[code] = {
-            "valuation_date": trade_date,
+            "valuation_date": v.get("valuation_date") or trade_date,
             "pe_dynamic": v.get("pe_dynamic"),
             "pe_ttm": v.get("pe_ttm"),
             "pb": v.get("pb"),
             "market_cap": v.get("market_cap"),
             **f,
             "sources": {
-                "valuation": "eastmoney_push2" if v else None,
+                "valuation": "eastmoney_market_cross_section" if v else None,
                 "financial": "eastmoney_RPT_LICO_FN_CPD" if f else None,
             },
             "warnings": warnings,
@@ -290,7 +401,10 @@ def build_fundamentals(
         "pb_usable": sum(1 for x in out.values() if x.get("pb") is not None),
         "roe_usable": sum(1 for x in out.values() if x.get("roe") is not None),
         "deduct_profit_growth_usable": sum(
-            1 for x in out.values() if x.get("deduct_net_profit_yoy") is not None
+            1
+            for x in out.values()
+            if x.get("deduct_net_profit_yoy") is not None
+            or x.get("deduct_basic_eps_yoy") is not None
         ),
         "errors": [x for x in (valuation_error, financial_error) if x],
     }
