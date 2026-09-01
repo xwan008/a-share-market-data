@@ -3,9 +3,9 @@
 ## 目标
 执行唯一正式主链：
 
-`DATA GATE → Prompt全市场轻召回 → taxonomy映射 → 三级行业盈利状态刷新 → 公司准入Gate → 盈利链解析 → Company Mapping Gate → 链内全部公司轻筛 → survivor横向比较 → 跨链去重 → 估值 → 独立价格结构 → 买点交集 → 接近买点榜 → Completion Gate → 正式发布`
+`DATA GATE → Prompt全市场轻召回 → taxonomy映射 → 三级行业盈利状态读取/刷新 → 公司准入Gate → 盈利链解析 → Company Mapping Gate → 链内全部公司轻筛 → survivor横向比较 → 跨链去重 → 估值 → 独立价格结构 → 买点交集 → 接近买点榜 → Completion Gate → 正式发布`
 
-核心原则：**发现阶段广而轻，验证阶段窄而深；价值与时机独立；任何硬门失败都 fail closed。**
+核心原则：**发现阶段广而轻，验证阶段窄而深；三级行业状态跨期复用；价值与时机独立；任何硬门失败都 fail closed。**
 
 本 Skill 只服从 `config/research_runtime_policy.json` 和 `config/research_pipeline_manifest.json` 的正式生产契约，不使用数字 schema、shadow、V2/V3 等版本标签作为运行条件。
 
@@ -34,31 +34,30 @@
 
 一级/二级只做路由，不保存长期景气标签。真正的跨期产业状态只存在于三级行业。
 
-### Bootstrap硬规则
-每次完成Data Gate后先检查 `industry_state.json`。若文件不存在、状态无效，或明确标记 `requires_full_refresh`，则本次运行**必须立即执行一次完整三级盈利基线重建**，不能因为当天不是周五而进入日度增量模式。Bootstrap从本次全市场Prompt发现结果出发，对映射出的全部相关三级行业完成盈利验证；只有Bootstrap通过Completion Gate并写出有效基线后，后续运行才允许进入正常“周度全量 + 日度增量”节奏。
+### 三级状态读取/刷新规则
+对本轮映射到的每一个三级行业：
+1. `industry_state.json` 中已有有效状态：直接作为当前基线读取；只有出现新证据、失效信号或实质变化时才做日度深度刷新。
+2. 该三级行业以前从未有状态：只对这个三级节点做首次完整验证并写入状态，不得因此重建其他三级行业。
+3. 某个三级行业状态明显过期或证据失效：只重新验证该节点，不触发整个状态库重建。
+4. 周五18:00对本轮发现方向映射出的相关三级行业做全量重验；失败则下一个可用工作日18:00补做。
 
-Bootstrap失败时，本轮为 `incomplete_research`，不得发布正式买点，也不得把半成品写成有效行业基线。
-
-### 周度与日度的边界
-- Prompt全市场轻召回：**每次运行都做**。
-- 三级行业深度盈利刷新：已有有效基线后，周度全量、日度增量。
-- 周五18:00对本轮发现方向映射出的全部相关三级行业重新验证；失败则下一个可用工作日18:00补做。
-- 其他运行读取最近有效 `industry_state.json`，只对存在新证据、新方向、失效或实质变化的三级节点做深度增量刷新。
-
-因此“每日增量”只限制三级深研工作量，**不能限制Prompt发现范围，也不能绕过首次Bootstrap**。
+因此：
+- Prompt全市场轻召回：**每次运行都做**；
+- 三级行业深度盈利研究：**周度全量重验相关节点 + 日度增量**；
+- 不存在“首次全库Bootstrap”或“因为一个节点缺失就重建所有三级行业”的流程。
 
 三级状态至少记录：`trend / strength / breadth / confidence / evidence_basis / leading_variables / profit_driver / falsifiers / last_verified_at`。
 
-## 4. 公司准入 Gate
+## 4. 公司准入 Gate 与盈利链
 三级行业进入公司层只有两种情况：
-1. `trend=improving`；
-2. `trend=stable AND breadth=divergent`。
+1. `trend=improving` → `chain_type=improving`；
+2. `trend=stable AND breadth=divergent` → `chain_type=stable_divergent`。
 
-第二种只代表行业内部出现可研究的结构性分化，**只扩大研究资格，不降低任何估值、价格结构或买点标准**。
+**这两种都属于 admitted profit chain / 盈利链。** 第二种表示行业整体稳定但内部出现结构性盈利分化，只扩大研究资格，不降低任何公司轻筛、估值、安全边际、价格结构或买点标准。
 
 `deteriorating`、`unconfirmed`、`stable + 非divergent`不进入公司机会研究。
 
-进入公司层之前必须把行业逻辑拆成 resolved profit chain，确认：Driver、领先变量、利润传导、Forward Bridge 与失效条件。没有确认利润传导的方向不能仅凭概念相关进入公司层。
+每条盈利链必须明确：`chain_type / admission_basis / source_level3_codes / profit_driver / leading_variables / profit_transmission / beneficiary_scope / falsifiers`。没有确认Driver和利润传导的方向不能仅凭概念相关进入公司层。
 
 ## 5. Company Mapping Gate
 在公司轻筛前读取 `data/research/company_industry_index.json`。
@@ -122,10 +121,9 @@ MOS只应用一次：`safe_price_ceiling = base_fair_value × (1-MOS)`。
 ## 12. COMPLETION GATE 与正式发布
 正式发布前必须机械确认：
 - Data Gate通过；
-- 若无有效三级基线，本轮Bootstrap已完整通过；
 - 本轮Prompt全市场轻召回完整，无Top-N截断；
 - 所有发现方向完成taxonomy映射；
-- 所有需要刷新的三级行业盈利状态完成；
+- 所有需要刷新或首次建立的三级行业状态完成；
 - 所有 admitted chains 完成Driver/利润传导解析；
 - Company Mapping Gate通过；
 - 所有 admitted chains 完成公司全集轻筛；
@@ -139,11 +137,11 @@ MOS只应用一次：`safe_price_ceiling = base_fair_value × (1-MOS)`。
 
 ## 13. 持久化边界
 只允许：
-- `data/research/industry_state.json`：紧凑的三级行业跨期盈利基线，是唯一跨期基本面记忆；
+- `data/research/industry_state.json`：紧凑的三级行业跨期盈利状态，是唯一跨期基本面记忆；
 - `data/research/research_state.json`：最近一次通过全部Gate的完整正式研究结果；
 - `data/research/full_market_price_structure.json`：全市场机械价格结构。
 
-禁止独立候选池、机会池、周榜缓存、Near-miss池和单独估值缓存。旧 `data/research/v2/*` 不再作为运行输入。
+禁止独立候选池、机会池、周榜缓存、Near-miss池和单独估值缓存。旧 `data/research/v2/*` 不再作为运行输入；历史文件仅允许用于这次一次性迁移已经验证过的三级行业状态，旧公司/估值/买点结果不得迁移或复用。
 
 ## 14. 正式输出
 固定输出：
