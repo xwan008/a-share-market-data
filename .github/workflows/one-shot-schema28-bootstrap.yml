@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   bootstrap:
-    if: github.event.head_commit.message == 'schema28-bootstrap-v2'
+    if: github.event.head_commit.message == 'schema28-bootstrap-v3'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -23,7 +23,7 @@ jobs:
       - name: Run schema28 bootstrap
         env:
           PYTHONPATH: ${{ github.workspace }}
-        run: python scripts/one_shot_schema28_bootstrap_v2.py
+        run: python scripts/one_shot_schema28_bootstrap_v3.py
       - name: Validate repository contracts
         env:
           PYTHONPATH: ${{ github.workspace }}
@@ -33,6 +33,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/research/v2/research_state.json
-          git rm .github/workflows/one-shot-schema28-bootstrap.yml scripts/one_shot_schema28_bootstrap.py scripts/one_shot_schema28_bootstrap_v2.py
+          git rm .github/workflows/one-shot-schema28-bootstrap.yml scripts/one_shot_schema28_bootstrap.py scripts/one_shot_schema28_bootstrap_v2.py scripts/one_shot_schema28_bootstrap_v3.py
           git commit -m "research: bootstrap schema28 full pipeline"
           git push
