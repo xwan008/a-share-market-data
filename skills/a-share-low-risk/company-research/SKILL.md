@@ -84,3 +84,14 @@
 
 ## 持久化
 公司研究只写本次`research_state.json`中的`company_light_screen`、`companies`、`chain_comparisons`与`valuation_set`，不建立独立公司池、候选池或Top榜。
+
+
+## 扣非/核心盈利硬门（schema28 quality fix）
+轻筛 survivor 不能只验证归母净利润。必须取得扣非归母净利润或能够等价剥离一次性损益的核心盈利证据，并明确 `core_earnings_trend`。
+
+- 扣非/核心盈利字段缺失时，不得把 `earnings_quality_match` 默认成 true；必须补查公司半年报、业绩预告/快报或交易所公告。
+- 若补查后仍不可得，轻筛只能 `exclude:data_unavailable`，不得进入估值。
+- 若非经常性损益占归母净利润达到30%及以上，但扣非/核心盈利仍明确改善，公司可以保留为 survivor；但估值盈利桥必须改用扣非/核心盈利，禁止把受污染的归母净利润资本化。
+- 若一次性收益主导且核心盈利不改善/无法确认，则 `exclude:nonrecurring_earnings_dominant`。
+
+因此“归母暴增 + 营收平稳 + 扣非字段缺失”本身是补证触发器，不是通过信号。

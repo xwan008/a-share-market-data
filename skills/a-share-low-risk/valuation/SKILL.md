@@ -94,3 +94,7 @@ Forward/正常化盈利至少回答：
 
 ## 持久化
 只写本次`research_state.json`的`valuations`，不使用旧估值作为本期内在价值输入，不写独立估值缓存。
+
+
+## 核心盈利污染检查（schema28 quality fix）
+Forward/正常化盈利在进入主模型前必须检查归母净利润与扣非/核心盈利的差额。若非经常性损益占归母净利润达到30%及以上，归母净利润不得直接进入Forward Bridge；必须使用扣非/核心盈利重新构造盈利基础。若当前运行无法取得足够的核心盈利历史以完成该重构，使用 `review_required:nonrecurring_earnings_dominant`，而不是继续用受污染利润估值。

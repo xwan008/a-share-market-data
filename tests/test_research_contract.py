@@ -115,3 +115,16 @@ def test_incomplete_fails_closed():
     assert s['incomplete_must_not_publish_new_current_opportunities'] is True
     assert 'company_light_screen' in s['required_top_level_sections']
     assert 'buy_point_assessments' in s['required_top_level_sections']
+
+
+def test_core_earnings_quality_cannot_silently_pass_when_deducted_profit_missing():
+    m = manifest()
+    ls = m['company_comparison_contract']['company_light_screen']
+    val = m['valuation_resolution_contract']
+    assert ls['core_earnings_evidence_required_for_survive'] is True
+    assert ls['deducted_netprofit_or_equivalent_core_earnings_must_be_checked'] is True
+    assert ls['missing_core_earnings_evidence_cannot_default_to_earnings_quality_match_true'] is True
+    assert ls['missing_core_earnings_requires_current_public_evidence_supplement_or_data_unavailable'] is True
+    assert ls['nonrecurring_dominance_threshold_of_parent_netprofit'] == 0.30
+    assert val['core_earnings_preferred_over_parent_netprofit_when_nonrecurring_dominant'] is True
+    assert val['parent_netprofit_contaminated_by_material_nonrecurring_items_cannot_feed_forward_bridge'] is True

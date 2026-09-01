@@ -30953,7 +30953,16 @@
           "comparability": true,
           "screen_decision": "survive",
           "exclusion_reason": null,
-          "evidence_basis": "SW3=输变电设备; 2026H1 revenue_yoy=4.04%, parent_np_yoy=451.36%, current_parent_np=581754919.7, deduct_np=None"
+          "evidence_basis": "2026H1归母净利润约5.82亿元，同比+451.36%，但扣非净利润约1.54亿元，同比+54.71%；约4.28亿元非经常性损益主要来自出售富特科技部分股权及剩余股权核算方式变更。原Forward Bridge错误使用受一次性收益污染的归母净利润，人工公开证据审计后作废。",
+          "core_earnings_evidence": "2026H1扣非净利润约1.54亿元，同比+54.71%（公司半年报/业绩预告公开证据）",
+          "core_earnings_trend": "improving",
+          "nonrecurring_dominance_check": {
+            "dominant": true,
+            "nonrecurring_amount_approx": 428000000.0,
+            "parent_netprofit": 581754919.7,
+            "ratio_approx": 0.736
+          },
+          "valuation_earnings_basis_requirement": "deducted_or_core_earnings_only"
         },
         {
           "code": "600089",
@@ -38333,7 +38342,7 @@
       ],
       "comparison_complete": true,
       "fundamental_best": "002452",
-      "current_opportunity_best": "002452",
+      "current_opportunity_best": null,
       "opportunity_resolution_complete": true,
       "singleton_reason": null
     },
@@ -63641,9 +63650,9 @@
     "002452": {
       "current_price": 11.61,
       "price_date": "2026-08-31",
-      "earnings_type": "forward",
-      "earnings_basis": "以2025H1/2025A季节性占比30.8%将2026H1归母利润桥接至FY2026总利润；Forward增长相对2025A上限50%，避免短期高增永久资本化",
-      "primary_method": "forward_PE",
+      "earnings_type": "review_required",
+      "earnings_basis": "2026H1归母净利润约5.82亿元，同比+451.36%，但扣非净利润约1.54亿元，同比+54.71%；约4.28亿元非经常性损益主要来自出售富特科技部分股权及剩余股权核算方式变更。原Forward Bridge错误使用受一次性收益污染的归母净利润，人工公开证据审计后作废。",
+      "primary_method": "review_required_pending_core_earnings_bridge",
       "key_assumptions": {
         "2025A_parent_netprofit": 342631421.4,
         "2026H1_parent_netprofit": 581754919.7,
@@ -63665,34 +63674,32 @@
         "material_share_count_change": false,
         "historical_eps_direct_scaling_used": false
       },
-      "earnings_bridge_integrity": "aggregate_profit_divided_by_current_or_forward_share_count",
-      "reasonable_price_assumption": "总利润Forward/正常化后除以当前股本，再使用与盈利类型匹配的估值带；当前价格不参与内在价值计算",
-      "reasonable_price_range": [
-        14.91,
-        21.54
-      ],
+      "earnings_bridge_integrity": "invalidated_parent_profit_due_to_nonrecurring_dominance",
+      "reasonable_price_assumption": "受一次性收益污染的原归母盈利桥已作废；需以扣非/核心盈利重建2026E/正常化盈利后再估值。",
+      "reasonable_price_range": null,
       "uncertainty": "medium",
       "margin_of_safety_reason": "低风险区取审计后合理价值下沿的75%-85%，吸收盈利预测、估值倍数与公司行动误差",
-      "safe_price_range": [
-        11.18,
-        12.67
-      ],
-      "valuation_position": "in_safe_zone",
+      "safe_price_range": null,
+      "valuation_position": "review_required",
       "falsifiers": [
-        "后续季度扣非/归母盈利转为同比恶化",
-        "利润Driver或行业盈利趋势反转",
-        "公司行动导致盈利口径再次断裂"
+        "取得足够的扣非/核心盈利历史与订单、毛利率证据后重建Forward Bridge"
       ],
       "valuation_attempt_complete": true,
-      "model_execution_status": "complete",
-      "review_required": false,
-      "review_exception_code": null,
-      "blocker_evidence": null,
+      "model_execution_status": "blocked_after_full_attempt",
+      "review_required": true,
+      "review_exception_code": "nonrecurring_earnings_dominant",
+      "blocker_evidence": "2026H1归母净利润约5.82亿元，同比+451.36%，但扣非净利润约1.54亿元，同比+54.71%；约4.28亿元非经常性损益主要来自出售富特科技部分股权及剩余股权核算方式变更。原Forward Bridge错误使用受一次性收益污染的归母净利润，人工公开证据审计后作废。",
       "secondary_method": null,
       "extreme_valuation_deviation_audit": {
         "triggered": false,
         "audit_passed": true,
         "passed": true
+      },
+      "manual_earnings_quality_audit": {
+        "passed": false,
+        "reason": "parent_netprofit_materially_contaminated_by_nonrecurring_items",
+        "core_h1_np_approx": 154000000.0,
+        "core_h1_yoy": 0.5471
       }
     },
     "002455": {
@@ -121916,22 +121923,6 @@
       "structure_entry_range": null,
       "invalidation_price": 7.482
     },
-    "002452": {
-      "code": "002452",
-      "value_eligible": true,
-      "timing_eligible": true,
-      "buy_point_status": "buyable_now",
-      "buy_price_range": [
-        11.3,
-        11.73
-      ],
-      "buy_point_basis": "safe_price_range ∩ independently-derived structure_entry_range; current price must lie inside intersection",
-      "structure_entry_range": [
-        11.3,
-        11.73
-      ],
-      "invalidation_price": 11.4105
-    },
     "002457": {
       "code": "002457",
       "value_eligible": false,
@@ -125466,35 +125457,7 @@
       "invalidation_price": 26.1325
     }
   },
-  "current_opportunities": [
-    {
-      "code": "002452",
-      "name": "长高电气",
-      "source_chain_ids": [
-        "L3_S630801_2026-09-01"
-      ],
-      "current_price": 11.61,
-      "reasonable_price_range": [
-        14.91,
-        21.54
-      ],
-      "safe_price_range": [
-        11.18,
-        12.67
-      ],
-      "structure_entry_range": [
-        11.3,
-        11.73
-      ],
-      "buy_price_range": [
-        11.3,
-        11.73
-      ],
-      "valuation_position": "in_safe_zone",
-      "price_structure": "trend_continuation",
-      "action": "low_risk_buy_point"
-    }
-  ],
+  "current_opportunities": [],
   "diagnostics": {
     "coverage": {
       "taxonomy": "申万行业分类标准2021版",
@@ -125529,18 +125492,22 @@
     "valuation": {
       "valuation_set_count": 644,
       "executed_count": 644,
-      "complete_non_review_count": 484,
-      "review_required_count": 160,
+      "complete_non_review_count": 483,
+      "review_required_count": 161,
       "extreme_deviation_audit_count": 306,
       "valuation_gate_passed": true
     },
     "buy_point": {
-      "assessed_count": 484,
-      "buyable_now_count": 1,
+      "assessed_count": 483,
+      "buyable_now_count": 0,
       "buy_point_gate_passed": true
     },
     "completion_gate_passed": true,
-    "method_note": "No Top-N research admission. Every confirmed improving SW3 chain is company-screened; all survivors are horizontally compared; stock-code dedup occurs only before valuation. Valuation uses aggregate-profit/current-share bridges and extreme-deviation secondary audits before buy-point intersection."
+    "method_note": "No Top-N research admission. Every confirmed improving SW3 chain is company-screened; all survivors are horizontally compared; stock-code dedup occurs only before valuation. Valuation uses aggregate-profit/current-share bridges and extreme-deviation secondary audits before buy-point intersection.",
+    "manual_quality_audit": {
+      "002452": "sole machine buy point invalidated: nonrecurring earnings dominated parent profit; core-earnings bridge required",
+      "current_opportunities_recomputed": true
+    }
   },
   "evidence_sources": {
     "financial_dataset": "Eastmoney RPT_LICO_FN_CPD public financial report dataset",
