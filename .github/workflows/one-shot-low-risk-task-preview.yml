@@ -1,0 +1,88 @@
+name: One-shot low risk task preview
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/one-shot-low-risk-task-preview.yml']
+permissions:
+  contents: write
+jobs:
+  preview:
+    if: github.event.head_commit.message == 'low-risk-task-preview'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install -r requirements.txt pytest
+      - name: Validate baseline
+        env: {PYTHONPATH: '${{ github.workspace }}'}
+        run: pytest -q
+      - name: Render scheduled-task preview
+        run: |
+          python - <<'PY'
+          import json, math
+          from collections import Counter, defaultdict
+          s=json.load(open('data/research/v2/research_state.json',encoding='utf-8'))
+          l1={x['code']:x for x in s['coverage_ledger']['level1']}
+          l2={x['code']:x for x in s['coverage_ledger']['level2']}
+          l3=s['coverage_ledger']['level3']
+          agg=defaultdict(lambda:Counter())
+          for x in l3:
+              p2=l2.get(x['parent_code'],{})
+              p1=p2.get('parent_code')
+              if p1:
+                  agg[p1][x['trend']]+=1
+                  agg[p1]['deep'] += (x.get('scan_depth')=='deep')
+                  agg[p1]['total'] += 1
+          radar=[]
+          for c,a in agg.items():
+              radar.append({'code':c,'name':l1.get(c,{}).get('name',c),'improving':a['improving'],'stable':a['stable'],'deteriorating':a['deteriorating'],'unconfirmed':a['unconfirmed'],'deep':a['deep'],'total':a['total'],'improving_ratio':round(a['improving']/a['total'],3) if a['total'] else 0})
+          radar=sorted(radar,key=lambda x:(x['improving'],x['improving_ratio'],x['deep']),reverse=True)
+          comps={x['chain_id']:x for x in s.get('chain_comparisons',[])}
+          companies=s.get('companies',{})
+          chains=[]
+          for ch in s.get('profit_chains',[]):
+              if ch.get('resolution_status')!='resolved': continue
+              cid=ch['chain_id']; comp=comps.get(cid,{})
+              best=comp.get('fundamental_best'); co=companies.get(best,{}) if best else {}
+              chains.append({'chain_id':cid,'name':ch.get('source_coverage_name') or (ch.get('source_coverage_codes') or [''])[0], 'level1':ch.get('level1_name'),'forward_bridge':ch.get('forward_bridge'),'compared_count':len(comp.get('compared_companies') or []),'fundamental_best':best,'fundamental_best_name':co.get('name'),'current_opportunity_best':comp.get('current_opportunity_best')})
+          chains=sorted(chains,key=lambda x:x['compared_count'],reverse=True)
+          vals=s.get('valuations',{}); bps=s.get('buy_point_assessments',{}); ps=s.get('price_structures',{})
+          valpos=Counter(v.get('valuation_position') for v in vals.values())
+          bpstat=Counter(v.get('buy_point_status') for v in bps.values())
+          near=[]
+          for c,b in bps.items():
+              v=vals.get(c,{}); p=ps.get(c,{}); co=companies.get(c,{})
+              cur=v.get('current_price'); safe=v.get('safe_price_range'); er=b.get('structure_entry_range')
+              gap=None
+              if cur is not None and safe:
+                  gap=round((cur-safe[1])/safe[1]*100,2) if safe[1] else None
+              near.append({'code':c,'name':co.get('name',c),'status':b.get('buy_point_status'),'current_price':cur,'safe_price_range':safe,'reasonable_price_range':v.get('reasonable_price_range'),'structure_type':p.get('structure_type'),'structure_entry_range':er,'value_eligible':b.get('value_eligible'),'timing_eligible':b.get('timing_eligible'),'gap_to_safe_upper_pct':gap,'invalidation':b.get('invalidation_price')})
+          # Show closest actionable watches: value-eligible first, then smallest positive gap to safe upper.
+          near=sorted(near,key=lambda x:(not x['value_eligible'], 9999 if x['gap_to_safe_upper_pct'] is None else abs(x['gap_to_safe_upper_pct']), not x['timing_eligible']))[:20]
+          out={
+            'meta':{k:s.get(k) for k in ['manifest_schema','status','generated_at','run_type','scan_mode','weekly_baseline_date']},
+            'data_health':s.get('data_health'),
+            'coverage':s.get('diagnostics',{}).get('coverage'),
+            'company_screen':s.get('diagnostics',{}).get('company_screen'),
+            'valuation_diag':s.get('diagnostics',{}).get('valuation'),
+            'buy_point_diag':s.get('diagnostics',{}).get('buy_point'),
+            'completion_gate_passed':s.get('diagnostics',{}).get('completion_gate_passed'),
+            'level1_profitability_radar_top15':radar[:15],
+            'resolved_chain_count':len(chains),
+            'chains_top15_by_compared_count':chains[:15],
+            'valuation_position_counts':dict(valpos),
+            'buy_point_status_counts':dict(bpstat),
+            'closest_actionable_watches':near,
+            'current_opportunities':s.get('current_opportunities') or []
+          }
+          print('TASK_PREVIEW_JSON')
+          print(json.dumps(out,ensure_ascii=False,indent=2))
+          PY
+      - name: Self remove
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/one-shot-low-risk-task-preview.yml
+          git commit -m "ci: remove low risk task preview"
+          git push
