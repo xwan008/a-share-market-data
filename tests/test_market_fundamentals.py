@@ -1,6 +1,10 @@
+import sys
 from datetime import date
+from pathlib import Path
 
-from scripts.fetch_market import completed_quarter_ends, parse_financial_row
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+
+from fetch_market import completed_quarter_ends, parse_financial_row
 
 
 def test_completed_quarter_ends_uses_latest_completed_reports():
