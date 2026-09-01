@@ -29,8 +29,8 @@ def test_near_miss_ranking_is_auditable_and_never_lowers_buy_gate():
 
 def test_orchestrator_requires_near_miss_without_versioned_labels():
     text = (ROOT / "skills/a-share-low-risk/orchestrator/SKILL.md").read_text(encoding="utf-8")
-    assert "## 11. 接近买点榜" in text
-    assert "绝不为了凑榜降低门槛" in text
+    assert "## 9. 接近买点榜" in text
+    assert "正式买点只允许 `buyable_now`" in text
     assert "Top10 Near-miss" in text
-    assert "不得成为跨期候选池" in text
+    assert "不形成跨期候选池" in text
     assert "Ranking V3" not in text
