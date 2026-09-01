@@ -78,9 +78,10 @@
   "level3_state_contract": {
     "taxonomy": "申万行业分类标准2021版",
     "expected_counts": {"level1": 31, "level2": 134, "level3": 346},
-    "bootstrap_full_refresh_required_when_state_missing_invalid_or_requires_full_refresh": true,
-    "bootstrap_ignores_weekly_anchor": true,
-    "bootstrap_must_complete_before_daily_incremental_mode": true,
+    "existing_valid_level3_state_must_be_reused": true,
+    "missing_level3_state_initialized_on_demand": true,
+    "stale_or_invalid_level3_state_revalidated_individually": true,
+    "whole_state_rebuild_for_missing_nodes_forbidden": true,
     "weekly_full_refresh_anchor": "Friday 18:00 Asia/Shanghai",
     "weekly_full_refresh_fallback": "next available weekday 18:00",
     "daily_incremental_refresh": true,
@@ -119,6 +120,22 @@
     "admitted_chain_requires_resolved_driver_and_profit_transmission": true,
     "research_admission_top_n_forbidden": true,
     "per_level1_chain_cap_forbidden": true
+  },
+  "profit_chain_contract": {
+    "allowed_chain_types": ["improving", "stable_divergent"],
+    "improving_chain_admission_basis": "trend=improving",
+    "stable_divergent_chain_admission_basis": "trend=stable AND breadth=divergent",
+    "required_fields": [
+      "chain_type",
+      "admission_basis",
+      "source_level3_codes",
+      "profit_driver",
+      "leading_variables",
+      "profit_transmission",
+      "beneficiary_scope",
+      "falsifiers"
+    ],
+    "both_chain_types_follow_same_company_screen_valuation_structure_and_buy_point_rules": true
   },
   "company_mapping_gate": {
     "company_index_may_be_globally_degraded": true,
@@ -263,7 +280,9 @@
     "persistent_candidate_or_opportunity_pools_forbidden": true,
     "standalone_valuation_cache_forbidden": true,
     "failed_or_stale_run_must_not_overwrite_valid_state": true,
-    "old_v2_state_is_legacy_and_not_runtime_input": true
+    "old_v2_state_is_legacy_and_not_runtime_input": true,
+    "one_time_level3_migration_from_legacy_history_is_allowed": true,
+    "legacy_company_valuation_buy_state_reuse_forbidden": true
   },
   "public_output": {
     "formal_publish_enabled": true,
