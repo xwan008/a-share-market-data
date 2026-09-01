@@ -1,0 +1,75 @@
+name: Enforce near-miss ranking gate
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/one-shot-enforce-near-miss.yml']
+permissions:
+  contents: write
+jobs:
+  patch:
+    if: github.event.head_commit.message == 'enforce near-miss ranking gate'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Patch contracts and tests
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          mp=Path('config/research_pipeline_manifest.json')
+          m=json.loads(mp.read_text(encoding='utf-8'))
+          rs=m['research_state_contract']['required_top_level_sections']
+          if 'near_miss_ranking' not in rs:
+              rs.insert(rs.index('diagnostics'), 'near_miss_ranking')
+          m['completion_gate_contract']['near_miss_ranking_complete_when_eligible_universe_nonempty']=True
+          secs=m['public_output']['sections']
+          if '接近买点榜' not in secs:
+              secs.insert(secs.index('诊断'), '接近买点榜')
+          m['public_output']['near_miss_must_be_output_even_when_current_opportunities_empty']=True
+          mp.write_text(json.dumps(m,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+
+          rp=Path('config/research_runtime_policy.json')
+          r=json.loads(rp.read_text(encoding='utf-8'))
+          r['schema_version']=8
+          s=r['stage_execution_policy']
+          s['every_complete_non_review_company_requires_near_miss_distance']=True
+          s['near_miss_top10_must_be_output_when_eligible_universe_nonempty']=True
+          s['empty_current_opportunities_does_not_allow_empty_near_miss_output']=True
+          r['write_policy']['new_state_must_include_near_miss_ranking']=True
+          rp.write_text(json.dumps(r,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+
+          tp=Path('tests/test_research_contract.py')
+          t=tp.read_text(encoding='utf-8')
+          needle="    assert b['price_structure_must_not_modify_intrinsic_value'] is True\n"
+          extra="    near = b['near_miss_ranking_contract']\n    assert near['must_output_when_eligible_universe_nonempty'] is True\n    assert near['default_display_limit'] == 10\n    assert near['ranking_is_display_only_not_candidate_pool'] is True\n    assert 'near_miss_ranking' in manifest()['research_state_contract']['required_top_level_sections']\n    assert manifest()['public_output']['near_miss_must_be_nonempty_when_eligible_universe_nonempty'] is True\n    assert manifest()['public_output']['near_miss_must_be_output_even_when_current_opportunities_empty'] is True\n    assert '接近买点榜' in manifest()['public_output']['sections']\n"
+          if extra not in t:
+              t=t.replace(needle, needle+extra)
+          gate="    assert g['current_opportunities_must_come_only_from_buyable_now'] is True\n"
+          gate_extra="    assert g['near_miss_ranking_complete_when_eligible_universe_nonempty'] is True\n"
+          if gate_extra not in t:
+              t=t.replace(gate, gate+gate_extra)
+          tp.write_text(t,encoding='utf-8')
+
+          rp_test=Path('tests/test_research_runtime_policy.py')
+          rt=rp_test.read_text(encoding='utf-8')
+          rt=rt.replace("assert p['schema_version'] == 7", "assert p['schema_version'] == 8")
+          anchor="    assert s['current_opportunity_requires_buyable_now'] is True\n"
+          add="    assert s['every_complete_non_review_company_requires_near_miss_distance'] is True\n    assert s['near_miss_top10_must_be_output_when_eligible_universe_nonempty'] is True\n    assert s['empty_current_opportunities_does_not_allow_empty_near_miss_output'] is True\n"
+          if add not in rt and anchor in rt:
+              rt=rt.replace(anchor, anchor+add)
+          rp_test.write_text(rt,encoding='utf-8')
+          PY
+      - run: python -m pip install pytest
+      - name: Validate contracts
+        run: pytest -q
+      - name: Commit and self-remove
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add config/research_pipeline_manifest.json config/research_runtime_policy.json tests/test_research_contract.py tests/test_research_runtime_policy.py
+          git rm .github/workflows/one-shot-enforce-near-miss.yml
+          git commit -m "research: make near-miss ranking mandatory"
+          git push
