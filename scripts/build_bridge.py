@@ -154,6 +154,7 @@ def main() -> int:
             "confidence": q.get("confidence"),
             "primary_source": q.get("primary_source"),
             "source_prices": q.get("source_prices"),
+            "fundamentals": q.get("fundamentals"),
             "trend": trend_stocks.get(code),
         }
 
@@ -168,6 +169,7 @@ def main() -> int:
         **common,
         "source_status": latest.get("source_status"),
         "validation_stats": latest.get("validation_stats"),
+        "fundamental_stats": latest.get("fundamental_stats"),
         "shard_count": len(groups),
         "market_breadth": build_market_breadth(latest_stocks, trend_stocks),
         "history": {
@@ -195,6 +197,7 @@ def main() -> int:
         f"history >=5d: {coverage.get('points_ge_5', 0)}, "
         f">=20d: {coverage.get('points_ge_20', 0)}, "
         f">=60d: {coverage.get('points_ge_60', 0)}, "
+        f"fundamentals: {(latest.get('fundamental_stats') or {}).get('financial_usable', 0)}, "
         f"repairs: {repair.get('repaired', 0)}"
     )
     return 0
