@@ -588,7 +588,13 @@
     "resource_asset_fixed_pe_only_valuation_forbidden": false,
     "normal_company_complex_archetype_forbidden_as_default": true,
     "single_mos_application_required": true,
-    "safe_price_ceiling_formula": "base_fair_value * (1 - margin_of_safety_pct)"
+    "safe_price_ceiling_formula": "base_fair_value * (1 - margin_of_safety_pct)",
+    "pb_fallback_contract": {
+      "vendor_pb_missing_must_not_force_review_when_financial_statement_equity_available": true,
+      "fallback_formula": "completed_session_market_cap / latest_reported_total_equity",
+      "fallback_equity_basis": "latest H1 TOTAL_EQUITY; consistency cross-check only, note minority-interest approximation",
+      "same_basis_required_for_level3_peer_pb": true
+    }
   },
   "buy_point_contract": {
     "purpose": "买点必须是价值安全边际与价格结构时机的交集，不能由任一单独维度替代。",
@@ -770,7 +776,9 @@
     "all_normal_non_review_valuations_have_simple_relative_inputs": true,
     "all_normal_non_review_valuations_have_peer_and_pb_cross_checks": true,
     "all_normal_non_review_valuations_have_180d_market_sanity": true,
-    "exception_companies_have_explicit_exception_trigger_and_model": true
+    "exception_companies_have_explicit_exception_trigger_and_model": true,
+    "nonempty_valuation_set_requires_at_least_one_complete_non_review_valuation": true,
+    "all_review_outcome_for_nonempty_valuation_set_forbidden": true
   },
   "persistence_contract": {
     "only_prompt_research_output": "data/research/v2/research_state.json",
