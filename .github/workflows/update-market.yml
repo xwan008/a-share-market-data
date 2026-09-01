@@ -12,6 +12,7 @@ on:
       - 'scripts/history_store.py'
       - 'scripts/build_history.py'
       - 'scripts/build_bridge.py'
+      - 'scripts/build_full_market_price_structure.py'
       - 'scripts/build_v2_full_market_price_structure.py'
       - 'requirements.txt'
   schedule:
@@ -61,7 +62,7 @@ jobs:
       - name: Build compact ChatGPT bridge files
         run: python scripts/build_bridge.py
       - name: Build full-market low-risk price structure
-        run: python scripts/build_v2_full_market_price_structure.py
+        run: python scripts/build_full_market_price_structure.py
       - name: Commit updated data
         shell: bash
         run: |
