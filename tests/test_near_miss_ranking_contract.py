@@ -3,7 +3,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
-def test_near_miss_ranking_contract_is_auditable_and_nonempty_by_rule():
+
+def test_near_miss_ranking_is_auditable_and_never_lowers_buy_gate():
     manifest = json.loads((ROOT / "config/research_pipeline_manifest.json").read_text(encoding="utf-8"))
     c = manifest["buy_point_contract"]["near_miss_ranking_contract"]
     assert c["buyable_now_stays_separate"] is True
@@ -13,15 +14,23 @@ def test_near_miss_ranking_contract_is_auditable_and_nonempty_by_rule():
     assert c["cross_run_persistence_as_pool_forbidden"] is True
     assert c["default_display_limit"] == 10
     assert c["research_admission_top_n_forbidden"] is True
-    assert "action_distance_pct" in c["required_metrics"]
-    assert "value_gap_pct" in c["required_metrics"]
-    assert "structure_gap_pct" in c["required_metrics"]
+    assert c["required_metrics"] == [
+        "missing_hard_conditions",
+        "value_gap_pct",
+        "structure_gap_pct",
+        "action_distance_pct",
+        "distance_band",
+        "current_missing",
+        "next_trigger",
+    ]
+    assert "max(value_gap_pct, structure_gap_pct)" in c["action_distance_formula"]
     assert manifest["public_output"]["near_miss_section_title"] == "【接近买点榜】"
-    assert manifest["public_output"]["near_miss_must_be_nonempty_when_eligible_universe_nonempty"] is True
 
-def test_orchestrator_requires_near_miss_output_without_lowering_buy_gate():
+
+def test_orchestrator_requires_near_miss_without_versioned_labels():
     text = (ROOT / "skills/a-share-low-risk/orchestrator/SKILL.md").read_text(encoding="utf-8")
-    assert "## 接近买点榜（Near-miss Ranking V3）" in text
-    assert "绝不为了凑榜降低" in text
-    assert "Top10仍必须输出" in text
-    assert "不得持久化为候选池" in text
+    assert "## 11. 接近买点榜" in text
+    assert "绝不为了凑榜降低门槛" in text
+    assert "Top10 Near-miss" in text
+    assert "不得成为跨期候选池" in text
+    assert "Ranking V3" not in text
