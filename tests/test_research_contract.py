@@ -59,20 +59,52 @@ def test_data_and_company_mapping_gates_fail_closed():
     assert d["fail_closed"] is True
     assert d["publish_on_failure"] is False
     assert d["mutate_valid_state_on_failure"] is False
+    assert g["inactive_or_untradable_company_is_runtime_skip"] is True
+    assert g["inactive_or_untradable_does_not_block_completion"] is True
     assert g["all_missing_or_unmapped_codes_must_be_checked_against_admitted_level3_scope"] is True
     assert g["unresolved_in_scope_mapping_forbidden"] is True
     assert g["silent_omission_forbidden"] is True
 
 
-def test_company_screen_is_exhaustive_after_admission():
+def test_company_filtering_funnel_is_exhaustive_without_top_n():
     c = manifest()["company_comparison_contract"]
-    s = c["company_light_screen"]
-    assert s["all_mapped_mainboard_companies_in_admitted_chain_must_be_screened"] is True
-    assert s["top_n_or_score_cutoff_before_screen_forbidden"] is True
-    assert s["exclusion_requires_company_specific_evidence"] is True
-    assert s["all_survivors_enter_horizontal_comparison"] is True
-    assert s["core_earnings_evidence_required_for_survive"] is True
+    assert c["full_chain_recall_required_before_filtering"] is True
+    assert c["research_admission_top_n_forbidden"] is True
+    assert c["company_level_inputs_dedup_before_expensive_research"] is True
+    assert c["dedup_key"] == "stock_code"
     assert c["dedup_must_preserve_all_source_chain_ids"] is True
+    assert c["same_company_financial_and_valuation_inputs_must_be_reused_within_run"] is True
+
+    hard = c["financial_hard_screen"]
+    assert hard["applies_to_unique_companies"] is True
+    assert hard["missing_core_earnings_cannot_default_pass"] is True
+    assert hard["nonrecurring_dominance_threshold_of_parent_netprofit"] == 0.30
+
+    driver = c["driver_quality_gate"]
+    assert driver["admit_only_if"] == [
+        "company_level_driver_clear",
+        "core_earnings_improving",
+        "cashflow_and_earnings_quality_acceptable",
+        "sustainability_sufficient",
+    ]
+    assert driver["top_n_or_fixed_quota_forbidden"] is True
+
+    peer = c["peer_redundancy_filter"]
+    assert peer["exclude_only_if_dominated_by_peer"] is True
+    assert peer["material_tradeoff_requires_both_companies_retained"] is True
+    assert peer["fixed_per_industry_count_forbidden"] is True
+    assert peer["leader_only_rule_forbidden"] is True
+
+    pre = c["valuation_precheck"]
+    assert pre["absolute_cross_industry_pe_cap_forbidden"] is True
+    assert pre["high_pe_must_be_judged_against_peers_and_core_growth"] is True
+    assert pre["uncertain_or_tradeoff_case_must_continue_to_full_valuation"] is True
+    assert pre["precheck_cannot_generate_fair_value_or_buy_point"] is True
+
+    comp = c["horizontal_comparison"]
+    assert comp["applies_after_financial_driver_peer_and_precheck_filters"] is True
+    assert comp["must_cover_all_remaining_companies"] is True
+    assert comp["top_n_or_fixed_quota_forbidden"] is True
 
 
 def test_valuation_and_buy_point_contract_remain_strict():
@@ -94,7 +126,13 @@ def test_completion_persistence_and_near_miss_fail_closed():
     g = m["completion_gate_contract"]
     p = m["persistence_contract"]
     n = m["buy_point_contract"]["near_miss_ranking_contract"]
-    assert g["all_admitted_chains_company_screened"] is True
+    assert g["all_admitted_chains_company_recalled"] is True
+    assert g["unique_company_dedup_complete"] is True
+    assert g["all_unique_companies_have_financial_hard_screen_decision"] is True
+    assert g["all_financial_screen_survivors_have_driver_quality_decision"] is True
+    assert g["all_driver_quality_survivors_have_peer_redundancy_decision"] is True
+    assert g["all_peer_filter_survivors_have_valuation_precheck_decision"] is True
+    assert g["all_precheck_survivors_horizontally_compared"] is True
     assert g["current_opportunities_must_come_only_from_buyable_now"] is True
     assert g["publish_on_failure"] is False
     assert p["industry_state_is_only_cross_run_fundamental_memory"] is True
