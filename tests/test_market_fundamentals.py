@@ -4,7 +4,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
-from fetch_market import completed_quarter_ends, parse_financial_row
+from fetch_market import completed_quarter_ends, parse_financial_row, year_ago
 
 
 def test_completed_quarter_ends_uses_latest_completed_reports():
@@ -16,6 +16,11 @@ def test_completed_quarter_ends_uses_latest_completed_reports():
         "2026-12-31",
         "2026-09-30",
     ]
+
+
+def test_year_ago_keeps_same_reporting_period():
+    assert year_ago("2026-06-30") == "2025-06-30"
+    assert year_ago("2026-03-31") == "2025-03-31"
 
 
 def test_parse_financial_row_keeps_filter_fields():
