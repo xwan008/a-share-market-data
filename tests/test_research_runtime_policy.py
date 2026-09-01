@@ -49,17 +49,33 @@ def test_company_admission_and_mapping_are_hard_runtime_gates():
     assert s["stable_divergent_does_not_relax_downstream_thresholds"] is True
     assert s["deteriorating_or_unconfirmed_cannot_enter_company_layer"] is True
     assert s["company_mapping_gate_must_run_before_company_screen"] is True
-    assert s["all_missing_or_unmapped_company_index_codes_must_be_checked_for_admitted_scope"] is True
+    assert s["inactive_or_untradable_company_is_runtime_skip"] is True
     assert s["unresolved_in_scope_company_mapping_fails_completion"] is True
-    assert s["every_admitted_chain_must_receive_company_light_screen"] is True
+    assert s["every_admitted_chain_must_be_fully_recalled_before_filtering"] is True
 
 
-def test_company_valuation_buy_point_flow_cannot_shortcut():
+def test_company_filtering_and_valuation_flow_cannot_shortcut():
     s = load("config/research_runtime_policy.json")["stage_execution_policy"]
-    assert s["all_mapped_mainboard_companies_in_chain_must_be_light_screened_before_any_ranking"] is True
-    assert s["all_light_screen_survivors_must_be_horizontally_compared"] is True
+    assert s["company_chain_relations_must_preserve_all_memberships"] is True
+    assert s["company_level_inputs_must_be_deduplicated_by_stock_code_before_expensive_research"] is True
+    assert s["same_company_financial_inputs_are_reused_within_run"] is True
+    assert s["financial_hard_screen_must_check_core_earnings_cashflow_nonrecurring_and_business_change"] is True
+    assert s["missing_deducted_profit_cannot_silently_pass"] is True
+    assert s["driver_quality_requires_company_driver_clear"] is True
+    assert s["driver_quality_requires_core_earnings_improving"] is True
+    assert s["driver_quality_requires_cashflow_and_earnings_quality_acceptable"] is True
+    assert s["driver_quality_requires_sustainability_sufficient"] is True
+    assert s["peer_redundancy_may_exclude_only_dominated_by_peer"] is True
+    assert s["peer_tradeoff_requires_both_companies_retained"] is True
+    assert s["peer_filter_fixed_quota_or_leader_only_forbidden"] is True
+    assert s["valuation_precheck_must_run_before_full_valuation"] is True
+    assert s["valuation_precheck_may_exclude_only_obviously_expensive"] is True
+    assert s["absolute_cross_industry_pe_cap_forbidden"] is True
+    assert s["high_pe_must_be_judged_against_peers_and_core_growth"] is True
+    assert s["valuation_precheck_uncertain_or_tradeoff_case_must_continue"] is True
+    assert s["horizontal_comparison_applies_to_all_companies_remaining_after_filters"] is True
+    assert s["horizontal_comparison_top_n_or_fixed_quota_forbidden"] is True
     assert s["valuation_set_must_be_deduplicated_by_stock_code"] is True
-    assert s["all_compared_companies_must_enter_valuation_set"] is True
     assert s["every_valuation_set_company_must_be_executed"] is True
     assert s["normal_profitable_company_uses_simple_relative_valuation_by_default"] is True
     assert s["exception_trigger_required_before_complex_model"] is True
