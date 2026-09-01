@@ -30,6 +30,7 @@ def test_scan_cadence_is_prompt_search_then_selected_level3_verification():
     assert c['full_346_level3_profitability_review_required'] is False
     assert c['selected_prosperity_directions_expand_all_relevant_level3'] is True
     assert c['selected_prosperity_directions_may_not_be_top_n_capped'] is True
+    assert 'selected_prosperity_directions_expand_all_descendant_level3' not in c
     assert c['daily_incremental_between_full_scans'] is True
 
 
@@ -127,6 +128,9 @@ def test_public_evidence_is_required_but_candidate_pools_remain_forbidden():
     assert m['evidence_contract']['current_public_research_evidence_required_for_1800_research'] is True
     assert m['persistence_contract']['persistent_intermediate_research_outputs_allowed'] is False
     assert m['persistence_contract']['cross_run_candidate_or_opportunity_caches_allowed'] is False
+    assert m['persistence_contract']['0600_requires_valid_previous_1800_state'] is False
+    assert m['persistence_contract']['0600_requires_valid_current_schema_market_baseline'] is True
+    assert len(m['public_output']['sections']) == len(set(m['public_output']['sections']))
 
 
 def test_incomplete_fails_closed():

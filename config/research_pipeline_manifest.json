@@ -81,7 +81,6 @@
     "successful_bootstrap_next_full_scan": "bootstrap可立即生成有效基线；最近一个Friday 18:00仍按正式锚点重新做全市场景气搜索。",
     "friday_full_scan_rule": "每周五18:00重新从当前公开证据做Prompt全市场景气搜索，不从上周方向名单起步；对本周识别出的所有景气方向映射到相关三级行业并重验盈利状态。",
     "full_346_level3_profitability_review_required": false,
-    "selected_prosperity_directions_expand_all_descendant_level3": true,
     "selected_prosperity_directions_may_not_be_top_n_capped": true,
     "level3_verification_scope": "Prompt全市场景气搜索识别出的全部景气方向，经taxonomy映射后覆盖的相关三级行业；未映射到景气方向的三级节点只做taxonomy routing。",
     "daily_incremental_discovery_scope": "基于最近有效周度景气方向/三级盈利基线，Prompt搜索过去约24小时新增产业证据；只对新增、移除或实质变化的景气方向及其三级行业更新。",
@@ -438,12 +437,12 @@
     "weekly_profitability_baseline_is_allowed_only_inside_research_state": true,
     "previous_state_may_seed_daily_industry_baseline_only": true,
     "previous_companies_chains_valuations_opportunities_may_not_seed_1800_discovery": true,
-    "0600_requires_valid_previous_1800_state": true
+    "0600_requires_valid_previous_1800_state": false,
+    "0600_requires_valid_current_schema_market_baseline": true
   },
   "public_output": {
     "sections": [
       "执行状态",
-      "全市场景气搜索",
       "全市场景气搜索",
       "完整盈利产业链雷达",
       "链内公司轻筛与横向比较",
