@@ -8,7 +8,7 @@ def load(path: str):
     return json.loads((ROOT / path).read_text(encoding='utf-8'))
 
 
-def test_persisted_state_schema29_contract_when_present():
+def test_persisted_state_schema30_contract_when_present():
     state_path = ROOT / 'data/research/v2/research_state.json'
     if not state_path.exists():
         return
@@ -16,11 +16,11 @@ def test_persisted_state_schema29_contract_when_present():
     state = json.loads(state_path.read_text(encoding='utf-8'))
     manifest = load('config/research_pipeline_manifest.json')
     taxonomy = load('config/industry_scan_universe.json')
-    assert state['manifest_schema'] == manifest['schema_version'] == 29
+    assert state['manifest_schema'] == manifest['schema_version'] == 30
     assert state['scan_mode'] in {'weekly_full', 'daily_incremental'}
     assert state['weekly_baseline_date']
 
-    # Coverage exactness
+    # Coverage is taxonomy routing only; prosperity/profitability state lives elsewhere.
     ledger = state['coverage_ledger']
     contract = manifest['coverage_contract']['ledger_contract']
     required = set(contract['required_node_fields'])
@@ -31,24 +31,22 @@ def test_persisted_state_schema29_contract_when_present():
         assert len(rows) == len(expected)
         by_code = {row['code']: row for row in rows}
         assert set(by_code) == set(expected)
-        if level == 'level3':
-            level3_by_code = by_code
+        if level == 'level3': level3_by_code = by_code
         for code, row in by_code.items():
             assert required.issubset(row)
             assert row['name'] == expected[code]['name']
             assert row['parent_code'] == expected[code]['parent_code']
             assert row['level'] == level
             assert row['accounted_for'] is True
-            assert row['trend'] in contract['allowed_trend']
-            assert row['strength'] in contract['allowed_strength']
-            assert row['breadth'] in contract['allowed_breadth']
-            assert row['confidence'] in contract['allowed_confidence']
-            assert row['evidence_basis']
-            must_deep = row['trend'] in {'improving', 'deteriorating'} or row['breadth'] in {'selective', 'divergent'}
-            if must_deep:
-                assert row['scan_depth'] == 'deep'
-                assert row['needs_profit_chain_research'] is True
-                assert row['profit_chain_resolution'] in {'resolved', 'unconfirmed_with_evidence_gap'}
+            assert row['routing_status'] in contract['allowed_routing_status']
+
+    assert isinstance(state['market_prosperity_search'], (dict, list))
+    verified = state['level3_profitability_verification']
+    rows = list(verified.values()) if isinstance(verified, dict) else verified
+    verified_by_code = {row['code']: row for row in rows}
+    for row in rows:
+        assert row['trend'] in {'improving','stable','deteriorating','unconfirmed'}
+        assert row['evidence_basis']
 
     # All confirmed improving chains must reach company screening; no Top-N research admission.
     confirmed_improving = set()
@@ -56,7 +54,7 @@ def test_persisted_state_schema29_contract_when_present():
         if chain['resolution_status'] != 'resolved':
             continue
         src = chain['source_coverage_codes']
-        if any(level3_by_code.get(code, {}).get('trend') == 'improving' for code in src):
+        if any(verified_by_code.get(code, {}).get('trend') == 'improving' for code in src):
             confirmed_improving.add(chain['chain_id'])
 
     screens = state['company_light_screen']
