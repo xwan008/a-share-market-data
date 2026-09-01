@@ -1,0 +1,49 @@
+name: One-shot schema28 inspect
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/one-shot-schema28-inspect.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  inspect:
+    if: github.event.head_commit.message == 'schema28-inspect'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Print compact schema28 result
+        run: |
+          python - <<'PY'
+          import json
+          s=json.load(open('data/research/v2/research_state.json',encoding='utf-8'))
+          ops=s.get('current_opportunities') or []
+          print('SUMMARY_JSON')
+          print(json.dumps({
+            'status':s.get('status'),'generated_at':s.get('generated_at'),'scan_mode':s.get('scan_mode'),
+            'weekly_baseline_date':s.get('weekly_baseline_date'),'data_health':s.get('data_health'),
+            'diagnostics':s.get('diagnostics'),'current_opportunities':ops
+          },ensure_ascii=False,indent=2))
+          for op in ops:
+            c=op['code']
+            print('OPPORTUNITY_AUDIT_JSON')
+            print(json.dumps({
+              'company':s.get('companies',{}).get(c),
+              'valuation':s.get('valuations',{}).get(c),
+              'price_structure':s.get('price_structures',{}).get(c),
+              'buy_point':s.get('buy_point_assessments',{}).get(c),
+              'source_chains':[x for x in s.get('profit_chains',[]) if x.get('chain_id') in (s.get('companies',{}).get(c,{}).get('source_chain_ids') or [])],
+              'chain_comparisons':[x for x in s.get('chain_comparisons',[]) if c in (x.get('compared_companies') or [])],
+              'light_screen':[{'chain_id':cid,'entry':next((e for e in b.get('screened_companies',[]) if e.get('code')==c),None)} for cid,b in (s.get('company_light_screen') or {}).items() if any(e.get('code')==c for e in b.get('screened_companies',[]))]
+            },ensure_ascii=False,indent=2))
+          PY
+      - name: Self remove
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/one-shot-schema28-inspect.yml
+          git commit -m "ci: remove schema28 inspection workflow"
+          git push
