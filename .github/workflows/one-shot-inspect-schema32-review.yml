@@ -1,0 +1,30 @@
+name: One-shot inspect schema32 review blockers
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/one-shot-inspect-schema32-review.yml']
+permissions:
+  contents: write
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect blockers
+        run: |
+          python - <<'PY'
+          import json,collections
+          s=json.load(open('data/research/v2/research_state.json',encoding='utf-8'))
+          vs=s.get('valuations',{})
+          print('BLOCKERS',json.dumps(collections.Counter(v.get('blocker_evidence') for v in vs.values()).most_common(),ensure_ascii=False,indent=2))
+          for c in ['601899','601225','600096','603236']:
+            print(c,json.dumps(vs.get(c),ensure_ascii=False,indent=2))
+          PY
+      - name: Cleanup
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/one-shot-inspect-schema32-review.yml
+          git commit -m "ci: remove schema32 review inspection"
+          git push
