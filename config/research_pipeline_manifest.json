@@ -77,7 +77,11 @@
   },
   "level3_state_contract": {
     "taxonomy": "申万行业分类标准2021版",
-    "expected_counts": {"level1": 31, "level2": 134, "level3": 346},
+    "expected_counts": {
+      "level1": 31,
+      "level2": 134,
+      "level3": 346
+    },
     "existing_valid_level3_state_must_be_reused": true,
     "missing_level3_state_initialized_on_demand": true,
     "stale_or_invalid_level3_state_revalidated_individually": true,
@@ -102,8 +106,18 @@
       "falsifiers",
       "last_verified_at"
     ],
-    "allowed_trend": ["improving", "stable", "deteriorating", "unconfirmed"],
-    "allowed_breadth": ["broad", "divergent", "narrow", "unconfirmed"]
+    "allowed_trend": [
+      "improving",
+      "stable",
+      "deteriorating",
+      "unconfirmed"
+    ],
+    "allowed_breadth": [
+      "broad",
+      "divergent",
+      "narrow",
+      "unconfirmed"
+    ]
   },
   "company_admission_contract": {
     "admit_if": [
@@ -122,7 +136,10 @@
     "per_level1_chain_cap_forbidden": true
   },
   "profit_chain_contract": {
-    "allowed_chain_types": ["improving", "stable_divergent"],
+    "allowed_chain_types": [
+      "improving",
+      "stable_divergent"
+    ],
     "improving_chain_admission_basis": "trend=improving",
     "stable_divergent_chain_admission_basis": "trend=stable AND breadth=divergent",
     "required_fields": [
@@ -139,6 +156,8 @@
   },
   "company_mapping_gate": {
     "company_index_may_be_globally_degraded": true,
+    "inactive_or_untradable_company_is_runtime_skip": true,
+    "inactive_or_untradable_does_not_block_completion": true,
     "all_missing_or_unmapped_codes_must_be_checked_against_admitted_level3_scope": true,
     "unresolved_in_scope_mapping_forbidden": true,
     "out_of_scope_missing_mapping_may_be_documented_and_continue": true,
@@ -146,32 +165,34 @@
     "silent_omission_forbidden": true
   },
   "company_comparison_contract": {
-    "company_light_screen": {
-      "all_mapped_mainboard_companies_in_admitted_chain_must_be_screened": true,
-      "top_n_or_score_cutoff_before_screen_forbidden": true,
-      "exclusion_requires_company_specific_evidence": true,
-      "all_survivors_enter_horizontal_comparison": true,
-      "core_earnings_evidence_required_for_survive": true,
-      "deducted_netprofit_or_equivalent_core_earnings_must_be_checked": true,
-      "missing_core_earnings_evidence_cannot_default_to_earnings_quality_match_true": true,
-      "missing_core_earnings_requires_current_public_evidence_supplement_or_data_unavailable": true,
-      "nonrecurring_dominance_threshold_of_parent_netprofit": 0.30,
+    "full_chain_recall_required_before_filtering": true,
+    "research_admission_top_n_forbidden": true,
+    "company_chain_relations_must_preserve_all_memberships": true,
+    "company_level_inputs_dedup_before_expensive_research": true,
+    "dedup_key": "stock_code",
+    "dedup_must_preserve_all_source_chain_ids": true,
+    "same_company_financial_and_valuation_inputs_must_be_reused_within_run": true,
+    "financial_hard_screen": {
+      "applies_to_unique_companies": true,
+      "required_checks": [
+        "deducted_or_core_earnings",
+        "core_earnings_direction",
+        "revenue_consistency",
+        "cashflow_quality",
+        "nonrecurring_items",
+        "major_business_change"
+      ],
+      "missing_core_earnings_cannot_default_pass": true,
+      "nonrecurring_dominance_threshold_of_parent_netprofit": 0.3,
       "allowed_exclusion_reasons": [
-        "business_exposure_mismatch",
-        "profit_driver_mismatch",
+        "core_earnings_not_improving",
         "earnings_quality_mismatch",
         "nonrecurring_earnings_dominant",
         "major_business_change",
-        "not_economically_comparable",
         "data_unavailable"
       ]
     },
-    "horizontal_comparison_must_cover_all_screen_survivors": true,
-    "cross_chain_dedup_after_comparison": true,
-    "dedup_key": "stock_code",
-    "dedup_must_preserve_all_source_chain_ids": true,
-    "valuation_admission_gate": {
-      "applies_after_horizontal_comparison": true,
+    "driver_quality_gate": {
       "admit_only_if": [
         "company_level_driver_clear",
         "core_earnings_improving",
@@ -179,11 +200,68 @@
         "sustainability_sufficient"
       ],
       "financial_companies_use_industry_appropriate_balance_sheet_and_earnings_quality_metrics": true,
-      "top_n_or_fixed_quota_forbidden": true,
-      "failure_means_not_enter_valuation_set": true,
-      "admission_or_exclusion_reason_required": true
+      "stable_divergent_requires_company_level_divergence_evidence": true,
+      "failure_stops_expensive_research": true,
+      "top_n_or_fixed_quota_forbidden": true
     },
-    "valuation_set_contains_only_valuation_admitted_companies": true,
+    "peer_redundancy_filter": {
+      "applies_only_to_same_driver_and_highly_comparable_business_models": true,
+      "exclude_only_if_dominated_by_peer": true,
+      "dominated_requires_no_material_independent_advantage": true,
+      "must_consider": [
+        "business_purity",
+        "driver_sensitivity",
+        "core_earnings_delivery",
+        "cashflow_and_earnings_quality",
+        "cost_or_margin_advantage",
+        "sustainability",
+        "capital_efficiency",
+        "valuation_advantage"
+      ],
+      "material_tradeoff_requires_both_companies_retained": true,
+      "fixed_per_industry_count_forbidden": true,
+      "leader_only_rule_forbidden": true,
+      "exclusion_reason": "dominated_by_peer"
+    },
+    "valuation_precheck": {
+      "purpose": "cheap_rejection_of_obviously_expensive_companies_before_full_valuation",
+      "required_inputs": [
+        "current_or_ttm_pe",
+        "dynamic_pe_if_available",
+        "pb",
+        "roe",
+        "core_profit_growth",
+        "level3_peer_pe_median",
+        "level3_peer_pb_median"
+      ],
+      "price_180d_may_be_sanity_only": true,
+      "absolute_cross_industry_pe_cap_forbidden": true,
+      "exclude_only_when_relative_valuation_is_clearly_extreme_and_growth_quality_cannot_justify_premium": true,
+      "high_pe_must_be_judged_against_peers_and_core_growth": true,
+      "uncertain_or_tradeoff_case_must_continue_to_full_valuation": true,
+      "precheck_cannot_generate_fair_value_or_buy_point": true,
+      "exclusion_reason": "obviously_expensive"
+    },
+    "horizontal_comparison": {
+      "applies_after_financial_driver_peer_and_precheck_filters": true,
+      "must_cover_all_remaining_companies": true,
+      "top_n_or_fixed_quota_forbidden": true,
+      "must_consider": [
+        "business_purity",
+        "driver_sensitivity",
+        "earnings_delivery",
+        "core_earnings_quality",
+        "cashflow",
+        "margin_and_cost_advantage",
+        "order_or_capacity_visibility",
+        "sustainability",
+        "capital_intensity",
+        "major_accounting_risk",
+        "relative_valuation",
+        "valuability"
+      ]
+    },
+    "valuation_set_contains_only_remaining_companies_after_all_filters": true,
     "valuation_set_must_be_deduplicated_by_stock_code": true
   },
   "valuation_contract": {
@@ -230,7 +308,14 @@
       "unresolved_model_market_sanity_conflict",
       "business_model_break"
     ],
-    "exception_path_models": ["pb_roe", "residual_income", "ev_ebitda", "nav_dcf", "fcf_dcf", "case_specific"],
+    "exception_path_models": [
+      "pb_roe",
+      "residual_income",
+      "ev_ebitda",
+      "nav_dcf",
+      "fcf_dcf",
+      "case_specific"
+    ],
     "exception_trigger_required": true,
     "single_mos_application_required": true,
     "safe_price_ceiling_formula": "base_fair_value * (1 - margin_of_safety_pct)",
@@ -239,8 +324,21 @@
   "price_structure_contract": {
     "independent_from_valuation": true,
     "full_market_scan_required": true,
-    "allowed_structure_types": ["base_not_started", "transition", "breakout", "pullback", "trend_continuation", "overheated", "damaged", "unavailable"],
-    "timing_eligible_types": ["breakout", "pullback", "trend_continuation"],
+    "allowed_structure_types": [
+      "base_not_started",
+      "transition",
+      "breakout",
+      "pullback",
+      "trend_continuation",
+      "overheated",
+      "damaged",
+      "unavailable"
+    ],
+    "timing_eligible_types": [
+      "breakout",
+      "pullback",
+      "trend_continuation"
+    ],
     "damaged_or_overheated_cannot_be_timing_eligible": true,
     "structure_entry_range_must_not_reference_fair_value": true
   },
@@ -259,10 +357,28 @@
       "cross_run_persistence_as_pool_forbidden": true,
       "default_display_limit": 10,
       "research_admission_top_n_forbidden": true,
-      "required_metrics": ["missing_hard_conditions", "value_gap_pct", "structure_gap_pct", "action_distance_pct", "distance_band", "current_missing", "next_trigger"],
+      "required_metrics": [
+        "missing_hard_conditions",
+        "value_gap_pct",
+        "structure_gap_pct",
+        "action_distance_pct",
+        "distance_band",
+        "current_missing",
+        "next_trigger"
+      ],
       "action_distance_formula": "max(value_gap_pct, structure_gap_pct) when both are measurable",
-      "distance_bands": {"near": "<=5%", "watch": ">5% and <=15%", "far": ">15%"},
-      "sort_order": ["missing_hard_conditions", "distance_band", "action_distance_pct", "fundamental_score", "stock_code"],
+      "distance_bands": {
+        "near": "<=5%",
+        "watch": ">5% and <=15%",
+        "far": ">15%"
+      },
+      "sort_order": [
+        "missing_hard_conditions",
+        "distance_band",
+        "action_distance_pct",
+        "fundamental_score",
+        "stock_code"
+      ],
       "unmeasurable_structure_gap_after_measurable_in_same_bucket": true
     }
   },
@@ -273,11 +389,14 @@
     "all_discovered_directions_taxonomy_mapped": true,
     "all_required_level3_refreshes_complete": true,
     "all_admitted_chains_resolved": true,
-    "all_admitted_chains_company_screened": true,
+    "all_admitted_chains_company_recalled": true,
     "company_mapping_gate_passed": true,
-    "all_light_screen_survivors_compared": true,
-    "all_compared_companies_have_valuation_admission_decision": true,
-    "valuation_set_contains_only_valuation_admitted_companies": true,
+    "unique_company_dedup_complete": true,
+    "all_unique_companies_have_financial_hard_screen_decision": true,
+    "all_financial_screen_survivors_have_driver_quality_decision": true,
+    "all_driver_quality_survivors_have_peer_redundancy_decision": true,
+    "all_peer_filter_survivors_have_valuation_precheck_decision": true,
+    "all_precheck_survivors_horizontally_compared": true,
     "valuation_set_dedup_complete": true,
     "all_valuation_set_companies_fully_valued_or_explicit_review": true,
     "all_complete_non_review_companies_have_price_structure": true,
