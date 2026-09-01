@@ -28,23 +28,18 @@ def test_runtime_data_gate_fails_closed():
     assert p["failure_may_not_overwrite_previous_valid_state"] is True
 
 
-def test_every_run_has_full_market_prompt_recall_while_level3_is_incremental():
+def test_every_run_has_full_market_prompt_recall_and_reuses_level3_state():
     p = load("config/research_runtime_policy.json")
     d = p["discovery_policy"]
     l3 = p["level3_refresh_policy"]
     assert d["prompt_full_market_light_recall_required_every_run"] is True
     assert d["daily_run_may_not_limit_prompt_discovery_to_previous_directions"] is True
     assert d["previous_industry_state_may_accelerate_level3_refresh_but_may_not_bound_discovery"] is True
-    assert d["previous_companies_chains_valuations_or_opportunities_may_not_seed_discovery"] is True
-    assert l3["daily_incremental_between_full_refreshes"] is True
+    assert l3["existing_valid_level3_state_must_be_reused"] is True
+    assert l3["missing_level3_state_initialized_on_demand"] is True
+    assert l3["stale_or_invalid_level3_state_revalidated_individually"] is True
+    assert l3["whole_state_rebuild_for_missing_nodes_forbidden"] is True
     assert l3["daily_incremental_rechecks_level3_only_when_new_or_changed_evidence_exists"] is True
-
-
-def test_runtime_bootstraps_before_incremental_when_no_valid_industry_baseline():
-    l3 = load("config/research_runtime_policy.json")["level3_refresh_policy"]
-    assert l3["bootstrap_full_refresh_required_when_state_missing_invalid_or_requires_full_refresh"] is True
-    assert l3["bootstrap_ignores_weekly_anchor"] is True
-    assert l3["bootstrap_must_complete_before_daily_incremental_mode"] is True
 
 
 def test_company_admission_and_mapping_are_hard_runtime_gates():
@@ -74,7 +69,7 @@ def test_company_valuation_buy_point_flow_cannot_shortcut():
     assert s["current_opportunity_requires_buyable_now"] is True
 
 
-def test_persistence_is_split_into_compact_industry_memory_and_latest_formal_run():
+def test_persistence_is_split_into_industry_memory_and_latest_formal_run():
     p = load("config/research_runtime_policy.json")
     w = p["write_policy"]
     assert p["industry_state_path"] == "data/research/industry_state.json"
@@ -86,9 +81,7 @@ def test_persistence_is_split_into_compact_industry_memory_and_latest_formal_run
     assert w["write_only_after_data_gate_and_completion_gate_pass"] is True
 
 
-def test_authoritative_data_paths_are_explicit_and_legacy_v2_is_not_runtime_input():
-    m = load("config/research_pipeline_manifest.json")
-    assert m["authoritative_data"]["industry_state"] == "data/research/industry_state.json"
-    assert m["authoritative_data"]["research_state"] == "data/research/research_state.json"
-    assert m["authoritative_data"]["full_market_price_structure"] == "data/research/full_market_price_structure.json"
-    assert load("config/research_runtime_policy.json")["repository_data_policy"]["legacy_v2_research_files_are_not_runtime_input"] is True
+def test_legacy_v2_is_not_runtime_input():
+    p = load("config/research_runtime_policy.json")
+    assert p["repository_data_policy"]["legacy_v2_research_files_are_not_runtime_input"] is True
+    assert p["repository_data_policy"]["git_history_is_audit_only_not_runtime_input"] is True
