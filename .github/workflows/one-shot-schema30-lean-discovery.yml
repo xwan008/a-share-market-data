@@ -1,0 +1,32 @@
+name: Schema30 lean prosperity discovery migration
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/one-shot-schema30-lean-discovery.yml']
+permissions:
+  contents: write
+jobs:
+  migrate:
+    if: github.event.head_commit.message == 'run schema30 lean prosperity discovery migration'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply migration
+        run: python .github/patch_schema30_lean_discovery.py
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt pytest
+      - name: Validate
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: pytest -q
+      - name: Commit and cleanup
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git rm .github/patch_schema30_lean_discovery.py .github/workflows/one-shot-schema30-lean-discovery.yml
+          git commit -m "research: simplify prosperity discovery to prompt search"
+          git push
