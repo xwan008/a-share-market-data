@@ -1,7 +1,12 @@
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
-from scripts.build_company_industry_index import is_main_board, is_stale, resolve_sw_levels
+from scripts.build_company_industry_index import (
+    is_main_board,
+    is_research_eligible_quote,
+    is_stale,
+    resolve_sw_levels,
+)
 
 
 def test_main_board_filter():
@@ -9,6 +14,38 @@ def test_main_board_filter():
     assert is_main_board('002475')
     assert not is_main_board('300750')
     assert not is_main_board('688981')
+
+
+def test_research_universe_excludes_invalid_or_stale_quotes():
+    trade_date = '2026-09-01'
+    assert is_research_eligible_quote(
+        {
+            'confidence': 'high',
+            'source_dates': {'sina': trade_date, 'tencent': None},
+        },
+        trade_date,
+    )
+    assert is_research_eligible_quote(
+        {
+            'confidence': 'medium',
+            'source_dates': {'sina': trade_date, 'tencent': trade_date},
+        },
+        trade_date,
+    )
+    assert not is_research_eligible_quote(
+        {
+            'confidence': 'invalid',
+            'source_dates': {'sina': '2026-07-13', 'tencent': None},
+        },
+        trade_date,
+    )
+    assert not is_research_eligible_quote(
+        {
+            'confidence': 'high',
+            'source_dates': {'sina': '2025-09-04', 'tencent': None},
+        },
+        trade_date,
+    )
 
 
 def test_taxonomy_walk_resolves_all_three_levels():

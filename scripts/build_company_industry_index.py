@@ -28,6 +28,27 @@ def is_main_board(code: str) -> bool:
     return code.startswith(MAIN_BOARD_PREFIXES)
 
 
+def is_research_eligible_quote(item: dict | None, trade_date: str | None) -> bool:
+    """Return whether a quote belongs to the current actionable research universe.
+
+    Raw market snapshots may retain delisted, merged, stale, or otherwise non-tradable
+    symbols. Those rows are useful for audit/history, but they must not create false
+    Company Mapping Gate failures. Only quotes validated against the current trade
+    date (high/medium confidence) are part of the company-research universe.
+    """
+    if not isinstance(item, dict):
+        return False
+    if str(item.get("confidence") or "").lower() not in {"high", "medium"}:
+        return False
+    if not trade_date:
+        return True
+    source_dates = item.get("source_dates")
+    if not isinstance(source_dates, dict):
+        return True
+    verified_dates = {str(value) for value in source_dates.values() if value}
+    return not verified_dates or trade_date in verified_dates
+
+
 def iso_date(value) -> str | None:
     if value is None:
         return None
@@ -206,7 +227,7 @@ def is_stale(item: dict | None, now: datetime, refresh_days: int) -> bool:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Build persistent main-board SW 2021 industry index")
+    parser = argparse.ArgumentParser(description="Build persistent active-main-board SW 2021 industry index")
     parser.add_argument("--refresh-days", type=int, default=60)
     parser.add_argument("--limit", type=int, default=0, help="0 means all missing/stale codes")
     parser.add_argument("--workers", type=int, default=6)
@@ -215,13 +236,22 @@ def main() -> int:
     now = datetime.now(TZ)
     now_iso = now.isoformat()
     latest = read_json(LATEST_PATH, {})
-    stocks = {
+    trade_date = latest.get("trade_date")
+    raw_stocks = {
         str(code).zfill(6): quote
         for code, quote in latest.get("stocks", {}).items()
         if is_main_board(str(code).zfill(6))
     }
+    excluded_codes = sorted(
+        code for code, quote in raw_stocks.items()
+        if not is_research_eligible_quote(quote, trade_date)
+    )
+    stocks = {
+        code: quote for code, quote in raw_stocks.items()
+        if is_research_eligible_quote(quote, trade_date)
+    }
     if not stocks:
-        print(json.dumps({"status": "error", "reason": "no_main_board_stocks"}, ensure_ascii=False))
+        print(json.dumps({"status": "error", "reason": "no_active_main_board_stocks"}, ensure_ascii=False))
         return 2
 
     try:
@@ -290,9 +320,13 @@ def main() -> int:
         "generated_at": now_iso,
         "source": "cninfo_sw_industry_via_akshare",
         "taxonomy": "申万行业分类标准2021版",
-        "trade_date_reference": latest.get("trade_date"),
+        "trade_date_reference": trade_date,
         "refresh_days": args.refresh_days,
+        "raw_main_board_snapshot_count": len(raw_stocks),
         "main_board_universe_count": len(stocks),
+        "research_universe_rule": "main-board quote confidence must be high/medium and, when source dates exist, include trade_date_reference",
+        "excluded_inactive_or_untradable_count": len(excluded_codes),
+        "excluded_inactive_or_untradable_codes": excluded_codes,
         "attempted_refresh_count": len(refresh_codes),
         "successful_refresh_count": successes,
         "failed_refresh_count": len(failures),
