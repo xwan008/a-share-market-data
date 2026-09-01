@@ -1,0 +1,42 @@
+name: One-shot schema28 core rerun fix
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/one-shot-schema28-core-rerun-fix.yml']
+permissions:
+  contents: write
+jobs:
+  rerun:
+    if: github.event.head_commit.message == 'schema28-core-rerun-fix'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Patch source chain persistence
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('scripts/one_shot_schema28_core_earnings_rerun.py')
+          t=p.read_text(encoding='utf-8')
+          old="scored.append((score,c)); base=dict(oldco.get(c) or {'code':c,'name':cr.get('SECURITY_NAME_ABBR') or c})\n        base.update({'core_h1_deduct_eps':ce,'core_h1_yoy':cy,'comparison_score':round(score,6)}); companies[c]=base"
+          new="scored.append((score,c)); base=dict(companies.get(c) or oldco.get(c) or {'code':c,'name':cr.get('SECURITY_NAME_ABBR') or c})\n        base.setdefault('source_chain_ids',[])\n        if cid not in base['source_chain_ids']: base['source_chain_ids'].append(cid)\n        base.update({'core_h1_deduct_eps':ce,'core_h1_yoy':cy,'comparison_score':round(score,6)}); companies[c]=base"
+          if old not in t:
+              raise SystemExit('patch target not found')
+          p.write_text(t.replace(old,new),encoding='utf-8')
+          PY
+      - run: python -m pip install -r requirements.txt pytest
+      - name: Rerun all company stages with deducted core earnings
+        env: {PYTHONPATH: '${{ github.workspace }}'}
+        run: python scripts/one_shot_schema28_core_earnings_rerun.py
+      - name: Validate
+        env: {PYTHONPATH: '${{ github.workspace }}'}
+        run: pytest -q
+      - name: Commit valid baseline and self-remove
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/research/v2/research_state.json
+          git rm scripts/one_shot_schema28_core_earnings_rerun.py .github/workflows/one-shot-schema28-core-rerun.yml .github/workflows/one-shot-schema28-core-rerun-fix.yml
+          git commit -m "research: persist valid schema28 core earnings baseline"
+          git push
