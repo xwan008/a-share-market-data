@@ -263,7 +263,10 @@
       "downside_value",
       "margin_of_safety_pct",
       "safe_price_ceiling",
-      "valuation_quality_flags"
+      "valuation_quality_flags",
+      "valuation_input_completeness",
+      "primary_model_family",
+      "market_reality_audit"
     ],
     "corporate_action_check_required_before_earnings_bridge": true,
     "historical_eps_direct_scaling_across_material_share_count_change_forbidden": true,
@@ -468,7 +471,22 @@
           "case_specific"
         ]
       }
-    }
+    },
+    "required_archetype_inputs_must_be_present_or_explicitly_supplemented": true,
+    "missing_archetype_critical_input_cannot_be_replaced_by_generic_pe": true,
+    "missing_archetype_critical_input_after_public_evidence_search_requires_review_or_explicit_low_confidence_blocker": true,
+    "primary_model_family_required": true,
+    "secondary_model_family_required_when_secondary_model_runs": true,
+    "primary_and_secondary_model_family_must_differ_when_independence_required": true,
+    "market_reality_audit_trigger_multiple": 1.5,
+    "market_reality_audit_must_report_market_implied_assumption_gap_not_reanchor_value": true,
+    "valuation_quality_flags_required": [
+      "archetype_inputs_complete",
+      "core_earnings_clean",
+      "no_repeated_conservatism",
+      "model_independence_passed_or_not_required",
+      "market_reality_audit_passed_or_not_required"
+    ]
   },
   "buy_point_contract": {
     "purpose": "买点必须是价值安全边际与价格结构时机的交集，不能由任一单独维度替代。",
@@ -490,7 +508,7 @@
       "avoid",
       "review_required"
     ],
-    "value_eligible_requires_current_price_at_or_below_safe_upper_bound": true,
+    "value_eligible_requires_current_price_at_or_below_safe_upper_bound": false,
     "timing_eligible_structure_types": [
       "pullback",
       "breakout",
@@ -515,6 +533,7 @@
       "required_metrics": [
         "near_miss_tier",
         "distance_band",
+        "missing_hard_conditions",
         "value_gap_pct",
         "structure_gap_pct",
         "ceiling_structure_gap_pct",
@@ -555,17 +574,27 @@
       "far_names_must_be_labeled_relative_closest_not_near": true,
       "safe_structure_range_gap_pct_deprecated": true,
       "sort_order": [
-        "near_miss_tier asc",
-        "action_distance_pct asc",
+        "near_miss_tier by missing_hard_conditions asc",
+        "measurable action_distance_pct asc",
         "valuation_confidence_penalty asc",
         "fundamental_score desc",
         "stock_code asc"
-      ]
+      ],
+      "missing_hard_conditions_is_step_count_not_primary_numeric_distance": true,
+      "near_miss_tier_definition": {
+        "one_step": "exactly one hard condition remains",
+        "two_step": "exactly two hard conditions remain",
+        "multi_step": "three or more hard conditions remain",
+        "buyable_now": "separate current-opportunity list, not near-miss"
+      },
+      "qualitative_structure_wait_allowed_when_value_eligible": true,
+      "unmeasurable_structure_distance_must_not_be_fabricated": true
     },
     "value_eligible_requires_current_price_at_or_below_safe_price_ceiling": true,
     "safe_price_ceiling_is_hard_value_boundary": true,
     "safe_price_range_lower_bound_is_not_hard_eligibility_floor": true,
-    "buy_price_range_must_equal_structure_entry_range_capped_by_safe_price_ceiling": true
+    "buy_price_range_must_equal_structure_entry_range_capped_by_safe_price_ceiling": true,
+    "legacy_safe_upper_bound_value_eligibility_deprecated": true
   },
   "research_state_contract": {
     "path": "data/research/v2/research_state.json",

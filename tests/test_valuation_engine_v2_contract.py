@@ -44,3 +44,19 @@ def test_near_miss_uses_action_distance_and_labels_far_names():
     assert n['far_names_must_be_labeled_relative_closest_not_near'] is True
     assert n['avoid_excluded_from_primary_near_miss_ranking'] is True
     assert r()['stage_execution_policy']['same_eps_different_pe_is_not_independent_secondary_method'] is True
+
+
+def test_v2_has_one_value_boundary_and_input_completeness_gate():
+    v=m()['valuation_resolution_contract']; b=m()['buy_point_contract']
+    assert b['value_eligible_requires_current_price_at_or_below_safe_upper_bound'] is False
+    assert b['value_eligible_requires_current_price_at_or_below_safe_price_ceiling'] is True
+    assert v['required_archetype_inputs_must_be_present_or_explicitly_supplemented'] is True
+    assert v['missing_archetype_critical_input_cannot_be_replaced_by_generic_pe'] is True
+    assert v['primary_and_secondary_model_family_must_differ_when_independence_required'] is True
+
+def test_near_miss_combines_step_count_and_action_distance():
+    n=m()['buy_point_contract']['near_miss_ranking_contract']
+    assert 'missing_hard_conditions' in n['required_metrics']
+    assert n['missing_hard_conditions_is_step_count_not_primary_numeric_distance'] is True
+    assert n['qualitative_structure_wait_allowed_when_value_eligible'] is True
+    assert n['unmeasurable_structure_distance_must_not_be_fabricated'] is True
