@@ -407,6 +407,7 @@
       "valuations",
       "price_structures",
       "buy_point_assessments",
+      "near_miss_ranking",
       "diagnostics"
     ],
     "required_run_fields": [
@@ -447,7 +448,8 @@
     "all_valuation_set_companies_executed": true,
     "all_triggered_extreme_valuation_audits_pass_or_review": true,
     "all_complete_non_review_companies_have_buy_point_assessment": true,
-    "current_opportunities_must_come_only_from_buyable_now": true
+    "current_opportunities_must_come_only_from_buyable_now": true,
+    "near_miss_ranking_complete_when_eligible_universe_nonempty": true
   },
   "persistence_contract": {
     "only_prompt_research_output": "data/research/v2/research_state.json",
@@ -467,6 +469,7 @@
       "估值与价格区间",
       "价格结构与时机",
       "当前买点",
+      "接近买点榜",
       "诊断"
     ],
     "company_columns": [
@@ -498,7 +501,8 @@
       "current_to_intersection_pct",
       "blocking_reason",
       "next_trigger"
-    ]
+    ],
+    "near_miss_must_be_output_even_when_current_opportunities_empty": true
   },
   "rule_ownership": {
     "manifest": "保存机器契约、扫描节奏、全盈利链公司轻筛守恒、估值异常审计、买点交集与输出契约。",

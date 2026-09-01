@@ -11,7 +11,7 @@ def load(p):
 
 def test_repo_whitelist_and_public_evidence_are_separate_layers():
     p = load('config/research_runtime_policy.json')
-    assert p['schema_version'] == 7
+    assert p['schema_version'] == 8
     assert p['research_read_mode'] == 'manifest_repo_data_plus_current_public_evidence'
     assert p['repository_data_policy']['allow_only_manifest_authoritative_data'] is True
     assert p['public_evidence_policy']['allowed'] is True
@@ -68,6 +68,9 @@ def test_valuation_and_buy_point_cannot_shortcut():
     assert s['every_complete_non_review_company_requires_buy_point_assessment'] is True
     assert s['buy_point_requires_value_and_timing_intersection'] is True
     assert s['current_opportunity_requires_buyable_now'] is True
+    assert s['every_complete_non_review_company_requires_near_miss_distance'] is True
+    assert s['near_miss_top10_must_be_output_when_eligible_universe_nonempty'] is True
+    assert s['empty_current_opportunities_does_not_allow_empty_near_miss_output'] is True
 
 
 def test_state_schema_match_when_present():

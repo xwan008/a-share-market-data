@@ -1,5 +1,5 @@
 {
-  "schema_version": 7,
+  "schema_version": 8,
   "pipeline": "a_share_low_risk_v2",
   "research_read_mode": "manifest_repo_data_plus_current_public_evidence",
   "manifest_path": "config/research_pipeline_manifest.json",
@@ -67,7 +67,10 @@
     "current_opportunity_requires_buyable_now": true,
     "core_earnings_quality_must_be_verified_before_light_screen_survive": true,
     "missing_deducted_profit_cannot_silently_pass_earnings_quality": true,
-    "material_nonrecurring_parent_profit_cannot_feed_valuation_bridge": true
+    "material_nonrecurring_parent_profit_cannot_feed_valuation_bridge": true,
+    "every_complete_non_review_company_requires_near_miss_distance": true,
+    "near_miss_top10_must_be_output_when_eligible_universe_nonempty": true,
+    "empty_current_opportunities_does_not_allow_empty_near_miss_output": true
   },
   "write_policy": {
     "current_research_output_only": "data/research/v2/research_state.json",
@@ -75,6 +78,7 @@
     "persistent_intermediate_research_outputs_forbidden": true,
     "never_relabel_old_state_to_new_schema": true,
     "new_state_must_record_manifest_schema": true,
-    "new_state_must_include_coverage_ledger_company_light_screen_buy_points_and_scan_mode": true
+    "new_state_must_include_coverage_ledger_company_light_screen_buy_points_and_scan_mode": true,
+    "new_state_must_include_near_miss_ranking": true
   }
 }

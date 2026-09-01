@@ -88,6 +88,14 @@ def test_buy_point_is_value_and_structure_intersection():
     assert b['damaged_or_overheated_cannot_be_buyable_now'] is True
     assert b['buyable_now_requires_value_and_timing_true'] is True
     assert b['price_structure_must_not_modify_intrinsic_value'] is True
+    near = b['near_miss_ranking_contract']
+    assert near['must_output_when_eligible_universe_nonempty'] is True
+    assert near['default_display_limit'] == 10
+    assert near['ranking_is_display_only_not_candidate_pool'] is True
+    assert 'near_miss_ranking' in manifest()['research_state_contract']['required_top_level_sections']
+    assert manifest()['public_output']['near_miss_must_be_nonempty_when_eligible_universe_nonempty'] is True
+    assert manifest()['public_output']['near_miss_must_be_output_even_when_current_opportunities_empty'] is True
+    assert '接近买点榜' in manifest()['public_output']['sections']
 
 
 def test_completion_gate_guards_research_depth_not_just_formal_sections():
@@ -99,6 +107,7 @@ def test_completion_gate_guards_research_depth_not_just_formal_sections():
     assert g['all_triggered_extreme_valuation_audits_pass_or_review'] is True
     assert g['all_complete_non_review_companies_have_buy_point_assessment'] is True
     assert g['current_opportunities_must_come_only_from_buyable_now'] is True
+    assert g['near_miss_ranking_complete_when_eligible_universe_nonempty'] is True
 
 
 def test_public_evidence_is_required_but_candidate_pools_remain_forbidden():
