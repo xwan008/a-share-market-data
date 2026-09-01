@@ -59,6 +59,13 @@ def test_prompt_discovery_is_full_market_every_run_not_previous_list_incremental
     assert l3["daily_refresh_only_deep_rechecks_level3_nodes_with_new_or_changed_evidence"] is True
 
 
+def test_invalid_or_missing_industry_state_forces_full_bootstrap_before_incremental():
+    l3 = manifest()["level3_state_contract"]
+    assert l3["bootstrap_full_refresh_required_when_state_missing_invalid_or_requires_full_refresh"] is True
+    assert l3["bootstrap_ignores_weekly_anchor"] is True
+    assert l3["bootstrap_must_complete_before_daily_incremental_mode"] is True
+
+
 def test_level3_company_admission_supports_improving_and_stable_divergent():
     c = manifest()["company_admission_contract"]
     assert "trend=improving" in c["admit_if"]
