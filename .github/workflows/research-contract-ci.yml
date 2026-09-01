@@ -1,0 +1,57 @@
+name: Research contract CI
+
+on:
+  pull_request:
+    paths:
+      - 'config/research_runtime_policy.json'
+      - 'config/research_pipeline_manifest.json'
+      - 'skills/a-share-low-risk/**'
+      - 'scripts/build_full_market_price_structure.py'
+      - 'scripts/build_v2_full_market_price_structure.py'
+      - 'tests/**'
+      - '.github/workflows/research-contract-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'config/research_runtime_policy.json'
+      - 'config/research_pipeline_manifest.json'
+      - 'skills/a-share-low-risk/**'
+      - 'scripts/build_full_market_price_structure.py'
+      - 'scripts/build_v2_full_market_price_structure.py'
+      - 'tests/**'
+      - '.github/workflows/research-contract-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest
+      - name: Run repository tests
+        run: python -m pytest -q
+      - name: Build production price-structure snapshot
+        run: python scripts/build_full_market_price_structure.py
+      - name: Validate production price-structure contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = json.loads(Path('data/research/full_market_price_structure.json').read_text(encoding='utf-8'))
+          assert p['contract_id'] == 'a-share-low-risk-price-structure'
+          assert 'schema_version' not in p
+          assert 'mode' not in p
+          assert p['reference_trade_date']
+          assert p['verified_count'] > 0
+          PY
