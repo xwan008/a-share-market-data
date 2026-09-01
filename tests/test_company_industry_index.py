@@ -9,6 +9,17 @@ from scripts.build_company_industry_index import (
 )
 
 
+def active_quote(trade_date: str, confidence: str = 'high') -> dict:
+    return {
+        'confidence': confidence,
+        'source_dates': {'sina': trade_date, 'tencent': None},
+        'open': 10.0,
+        'high': 10.5,
+        'low': 9.8,
+        'volume': 1000,
+    }
+
+
 def test_main_board_filter():
     assert is_main_board('600000')
     assert is_main_board('002475')
@@ -16,36 +27,22 @@ def test_main_board_filter():
     assert not is_main_board('688981')
 
 
-def test_research_universe_excludes_invalid_or_stale_quotes():
+def test_research_universe_excludes_invalid_stale_or_nontradable_quotes():
     trade_date = '2026-09-01'
-    assert is_research_eligible_quote(
-        {
-            'confidence': 'high',
-            'source_dates': {'sina': trade_date, 'tencent': None},
-        },
-        trade_date,
-    )
-    assert is_research_eligible_quote(
-        {
-            'confidence': 'medium',
-            'source_dates': {'sina': trade_date, 'tencent': trade_date},
-        },
-        trade_date,
-    )
-    assert not is_research_eligible_quote(
-        {
-            'confidence': 'invalid',
-            'source_dates': {'sina': '2026-07-13', 'tencent': None},
-        },
-        trade_date,
-    )
-    assert not is_research_eligible_quote(
-        {
-            'confidence': 'high',
-            'source_dates': {'sina': '2025-09-04', 'tencent': None},
-        },
-        trade_date,
-    )
+    assert is_research_eligible_quote(active_quote(trade_date), trade_date)
+    assert is_research_eligible_quote(active_quote(trade_date, 'medium'), trade_date)
+
+    invalid = active_quote(trade_date)
+    invalid['confidence'] = 'invalid'
+    assert not is_research_eligible_quote(invalid, trade_date)
+
+    stale = active_quote(trade_date)
+    stale['source_dates'] = {'sina': '2025-09-04', 'tencent': None}
+    assert not is_research_eligible_quote(stale, trade_date)
+
+    frozen = active_quote(trade_date)
+    frozen.update({'open': 0.0, 'high': 0.0, 'low': 0.0, 'volume': 0})
+    assert not is_research_eligible_quote(frozen, trade_date)
 
 
 def test_taxonomy_walk_resolves_all_three_levels():
