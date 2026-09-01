@@ -74,15 +74,18 @@ weekly_full直接基于当前公开证据做一次全市场搜索，回答：**�
 
 `unscreened_confirmed_improving_chains`非空时直接fail closed。
 
-## 8. VALUATION：先审口径，再算价值
-valuation_set每家公司执行valuation Skill完整流程。
+## 8. VALUATION：经济价值驱动优先
+valuation_set每家公司执行 Valuation Engine V2。
 
-特别硬门：
-1. Forward EPS前检查当前股本与重大公司行动；
-2. 股本重大变化时禁止历史EPS直接乘增长率；
-3. 资源/订单周期公司禁止把短期高增长直接配成长PE；
-4. 估值出现极端偏离时强制独立第二模型、股本复核和周期/增长持续性复核；
-5. 第二模型无法支持则`review_required:model_instability`，不能把极端低估直接当机会。
+硬门：
+1. 先识别 `valuation_archetype`，申万一级行业不能单独决定模型；
+2. 非review公司必须有 `base_case + downside_case + base_fair_value + safe_price_ceiling`；
+3. resource_asset 禁止固定低PE单模型，必须使用NAV/DCF、正常化EV/EBITDA、FCF/股息能力等资产/现金流方法；
+4. spread_cyclical 必须显式研究产品-原料价差、开工与正常化利润率；
+5. financial 必须执行PB-ROE或Residual Income；
+6. 正常化必须反映已发生的产能、资源量、产品结构变化，不能机械回归旧年度利润；
+7. 极端偏离的第二模型必须更换价值驱动家族，同一EPS换另一个PE倍数不算独立模型；
+8. 安全价硬边界是 `safe_price_ceiling`，MOS只作用一次，禁止“压盈利+低倍数+再折合理价下沿”的重复保守化。
 
 ## 9. PRICE STRUCTURE：独立生成入场区间
 价格结构只回答WHEN。对每家非review估值公司输出独立的`structure_entry_range`和`structure_invalidation`，不得参考合理/安全价值调整技术区间。
@@ -92,13 +95,13 @@ valuation_set每家公司执行valuation Skill完整流程。
 - `value_eligible`；
 - `timing_eligible`；
 - `structure_entry_range`；
-- `buy_price_range = safe_price_range ∩ structure_entry_range`；
+- `buy_price_range = structure_entry_range ∩ (-∞, safe_price_ceiling]`；
 - `buy_point_status`；
 - `invalidation_price`；
 - `buy_point_basis`。
 
 只有：
-`value_eligible=true + timing_eligible=true + buy_price_range非空`
+`current_price <= safe_price_ceiling + timing_eligible=true + buy_price_range非空`
 才允许`buyable_now`并进入【当前买点】。
 
 `damaged/overheated`禁止buyable_now；没有交集就等待，绝不扩张安全区或技术区制造买点。
@@ -125,19 +128,27 @@ Gate前必须满足：
 固定输出：执行状态、全市场盈利景气雷达、完整盈利产业链雷达、链内公司轻筛与横向比较、估值与价格区间、价格结构与时机、当前买点、诊断。
 
 
-## 接近买点榜（Near-miss Ranking）
+## 接近买点榜（Near-miss Ranking V2）
 
-【当前低风险买点】继续只允许 `buy_point_status=buyable_now`，不得为了凑榜降低价值、安全边际、结构或交集门槛。
+【当前低风险买点】仍只允许 `buyable_now`，绝不为了凑榜降低价值或结构门槛。
 
-但只要存在完成估值且非 `review_required` 的公司，每次正式输出都必须同时生成【接近买点榜】，默认展示前10名；即使当前买点为0，也不得只输出空列表或一句“暂无买点”。该榜只做当期展示排序，不得持久化为候选池、机会池或下一轮发现种子。
+Near-miss 的含义改为：**距离成为可执行买点还需要多大实际变化**，而不是旧版按区间字段字典序排序。
 
-对全部完成估值且非review公司计算：
-- `missing_hard_conditions`：`value_eligible=false` +1；`timing_eligible=false` +1；安全价区与结构入场区无交集 +1；若已有交集但当前价不在交集内 +1；`avoid` 额外 +1风险门惩罚。
-- `value_gap_pct`：当前价高于安全价上沿时，计算降到安全价上沿所需百分比；已满足价值条件则为0。
-- `structure_gap_pct`：当前价距离独立 `structure_entry_range` 最近边界的百分比；已位于结构入场区则为0；无有效结构入场区则记为不可测并排在可测者之后。
-- `safe_structure_range_gap_pct`：安全价区与结构入场区不相交时，计算两区间最近边界的百分比距离；已有交集则为0。
-- `current_to_intersection_pct`：两区间已有交集时，计算当前价距离交集最近边界的百分比；当前价已在交集内则为0。
+对所有完整非review且非avoid公司计算：
+- `value_gap_pct`：当前价下降到 `safe_price_ceiling` 所需幅度；已价值合格为0；
+- `structure_gap_pct`：当前价到有效结构入场区最近边界的距离；
+- `ceiling_structure_gap_pct`：结构入场区整体高于安全上限时，两者最近边界距离；若结构区已有部分位于安全上限以内则为0；
+- `current_to_actionable_range_pct`：有效可执行区存在时，当前价到该区最近边界距离；
+- `action_distance_pct = max(上述可测硬距离)`，表示当前最大的阻塞距离；
+- `valuation_confidence_penalty`：估值不确定性越高，排序越靠后。
 
-固定排序为：`avoid_penalty`升序 → `missing_hard_conditions`升序 → `safe_structure_range_gap_pct`升序（不可测最后） → `current_to_intersection_pct`升序（不可测最后） → `value_gap_pct + structure_gap_pct`升序 → 基本面横比得分降序 → 股票代码升序。
+距离标签：
+- `near`：<=5%；
+- `watch`：>5%且<=15%；
+- `far`：>15%。
 
-每个上榜公司必须明确写出【当前还缺什么】和【下一触发条件】。第1名只表示“离现有低风险买点规则最近”，不表示预期收益最高，也不等于现在可以买。
+排序：`near_miss_tier → action_distance_pct → valuation_confidence_penalty → 基本面得分 → 股票代码`。
+
+Top10仍必须输出；如果最接近的公司也超过15%，必须明确写“相对最接近，但仍远离买点”，不能把35%、60%的价值缺口包装成“接近买点”。
+
+该榜只做当期展示，不得持久化为候选池或下一轮发现种子。

@@ -8,7 +8,7 @@ def load(path: str):
     return json.loads((ROOT / path).read_text(encoding='utf-8'))
 
 
-def test_persisted_state_schema30_contract_when_present():
+def test_persisted_state_schema31_contract_when_present():
     state_path = ROOT / 'data/research/v2/research_state.json'
     if not state_path.exists():
         return
@@ -16,7 +16,7 @@ def test_persisted_state_schema30_contract_when_present():
     state = json.loads(state_path.read_text(encoding='utf-8'))
     manifest = load('config/research_pipeline_manifest.json')
     taxonomy = load('config/industry_scan_universe.json')
-    assert state['manifest_schema'] == manifest['schema_version'] == 30
+    assert state['manifest_schema'] == manifest['schema_version'] == 31
     assert state['scan_mode'] in {'weekly_full', 'daily_incremental'}
     assert state['weekly_baseline_date']
 

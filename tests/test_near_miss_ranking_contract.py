@@ -13,14 +13,14 @@ def test_near_miss_ranking_contract_is_auditable_and_nonempty_by_rule():
     assert c["cross_run_persistence_as_pool_forbidden"] is True
     assert c["default_display_limit"] == 10
     assert c["research_admission_top_n_forbidden"] is True
-    assert "missing_hard_conditions" in c["required_metrics"]
-    assert "safe_structure_range_gap_pct" in c["required_metrics"]
+    assert "action_distance_pct" in c["required_metrics"]
+    assert "ceiling_structure_gap_pct" in c["required_metrics"]
     assert manifest["public_output"]["near_miss_section_title"] == "【接近买点榜】"
     assert manifest["public_output"]["near_miss_must_be_nonempty_when_eligible_universe_nonempty"] is True
 
 def test_orchestrator_requires_near_miss_output_without_lowering_buy_gate():
     text = (ROOT / "skills/a-share-low-risk/orchestrator/SKILL.md").read_text(encoding="utf-8")
-    assert "## 接近买点榜（Near-miss Ranking）" in text
-    assert "不得为了凑榜降低" in text
-    assert "即使当前买点为0" in text
+    assert "## 接近买点榜（Near-miss Ranking V2）" in text
+    assert "绝不为了凑榜降低" in text
+    assert "Top10仍必须输出" in text
     assert "不得持久化为候选池" in text

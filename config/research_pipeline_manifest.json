@@ -1,5 +1,5 @@
 {
-  "schema_version": 30,
+  "schema_version": 31,
   "pipeline": "a_share_low_risk_v2",
   "mode": "shadow",
   "architecture": "prompt_first_research",
@@ -254,7 +254,16 @@
       "valuation_position",
       "falsifiers",
       "valuation_attempt_complete",
-      "model_execution_status"
+      "model_execution_status",
+      "valuation_archetype",
+      "archetype_basis",
+      "scenario_analysis",
+      "primary_model_output",
+      "base_fair_value",
+      "downside_value",
+      "margin_of_safety_pct",
+      "safe_price_ceiling",
+      "valuation_quality_flags"
     ],
     "corporate_action_check_required_before_earnings_bridge": true,
     "historical_eps_direct_scaling_across_material_share_count_change_forbidden": true,
@@ -287,12 +296,179 @@
       "requires_share_count_and_corporate_action_recheck": true,
       "requires_cycle_or_growth_persistence_recheck": true,
       "max_method_midpoint_divergence_pct_before_model_instability": 30.0,
-      "if_audit_fails": "review_required:model_instability"
+      "if_audit_fails": "review_required:model_instability",
+      "requires_independent_value_driver_family": true,
+      "same_eps_different_pe_fails_independence_test": true
     },
     "core_earnings_preferred_over_parent_netprofit_when_nonrecurring_dominant": true,
     "nonrecurring_dominance_threshold_of_parent_netprofit": 0.3,
     "parent_netprofit_contaminated_by_material_nonrecurring_items_cannot_feed_forward_bridge": true,
-    "missing_required_core_earnings_evidence_after_light_screen_means_review_required": "nonrecurring_earnings_dominant"
+    "missing_required_core_earnings_evidence_after_light_screen_means_review_required": "nonrecurring_earnings_dominant",
+    "valuation_engine_version": 2,
+    "valuation_archetype_required": true,
+    "valuation_archetypes": [
+      "resource_asset",
+      "spread_cyclical",
+      "order_backlog",
+      "growth_compounder",
+      "stable_cashflow",
+      "financial",
+      "special_situation"
+    ],
+    "sw_level1_alone_cannot_determine_valuation_archetype": true,
+    "base_case_required": true,
+    "downside_case_required": true,
+    "base_fair_value_required": true,
+    "safe_price_ceiling_required": true,
+    "safe_price_ceiling_is_value_eligibility_boundary": true,
+    "fixed_discount_from_reasonable_lower_bound_forbidden": true,
+    "repeat_conservatism_across_earnings_multiple_and_mos_forbidden": true,
+    "secondary_method_must_use_independent_value_driver_family": true,
+    "same_earnings_basis_with_different_multiple_is_not_independent_method": true,
+    "market_reality_audit_required_when_safe_ceiling_gap_is_extreme": true,
+    "resource_asset_requires_asset_or_cashflow_model": true,
+    "resource_asset_single_fixed_pe_forbidden": true,
+    "spread_cyclical_requires_spread_or_margin_normalization": true,
+    "financial_requires_pb_roe_or_residual_income": true,
+    "normalization_must_reflect_structural_capacity_or_mix_change": true,
+    "mos_reference_ranges": {
+      "low": [
+        0.1,
+        0.15
+      ],
+      "medium": [
+        0.15,
+        0.25
+      ],
+      "high": [
+        0.25,
+        0.35
+      ]
+    },
+    "archetype_model_contract": {
+      "resource_asset": {
+        "required_inputs": [
+          "commodity_price_anchor",
+          "production_or_equity_volume",
+          "unit_cost",
+          "capex",
+          "net_debt",
+          "asset_life_or_reserve_quality"
+        ],
+        "primary_methods": [
+          "nav_dcf",
+          "normalized_ev_ebitda",
+          "fcf_dividend_capacity"
+        ],
+        "independent_secondary_families": [
+          "nav_dcf",
+          "normalized_ev_ebitda",
+          "pb_roe",
+          "fcf_dividend_capacity"
+        ]
+      },
+      "spread_cyclical": {
+        "required_inputs": [
+          "product_price",
+          "feedstock_cost",
+          "spread",
+          "utilization_or_volume",
+          "normalized_margin"
+        ],
+        "primary_methods": [
+          "normalized_ev_ebitda",
+          "spread_scenario_dcf"
+        ],
+        "independent_secondary_families": [
+          "normalized_core_pe",
+          "roic_sanity",
+          "spread_scenario_dcf"
+        ]
+      },
+      "order_backlog": {
+        "required_inputs": [
+          "order_backlog",
+          "delivery_schedule",
+          "pricing",
+          "margin",
+          "capacity"
+        ],
+        "primary_methods": [
+          "forward_ev_ebit",
+          "forward_pe"
+        ],
+        "independent_secondary_families": [
+          "normalized_cashflow",
+          "pb_roe"
+        ]
+      },
+      "growth_compounder": {
+        "required_inputs": [
+          "forward_revenue",
+          "forward_core_earnings",
+          "margin",
+          "roic_or_roe",
+          "cash_conversion"
+        ],
+        "primary_methods": [
+          "justified_forward_pe",
+          "forward_ev_ebit"
+        ],
+        "independent_secondary_families": [
+          "dcf",
+          "fcf_yield",
+          "peg_sanity"
+        ]
+      },
+      "stable_cashflow": {
+        "required_inputs": [
+          "normalized_cashflow",
+          "capex",
+          "growth",
+          "capital_structure"
+        ],
+        "primary_methods": [
+          "dcf",
+          "dividend_capacity",
+          "ev_ebitda",
+          "justified_pe"
+        ],
+        "independent_secondary_families": [
+          "dcf",
+          "dividend_capacity",
+          "ev_ebitda",
+          "justified_pe"
+        ]
+      },
+      "financial": {
+        "required_inputs": [
+          "book_value",
+          "sustainable_roe",
+          "asset_quality",
+          "capital_constraint"
+        ],
+        "primary_methods": [
+          "pb_roe",
+          "residual_income"
+        ],
+        "independent_secondary_families": [
+          "pb_roe",
+          "residual_income"
+        ]
+      },
+      "special_situation": {
+        "required_inputs": [
+          "post_transaction_business",
+          "comparable_earnings_basis"
+        ],
+        "primary_methods": [
+          "case_specific"
+        ],
+        "independent_secondary_families": [
+          "case_specific"
+        ]
+      }
+    }
   },
   "buy_point_contract": {
     "purpose": "买点必须是价值安全边际与价格结构时机的交集，不能由任一单独维度替代。",
@@ -321,7 +497,7 @@
       "trend_continuation"
     ],
     "timing_eligible_forbids_high_chase_risk": true,
-    "buy_price_range_must_equal_intersection_of_safe_price_range_and_structure_entry_range": true,
+    "buy_price_range_must_equal_intersection_of_safe_price_range_and_structure_entry_range": false,
     "empty_intersection_means_not_buyable_now": true,
     "damaged_or_overheated_cannot_be_buyable_now": true,
     "buyable_now_requires_value_and_timing_true": true,
@@ -337,12 +513,16 @@
       "ranking_is_display_only_not_candidate_pool": true,
       "cross_run_persistence_as_pool_forbidden": true,
       "required_metrics": [
-        "missing_hard_conditions",
+        "near_miss_tier",
+        "distance_band",
         "value_gap_pct",
         "structure_gap_pct",
-        "safe_structure_range_gap_pct",
-        "current_to_intersection_pct",
-        "blocking_reason"
+        "ceiling_structure_gap_pct",
+        "current_to_actionable_range_pct",
+        "action_distance_pct",
+        "valuation_confidence_penalty",
+        "current_missing",
+        "next_trigger"
       ],
       "missing_hard_conditions_definition": [
         "value_eligible=false adds 1",
@@ -360,8 +540,32 @@
         "fundamental comparison score descending only as final tie-breaker",
         "stock_code ascending final deterministic tie-breaker"
       ],
-      "interpretation": "rank 1 means closest to satisfying the existing low-risk buy-point rules, not highest expected return and not a recommendation to buy now."
-    }
+      "interpretation": "rank 1 means closest to satisfying the existing low-risk buy-point rules, not highest expected return and not a recommendation to buy now.",
+      "ranking_version": 2,
+      "avoid_excluded_from_primary_near_miss_ranking": true,
+      "action_distance_is_primary_metric": true,
+      "action_distance_formula": "max(value_gap_pct, structure_gap_pct, ceiling_structure_gap_pct, current_to_actionable_range_pct)",
+      "near_threshold_pct": 5.0,
+      "watch_threshold_pct": 15.0,
+      "distance_bands": {
+        "near": "<=5%",
+        "watch": ">5% and <=15%",
+        "far": ">15%"
+      },
+      "far_names_must_be_labeled_relative_closest_not_near": true,
+      "safe_structure_range_gap_pct_deprecated": true,
+      "sort_order": [
+        "near_miss_tier asc",
+        "action_distance_pct asc",
+        "valuation_confidence_penalty asc",
+        "fundamental_score desc",
+        "stock_code asc"
+      ]
+    },
+    "value_eligible_requires_current_price_at_or_below_safe_price_ceiling": true,
+    "safe_price_ceiling_is_hard_value_boundary": true,
+    "safe_price_range_lower_bound_is_not_hard_eligibility_floor": true,
+    "buy_price_range_must_equal_structure_entry_range_capped_by_safe_price_ceiling": true
   },
   "research_state_contract": {
     "path": "data/research/v2/research_state.json",
@@ -428,7 +632,13 @@
     "market_prosperity_prompt_search_complete": true,
     "no_prosperity_search_top_n_truncation": true,
     "all_selected_directions_have_taxonomy_mapping": true,
-    "all_mapped_relevant_level3_profitability_verified": true
+    "all_mapped_relevant_level3_profitability_verified": true,
+    "all_non_review_valuations_have_archetype": true,
+    "all_non_review_valuations_have_base_and_downside_cases": true,
+    "all_non_review_valuations_have_base_fair_value_and_safe_price_ceiling": true,
+    "resource_and_spread_cyclical_valuations_use_archetype_specific_models": true,
+    "extreme_deviation_secondary_models_pass_independent_driver_test": true,
+    "near_miss_action_distance_complete_when_eligible_universe_nonempty": true
   },
   "persistence_contract": {
     "only_prompt_research_output": "data/research/v2/research_state.json",

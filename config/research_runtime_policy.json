@@ -1,5 +1,5 @@
 {
-  "schema_version": 10,
+  "schema_version": 11,
   "pipeline": "a_share_low_risk_v2",
   "research_read_mode": "manifest_repo_data_plus_current_public_evidence",
   "manifest_path": "config/research_pipeline_manifest.json",
@@ -85,7 +85,18 @@
     "prosperity_search_top_n_forbidden": true,
     "every_selected_direction_must_map_to_relevant_level3": true,
     "every_mapped_relevant_level3_must_be_profitability_verified": true,
-    "daily_incremental_uses_prompt_search_for_new_or_changed_prosperity_evidence": true
+    "daily_incremental_uses_prompt_search_for_new_or_changed_prosperity_evidence": true,
+    "valuation_archetype_required_before_model_execution": true,
+    "sw_level1_only_valuation_model_selection_forbidden": true,
+    "resource_asset_fixed_pe_only_valuation_forbidden": true,
+    "spread_cyclical_fixed_pe_only_valuation_forbidden": true,
+    "base_and_downside_scenarios_required_for_non_review_valuation": true,
+    "safe_price_ceiling_required_for_value_eligibility": true,
+    "fixed_discount_from_reasonable_lower_bound_forbidden": true,
+    "extreme_deviation_secondary_method_must_use_independent_value_driver_family": true,
+    "same_eps_different_pe_is_not_independent_secondary_method": true,
+    "near_miss_action_distance_is_primary_sort_metric": true,
+    "near_miss_far_names_must_be_labeled_far": true
   },
   "write_policy": {
     "current_research_output_only": "data/research/v2/research_state.json",
@@ -95,6 +106,7 @@
     "new_state_must_record_manifest_schema": true,
     "new_state_must_include_coverage_ledger_company_light_screen_buy_points_and_scan_mode": true,
     "new_state_must_include_near_miss_ranking": true,
-    "new_state_must_include_market_prosperity_search_and_level3_verification": true
+    "new_state_must_include_market_prosperity_search_and_level3_verification": true,
+    "new_state_must_include_valuation_engine_v2_fields": true
   }
 }

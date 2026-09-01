@@ -8,9 +8,9 @@ def manifest():
     return json.loads((ROOT / 'config/research_pipeline_manifest.json').read_text(encoding='utf-8'))
 
 
-def test_manifest_schema30_and_stage_order():
+def test_manifest_schema31_and_stage_order():
     m = manifest()
-    assert m['schema_version'] == 30
+    assert m['schema_version'] == 31
     assert m['mode'] == 'shadow'
     assert m['stage_order'] == [
         'data_health', 'taxonomy_coverage', 'market_prosperity_search',
@@ -92,7 +92,8 @@ def test_valuation_requires_corporate_action_and_extreme_deviation_audits():
 def test_buy_point_is_value_and_structure_intersection():
     b = manifest()['buy_point_contract']
     assert b['required_for_every_complete_non_review_valuation'] is True
-    assert b['buy_price_range_must_equal_intersection_of_safe_price_range_and_structure_entry_range'] is True
+    assert b['buy_price_range_must_equal_intersection_of_safe_price_range_and_structure_entry_range'] is False
+    assert b['buy_price_range_must_equal_structure_entry_range_capped_by_safe_price_ceiling'] is True
     assert b['empty_intersection_means_not_buyable_now'] is True
     assert b['damaged_or_overheated_cannot_be_buyable_now'] is True
     assert b['buyable_now_requires_value_and_timing_true'] is True

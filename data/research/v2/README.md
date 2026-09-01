@@ -9,3 +9,6 @@ The current baseline follows a lean prosperity-first design: use a broad Prompt-
 Weekly baseline memory contains only selected prosperity directions plus verified level-3 profitability states. Daily runs search for incremental new evidence and update only affected directions/chains. Previous companies, valuations, opportunities and near-miss rankings may not seed a new company discovery run.
 
 Public fundamental/industry evidence is researched at run time. No independent weekly pool, candidate cache, T2 cache or duplicated valuation output may be persisted. `research_state.manifest_schema` must equal the current Manifest schema.
+
+
+Valuation Engine V2 (schema31): valuation archetype is economic-driver based; safe_price_ceiling replaces repeated discounts from a conservative lower bound; same-EPS/different-PE does not count as an independent secondary model.
