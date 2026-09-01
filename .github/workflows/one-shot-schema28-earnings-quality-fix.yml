@@ -1,0 +1,143 @@
+name: One-shot schema28 earnings quality fix
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/one-shot-schema28-earnings-quality-fix.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: github.event.head_commit.message == 'schema28-earnings-quality-fix'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Harden earnings-quality contract and patch audited state
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root=Path('.')
+          mp=root/'config/research_pipeline_manifest.json'
+          m=json.loads(mp.read_text(encoding='utf-8'))
+          ls=m['company_comparison_contract']['company_light_screen']
+          ls['core_earnings_evidence_required_for_survive']=True
+          ls['deducted_netprofit_or_equivalent_core_earnings_must_be_checked']=True
+          ls['missing_core_earnings_evidence_cannot_default_to_earnings_quality_match_true']=True
+          ls['missing_core_earnings_requires_current_public_evidence_supplement_or_data_unavailable']=True
+          ls['nonrecurring_dominance_threshold_of_parent_netprofit']=0.30
+          ls['nonrecurring_dominance_with_improving_core_earnings_may_survive_but_valuation_must_use_core_earnings']=True
+          ls['nonrecurring_dominance_with_weak_or_unconfirmed_core_earnings_must_exclude']=True
+          ls['required_screen_fields']=list(dict.fromkeys(ls['required_screen_fields']+[
+              'core_earnings_evidence','core_earnings_trend','nonrecurring_dominance_check','valuation_earnings_basis_requirement'
+          ]))
+          val=m['valuation_resolution_contract']
+          val['core_earnings_preferred_over_parent_netprofit_when_nonrecurring_dominant']=True
+          val['nonrecurring_dominance_threshold_of_parent_netprofit']=0.30
+          val['parent_netprofit_contaminated_by_material_nonrecurring_items_cannot_feed_forward_bridge']=True
+          val['missing_required_core_earnings_evidence_after_light_screen_means_review_required']='nonrecurring_earnings_dominant'
+          mp.write_text(json.dumps(m,ensure_ascii=False,indent=2),encoding='utf-8')
+
+          rp=root/'config/research_runtime_policy.json'
+          r=json.loads(rp.read_text(encoding='utf-8'))
+          s=r['stage_execution_policy']
+          s['core_earnings_quality_must_be_verified_before_light_screen_survive']=True
+          s['missing_deducted_profit_cannot_silently_pass_earnings_quality']=True
+          s['material_nonrecurring_parent_profit_cannot_feed_valuation_bridge']=True
+          rp.write_text(json.dumps(r,ensure_ascii=False,indent=2),encoding='utf-8')
+
+          skill=root/'skills/a-share-low-risk/company-research/SKILL.md'
+          text=skill.read_text(encoding='utf-8')
+          marker='## 扣非/核心盈利硬门（schema28 quality fix）'
+          if marker not in text:
+              text += '''\n\n## 扣非/核心盈利硬门（schema28 quality fix）\n轻筛 survivor 不能只验证归母净利润。必须取得扣非归母净利润或能够等价剥离一次性损益的核心盈利证据，并明确 `core_earnings_trend`。\n\n- 扣非/核心盈利字段缺失时，不得把 `earnings_quality_match` 默认成 true；必须补查公司半年报、业绩预告/快报或交易所公告。\n- 若补查后仍不可得，轻筛只能 `exclude:data_unavailable`，不得进入估值。\n- 若非经常性损益占归母净利润达到30%及以上，但扣非/核心盈利仍明确改善，公司可以保留为 survivor；但估值盈利桥必须改用扣非/核心盈利，禁止把受污染的归母净利润资本化。\n- 若一次性收益主导且核心盈利不改善/无法确认，则 `exclude:nonrecurring_earnings_dominant`。\n\n因此“归母暴增 + 营收平稳 + 扣非字段缺失”本身是补证触发器，不是通过信号。\n'''
+              skill.write_text(text,encoding='utf-8')
+
+          vskill=root/'skills/a-share-low-risk/valuation/SKILL.md'
+          text=vskill.read_text(encoding='utf-8')
+          marker2='## 核心盈利污染检查（schema28 quality fix）'
+          if marker2 not in text:
+              text += '''\n\n## 核心盈利污染检查（schema28 quality fix）\nForward/正常化盈利在进入主模型前必须检查归母净利润与扣非/核心盈利的差额。若非经常性损益占归母净利润达到30%及以上，归母净利润不得直接进入Forward Bridge；必须使用扣非/核心盈利重新构造盈利基础。若当前运行无法取得足够的核心盈利历史以完成该重构，使用 `review_required:nonrecurring_earnings_dominant`，而不是继续用受污染利润估值。\n'''
+              vskill.write_text(text,encoding='utf-8')
+
+          # Patch current schema28 state: manual public-evidence audit invalidates the sole machine buy point.
+          sp=root/'data/research/v2/research_state.json'
+          st=json.loads(sp.read_text(encoding='utf-8'))
+          code='002452'
+          audit_note=(
+              '2026H1归母净利润约5.82亿元，同比+451.36%，但扣非净利润约1.54亿元，同比+54.71%；'
+              '约4.28亿元非经常性损益主要来自出售富特科技部分股权及剩余股权核算方式变更。'
+              '原Forward Bridge错误使用受一次性收益污染的归母净利润，人工公开证据审计后作废。'
+          )
+          # Update light screen evidence, keep company in chain because core earnings still improve, but require core-earnings valuation.
+          for bucket in (st.get('company_light_screen') or {}).values():
+              for e in bucket.get('screened_companies',[]):
+                  if e.get('code')==code:
+                      e['earnings_quality_match']=True
+                      e['core_earnings_evidence']='2026H1扣非净利润约1.54亿元，同比+54.71%（公司半年报/业绩预告公开证据）'
+                      e['core_earnings_trend']='improving'
+                      e['nonrecurring_dominance_check']={'dominant':True,'nonrecurring_amount_approx':428000000.0,'parent_netprofit':581754919.7,'ratio_approx':0.736}
+                      e['valuation_earnings_basis_requirement']='deducted_or_core_earnings_only'
+                      e['evidence_basis']=audit_note
+          v=st['valuations'][code]
+          v['earnings_type']='review_required'
+          v['earnings_basis']=audit_note
+          v['primary_method']='review_required_pending_core_earnings_bridge'
+          v['reasonable_price_assumption']='受一次性收益污染的原归母盈利桥已作废；需以扣非/核心盈利重建2026E/正常化盈利后再估值。'
+          v['reasonable_price_range']=None
+          v['safe_price_range']=None
+          v['valuation_position']='review_required'
+          v['valuation_attempt_complete']=True
+          v['model_execution_status']='blocked_after_full_attempt'
+          v['review_required']=True
+          v['review_exception_code']='nonrecurring_earnings_dominant'
+          v['blocker_evidence']=audit_note
+          v['earnings_bridge_integrity']='invalidated_parent_profit_due_to_nonrecurring_dominance'
+          v['falsifiers']=['取得足够的扣非/核心盈利历史与订单、毛利率证据后重建Forward Bridge']
+          v['manual_earnings_quality_audit']={'passed':False,'reason':'parent_netprofit_materially_contaminated_by_nonrecurring_items','core_h1_np_approx':154000000.0,'core_h1_yoy':0.5471}
+          st.get('buy_point_assessments',{}).pop(code,None)
+          st['current_opportunities']=[]
+          for comp in st.get('chain_comparisons',[]):
+              if code in (comp.get('compared_companies') or []):
+                  comp['current_opportunity_best']=None
+          vd=st['diagnostics']['valuation']
+          vd['review_required_count']=sum(1 for x in st['valuations'].values() if x.get('review_required'))
+          vd['complete_non_review_count']=len(st['valuation_set'])-vd['review_required_count']
+          bd=st['diagnostics']['buy_point']
+          bd['assessed_count']=len(st.get('buy_point_assessments') or {})
+          bd['buyable_now_count']=0
+          st['diagnostics']['manual_quality_audit']={
+              '002452':'sole machine buy point invalidated: nonrecurring earnings dominated parent profit; core-earnings bridge required',
+              'current_opportunities_recomputed':True
+          }
+          sp.write_text(json.dumps(st,ensure_ascii=False,indent=2),encoding='utf-8')
+
+          # Add contract tests for the newly discovered silent-null failure mode.
+          tp=root/'tests/test_research_contract.py'
+          t=tp.read_text(encoding='utf-8')
+          marker3='def test_core_earnings_quality_cannot_silently_pass_when_deducted_profit_missing():'
+          if marker3 not in t:
+              t += '''\n\ndef test_core_earnings_quality_cannot_silently_pass_when_deducted_profit_missing():\n    m = manifest()\n    ls = m['company_comparison_contract']['company_light_screen']\n    val = m['valuation_resolution_contract']\n    assert ls['core_earnings_evidence_required_for_survive'] is True\n    assert ls['deducted_netprofit_or_equivalent_core_earnings_must_be_checked'] is True\n    assert ls['missing_core_earnings_evidence_cannot_default_to_earnings_quality_match_true'] is True\n    assert ls['missing_core_earnings_requires_current_public_evidence_supplement_or_data_unavailable'] is True\n    assert ls['nonrecurring_dominance_threshold_of_parent_netprofit'] == 0.30\n    assert val['core_earnings_preferred_over_parent_netprofit_when_nonrecurring_dominant'] is True\n    assert val['parent_netprofit_contaminated_by_material_nonrecurring_items_cannot_feed_forward_bridge'] is True\n'''
+              tp.write_text(t,encoding='utf-8')
+          PY
+      - name: Validate
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          python -m pip install -r requirements.txt pytest
+          pytest -q
+      - name: Commit and self-remove
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add config/research_pipeline_manifest.json config/research_runtime_policy.json skills/a-share-low-risk/company-research/SKILL.md skills/a-share-low-risk/valuation/SKILL.md tests/test_research_contract.py data/research/v2/research_state.json
+          git rm .github/workflows/one-shot-schema28-earnings-quality-fix.yml
+          git commit -m "research: harden core earnings quality gate"
+          git push
