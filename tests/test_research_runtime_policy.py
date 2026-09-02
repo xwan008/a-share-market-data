@@ -25,7 +25,7 @@ def test_runtime_data_gate_fails_closed():
     assert p["health_market_status_must_be_closed"] is True
     assert p["latest_history_and_price_structure_must_match_expected_trade_date"] is True
     assert p["failure_may_not_publish_new_formal_result"] is True
-    assert p["failure_may_not_overwrite_previous_valid_state"] is True
+    assert p["failure_may_not_mutate_cross_run_industry_state"] is True
 
 
 def test_history_window_semantics_are_explicit_and_storage_authoritative():
@@ -43,13 +43,15 @@ def test_history_window_semantics_are_explicit_and_storage_authoritative():
     assert h["storage_sufficiency_must_be_judged_from_history_shards_or_explicit_storage_coverage"] is True
 
 
-def test_every_run_has_full_market_prompt_recall_and_reuses_level3_state():
+def test_every_run_has_full_market_prompt_recall_and_reuses_only_level3_state():
     p = load("config/research_runtime_policy.json")
     d = p["discovery_policy"]
     l3 = p["level3_refresh_policy"]
     assert d["prompt_full_market_light_recall_required_every_run"] is True
     assert d["daily_run_may_not_limit_prompt_discovery_to_previous_directions"] is True
     assert d["previous_industry_state_may_accelerate_level3_refresh_but_may_not_bound_discovery"] is True
+    assert d["previous_companies_chains_valuations_or_opportunities_may_not_seed_discovery"] is True
+    assert d["company_chain_valuation_buy_results_are_ephemeral_per_run"] is True
     assert l3["existing_valid_level3_state_must_be_reused"] is True
     assert l3["missing_level3_state_initialized_on_demand"] is True
     assert l3["stale_or_invalid_level3_state_revalidated_individually"] is True
@@ -100,16 +102,20 @@ def test_company_filtering_and_valuation_flow_cannot_shortcut():
     assert s["current_opportunity_requires_buyable_now"] is True
 
 
-def test_persistence_is_split_into_industry_memory_and_latest_formal_run():
+def test_only_industry_state_is_cross_run_research_memory():
     p = load("config/research_runtime_policy.json")
     w = p["write_policy"]
     assert p["industry_state_path"] == "data/research/industry_state.json"
-    assert p["active_state_path"] == "data/research/research_state.json"
+    assert "active_state_path" not in p
+    assert p["repository_data_policy"]["research_state_file_forbidden"] is True
     assert w["industry_state_is_only_cross_run_fundamental_memory"] is True
-    assert w["current_research_state_is_latest_valid_formal_run_only"] is True
+    assert w["research_run_outputs_are_not_persisted"] is True
+    assert w["published_leaderboard_is_current_run_only"] is True
+    assert w["persistent_formal_run_state_forbidden"] is True
+    assert "current_research_output" not in w
     assert w["persistent_candidate_or_opportunity_pools_forbidden"] is True
     assert w["standalone_valuation_cache_forbidden"] is True
-    assert w["write_only_after_data_gate_and_completion_gate_pass"] is True
+    assert w["industry_state_write_only_after_data_gate_and_completion_gate_pass"] is True
 
 
 def test_legacy_v2_is_not_runtime_input():
