@@ -19,12 +19,12 @@ def test_research_directory_has_only_authoritative_runtime_files_and_readme():
     }
 
 
-def test_root_readme_does_not_publish_or_persist_formal_run_state():
+def test_root_readme_declares_no_persisted_formal_run_state():
     text = (ROOT / "README.md").read_text(encoding="utf-8")
     assert "only cross-run fundamental research memory" in text
     assert "research_state.json" in text
     assert "forbidden" in text
-    assert "persisted as a candidate pool or formal-run state" not in text
+    assert "are generated fresh on every run and are not persisted" in text
 
 
 def test_runtime_is_manifest_whitelisted():
