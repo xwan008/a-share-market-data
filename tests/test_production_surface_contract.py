@@ -8,6 +8,21 @@ def test_legacy_runtime_builders_are_absent():
     assert not (ROOT / "scripts/migrate_level3_industry_state.py").exists()
 
 
+def test_production_builder_has_no_legacy_import():
+    text = (ROOT / "scripts/build_full_market_price_structure.py").read_text(encoding="utf-8")
+    assert "build_v2_full_market_price_structure" not in text
+    assert "data/research/v2" not in text
+    assert "shadow" not in text
+
+
+def test_workflows_have_no_legacy_runtime_dependencies():
+    update_market = (ROOT / ".github/workflows/update-market.yml").read_text(encoding="utf-8")
+    research_ci = (ROOT / ".github/workflows/research-contract-ci.yml").read_text(encoding="utf-8")
+    for text in (update_market, research_ci):
+        assert "build_v2_full_market_price_structure.py" not in text
+        assert "migrate_level3_industry_state.py" not in text
+
+
 def test_research_directory_has_only_authoritative_runtime_files_and_readme():
     research_dir = ROOT / "data/research"
     names = {p.name for p in research_dir.iterdir()}
