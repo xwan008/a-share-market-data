@@ -97,9 +97,23 @@ def test_company_filtering_and_valuation_flow_cannot_shortcut():
     assert s["normal_profitable_company_uses_simple_relative_valuation_by_default"] is True
     assert s["exception_trigger_required_before_complex_model"] is True
     assert s["single_margin_of_safety_application_required"] is True
+
+
+def test_runtime_uses_reasonable_buy_range_and_two_left_side_lists():
+    s = load("config/research_runtime_policy.json")["stage_execution_policy"]
+    assert s["reasonable_buy_range_required_for_every_complete_non_review_company"] is True
+    assert s["safe_price_ceiling_is_not_reasonable_buy_range"] is True
+    assert s["reasonable_buy_range_must_be_valuation_only"] is True
+    assert s["reasonable_buy_range_upper_bound_must_not_exceed_safe_price_ceiling"] is True
+    assert s["extreme_cycle_peak_earnings_may_not_be_mechanically_extrapolated"] is True
     assert s["every_complete_non_review_company_requires_price_structure"] is True
     assert s["every_complete_non_review_company_requires_buy_point_assessment"] is True
-    assert s["current_opportunity_requires_buyable_now"] is True
+    assert s["left_value_buy_requires_price_inside_reasonable_buy_range"] is True
+    assert s["price_structure_is_not_hard_gate_for_left_value_list"] is True
+    assert s["left_turn_buy_requires_left_value_and_turn_confirmation"] is True
+    assert s["left_turn_list_must_be_subset_of_left_value_list"] is True
+    assert s["legacy_single_buyable_now_list_forbidden"] is True
+    assert s["near_miss_uses_distance_to_reasonable_buy_range"] is True
 
 
 def test_only_industry_state_is_cross_run_research_memory():
