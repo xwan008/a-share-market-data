@@ -27,13 +27,10 @@ def test_workflows_have_no_legacy_runtime_dependencies():
         assert "migrate_level3_industry_state.py" not in text
 
 
-def test_market_data_workflow_push_surface_is_one_shot_only():
+def test_market_data_workflow_cannot_persist_on_code_push():
     text = (ROOT / ".github/workflows/update-market.yml").read_text(encoding="utf-8")
     trigger_block = text.split("permissions:", 1)[0]
-    if "push:" in trigger_block:
-        assert "branches: [main]" in trigger_block
-        assert "- '.github/market-refresh.trigger'" in trigger_block
-        assert trigger_block.count("- '.github/market-refresh.trigger'") == 1
+    assert "push:" not in trigger_block
     assert "steps.session.outputs.persist == 'true'" in text
     assert "status == 'closed'" in text
 
