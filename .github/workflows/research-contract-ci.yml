@@ -39,17 +39,41 @@ jobs:
           pip install pytest
       - name: Run repository tests
         run: python -m pytest -q
-      - name: Build production price-structure snapshot
-        run: python scripts/build_full_market_price_structure.py
-      - name: Validate production price-structure contract
+      - name: Build or validate production price-structure snapshot
         run: |
           python - <<'PY'
           import json
+          import subprocess
           from pathlib import Path
-          p = json.loads(Path('data/research/full_market_price_structure.json').read_text(encoding='utf-8'))
+
+          health = json.loads(Path('data/health.json').read_text(encoding='utf-8'))
+          latest = json.loads(Path('data/latest.json').read_text(encoding='utf-8'))
+          structure_path = Path('data/research/full_market_price_structure.json')
+
+          health_date = str(health.get('trade_date') or '')
+          latest_date = str(latest.get('trade_date') or '')
+          closed_complete = (
+              health.get('market_status') == 'closed'
+              and health_date
+              and health_date == latest_date
+          )
+
+          if closed_complete:
+              subprocess.run(['python', 'scripts/build_full_market_price_structure.py'], check=True)
+          else:
+              print(
+                  'Skipping structure rebuild because repository market data is not a '
+                  'closed-session-complete snapshot; validating the last committed structure instead.'
+              )
+
+          p = json.loads(structure_path.read_text(encoding='utf-8'))
           assert p['contract_id'] == 'a-share-low-risk-price-structure'
           assert 'schema_version' not in p
           assert 'mode' not in p
           assert p['reference_trade_date']
           assert p['verified_count'] > 0
+          if closed_complete:
+              assert p['reference_trade_date'] == health_date
+          elif latest_date:
+              assert p['reference_trade_date'] <= latest_date
           PY
