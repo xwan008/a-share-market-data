@@ -76,6 +76,9 @@ jobs:
       - name: Build compact ChatGPT bridge files
         if: steps.session.outputs.persist == 'true'
         run: python scripts/build_bridge.py
+      - name: Embed SW level3 industry into quote shards
+        if: steps.session.outputs.persist == 'true'
+        run: python scripts/enrich_shards_with_industry.py
       - name: Build full-market low-risk price structure
         if: steps.session.outputs.persist == 'true'
         run: python scripts/build_full_market_price_structure.py
