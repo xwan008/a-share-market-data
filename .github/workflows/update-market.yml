@@ -1,19 +1,9 @@
 name: Update A-share market data
 
 # Consolidated post-close pipeline: quote/history/bridge/price-structure refresh together.
+# Code pushes are validated by CI and never write market data.
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/update-market.yml'
-      - 'scripts/fetch_market.py'
-      - 'scripts/repair_corporate_actions.py'
-      - 'scripts/history_store.py'
-      - 'scripts/build_history.py'
-      - 'scripts/build_bridge.py'
-      - 'scripts/build_full_market_price_structure.py'
-      - 'requirements.txt'
   schedule:
     - cron: '10 16 * * 1-5'
       timezone: 'Asia/Shanghai'
@@ -25,7 +15,7 @@ permissions:
 
 concurrency:
   group: a-share-market-data-write
-  cancel-in-progress: ${{ github.event_name == 'push' }}
+  cancel-in-progress: false
 
 jobs:
   update:
@@ -35,8 +25,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Sync latest main for scheduled/manual reruns
-        if: github.event_name != 'push'
+      - name: Sync latest main
         run: |
           git fetch origin main
           git reset --hard origin/main
@@ -50,19 +39,48 @@ jobs:
           pip install pytest
       - name: Run tests
         run: python -m pytest -q
-      - name: Fetch and validate closed-session quotes
+      - name: Fetch market snapshot
         run: python scripts/fetch_market.py
+      - name: Check completed-session persistence gate
+        id: session
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          latest = json.loads(Path('data/latest.json').read_text(encoding='utf-8'))
+          trade_date = str(latest.get('trade_date') or '')
+          status = str(latest.get('market_status') or '')
+          source_errors = ((latest.get('source_status') or {}).get('errors') or [])
+          persist = bool(trade_date and status == 'closed' and not source_errors)
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as fh:
+              fh.write(f"persist={'true' if persist else 'false'}\n")
+          print(json.dumps({
+              'trade_date': trade_date,
+              'market_status': status,
+              'source_errors': source_errors,
+              'persist': persist,
+          }, ensure_ascii=False))
+          PY
       - name: Detect and repair corporate-action qfq drift
+        if: steps.session.outputs.persist == 'true'
         run: python scripts/repair_corporate_actions.py
       - name: Append closed session to bounded rolling history
+        if: steps.session.outputs.persist == 'true'
         run: python scripts/history_store.py
       - name: Build market history summaries
+        if: steps.session.outputs.persist == 'true'
         run: python scripts/build_history.py
       - name: Build compact ChatGPT bridge files
+        if: steps.session.outputs.persist == 'true'
         run: python scripts/build_bridge.py
       - name: Build full-market low-risk price structure
+        if: steps.session.outputs.persist == 'true'
         run: python scripts/build_full_market_price_structure.py
       - name: Commit updated data
+        if: steps.session.outputs.persist == 'true'
         shell: bash
         run: |
           if git status --porcelain -- data | grep -q .; then
@@ -79,6 +97,9 @@ jobs:
           else
             echo "No market-data changes to commit."
           fi
+      - name: Report skipped persistence
+        if: steps.session.outputs.persist != 'true'
+        run: echo "Market snapshot is not a completed clean session; no repository data will be persisted."
 
-# Only completed daily sessions are persisted. The same post-close workflow also
-# refreshes the mechanical full-market price-structure input consumed by research.
+# Only completed daily sessions with clean quote-source status are persisted.
+# Intraday/manual runs may fetch for diagnostics inside the runner, but cannot mutate the repository.
