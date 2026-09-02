@@ -109,18 +109,38 @@ def test_company_filtering_funnel_is_exhaustive_without_top_n():
     assert comp["top_n_or_fixed_quota_forbidden"] is True
 
 
-def test_valuation_and_buy_point_contract_remain_strict():
+def test_valuation_has_distinct_fair_safe_and_reasonable_buy_ranges():
     m = manifest()
     v = m["valuation_contract"]
-    b = m["buy_point_contract"]
-    p = m["price_structure_contract"]
+    r = v["reasonable_buy_range_contract"]
     assert v["default_path"] == "relative_earnings_valuation"
     assert v["complex_model_is_exception_not_default"] is True
     assert v["single_mos_application_required"] is True
+    assert v["cycle_normalization_check_required"] is True
+    assert v["extreme_cycle_peak_earnings_may_not_be_mechanically_extrapolated"] is True
+    assert r["required_for_every_complete_non_review_company"] is True
+    assert r["valuation_only"] is True
+    assert r["must_be_bounded_interval"] is True
+    assert r["upper_bound_must_not_exceed_safe_price_ceiling"] is True
+    assert r["safe_price_ceiling_is_not_itself_buy_range"] is True
+    assert r["must_not_reference_price_structure"] is True
+    assert r["double_margin_of_safety_forbidden"] is True
+
+
+def test_buy_point_contract_is_two_left_side_lists_not_single_intersection():
+    m = manifest()
+    b = m["buy_point_contract"]
+    p = m["price_structure_contract"]
+    assert b["value_anchor"] == "reasonable_buy_range"
+    assert b["left_value_list"]["formula"] == "current_price inside reasonable_buy_range"
+    assert b["left_value_list"]["price_structure_is_not_hard_gate"] is True
+    assert b["left_turn_list"]["formula"] == "left_value_buyable_now AND left_turn_confirmed"
+    assert b["left_turn_list"]["must_be_subset_of_left_value_list"] is True
+    assert b["left_turn_list"]["requires_price_still_inside_reasonable_buy_range"] is True
+    assert b["legacy_single_buyable_now_list_forbidden"] is True
     assert p["independent_from_valuation"] is True
-    assert b["hard_value_gate"] == "current_price <= safe_price_ceiling"
-    assert b["buy_price_range_formula"] == "structure_entry_range intersect (-infinity, safe_price_ceiling]"
-    assert b["damaged_or_overheated_cannot_be_buyable_now"] is True
+    assert p["price_structure_is_not_hard_gate_for_left_value_list"] is True
+    assert p["left_turn_confirmation_is_for_turn_list_only"] is True
 
 
 def test_completion_persistence_and_near_miss_fail_closed():
@@ -135,7 +155,11 @@ def test_completion_persistence_and_near_miss_fail_closed():
     assert g["all_driver_quality_survivors_have_peer_redundancy_decision"] is True
     assert g["all_peer_filter_survivors_have_valuation_precheck_decision"] is True
     assert g["all_precheck_survivors_horizontally_compared"] is True
-    assert g["current_opportunities_must_come_only_from_buyable_now"] is True
+    assert g["all_complete_non_review_companies_have_reasonable_buy_range"] is True
+    assert g["all_complete_non_review_companies_have_left_value_assessment"] is True
+    assert g["all_complete_non_review_companies_have_left_turn_assessment"] is True
+    assert g["left_turn_list_is_verified_subset_of_left_value_list"] is True
+    assert g["near_miss_excludes_current_left_value_list"] is True
     assert g["publish_on_failure"] is False
     assert g["mutate_industry_state_on_failure"] is False
     assert p["industry_state_is_only_cross_run_fundamental_memory"] is True
@@ -147,3 +171,11 @@ def test_completion_persistence_and_near_miss_fail_closed():
     assert "research_state" not in m["authoritative_data"]
     assert n["ranking_is_display_only_not_candidate_pool"] is True
     assert n["default_display_limit"] == 10
+
+
+def test_public_output_has_both_left_side_lists():
+    o = manifest()["public_output"]
+    assert o["left_value_section_title"] == "【左侧价值买点榜】"
+    assert o["left_turn_section_title"] == "【左侧拐点买点榜】"
+    assert o["left_value_section_title"] in o["sections"]
+    assert o["left_turn_section_title"] in o["sections"]
