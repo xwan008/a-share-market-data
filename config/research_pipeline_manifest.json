@@ -304,6 +304,8 @@
     "when_share_count_changes_use_aggregate_earnings_and_current_or_forward_diluted_share_count": true,
     "core_earnings_preferred_over_parent_netprofit_when_nonrecurring_dominant": true,
     "parent_netprofit_contaminated_by_material_nonrecurring_items_cannot_feed_forward_bridge": true,
+    "cycle_normalization_check_required": true,
+    "extreme_cycle_peak_earnings_may_not_be_mechanically_extrapolated": true,
     "fair_pe_construction": {
       "level3_peer_pe_is_primary_relative_anchor": true,
       "dynamic_pe_is_reference_not_fair_value_copy": true,
@@ -335,7 +337,18 @@
     "exception_trigger_required": true,
     "single_mos_application_required": true,
     "safe_price_ceiling_formula": "base_fair_value * (1 - margin_of_safety_pct)",
-    "fixed_discount_from_reasonable_lower_bound_forbidden": true
+    "fixed_discount_from_reasonable_lower_bound_forbidden": true,
+    "reasonable_buy_range_contract": {
+      "required_for_every_complete_non_review_company": true,
+      "valuation_only": true,
+      "must_be_bounded_interval": true,
+      "upper_bound_must_not_exceed_safe_price_ceiling": true,
+      "safe_price_ceiling_is_not_itself_buy_range": true,
+      "must_consider_conservative_forward_core_earnings": true,
+      "must_consider_cycle_normalization": true,
+      "must_not_reference_price_structure": true,
+      "double_margin_of_safety_forbidden": true
+    }
   },
   "price_structure_contract": {
     "independent_from_valuation": true,
@@ -350,23 +363,31 @@
       "damaged",
       "unavailable"
     ],
-    "timing_eligible_types": [
-      "breakout",
-      "pullback",
-      "trend_continuation"
-    ],
-    "damaged_or_overheated_cannot_be_timing_eligible": true,
-    "structure_entry_range_must_not_reference_fair_value": true
+    "structure_entry_range_must_not_reference_fair_value": true,
+    "price_structure_is_not_hard_gate_for_left_value_list": true,
+    "left_turn_confirmation_is_for_turn_list_only": true,
+    "damaged_or_overheated_or_unavailable_cannot_be_left_turn_confirmed": true,
+    "generic_trend_continuation_does_not_automatically_mean_left_turn": true
   },
   "buy_point_contract": {
-    "hard_value_gate": "current_price <= safe_price_ceiling",
-    "buy_price_range_formula": "structure_entry_range intersect (-infinity, safe_price_ceiling]",
-    "empty_intersection_means_not_buyable_now": true,
-    "damaged_or_overheated_cannot_be_buyable_now": true,
-    "buyable_now_requires_value_and_timing_true": true,
+    "value_anchor": "reasonable_buy_range",
+    "left_value_list": {
+      "formula": "current_price inside reasonable_buy_range",
+      "price_structure_is_not_hard_gate": true,
+      "technical_damage_may_be_shown_as_risk_but_not_auto_exclusion": true
+    },
+    "left_turn_list": {
+      "formula": "left_value_buyable_now AND left_turn_confirmed",
+      "must_be_subset_of_left_value_list": true,
+      "requires_price_still_inside_reasonable_buy_range": true,
+      "requires_turn_from_left_context": true,
+      "high_chase_risk_forbidden": true
+    },
+    "legacy_single_buyable_now_list_forbidden": true,
     "price_structure_must_not_modify_intrinsic_value": true,
     "near_miss_ranking_contract": {
-      "buyable_now_stays_separate": true,
+      "buyable_lists_stay_separate": true,
+      "left_value_list_excluded_from_near_miss": true,
       "must_output_when_eligible_universe_nonempty": true,
       "review_required_excluded_from_distance_ranking": true,
       "ranking_is_display_only_not_candidate_pool": true,
@@ -376,13 +397,11 @@
       "required_metrics": [
         "missing_hard_conditions",
         "value_gap_pct",
-        "structure_gap_pct",
-        "action_distance_pct",
         "distance_band",
         "current_missing",
         "next_trigger"
       ],
-      "action_distance_formula": "max(value_gap_pct, structure_gap_pct) when both are measurable",
+      "action_distance_formula": "value_gap_pct to reasonable_buy_range upper bound",
       "distance_bands": {
         "near": "<=5%",
         "watch": ">5% and <=15%",
@@ -391,11 +410,10 @@
       "sort_order": [
         "missing_hard_conditions",
         "distance_band",
-        "action_distance_pct",
+        "value_gap_pct",
         "fundamental_score",
         "stock_code"
-      ],
-      "unmeasurable_structure_gap_after_measurable_in_same_bucket": true
+      ]
     }
   },
   "completion_gate_contract": {
@@ -415,10 +433,13 @@
     "all_precheck_survivors_horizontally_compared": true,
     "valuation_set_dedup_complete": true,
     "all_valuation_set_companies_fully_valued_or_explicit_review": true,
+    "all_complete_non_review_companies_have_reasonable_buy_range": true,
     "all_complete_non_review_companies_have_price_structure": true,
-    "all_complete_non_review_companies_have_buy_point_assessment": true,
+    "all_complete_non_review_companies_have_left_value_assessment": true,
+    "all_complete_non_review_companies_have_left_turn_assessment": true,
+    "left_turn_list_is_verified_subset_of_left_value_list": true,
     "near_miss_ranking_complete_when_eligible_universe_nonempty": true,
-    "current_opportunities_must_come_only_from_buyable_now": true,
+    "near_miss_excludes_current_left_value_list": true,
     "on_failure": "incomplete_research",
     "publish_on_failure": false,
     "mutate_industry_state_on_failure": false
@@ -444,14 +465,17 @@
       "【全市场景气发现】",
       "【三级行业盈利状态】",
       "【产业链与公司轻筛】",
-      "【估值与安全价】",
-      "【价格结构与时机】",
-      "【当前买点】",
+      "【估值与合理买入区】",
+      "【价格结构与拐点】",
+      "【左侧价值买点榜】",
+      "【左侧拐点买点榜】",
       "【接近买点榜】",
       "【诊断与失效条件】"
     ],
+    "left_value_section_title": "【左侧价值买点榜】",
+    "left_turn_section_title": "【左侧拐点买点榜】",
     "near_miss_section_title": "【接近买点榜】",
     "near_miss_must_be_nonempty_when_eligible_universe_nonempty": true,
-    "no_buyable_now_may_be_reported_as_zero_without_lowering_thresholds": true
+    "zero_left_turn_opportunities_may_be_reported_without_lowering_thresholds": true
   }
 }
