@@ -45,3 +45,12 @@ jobs:
           pip install pytest
       - name: Run tests
         run: python -m pytest -q
+      - name: Build temporary low-risk scan snapshot
+        run: python scripts/tmp_run_low_risk_scan_snapshot.py
+      - name: Upload temporary low-risk scan snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: low-risk-scan-snapshot
+          path: tmp_low_risk_scan_snapshot.json
+          if-no-files-found: error
+          retention-days: 1
