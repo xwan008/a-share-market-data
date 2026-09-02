@@ -106,12 +106,22 @@
 
 必须区分：
 - `reasonable_price_range`：合理价值区；
-- `safe_price_ceiling`：安全价上限，不等于买入区；
-- `reasonable_buy_range`：本榜单真正使用的合理买入区。
+- `safe_price_ceiling`：安全价上限；
+- `reasonable_buy_range`：本榜单真正使用的低风险正常执行区。
 
-`reasonable_buy_range`必须由估值独立产生、有上下界、上沿不高于safe price ceiling，且不能参考技术结构。
+正常路径固定迁移旧 `safe_price_range` 的核心计算逻辑：
+- `safe_price_ceiling = base_fair_value × (1 - MOS)`；
+- `reasonable_buy_range.upper = safe_price_ceiling`；
+- `reasonable_buy_range.lower = safe_price_ceiling × 0.95`。
 
-强周期公司禁止机械外推景气高点盈利；必要时使用正常化盈利或触发Exception Path。
+5%只表示执行带宽，不是第二次MOS。旧字段 `safe_price_range` 正式废弃，新一轮不得继续输出或作为买点字段使用。
+
+`reasonable_buy_range`必须由估值独立产生、有上下界，且不能参考技术结构。强周期公司必须先做盈利正常化，再进入同一构造；必要时触发Exception Path。
+
+每家公司同时输出 `valuation_position`：
+- `above_buy_range`：价格高于上沿；
+- `inside_buy_range`：价格位于区间内；
+- `deep_discount_review`：价格低于下沿，必须重新验证盈利链、产业领先变量、核心盈利、周期位置、重大事项和估值假设，完成复核前不得机械抄底。
 
 ## 8. 独立价格结构
 对每家完整非review估值公司读取：
@@ -121,11 +131,15 @@
 
 ## 9. 两个正式买点榜
 ### 9.1 左侧价值买点榜
-核心条件：
+正常核心条件：
 
-`left_value_buyable_now = current_price ∈ reasonable_buy_range`
+`left_value_buyable_now = valuation_position == inside_buy_range`
+
+即 `reasonable_buy_range.lower <= current_price <= reasonable_buy_range.upper`。
 
 只要基本面、估值仍有效且当前价格进入合理买入区，即可进入**左侧价值买点榜**。当前仍在下跌、transition甚至技术damaged，不得仅因技术结构未确认而把它从左侧价值榜淘汰；必须清楚展示结构风险和失效条件。
+
+若 `current_price < reasonable_buy_range.lower`，必须标记 `deep_discount_review`。这不是Near-miss，也不是自动买点；完成基本面与估值复核并重新估值后，再按新的 `valuation_position` 判断。
 
 ### 9.2 左侧拐点买点榜
 核心条件：
@@ -150,13 +164,14 @@
 - `left_turn_buyable_now`。
 
 ## 10. 接近买点榜
-Near-miss只收**尚未进入 `reasonable_buy_range`**、但距离合理买入区已经较近的非review公司。
+Near-miss只收**当前价格高于 `reasonable_buy_range.upper`**、但距离合理买入区已经较近的非review公司。
 
 默认Top10，仅用于展示，不形成跨期候选池。
 
 距离核心锚改为合理买入区：
 - 当前价高于买入区上沿：计算到上沿的 `value_gap_pct`；
 - 已进入合理买入区：必须进入左侧价值榜，不再作为Near-miss；
+- 当前价低于下沿：标记 `deep_discount_review`，不得进入Near-miss距离排名；
 - 技术结构不是Near-miss的硬距离门槛，可作为“下一触发点”辅助展示。
 
 ## 11. COMPLETION GATE
@@ -171,11 +186,12 @@ Near-miss只收**尚未进入 `reasonable_buy_range`**、但距离合理买入�
 - 所有唯一公司完成财务硬筛；
 - survivor完成Driver/盈利质量、去冗余、Precheck、横向比较；
 - valuation_set逐只完成估值或明确review；
-- 所有非review公司产生 `reasonable_buy_range`；
+- 所有非review公司产生固定口径的 `reasonable_buy_range` 和 `valuation_position`；
+- `deep_discount_review` 公司已完成本轮异常折价复核或明确保持review状态；
 - 所有非review公司完成价格结构和 `left_turn_confirmed` 判断；
 - 所有非review公司完成左侧价值买点评估；
 - 左侧拐点榜逐只验证为左侧价值榜子集；
-- Near-miss仅来自尚未进入reasonable_buy_range的公司。
+- Near-miss只来自 `above_buy_range` 公司，不得包含 `inside_buy_range` 或 `deep_discount_review`。
 
 任一失败：`status=incomplete_research`，不发布本轮正式买点，也不得修改 `industry_state.json`。不存在回退发布上一轮榜单的路径。
 
