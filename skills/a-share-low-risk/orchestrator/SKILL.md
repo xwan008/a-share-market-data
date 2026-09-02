@@ -18,7 +18,17 @@
 - 历史数据覆盖该交易日；
 - `full_market_price_structure.json` 的参考交易日与之相同。
 
-任一失败：输出 `data_stale_or_incomplete`，不得发布新的正式买点，也不得覆盖上一份有效 `industry_state.json` 或 `research_state.json`。
+### 历史窗口语义（强制）
+历史数据存在三个不同用途的窗口，禁止混为一谈：
+- **65日 = 轻量摘要窗口**：只用于 `trend_summary` / health 中的5/20/60日摘要、市场宽度和辅助结构描述；
+- **120日 = 正式价格结构最低门槛**：低于120个有效交易日时正式价格结构才可判定为历史不足；
+- **180日 = 底层滚动历史存储窗口，同时也是正式价格结构与估值 sanity 的目标窗口**。
+
+权威底层历史来源始终是 `data/history_shards/*.json`。正式价格结构直接读取该底层历史，不读取65日摘要作为历史长度判断依据。
+
+兼容旧版 health 时必须遵守：若 `health.schema_version <= 6`，其中 `history.window_days=65` 与 `history.coverage.max_points=65` **都只表示摘要视图长度**，绝不能据此判断底层历史只有65日，也不能据此让 Data Gate / Completion Gate 失败。历史是否满足120/180日要求，必须读取 `history_shards`，或使用新版 health 中明确的 `storage_coverage`。
+
+任一真正的 Data Gate 失败：输出 `data_stale_or_incomplete`，不得发布新的正式买点，也不得覆盖上一份有效 `industry_state.json` 或 `research_state.json`。
 
 ## 2. Prompt全市场轻召回
 每次运行都基于当前公开证据，从全市场重新做轻量开放式召回。不能把上一期景气方向、公司、估值、Near-miss 或关注名单当成搜索边界。
