@@ -15,8 +15,7 @@
     "latest_market": "data/latest.json",
     "market_health": "data/health.json",
     "bounded_history_store": "data/history_shards/*.json",
-    "industry_state": "data/research/industry_state.json",
-    "research_state": "data/research/research_state.json"
+    "industry_state": "data/research/industry_state.json"
   },
   "stage_order": [
     "data_gate",
@@ -44,7 +43,7 @@
     "price_structure_must_cover_expected_trade_date": true,
     "on_failure": "data_stale_or_incomplete",
     "publish_on_failure": false,
-    "mutate_valid_state_on_failure": false
+    "mutate_industry_state_on_failure": false
   },
   "history_semantics_contract": {
     "summary_window_days": 65,
@@ -66,6 +65,7 @@
     "method": "prompt_full_market_light_recall_every_run",
     "previous_focus_list_may_not_seed_or_bound_discovery": true,
     "previous_companies_chains_valuations_or_opportunities_may_not_seed_discovery": true,
+    "company_chain_valuation_buy_results_are_ephemeral_per_run": true,
     "top_n_or_fixed_count_selection_forbidden": true,
     "must_cover_major_economic_domains": [
       "资源能源",
@@ -421,22 +421,24 @@
     "current_opportunities_must_come_only_from_buyable_now": true,
     "on_failure": "incomplete_research",
     "publish_on_failure": false,
-    "mutate_previous_valid_state_on_failure": false
+    "mutate_industry_state_on_failure": false
   },
   "persistence_contract": {
     "industry_state_path": "data/research/industry_state.json",
-    "research_state_path": "data/research/research_state.json",
     "industry_state_is_only_cross_run_fundamental_memory": true,
-    "research_state_contains_latest_valid_formal_run_only": true,
+    "run_company_chain_valuation_buy_outputs_are_ephemeral": true,
+    "published_leaderboard_is_current_run_only": true,
+    "persistent_formal_run_state_forbidden": true,
     "persistent_candidate_or_opportunity_pools_forbidden": true,
     "standalone_valuation_cache_forbidden": true,
-    "failed_or_stale_run_must_not_overwrite_valid_state": true,
+    "failed_or_stale_run_must_not_mutate_industry_state": true,
     "old_v2_state_is_legacy_and_not_runtime_input": true,
     "one_time_level3_migration_from_legacy_history_is_allowed": true,
     "legacy_company_valuation_buy_state_reuse_forbidden": true
   },
   "public_output": {
     "formal_publish_enabled": true,
+    "current_run_only": true,
     "sections": [
       "【执行状态】",
       "【全市场景气发现】",
