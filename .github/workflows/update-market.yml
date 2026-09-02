@@ -1,11 +1,15 @@
 name: Update A-share market data
 
 # Consolidated post-close pipeline: quote/history/bridge/price-structure refresh together.
-# Code pushes are validated by CI and never write market data.
+# Ordinary code pushes are validated by CI and never write market data.
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/market-refresh.trigger'
   schedule:
-    - cron: '10 16 * * 1-5'
+    - cron: '11 16 * * 1-5'
       timezone: 'Asia/Shanghai'
     - cron: '30 16 * * 1-5'
       timezone: 'Asia/Shanghai'
@@ -102,4 +106,4 @@ jobs:
         run: echo "Market snapshot is not a completed clean session; no repository data will be persisted."
 
 # Only completed daily sessions with clean quote-source status are persisted.
-# Intraday/manual runs may fetch for diagnostics inside the runner, but cannot mutate the repository.
+# The temporary trigger path is used only for the one-shot 2026-09-02 recovery run and will be removed afterward.
