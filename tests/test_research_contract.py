@@ -33,6 +33,8 @@ def test_prompt_discovery_is_full_market_every_run_while_level3_state_is_reused(
     l3 = m["level3_state_contract"]
     assert d["method"] == "prompt_full_market_light_recall_every_run"
     assert d["previous_focus_list_may_not_seed_or_bound_discovery"] is True
+    assert d["previous_companies_chains_valuations_or_opportunities_may_not_seed_discovery"] is True
+    assert d["company_chain_valuation_buy_results_are_ephemeral_per_run"] is True
     assert d["top_n_or_fixed_count_selection_forbidden"] is True
     assert l3["existing_valid_level3_state_must_be_reused"] is True
     assert l3["missing_level3_state_initialized_on_demand"] is True
@@ -58,7 +60,7 @@ def test_data_and_company_mapping_gates_fail_closed():
     g = m["company_mapping_gate"]
     assert d["fail_closed"] is True
     assert d["publish_on_failure"] is False
-    assert d["mutate_valid_state_on_failure"] is False
+    assert d["mutate_industry_state_on_failure"] is False
     assert g["inactive_or_untradable_company_is_runtime_skip"] is True
     assert g["inactive_or_untradable_does_not_block_completion"] is True
     assert g["all_missing_or_unmapped_codes_must_be_checked_against_admitted_level3_scope"] is True
@@ -135,7 +137,13 @@ def test_completion_persistence_and_near_miss_fail_closed():
     assert g["all_precheck_survivors_horizontally_compared"] is True
     assert g["current_opportunities_must_come_only_from_buyable_now"] is True
     assert g["publish_on_failure"] is False
+    assert g["mutate_industry_state_on_failure"] is False
     assert p["industry_state_is_only_cross_run_fundamental_memory"] is True
+    assert p["run_company_chain_valuation_buy_outputs_are_ephemeral"] is True
+    assert p["published_leaderboard_is_current_run_only"] is True
+    assert p["persistent_formal_run_state_forbidden"] is True
     assert p["legacy_company_valuation_buy_state_reuse_forbidden"] is True
+    assert "research_state_path" not in p
+    assert "research_state" not in m["authoritative_data"]
     assert n["ranking_is_display_only_not_candidate_pool"] is True
     assert n["default_display_limit"] == 10
