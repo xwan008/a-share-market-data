@@ -8,11 +8,15 @@ def test_legacy_runtime_builders_are_absent():
     assert not (ROOT / "scripts/migrate_level3_industry_state.py").exists()
 
 
-def test_production_builder_has_no_legacy_import():
-    text = (ROOT / "scripts/build_full_market_price_structure.py").read_text(encoding="utf-8")
-    assert "build_v2_full_market_price_structure" not in text
-    assert "data/research/v2" not in text
-    assert "shadow" not in text
+def test_production_builders_have_no_legacy_imports():
+    for path in (
+        ROOT / "scripts/build_full_market_price_structure.py",
+        ROOT / "scripts/build_bridge.py",
+    ):
+        text = path.read_text(encoding="utf-8")
+        assert "build_v2_full_market_price_structure" not in text
+        assert "data/research/v2" not in text
+        assert "shadow" not in text
 
 
 def test_workflows_have_no_legacy_runtime_dependencies():
