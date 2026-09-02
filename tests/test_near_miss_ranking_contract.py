@@ -9,6 +9,8 @@ def test_near_miss_ranking_is_auditable_and_never_absorbs_buy_lists():
     c = manifest["buy_point_contract"]["near_miss_ranking_contract"]
     assert c["buyable_lists_stay_separate"] is True
     assert c["left_value_list_excluded_from_near_miss"] is True
+    assert c["deep_discount_review_excluded_from_near_miss"] is True
+    assert c["eligible_only_when_price_above_buy_range_upper"] is True
     assert c["must_output_when_eligible_universe_nonempty"] is True
     assert c["review_required_excluded_from_distance_ranking"] is True
     assert c["ranking_is_display_only_not_candidate_pool"] is True
@@ -23,6 +25,7 @@ def test_near_miss_ranking_is_auditable_and_never_absorbs_buy_lists():
         "next_trigger",
     ]
     assert "reasonable_buy_range upper bound" in c["action_distance_formula"]
+    assert "above_buy_range only" in c["action_distance_formula"]
     assert manifest["public_output"]["near_miss_section_title"] == "【接近买点榜】"
 
 
@@ -33,6 +36,8 @@ def test_orchestrator_requires_dual_lists_and_value_based_near_miss():
     assert "### 9.2 左侧拐点买点榜" in text
     assert "左侧拐点买点榜 ⊂ 左侧价值买点榜" in text
     assert "## 10. 接近买点榜" in text
-    assert "尚未进入 `reasonable_buy_range`" in text
+    assert "当前价格高于 `reasonable_buy_range.upper`" in text
+    assert "`deep_discount_review`" in text
+    assert "不得进入Near-miss距离排名" in text
     assert "不形成跨期候选池" in text
     assert "Ranking V3" not in text
