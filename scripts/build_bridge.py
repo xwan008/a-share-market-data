@@ -6,13 +6,13 @@ from pathlib import Path
 from statistics import median
 
 try:
-    from .build_v2_full_market_price_structure import (
+    from .build_full_market_price_structure import (
         MIN_POINTS as PRICE_STRUCTURE_MIN_POINTS,
         TARGET_POINTS as PRICE_STRUCTURE_TARGET_POINTS,
     )
     from .history_store import ROLLING_DAYS
 except ImportError:  # direct script execution
-    from build_v2_full_market_price_structure import (
+    from build_full_market_price_structure import (
         MIN_POINTS as PRICE_STRUCTURE_MIN_POINTS,
         TARGET_POINTS as PRICE_STRUCTURE_TARGET_POINTS,
     )
