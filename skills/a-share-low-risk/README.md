@@ -30,14 +30,28 @@ Prompt景气发现**每次运行都从全市场做轻召回**，不能被上一�
 
 ## 三个价格概念必须分开
 - `reasonable_price_range`：合理价值区，大致回答“值多少钱”；
-- `safe_price_ceiling`：安全价格上限，不等于实际买入区；
-- `reasonable_buy_range`：真正用于低风险榜单的合理买入区。
+- `safe_price_ceiling`：在 `base_fair_value` 上应用一次MOS后的安全价格上限；
+- `reasonable_buy_range`：真正用于低风险榜单的正常左侧执行区。
 
-最终买点只认 `reasonable_buy_range`，不能再把“低于safe price ceiling”全部算作买点。
+正常估值路径固定为：
+
+`safe_price_ceiling = base_fair_value × (1 - MOS)`
+
+`reasonable_buy_range = [safe_price_ceiling × 0.95, safe_price_ceiling]`
+
+这里5%是窄执行带宽，不是第二次MOS。旧 `safe_price_range` 的核心计算逻辑迁移到 `reasonable_buy_range`，旧字段名正式废弃，后续正式输出不得继续生成 `safe_price_range`。
+
+当前价格相对合理买入区只有三种正式语义：
+- `above_buy_range`：高于上沿，尚未进入价值买点，可参与Near-miss排序；
+- `inside_buy_range`：位于区间内，具备左侧价值买点资格；
+- `deep_discount_review`：低于下沿，触发基本面与估值复核，不机械抄底，也不进入Near-miss。
 
 ## 两个正式榜单
 ### 左侧价值买点榜
-`current_price ∈ reasonable_buy_range`
+`valuation_position == inside_buy_range`
+
+等价于：
+`reasonable_buy_range.lower <= current_price <= reasonable_buy_range.upper`
 
 只要基本面与估值仍有效，进入合理买入区即有左侧参与资格；技术结构尚未确认不能把它淘汰，只需要明确结构风险。
 
