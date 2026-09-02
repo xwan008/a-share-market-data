@@ -46,6 +46,22 @@
     "publish_on_failure": false,
     "mutate_valid_state_on_failure": false
   },
+  "history_semantics_contract": {
+    "summary_window_days": 65,
+    "summary_structure_window_days": 60,
+    "price_structure_min_points": 120,
+    "price_structure_target_points": 180,
+    "storage_window_days": 180,
+    "authoritative_storage_source": "data/history_shards/*.json",
+    "summary_window_is_not_storage_length": true,
+    "legacy_health_schema_6_window_days_is_summary_only": true,
+    "legacy_health_schema_6_coverage_max_points_is_summary_only": true,
+    "storage_sufficiency_source_order": [
+      "health.history.storage_coverage",
+      "data/history_shards/*.json"
+    ],
+    "model_must_not_fail_data_or_completion_gate_from_65d_summary_length": true
+  },
   "discovery_contract": {
     "method": "prompt_full_market_light_recall_every_run",
     "previous_focus_list_may_not_seed_or_bound_discovery": true,
