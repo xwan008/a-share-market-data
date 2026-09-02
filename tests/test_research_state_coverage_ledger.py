@@ -1,3 +1,4 @@
+# Contract: formal research results are current-run only and are never persisted.
 import json
 from pathlib import Path
 
