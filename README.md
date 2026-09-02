@@ -1,21 +1,50 @@
 # A-share Market Data + Low-risk Research Bridge
 
-The repository keeps the A-share low-risk workflow small and auditable.
+This repository contains the production A-share market-data layer and the single active low-risk research contract.
+
+## Production baseline
+
+- `main` is the only production development line.
+- The low-risk runtime is fail-closed and reads only the repository inputs declared by `config/research_pipeline_manifest.json`, plus current public research evidence required by the Skills.
+- Git history and archived branches are audit/recovery material only and are never runtime research inputs.
 
 ## Active workflows
-1. **Update A-share market data** — weekdays 16:10/16:30 Asia/Shanghai; refreshes closed-session quotes/history/bridge and full-market price structure.
-2. **Backfill A-share rolling history** — weekly Saturday or manual; repairs bounded history and summaries.
-3. **Build SW taxonomy and company industry index** — weekly Sunday; refreshes Shenwan 2021 31/134/346 taxonomy and main-board company mapping.
-4. **CI** — validates code/config/Skill contracts without writing market data.
 
-## Low-risk rule sources
-Load `research_runtime_policy.json` → current Manifest → four authoritative Skills. The Manifest owns machine contracts; detailed research discipline lives in Skills.
+1. **Update A-share market data** — weekdays after the A-share close; refreshes quotes, fundamentals, rolling history, bridge data and full-market price structure.
+2. **Backfill A-share rolling history** — scheduled/manual bounded history repair.
+3. **Build SW taxonomy and company industry index** — scheduled refresh of Shenwan taxonomy and main-board company mapping.
+4. **CI / Research contract CI** — validates code, data and low-risk production contracts.
 
-## Two source layers
-**Persistent repository data** is limited to Manifest `authoritative_data`: SW taxonomy, company index, market snapshot/history, full-market price structure and current research state.
+## Low-risk runtime entry points
 
-**Current public research evidence** is separate and is required for the 18:00 full study: company filings/announcements, exchange disclosures, official statistics, industry/commodity/price-spread/order/production data and other credible current evidence. The repository whitelist does not block this evidence layer.
+Load in this order:
 
-Public evidence is consumed for the current run; it must not be converted into weekly pools, candidate pools, T2 registries or other cross-run research caches.
+1. `config/research_runtime_policy.json`
+2. `config/research_pipeline_manifest.json`
+3. the four authoritative Skills declared by the Manifest
 
-18:00 always starts from current full-market Coverage. Only the final structured Prompt result is persisted as `data/research/v2/research_state.json`. A state with a mismatched `manifest_schema` is stale.
+The Manifest is the repository-data whitelist. The low-risk task must not scan arbitrary repository JSON files for extra research inputs.
+
+## Authoritative low-risk repository data
+
+The active production data surface is:
+
+- `config/industry_scan_universe.json`
+- `data/research/company_industry_index.json`
+- `data/research/full_market_price_structure.json`
+- `data/research/industry_state.json`
+- `data/latest.json`
+- `data/health.json`
+- `data/history_shards/*.json`
+
+Other market-maintenance files may exist for ingestion, repair or other workflows, but they are not low-risk research inputs unless the Manifest explicitly declares them.
+
+## Persistence rule
+
+`data/research/industry_state.json` is the only cross-run fundamental research memory. Company sets, profit chains, valuations, `reasonable_buy_range`, left-value assessments, left-turn assessments, Near-miss rankings and published leaderboards are generated fresh on every run and are not persisted as a candidate pool or formal-run state.
+
+`research_state.json`, versioned/shadow research states and legacy `data/research/v2/*` outputs are forbidden as production runtime inputs.
+
+## Public evidence layer
+
+Current company filings, exchange disclosures, official statistics, commodity/industry data and other credible public evidence remain required for formal research. They are consumed for the current run and do not become persistent candidate/opportunity pools.
