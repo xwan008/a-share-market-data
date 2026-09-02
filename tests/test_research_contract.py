@@ -109,7 +109,7 @@ def test_company_filtering_funnel_is_exhaustive_without_top_n():
     assert comp["top_n_or_fixed_quota_forbidden"] is True
 
 
-def test_valuation_has_distinct_fair_safe_and_reasonable_buy_ranges():
+def test_valuation_migrates_legacy_safe_range_logic_into_fixed_reasonable_buy_range():
     m = manifest()
     v = m["valuation_contract"]
     r = v["reasonable_buy_range_contract"]
@@ -118,13 +118,24 @@ def test_valuation_has_distinct_fair_safe_and_reasonable_buy_ranges():
     assert v["single_mos_application_required"] is True
     assert v["cycle_normalization_check_required"] is True
     assert v["extreme_cycle_peak_earnings_may_not_be_mechanically_extrapolated"] is True
+    assert v["safe_price_ceiling_formula"] == "base_fair_value * (1 - margin_of_safety_pct)"
     assert r["required_for_every_complete_non_review_company"] is True
     assert r["valuation_only"] is True
     assert r["must_be_bounded_interval"] is True
-    assert r["upper_bound_must_not_exceed_safe_price_ceiling"] is True
-    assert r["safe_price_ceiling_is_not_itself_buy_range"] is True
+    assert r["normal_path_constructor"] == "lower = safe_price_ceiling * 0.95; upper = safe_price_ceiling"
+    assert r["normal_path_width_pct"] == 5.0
+    assert r["upper_bound_must_equal_safe_price_ceiling"] is True
+    assert r["legacy_safe_price_range_core_logic_migrated"] is True
+    assert r["legacy_safe_price_range_field_deprecated"] is True
+    assert r["execution_width_is_not_second_margin_of_safety"] is True
     assert r["must_not_reference_price_structure"] is True
     assert r["double_margin_of_safety_forbidden"] is True
+    assert r["price_position_states"] == [
+        "above_buy_range", "inside_buy_range", "deep_discount_review"
+    ]
+    assert r["deep_discount_requires_fundamental_and_valuation_recheck"] is True
+    assert r["deep_discount_is_not_automatic_buy"] is True
+    assert r["deep_discount_is_not_near_miss"] is True
 
 
 def test_buy_point_contract_is_two_left_side_lists_not_single_intersection():
@@ -132,8 +143,12 @@ def test_buy_point_contract_is_two_left_side_lists_not_single_intersection():
     b = m["buy_point_contract"]
     p = m["price_structure_contract"]
     assert b["value_anchor"] == "reasonable_buy_range"
-    assert b["left_value_list"]["formula"] == "current_price inside reasonable_buy_range"
+    assert b["left_value_list"]["formula"] == "valuation_position == inside_buy_range"
+    assert b["left_value_list"]["equivalent_price_formula"] == (
+        "reasonable_buy_range.lower <= current_price <= reasonable_buy_range.upper"
+    )
     assert b["left_value_list"]["price_structure_is_not_hard_gate"] is True
+    assert b["left_value_list"]["deep_discount_review_not_automatic_buy"] is True
     assert b["left_turn_list"]["formula"] == "left_value_buyable_now AND left_turn_confirmed"
     assert b["left_turn_list"]["must_be_subset_of_left_value_list"] is True
     assert b["left_turn_list"]["requires_price_still_inside_reasonable_buy_range"] is True
@@ -156,10 +171,14 @@ def test_completion_persistence_and_near_miss_fail_closed():
     assert g["all_peer_filter_survivors_have_valuation_precheck_decision"] is True
     assert g["all_precheck_survivors_horizontally_compared"] is True
     assert g["all_complete_non_review_companies_have_reasonable_buy_range"] is True
+    assert g["all_complete_non_review_companies_have_valuation_position"] is True
+    assert g["deep_discount_cases_rechecked_or_explicit_review"] is True
     assert g["all_complete_non_review_companies_have_left_value_assessment"] is True
     assert g["all_complete_non_review_companies_have_left_turn_assessment"] is True
     assert g["left_turn_list_is_verified_subset_of_left_value_list"] is True
+    assert g["near_miss_contains_only_above_buy_range"] is True
     assert g["near_miss_excludes_current_left_value_list"] is True
+    assert g["near_miss_excludes_deep_discount_review"] is True
     assert g["publish_on_failure"] is False
     assert g["mutate_industry_state_on_failure"] is False
     assert p["industry_state_is_only_cross_run_fundamental_memory"] is True
@@ -170,6 +189,8 @@ def test_completion_persistence_and_near_miss_fail_closed():
     assert "research_state_path" not in p
     assert "research_state" not in m["authoritative_data"]
     assert n["ranking_is_display_only_not_candidate_pool"] is True
+    assert n["eligible_only_when_price_above_buy_range_upper"] is True
+    assert n["deep_discount_review_excluded_from_near_miss"] is True
     assert n["default_display_limit"] == 10
 
 
