@@ -5,9 +5,23 @@ from collections import defaultdict
 from pathlib import Path
 from statistics import median
 
+try:
+    from .build_v2_full_market_price_structure import (
+        MIN_POINTS as PRICE_STRUCTURE_MIN_POINTS,
+        TARGET_POINTS as PRICE_STRUCTURE_TARGET_POINTS,
+    )
+    from .history_store import ROLLING_DAYS
+except ImportError:  # direct script execution
+    from build_v2_full_market_price_structure import (
+        MIN_POINTS as PRICE_STRUCTURE_MIN_POINTS,
+        TARGET_POINTS as PRICE_STRUCTURE_TARGET_POINTS,
+    )
+    from history_store import ROLLING_DAYS
+
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 SHARDS = DATA / "shards"
+HISTORY_SHARDS = DATA / "history_shards"
 SHARD_KEY_LENGTH = 5
 SAMPLES = ("002475", "601138", "601899")
 
@@ -120,20 +134,54 @@ def build_market_breadth(latest_stocks: dict, trend_stocks: dict) -> dict:
     }
 
 
+def build_history_storage_coverage() -> dict:
+    """Measure the persisted history store itself, not the 65-day summary view."""
+    stocks = points_ge_min = points_ge_target = 0
+    max_points = 0
+    shard_files = sorted(HISTORY_SHARDS.glob("*.json"))
+
+    for path in shard_files:
+        payload = read_json(path, {"stocks": {}})
+        for item in payload.get("stocks", {}).values():
+            rows = [
+                row
+                for row in item.get("history", [])
+                if row.get("date") and fnum(row.get("close")) not in (None, 0)
+            ]
+            points = len(rows)
+            if points <= 0:
+                continue
+            stocks += 1
+            max_points = max(max_points, points)
+            if points >= PRICE_STRUCTURE_MIN_POINTS:
+                points_ge_min += 1
+            if points >= PRICE_STRUCTURE_TARGET_POINTS:
+                points_ge_target += 1
+
+    return {
+        "stocks": stocks,
+        "points_ge_price_structure_min": points_ge_min,
+        "points_ge_price_structure_target": points_ge_target,
+        "max_persisted_points": max_points,
+        "shard_files": len(shard_files),
+    }
+
+
 def main() -> int:
     latest = read_json(DATA / "latest.json", {})
     trends = read_json(DATA / "trend_summary.json", {"stocks": {}})
     repair = read_json(DATA / "repair_status.json", {})
     latest_stocks = latest.get("stocks", {})
     trend_stocks = trends.get("stocks", {})
-    coverage = trends.get("coverage", {})
+    summary_coverage = trends.get("coverage", {})
+    storage_coverage = build_history_storage_coverage()
     SHARDS.mkdir(parents=True, exist_ok=True)
 
     for old in SHARDS.glob("*.json"):
         old.unlink()
 
     common = {
-        "schema_version": 6,
+        "schema_version": 7,
         "generated_at": latest.get("generated_at"),
         "trade_date": latest.get("trade_date"),
         "market_status": latest.get("market_status"),
@@ -174,10 +222,28 @@ def main() -> int:
         "market_breadth": build_market_breadth(latest_stocks, trend_stocks),
         "history": {
             "storage": trends.get("history_storage"),
-            "window_days": trends.get("history_window_days"),
-            "structure_window_days": trends.get("structure_window_days"),
             "history_shard_key_length": trends.get("history_shard_key_length"),
-            "coverage": coverage,
+            "summary_window_days": trends.get("history_window_days"),
+            "summary_structure_window_days": trends.get("structure_window_days"),
+            "storage_window_days": ROLLING_DAYS,
+            "price_structure_min_points": PRICE_STRUCTURE_MIN_POINTS,
+            "price_structure_target_points": PRICE_STRUCTURE_TARGET_POINTS,
+            "summary_coverage": summary_coverage,
+            "storage_coverage": storage_coverage,
+            "semantics": {
+                "summary_window_is_storage_window": False,
+                "summary_source": "data/trend_summary.json",
+                "storage_source": "data/history_shards/*.json",
+                "price_structure_source": "data/history_shards/*.json",
+                "interpretation": (
+                    "The 65-session value is only the lightweight trend-summary view. "
+                    "It must never be interpreted as persisted history length. "
+                    "Formal price structure reads history_shards directly, requires at least "
+                    f"{PRICE_STRUCTURE_MIN_POINTS} sessions, and targets "
+                    f"{PRICE_STRUCTURE_TARGET_POINTS} sessions from the "
+                    f"{ROLLING_DAYS}-session rolling store."
+                ),
+            },
             "corporate_action_repair": repair,
         },
         "sample_quotes": {
@@ -194,9 +260,13 @@ def main() -> int:
     )
     print(
         f"wrote {len(groups)} {SHARD_KEY_LENGTH}-digit quote shards; "
-        f"history >=5d: {coverage.get('points_ge_5', 0)}, "
-        f">=20d: {coverage.get('points_ge_20', 0)}, "
-        f">=60d: {coverage.get('points_ge_60', 0)}, "
+        f"summary >=5d: {summary_coverage.get('points_ge_5', 0)}, "
+        f">=20d: {summary_coverage.get('points_ge_20', 0)}, "
+        f">=60d: {summary_coverage.get('points_ge_60', 0)}, "
+        f"storage >={PRICE_STRUCTURE_MIN_POINTS}d: "
+        f"{storage_coverage.get('points_ge_price_structure_min', 0)}, "
+        f">={PRICE_STRUCTURE_TARGET_POINTS}d: "
+        f"{storage_coverage.get('points_ge_price_structure_target', 0)}, "
         f"fundamentals: {(latest.get('fundamental_stats') or {}).get('financial_usable', 0)}, "
         f"repairs: {repair.get('repaired', 0)}"
     )
