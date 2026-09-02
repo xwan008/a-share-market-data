@@ -9,6 +9,11 @@
 
 本 Skill 只服从 `config/research_runtime_policy.json` 和 `config/research_pipeline_manifest.json` 的正式生产契约，不使用数字 schema、shadow、V2/V3 等版本标签作为运行条件。
 
+### 当前轮隔离原则（强制）
+除 `data/research/industry_state.json` 的三级行业盈利基线外，上一轮公司、盈利链、估值、价格结构判断、当前买点、Near-miss、榜单结果都不是下一轮输入。
+
+禁止读取、恢复、续跑或发布任何上一轮正式研究结果。`research_state.json` 不存在，也不得重新创建。每次执行必须重新生成本轮公司集合、估值集合、买点评估和最终榜单。
+
 ## 1. DATA GATE
 正式研究开始前确定最近一个已经完成的A股交易日，读取 `data/health.json` 并验证：
 - `health.trade_date` 等于预期交易日；
@@ -28,7 +33,7 @@
 
 兼容旧版 health 时必须遵守：若 `health.schema_version <= 6`，其中 `history.window_days=65` 与 `history.coverage.max_points=65` **都只表示摘要视图长度**，绝不能据此判断底层历史只有65日，也不能据此让 Data Gate / Completion Gate 失败。历史是否满足120/180日要求，必须读取 `history_shards`，或使用新版 health 中明确的 `storage_coverage`。
 
-任一真正的 Data Gate 失败：输出 `data_stale_or_incomplete`，不得发布新的正式买点，也不得覆盖上一份有效 `industry_state.json` 或 `research_state.json`。
+任一真正的 Data Gate 失败：输出 `data_stale_or_incomplete`，不得发布新的正式买点，也不得修改 `industry_state.json`。
 
 ## 2. Prompt全市场轻召回
 每次运行都基于当前公开证据，从全市场重新做轻量开放式召回。不能把上一期景气方向、公司、估值、Near-miss 或关注名单当成搜索边界。
@@ -145,15 +150,16 @@
 - 所有非review公司完成价格结构、买点评估和Near-miss距离；
 - 【当前买点】只来自 `buyable_now`。
 
-任一失败：`status=incomplete_research`，不发布新的正式买点，也不得覆盖上一份有效正式状态。
+任一失败：`status=incomplete_research`，不发布本轮正式买点，也不得修改 `industry_state.json`。不存在“回退并发布上一轮榜单”的路径。
 
 ## 11. 持久化边界
 只允许：
-- `data/research/industry_state.json`：三级行业跨期盈利状态；
-- `data/research/research_state.json`：最近一次通过全部Gate的正式研究结果；
-- `data/research/full_market_price_structure.json`：全市场机械价格结构。
+- `data/research/industry_state.json`：三级行业跨期盈利状态，是唯一跨轮研究记忆；
+- `data/research/full_market_price_structure.json`：全市场机械价格结构，不属于研究结果状态。
 
-禁止独立候选池、机会池、去冗余名单、周榜缓存、Near-miss池和单独估值缓存。公司层所有中间集合均只在当轮运行时存在。
+本轮公司集合、盈利链关系、去冗余结果、valuation_set、估值、价格结构判断、买点评估、Near-miss 和最终榜单均为**当轮临时结果**，发布完成即结束，不写入跨轮研究状态文件。
+
+明确禁止：`data/research/research_state.json`、独立候选池、机会池、去冗余名单、周榜缓存、Near-miss池和单独估值缓存。
 
 ## 12. 正式输出
 固定输出：
