@@ -7,13 +7,14 @@
 `Data Gate → 每次全市场Prompt轻召回 → taxonomy映射 → 三级行业周度全量/日度增量 → 公司准入 → 盈利链 → Company Mapping Gate → 公司全集轻筛 → survivor比较/去重 → 估值 → 独立价格结构 → 买点交集 → Near-miss → Completion Gate → 正式发布`
 
 ## 状态边界
-跨期只允许保留两类正式研究状态：
-- `data/research/industry_state.json`：紧凑的三级行业盈利基线，是唯一跨期基本面记忆；
-- `data/research/research_state.json`：最近一次通过全部Gate的完整正式研究结果。
+跨期只允许保留一类基本面研究状态：
+- `data/research/industry_state.json`：紧凑的三级行业盈利基线，是唯一跨期基本面记忆。
 
-机械价格结构独立保存为 `data/research/full_market_price_structure.json`。
+机械价格结构独立保存为 `data/research/full_market_price_structure.json`，它属于市场机械数据，不属于上一轮研究结果。
 
-上一期公司、估值、当前买点和Near-miss不得成为下一轮景气发现种子。禁止周度机会池、候选池、T2池、独立公司池和估值缓存。
+**不持久化上一轮正式榜单。** 公司、盈利链关系、估值、当前买点、Near-miss 和最终榜单均只存在于本轮执行上下文；下一轮必须重新生成，禁止读取任何上一轮研究结果来恢复、续跑、缩小搜索范围或直接发布。
+
+禁止周度机会池、候选池、T2池、独立公司池、估值缓存和 `research_state.json`。
 
 ## 发现与刷新不是一回事
 Prompt景气发现**每次运行都从全市场做轻召回**，不能被上一期方向限制。
