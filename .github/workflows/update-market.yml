@@ -13,8 +13,6 @@ on:
       - 'scripts/build_history.py'
       - 'scripts/build_bridge.py'
       - 'scripts/build_full_market_price_structure.py'
-      - 'scripts/build_v2_full_market_price_structure.py'
-      - 'scripts/migrate_level3_industry_state.py'
       - 'requirements.txt'
   schedule:
     - cron: '10 16 * * 1-5'
@@ -50,8 +48,6 @@ jobs:
         run: |
           pip install -r requirements.txt
           pip install pytest
-      - name: Restore retained Level-3 profitability state when needed
-        run: python scripts/migrate_level3_industry_state.py
       - name: Run tests
         run: python -m pytest -q
       - name: Fetch and validate closed-session quotes
