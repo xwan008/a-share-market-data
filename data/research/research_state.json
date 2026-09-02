@@ -1,9 +1,59 @@
 {
   "contract_id": "a-share-low-risk-production",
   "mode": "production",
-  "status": "no_valid_formal_run_yet",
-  "generated_at": null,
-  "trade_date": null,
-  "publishable": false,
-  "note": "This file is replaced only by a run that passes Data Gate and Completion Gate. Failed or stale runs must leave the last valid formal state unchanged."
+  "status": "completed",
+  "generated_at": "2026-09-02T02:44:46Z",
+  "trade_date": "2026-09-01",
+  "publishable": true,
+  "scope": {
+    "current_run_recalled_level3": [
+      {"chain_id": "S240401", "name": "黄金"},
+      {"chain_id": "S270202", "name": "印制电路板"}
+    ],
+    "admitted_level3": ["S240401", "S270202"]
+  },
+  "diagnostics": {
+    "current_run_recalled_level3_count": 2,
+    "admitted_in_current_run_count": 2,
+    "company_chain_relations": 33,
+    "unique_company_count": 33,
+    "gate1_excluded_count": 0,
+    "gate2_excluded_count": 10,
+    "gate3_dominated_by_peer_excluded_count": 2,
+    "gate4_pass_count": 17,
+    "gate4_excluded_count": 0,
+    "gate4_research_uncertain_count": 4,
+    "valuation_set_count": 17,
+    "value_eligible_count": 2,
+    "buyable_now_count": 1
+  },
+  "formal_picks": [
+    {
+      "stock_code": "000975",
+      "name": "山金国际",
+      "source_chain_ids": ["S240401"],
+      "current_price": 26.4,
+      "pe_ttm": 19.3004,
+      "pe_dynamic": 15.1436,
+      "pb": 4.6,
+      "roe": 15.45,
+      "core_earnings_signal": "improving",
+      "fair_pe_range": [20.0, 24.0],
+      "base_fair_value": 38.36,
+      "margin_of_safety": 0.2,
+      "safe_price_ceiling": 30.69,
+      "value_eligible": true,
+      "structure_type": "pullback",
+      "structure_action": "participate",
+      "chase_risk": "low",
+      "ma20": 26.7875,
+      "ma60": 22.4935,
+      "support_invalidation": 24.67,
+      "buy_price_range": [24.7, 26.8],
+      "timing_eligible": true,
+      "buyable_now": true,
+      "invalidation": "close/structure breaks below 24.67 or company core earnings/gold-profit transmission materially reverses"
+    }
+  ],
+  "note": "Formal picks require Gate4 pass, value eligibility, and independent price-structure eligibility. research_uncertain companies are excluded from the formal valuation set for the current run but do not invalidate the run. Near-miss items are intentionally not persisted."
 }
