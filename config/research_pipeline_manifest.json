@@ -342,12 +342,25 @@
       "required_for_every_complete_non_review_company": true,
       "valuation_only": true,
       "must_be_bounded_interval": true,
-      "upper_bound_must_not_exceed_safe_price_ceiling": true,
-      "safe_price_ceiling_is_not_itself_buy_range": true,
+      "normal_path_constructor": "lower = safe_price_ceiling * 0.95; upper = safe_price_ceiling",
+      "normal_path_width_pct": 5.0,
+      "upper_bound_must_equal_safe_price_ceiling": true,
+      "legacy_safe_price_range_core_logic_migrated": true,
+      "legacy_safe_price_range_field_deprecated": true,
+      "execution_width_is_not_second_margin_of_safety": true,
       "must_consider_conservative_forward_core_earnings": true,
       "must_consider_cycle_normalization": true,
       "must_not_reference_price_structure": true,
-      "double_margin_of_safety_forbidden": true
+      "double_margin_of_safety_forbidden": true,
+      "price_position_states": [
+        "above_buy_range",
+        "inside_buy_range",
+        "deep_discount_review"
+      ],
+      "deep_discount_review_formula": "current_price < reasonable_buy_range.lower",
+      "deep_discount_requires_fundamental_and_valuation_recheck": true,
+      "deep_discount_is_not_automatic_buy": true,
+      "deep_discount_is_not_near_miss": true
     }
   },
   "price_structure_contract": {
@@ -372,9 +385,11 @@
   "buy_point_contract": {
     "value_anchor": "reasonable_buy_range",
     "left_value_list": {
-      "formula": "current_price inside reasonable_buy_range",
+      "formula": "valuation_position == inside_buy_range",
+      "equivalent_price_formula": "reasonable_buy_range.lower <= current_price <= reasonable_buy_range.upper",
       "price_structure_is_not_hard_gate": true,
-      "technical_damage_may_be_shown_as_risk_but_not_auto_exclusion": true
+      "technical_damage_may_be_shown_as_risk_but_not_auto_exclusion": true,
+      "deep_discount_review_not_automatic_buy": true
     },
     "left_turn_list": {
       "formula": "left_value_buyable_now AND left_turn_confirmed",
@@ -388,6 +403,8 @@
     "near_miss_ranking_contract": {
       "buyable_lists_stay_separate": true,
       "left_value_list_excluded_from_near_miss": true,
+      "deep_discount_review_excluded_from_near_miss": true,
+      "eligible_only_when_price_above_buy_range_upper": true,
       "must_output_when_eligible_universe_nonempty": true,
       "review_required_excluded_from_distance_ranking": true,
       "ranking_is_display_only_not_candidate_pool": true,
@@ -401,7 +418,7 @@
         "current_missing",
         "next_trigger"
       ],
-      "action_distance_formula": "value_gap_pct to reasonable_buy_range upper bound",
+      "action_distance_formula": "value_gap_pct to reasonable_buy_range upper bound for above_buy_range only",
       "distance_bands": {
         "near": "<=5%",
         "watch": ">5% and <=15%",
@@ -434,12 +451,16 @@
     "valuation_set_dedup_complete": true,
     "all_valuation_set_companies_fully_valued_or_explicit_review": true,
     "all_complete_non_review_companies_have_reasonable_buy_range": true,
+    "all_complete_non_review_companies_have_valuation_position": true,
+    "deep_discount_cases_rechecked_or_explicit_review": true,
     "all_complete_non_review_companies_have_price_structure": true,
     "all_complete_non_review_companies_have_left_value_assessment": true,
     "all_complete_non_review_companies_have_left_turn_assessment": true,
     "left_turn_list_is_verified_subset_of_left_value_list": true,
     "near_miss_ranking_complete_when_eligible_universe_nonempty": true,
+    "near_miss_contains_only_above_buy_range": true,
     "near_miss_excludes_current_left_value_list": true,
+    "near_miss_excludes_deep_discount_review": true,
     "on_failure": "incomplete_research",
     "publish_on_failure": false,
     "mutate_industry_state_on_failure": false
