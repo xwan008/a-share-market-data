@@ -5,7 +5,6 @@
   "research_read_mode": "manifest_repo_data_plus_current_public_evidence",
   "manifest_path": "config/research_pipeline_manifest.json",
   "industry_state_path": "data/research/industry_state.json",
-  "active_state_path": "data/research/research_state.json",
   "read_order": [
     "config/research_runtime_policy.json",
     "config/research_pipeline_manifest.json",
@@ -15,6 +14,7 @@
     "allow_only_manifest_authoritative_data": true,
     "do_not_scan_repository_for_extra_research_json": true,
     "legacy_v2_research_files_are_not_runtime_input": true,
+    "research_state_file_forbidden": true,
     "git_history_is_audit_only_not_runtime_input": true
   },
   "public_evidence_policy": {
@@ -32,7 +32,7 @@
     "latest_history_and_price_structure_must_match_expected_trade_date": true,
     "fail_closed": true,
     "failure_may_not_publish_new_formal_result": true,
-    "failure_may_not_overwrite_previous_valid_state": true
+    "failure_may_not_mutate_cross_run_industry_state": true
   },
   "history_semantics_policy": {
     "summary_window_days": 65,
@@ -54,6 +54,7 @@
     "daily_run_may_not_limit_prompt_discovery_to_previous_directions": true,
     "previous_industry_state_may_accelerate_level3_refresh_but_may_not_bound_discovery": true,
     "previous_companies_chains_valuations_or_opportunities_may_not_seed_discovery": true,
+    "company_chain_valuation_buy_results_are_ephemeral_per_run": true,
     "cross_run_candidate_or_opportunity_pools_forbidden": true,
     "research_admission_top_n_forbidden": true,
     "research_admission_per_level1_chain_cap_forbidden": true,
@@ -125,15 +126,16 @@
   },
   "write_policy": {
     "industry_state_output": "data/research/industry_state.json",
-    "current_research_output": "data/research/research_state.json",
     "full_market_price_structure_output": "data/research/full_market_price_structure.json",
     "industry_state_is_only_cross_run_fundamental_memory": true,
-    "current_research_state_is_latest_valid_formal_run_only": true,
+    "research_run_outputs_are_not_persisted": true,
+    "published_leaderboard_is_current_run_only": true,
+    "persistent_formal_run_state_forbidden": true,
     "persistent_intermediate_research_outputs_forbidden": true,
     "persistent_candidate_or_opportunity_pools_forbidden": true,
     "standalone_valuation_cache_forbidden": true,
-    "write_only_after_data_gate_and_completion_gate_pass": true,
-    "failed_or_stale_run_must_not_mutate_previous_valid_state": true
+    "industry_state_write_only_after_data_gate_and_completion_gate_pass": true,
+    "failed_or_stale_run_must_not_mutate_industry_state": true
   },
   "production_policy": {
     "formal_publish_enabled": true,
