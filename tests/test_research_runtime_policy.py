@@ -28,6 +28,21 @@ def test_runtime_data_gate_fails_closed():
     assert p["failure_may_not_overwrite_previous_valid_state"] is True
 
 
+def test_history_window_semantics_are_explicit_and_storage_authoritative():
+    h = load("config/research_runtime_policy.json")["history_semantics_policy"]
+    assert h["summary_window_days"] == 65
+    assert h["summary_structure_window_days"] == 60
+    assert h["price_structure_min_points"] == 120
+    assert h["price_structure_target_points"] == 180
+    assert h["storage_window_days"] == 180
+    assert h["authoritative_storage_source"] == "data/history_shards/*.json"
+    assert h["summary_window_is_not_storage_length"] is True
+    assert h["legacy_health_schema_6_window_days_is_summary_only"] is True
+    assert h["legacy_health_schema_6_coverage_max_points_is_summary_only"] is True
+    assert h["model_must_not_infer_storage_insufficiency_from_summary_points"] is True
+    assert h["storage_sufficiency_must_be_judged_from_history_shards_or_explicit_storage_coverage"] is True
+
+
 def test_every_run_has_full_market_prompt_recall_and_reuses_level3_state():
     p = load("config/research_runtime_policy.json")
     d = p["discovery_policy"]
