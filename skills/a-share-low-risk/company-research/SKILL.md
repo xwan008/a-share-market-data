@@ -3,7 +3,7 @@
 ## 目的
 把本期所有**通过公司准入 Gate 的盈利链**映射到真正受益的主板公司，并用“先便宜淘汰、后昂贵估值”的漏斗压缩工作量：
 
-`Company Mapping Gate → 全链公司召回 → stock_code去重 → 批量财务硬筛 → Driver/盈利质量 Gate → 同类公司去冗余 → 快速估值 Precheck → 剩余公司横向比较 → valuation_set → 完整估值`
+`Company Mapping Gate → 全链公司召回 → stock_code去重 → 批量财务硬筛 → Driver/盈利质量 Gate → 同类公司横向择优 → 快速估值 Precheck → valuation_set → 完整估值`
 
 核心原则：
 - 不得靠 Top-N、每行业配额、龙头名单或代表股截断研究；
@@ -62,15 +62,41 @@
 
 `stable + divergent` 链必须额外证明公司级 Driver/核心盈利真实改善或显著优于同链公司；不能只凭行业 breadth 继续。
 
-## 5. 同类公司去冗余
-只在**同一盈利 Driver + 高度相似业务模式/盈利机制**的公司之间判断。
+## 5. Gate3｜同类公司横向择优
+Gate3 只做一件事：在通过前述公司级盈利确认的公司中，找出真正同类的公司，并保留当前综合风险收益比最优的代表继续研究。
 
-只有当某公司不存在明确独立优势，并在业务纯度、Driver敏感度、核心盈利兑现、现金流/盈利质量、成本/毛利优势、持续性、资本效率、估值优势等多个重要维度被直接可比公司整体压制时，才允许 `dominated_by_peer`。
+先判断是否真正同类：
+- 按主营业务和核心盈利驱动分组；
+- 不以申万三级名称机械代替真实可比关系；
+- 盈利来源、产业链位置或商业模式明显不同的公司，不得强行放在同一组比较。
 
-只要存在明显权衡，例如“一家盈利更强但更贵、另一家盈利稍弱但明显更便宜”，两家都必须保留。禁止每行业固定留1/2/3家或只留龙头。
+同类公司统一比较以下5个维度：
+1. `earnings_realization`：核心/扣非盈利兑现强度与持续性；
+2. `profitability_quality`：ROE、利润率、现金流、资产负债与盈利稳定性；
+3. `valuation_attractiveness`：当前价格下的估值吸引力；
+4. `business_purity`：主营对本轮盈利逻辑的暴露纯度；
+5. `independent_advantage`：成本、资源、产能、技术、产品、客户、渠道、结构性成长等可验证竞争优势。
+
+原则上每个真正同类的可比组只保留当前综合风险收益比最优的1家公司继续进入后续研究。
+
+- 不设置全市场固定通过数量；
+- 不设置每个申万三级固定名额；
+- 通过数量由本轮实际形成的真实可比组数量自然决定；
+- 如果两家公司盈利机制明显不同，应拆成不同组后分别比较；
+- 不得在已经认定同组后，再以“各有优势”为理由同时放行；
+- `independent_advantage` 用于解释竞争力和判断是否应拆组，不是自动放行条件。
+
+对强周期/资源类公司进行同组比较时，必须在上述5维中实际考虑成本曲线、资源/产能质量、未来产量增长、商品价格敏感度与周期下行风险，但不新增独立 Gate。
+
+Gate3终态：
+- `pass:best_in_group`
+- `exclude:inferior_to_group_winner:<reason>`
+- `research_uncertain:<reason>`
+
+所有 Gate3 排除都必须说明相对于同组赢家的主要差距；公司本身优秀不等于必须保留。
 
 ## 6. 快速估值 Precheck
-对剩余公司先读取：
+对 Gate3 通过公司先读取：
 - 当前/TTM PE；
 - 动态PE；
 - PB、ROE；
@@ -82,20 +108,14 @@
 
 禁止跨行业统一绝对PE上限。存在明显权衡或无法确定时必须继续完整估值。Precheck不能直接生成合理价或买点。
 
-## 7. 剩余公司横向比较
-所有通过前述过滤的公司都进入横向比较，不设Top-N或固定配额。
-
-比较至少包括：
-`业务纯度 / Driver敏感度 / 盈利兑现 / 扣非质量 / 现金流 / 毛利率与成本优势 / 订单或产能可见度 / 持续性 / 资本强度 / 重大口径风险 / 相对估值 / 可估值性`。
-
-## 8. valuation_set
-过滤完成后：
+## 7. valuation_set
+Gate3 与快速估值 Precheck 完成后：
 - 按股票代码去重进入 `valuation_set`；
 - 保留全部 `source_chain_ids`；
 - 同一股票只执行一次完整估值、一次价格结构判断和一次买点评估；
 - 所有进入 `valuation_set` 的公司必须逐只完整估值，不得因数量多而跳过。
 
-## 9. 守恒诊断
+## 8. 守恒诊断
 每轮必须机械回答：
 - admitted chain count；
 - company_chain_relations 数；
@@ -104,14 +124,21 @@
 - unresolved in-scope mappings；
 - 财务硬筛通过/排除数；
 - Driver/盈利质量 Gate 通过/排除数；
-- `dominated_by_peer` 排除数；
+- Gate3真实可比组数；
+- Gate3 `pass:best_in_group` 数；
+- Gate3 `exclude:inferior_to_group_winner` 数；
+- Gate3 `research_uncertain` 数；
 - `obviously_expensive` 排除数；
-- 深度横向比较数；
 - 去重后 valuation_set 数。
+
+必须满足 Gate3 守恒：
+`Gate3输入公司数 = Gate3 pass数 + Gate3 exclude数 + Gate3 research_uncertain数`。
+
+若一个已确认的真正同类组出现多家公司同时 `pass:best_in_group`，说明 Gate3 未完成有效择优，Completion Gate失败。
 
 只要存在未完成召回的 admitted chain、未完成过滤决策的有效公司或 unresolved in-scope mapping，Completion Gate失败。
 
-## 10. 持久化
-公司研究的所有运行结果均为**当前轮临时状态**：公司集合、盈利链关系、硬筛结果、去冗余结果、valuation_set、估值、左侧价值买点、左侧拐点买点和Near-miss都不跨轮持久化。
+## 9. 持久化
+公司研究的所有运行结果均为**当前轮临时状态**：公司集合、盈利链关系、硬筛结果、Gate3比较结果、valuation_set、估值、左侧价值买点、左侧拐点买点和Near-miss都不跨轮持久化。
 
 `research_state.json` 被禁止，不得创建、恢复或读取。跨轮基本面研究记忆只有 `data/research/industry_state.json`。
