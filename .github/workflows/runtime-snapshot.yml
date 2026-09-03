@@ -1,0 +1,65 @@
+name: Publish ChatGPT runtime snapshot
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: a-share-runtime-snapshot
+  cancel-in-progress: true
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Build locked-commit manifest
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import subprocess
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          sha = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
+          payload = {
+              'schema_version': 1,
+              'repo': 'xwan008/a-share-market-data',
+              'commit_sha': sha,
+              'generated_at': datetime.now(timezone.utc).isoformat(),
+              'snapshot_kind': 'chatgpt_runtime_locked_commit',
+          }
+          Path('runtime_snapshot_manifest.json').write_text(
+              json.dumps(payload, ensure_ascii=False, indent=2),
+              encoding='utf-8',
+          )
+          print(json.dumps(payload, ensure_ascii=False))
+          PY
+
+      - name: Upload locked-commit runtime snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: a-share-runtime-snapshot
+          path: |
+            runtime_snapshot_manifest.json
+            config/industry_scan_universe.json
+            data/health.json
+            data/research/industry_state.json
+            data/research/full_market_price_structure.json
+            data/shards/*.json
+            data/history_shards/*.json
+            skills/a-share-low-risk/company-research/SKILL.md
+            skills/a-share-low-risk/valuation/SKILL.md
+            skills/a-share-low-risk/price-structure/SKILL.md
+          if-no-files-found: error
+          retention-days: 3
