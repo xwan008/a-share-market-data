@@ -40,7 +40,7 @@ jobs:
       - name: Run tests
         run: python -m pytest -q
       - name: Fetch market snapshot
-        run: python scripts/fetch_market.py
+        run: python scripts/fetch_market_resilient.py
       - name: Check completed-session persistence gate
         id: session
         shell: bash
@@ -53,14 +53,57 @@ jobs:
           latest = json.loads(Path('data/latest.json').read_text(encoding='utf-8'))
           trade_date = str(latest.get('trade_date') or '')
           status = str(latest.get('market_status') or '')
-          source_errors = ((latest.get('source_status') or {}).get('errors') or [])
-          persist = bool(trade_date and status == 'closed' and not source_errors)
+          stocks = latest.get('stocks') or {}
+          total = len(stocks)
+
+          source_status = latest.get('source_status') or {}
+          source_errors = source_status.get('errors') or []
+          source_ok = [name for name in ('sina', 'tencent') if source_status.get(name) == 'ok']
+
+          validation = latest.get('validation_stats') or {}
+          high = int(validation.get('high') or 0)
+          medium = int(validation.get('medium') or 0)
+          invalid = int(validation.get('invalid') or 0)
+          usable = high + medium
+          quote_coverage = (usable / total) if total else 0.0
+          invalid_ratio = (invalid / total) if total else 1.0
+          quote_gate = bool(total >= 3000 and quote_coverage >= 0.99 and invalid_ratio <= 0.01)
+
+          fundamental = latest.get('fundamental_stats') or {}
+          fundamental_errors = fundamental.get('errors') or []
+          valuation_usable = int(fundamental.get('valuation_usable') or 0)
+          financial_usable = int(fundamental.get('financial_usable') or 0)
+          valuation_coverage = (valuation_usable / total) if total else 0.0
+          financial_coverage = (financial_usable / total) if total else 0.0
+          fundamental_gate = bool(
+              valuation_coverage >= 0.95
+              and financial_coverage >= 0.95
+              and not fundamental_errors
+          )
+
+          source_gate = bool(source_ok)
+          quality_mode = 'dual_source' if len(source_ok) >= 2 else 'single_source_degraded'
+          persist = bool(
+              trade_date
+              and status == 'closed'
+              and source_gate
+              and quote_gate
+              and fundamental_gate
+          )
+
           with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as fh:
               fh.write(f"persist={'true' if persist else 'false'}\n")
           print(json.dumps({
               'trade_date': trade_date,
               'market_status': status,
+              'quality_mode': quality_mode,
+              'source_ok': source_ok,
               'source_errors': source_errors,
+              'quote_coverage': round(quote_coverage, 6),
+              'invalid_ratio': round(invalid_ratio, 6),
+              'valuation_coverage': round(valuation_coverage, 6),
+              'financial_coverage': round(financial_coverage, 6),
+              'fundamental_errors': fundamental_errors,
               'persist': persist,
           }, ensure_ascii=False))
           PY
@@ -102,7 +145,8 @@ jobs:
           fi
       - name: Report skipped persistence
         if: steps.session.outputs.persist != 'true'
-        run: echo "Market snapshot is not a completed clean session; no repository data will be persisted."
+        run: echo "Market snapshot did not pass the completed-session quality gate; no repository data will be persisted."
 
-# Only completed daily sessions with clean quote-source status are persisted.
-# Intraday/manual runs may fetch for diagnostics inside the runner, but cannot mutate the repository.
+# Completed daily sessions may persist in dual-source mode or verified single-source degraded mode.
+# Single-source fallback still requires >=99% usable quote coverage, <=1% invalid quotes,
+# and >=95% valuation/financial coverage with no fundamental-source errors.
