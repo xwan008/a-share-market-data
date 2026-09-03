@@ -29,15 +29,16 @@ def test_near_miss_ranking_is_auditable_and_never_absorbs_buy_lists():
     assert manifest["public_output"]["near_miss_section_title"] == "【接近买点榜】"
 
 
-def test_orchestrator_requires_dual_lists_and_value_based_near_miss():
+def test_orchestrator_requires_dual_lists_and_reasonable_buy_based_near_miss():
     text = (ROOT / "skills/a-share-low-risk/orchestrator/SKILL.md").read_text(encoding="utf-8")
-    assert "## 9. 两个正式买点榜" in text
-    assert "### 9.1 左侧价值买点榜" in text
-    assert "### 9.2 左侧拐点买点榜" in text
+    assert "## 8. 两个正式买点榜" in text
+    assert "### 8.1 左侧价值买点榜" in text
+    assert "### 8.2 左侧拐点买点榜" in text
     assert "左侧拐点买点榜 ⊂ 左侧价值买点榜" in text
-    assert "## 10. 接近买点榜" in text
-    assert "当前价格高于 `reasonable_buy_range.upper`" in text
-    assert "`deep_discount_review`" in text
-    assert "不得进入Near-miss距离排名" in text
-    assert "不形成跨期候选池" in text
+    assert "## 9. Near-miss" in text
+    assert "current_price > reasonable_buy_range.upper" in text
+    assert "low_risk_buy_range.upper" in text
+    assert "禁止用 `low_risk_buy_range.upper` 或 `safe_price_ceiling` 排Near-miss" in text
+    assert "deep_discount_review" in text
+    assert "仅展示，不持久化" in text
     assert "Ranking V3" not in text
