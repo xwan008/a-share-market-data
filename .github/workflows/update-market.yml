@@ -4,10 +4,6 @@ name: Update A-share market data
 # Code pushes are validated by CI and never write market data.
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - '.github/market-refresh.trigger'
   schedule:
     # Beijing/Shanghai 16:10 = UTC 08:10. China does not observe DST.
     - cron: '10 8 * * 1-5'
