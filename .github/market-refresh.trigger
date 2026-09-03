@@ -1,2 +1,0 @@
-manual_post_close_refresh=2026-09-03
-reason=scheduler_missed_16_10_16_30
