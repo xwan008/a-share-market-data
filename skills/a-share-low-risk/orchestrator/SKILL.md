@@ -3,207 +3,173 @@
 ## 目标
 执行唯一正式主链：
 
-`DATA GATE → Prompt全市场轻召回 → taxonomy映射 → 三级行业盈利状态读取/刷新 → 公司准入Gate → 盈利链解析 → Company Mapping Gate → 全链公司召回 → stock_code去重 → 财务硬筛 → Driver/盈利质量 Gate → 同类公司去冗余 → 快速估值 Precheck → 横向比较 → 完整估值 → reasonable_buy_range → 独立价格结构 → 左侧价值买点榜 → 左侧拐点买点榜 → 接近买点榜 → Completion Gate → 正式发布`
+`DATA GATE → 全市场/全行业召回 → taxonomy映射 → 三级行业盈利状态 → 公司全集扫描 → Gate1 → Gate2 → Gate3同类择优 → Gate4 → 完整估值 → reasonable_buy_range + low_risk_buy_range → 独立价格结构 → 左侧价值买点榜 → 左侧拐点买点榜 → Near-miss → Completion Gate → 正式发布`
 
-核心原则：**发现阶段广而轻，验证阶段窄而深；三级行业状态跨期复用；公司层先便宜淘汰、后昂贵估值；价值决定 WHERE，结构只决定是否出现左侧 TURN；任何硬门失败都 fail closed。**
+核心原则：**发现阶段广而轻，验证阶段窄而深；公司层先便宜淘汰、后昂贵研究；合理价值、合理买入、低风险执行三层价值语义必须分开；价值决定 WHERE，结构只决定 TURN；任何硬门失败都 fail closed。**
 
-本 Skill 只服从 `config/research_runtime_policy.json` 和 `config/research_pipeline_manifest.json` 的正式生产契约。
+本 Skill 服从 `config/research_runtime_policy.json`、`config/research_pipeline_manifest.json` 与 `valuation/SKILL.md`、`price-structure/SKILL.md`。若旧契约仍把 `reasonable_buy_range` 定义成 MOS 后5%窄带，以新版估值 Skill 的“双买入区”语义为准，旧窄带语义迁移到 `low_risk_buy_range`。
 
 ### 当前轮隔离原则（强制）
 除 `data/research/industry_state.json` 的三级行业盈利基线外，上一轮公司、盈利链、估值、价格结构判断、买点、Near-miss、榜单结果都不是下一轮输入。
 
-`research_state.json` 不存在，也不得重新创建。每次执行必须重新生成本轮公司集合、估值集合、合理买入区、两类买点和最终榜单。
+`research_state.json` 不存在，也不得重新创建。每次执行必须重新生成本轮公司集合、估值集合、合理买入区、低风险买入区、两类买点和最终榜单。
 
 ## 1. DATA GATE
 正式研究开始前确定最近一个已经完成的A股交易日，读取 `data/health.json` 并验证：
 - `health.trade_date` 等于预期交易日；
 - `market_status=closed`；
 - 数据源 errors 为空；
-- 行情覆盖没有实质退化；
+- 行情/财务/估值覆盖没有实质退化；
 - 历史数据覆盖该交易日；
 - `full_market_price_structure.json` 的参考交易日与之相同。
 
-### 历史窗口语义（强制）
-- **65日**：轻量摘要窗口；
-- **120日**：正式价格结构最低门槛；
-- **180日**：底层滚动历史存储窗口，也是正式结构与估值sanity目标窗口。
-
-权威底层历史来源始终是 `data/history_shards/*.json`。禁止把65日摘要误判成底层只有65日历史。
+历史窗口：65日仅为轻量摘要；120日为正式价格结构最低门槛；180日为底层滚动历史和正式结构/估值sanity目标窗口。权威底层历史来源始终是 `data/history_shards/*.json`。
 
 真正Data Gate失败：输出 `data_stale_or_incomplete`，不得发布新的正式买点，也不得修改 `industry_state.json`。
 
-## 2. Prompt全市场轻召回
-每次运行都基于当前公开证据，从全市场重新做轻量开放式召回。不能把上一期景气方向、公司、估值、Near-miss或关注名单当搜索边界。
+## 2. 全市场/全行业召回
+每次运行都从当前全市场重新开始，不能把上一期景气方向、公司、估值、Near-miss或关注名单当搜索边界。
 
-必须覆盖：资源能源、化工材料、制造设备、科技、消费、医药、金融地产、公用事业/交通运输、农业；禁止Top-N截断。
+必须覆盖完整申万2021一级行业。逐行业检查领先变量/第一锚、最新盈利兑现、反向证据，并给出 `improving / neutral / deteriorating / uncertain`。资源能源必须看商品价格/价差/供需/库存；制造、科技、消费、医药等使用订单、出货、价格、库存、利用率、资本开支、招投标和需求等适配变量。
 
-优先证据：行业收入利润/利润率、产品价格与价差、库存、开工率/产能利用率、订单/出货/销量/产量、进出口/供需、代表性公司经营数据及真正改变供需或成本的政策。板块涨幅和ETF强弱只能辅助。
+只有 `improving` 一级行业继续下钻到真正贡献盈利改善的细分产业链并映射申万三级。三级准入仅允许：
+- `trend=improving`；
+- 或 `trend=stable AND breadth=divergent`。
 
-## 3. taxonomy映射与三级盈利状态
-景气方向映射到申万2021 taxonomy；映射到一级/二级后继续展开到所有与本轮盈利逻辑相关的三级行业。
+## 3. Shard全集与公司准入
+锁定本轮 `repo_commit_sha`。规则文件、运行时快照和shard正文不得混用不同SHA。
 
-三级状态规则：
-1. 已有有效状态直接复用；只有新证据、失效信号或实质变化才做日度深度刷新；
-2. 从未有状态的节点只初始化该节点；
-3. 过期/无效只重验该节点；
-4. 周五18:00对本轮发现方向映射出的相关三级行业全量重验，失败则下一个可用工作日18:00补做。
+枚举并完整读取该SHA下全部 `data/shards/*.json`。目录元数据不能替代正文。如果连接器正文被截断，必须回退到同SHA完整本地归档或同SHA GitHub Actions `a-share-runtime-snapshot`，并验证manifest SHA一致后逐文件完整JSON解析。
 
-不存在首次全库Bootstrap或单节点缺失触发全库重建。
+记录：`repo_commit_sha / scan_source / shard_file_count / actual_shard_content_read_count / company_universe_count`。Completion Gate前必须满足：
+`actual_shard_content_read_count == shard_file_count`。
 
-## 4. 公司准入 Gate 与盈利链
-三级行业进入公司层仅有：
-- `trend=improving` → `chain_type=improving`；
-- `trend=stable AND breadth=divergent` → `chain_type=stable_divergent`。
+公司行业映射唯一运行时来源为shard自带 `industry_mapping_status / sw_level3_code / sw_level3_name`：
+- missing → `industry_unmapped`；
+- mapped但非准入三级 → `industry_not_eligible`；
+- 命中准入三级 → `mapped+eligible` 并进入Gate1。
 
-`deteriorating`、`unconfirmed`、普通stable不进入公司机会研究。
+禁止Top-N、只挑龙头或因公司数量大而跳过。
 
-每条盈利链必须明确：
-`chain_type / admission_basis / source_level3_codes / profit_driver / leading_variables / profit_transmission / beneficiary_scope / falsifiers`。
+## 4. 公司层 Gate
+### Gate1｜估值风险过滤
+只排除多个维度共同显示明显透支、估值风险极高且增长/ROE/质量无法解释的公司。参考当前/TTM PE、动态PE、PB、ROE、核心盈利增速、同类相对估值和必要历史位置。Gate1不产生正式合理价。
 
-## 5. Company Mapping Gate
-读取 `data/research/company_industry_index.json`。
+### Gate2｜核心盈利兑现
+确认核心/扣非利润方向、主营对产业链真实暴露、收入/利润率/现金流/订单/销量/价格等经营支持，以及一次性事项/非经常损益/业务变化。明显不受益、核心盈利恶化或利润失真可排除；证据冲突时最小必要补查。
 
-- inactive/untradable：`skip/inactive`；
-- 非本轮盈利链的missing/unmapped只记录；
-- 可能属于本轮范围的缺失映射必须补查；
-- 补查后仍 unresolved in-scope → `incomplete_research`。
+### Gate3｜同类横向择优
+在Gate2 survivors中按“核心盈利驱动”形成足够宽且可统一排序的可比组，原则上每组只留1家进入Gate4。
 
-## 6. 公司层过滤漏斗
-### 6.1 全链召回 + stock_code 去重
-每条 admitted profit chain 完整召回全部当前有效主板公司，不得先选龙头或Top-N。
+统一比较：`earnings_realization / profitability_quality / valuation_attractiveness / business_purity / independent_advantage`。
 
-保留全部 `company_chain_relations / source_chain_ids`，公司级财务、估值和历史输入按stock_code只获取一次。
+强周期/资源组必须深比较成本曲线/单位成本/AISC、当前与未来1–3年可验证产量、资源储量/品位/产能质量/项目进度、商品价格敏感度/伴生品/周期下行风险、现金流/负债/估值。必要数据不足则最小公开资料补查；仍无法可靠排序则 `research_uncertain:<reason>`。
 
-### 6.2 批量财务硬筛
-排除：扣非/核心盈利不改善、盈利质量失真、一次性收益主导且核心盈利不改善、重大业务变化、关键数据补查后仍不可得等。
+Gate3终态：
+- `pass:best_in_group`
+- `exclude:inferior_to_group_winner:<reason>`
+- `research_uncertain:<reason>`
 
-### 6.3 Driver / 盈利质量 Gate
-必须同时满足：
-- 公司级Driver明确；
-- 扣非/核心盈利改善；
-- 现金流/盈利质量合格；
-- 持续性足够。
+每组至少记录 `group_basis / winner / winner_reason / key_tradeoff / excluded_count`。
 
-### 6.4 同类公司去冗余
-只允许在“同一Driver + 高度相似业务/盈利机制”内排除被直接可比公司多维度整体压制、且没有独立优势的公司。
+### Gate4｜公司级确认
+仅对Gate3通过公司确认主营贡献、公司Driver、订单/价格/销量/利用率/利润率/现金流、盈利质量、未来1–2季度持续性及重大反向证据。终态：`pass / exclude:<reason> / research_uncertain`。
 
-存在明显权衡必须同时保留；禁止每行业固定留1/2/3家或只留龙头。
+## 5. 完整估值与四层价格体系
+仅对Gate4=pass执行。先识别：
+- `normal_equity`；
+- `strong_cycle_or_commodity`。
 
-### 6.5 快速估值 Precheck
-读取当前/TTM PE、动态PE、PB、ROE、核心盈利增速、三级同行PE/PB中枢。
+正常公司固定顺序：
+`核心盈利 → Forward核心EPS → 当前/TTM PE + 动态PE → 三级同行 → 增长/质量调整 → PB/ROE交叉验证 → 周期/口径检查 → 180日sanity → fair PE区间 → reasonable_price_range → base_fair_value → reasonable_buy_range → 一次MOS → safe_price_ceiling → low_risk_buy_range`
 
-只有相对估值明显极端且增长/ROE/质量/持续性不能解释时，才 `exclude:obviously_expensive`。禁止跨行业统一PE上限。
+四层语义必须严格分开：
+1. `reasonable_price_range`：合理价值区，大致值多少钱；
+2. `reasonable_buy_range`：正常合理买入区，什么价格已经值得左侧参与；
+3. `safe_price_ceiling`：base_fair_value应用一次MOS后的高安全边际上限；
+4. `low_risk_buy_range`：围绕safe_price_ceiling的低风险/高安全边际窄执行带。
 
-### 6.6 横向比较
-所有survivor都比较，不设Top-N或固定配额。
+正常路径固定公式：
+`reasonable_buy_range.lower = reasonable_price_range.lower`
+`reasonable_buy_range.upper = base_fair_value`
+`safe_price_ceiling = base_fair_value × (1 - margin_of_safety_pct)`
+`low_risk_buy_range.upper = safe_price_ceiling`
+`low_risk_buy_range.lower = safe_price_ceiling × 0.95`
 
-## 7. valuation_set 与完整估值
-按 `stock_code` 去重进入 `valuation_set`；所有公司必须完整估值或明确review。
+`reasonable_buy_range` 不使用MOS；5%仅是 `low_risk_buy_range` 的执行带宽；MOS只应用一次。旧 `safe_price_range` 字段继续废弃，其窄带语义迁移到 `low_risk_buy_range`。
 
-正常盈利公司固定走：
+强周期公司必须先获取并评估最直接商品价格/价差、供需、库存和周期位置，形成 `normalized_core_eps`，区分结构性盈利和周期性盈利。高景气利润不得机械外推；周期景气不得通过EPS和PE重复计价。缺少周期第一锚 → `valuation_incomplete:missing_cycle_anchor`。
 
-`核心盈利 → Forward核心EPS → 当前/TTM PE + 动态PE → 三级同行PE → 核心盈利增速调整 → PB/ROE交叉验证 → 周期/口径检查 → 180日市场sanity → fair PE区间 → reasonable_price_range → base_fair_value → 一次MOS → safe_price_ceiling → reasonable_buy_range`
+## 6. 当前价格位置与折价复核
+每家公司同时输出：
+- `valuation_position = above_reasonable_buy_range / inside_reasonable_buy_range / below_reasonable_buy_range`
+- `low_risk_position = above_low_risk_buy_range / inside_low_risk_buy_range / below_low_risk_buy_range`
 
-必须区分：
-- `reasonable_price_range`：合理价值区；
-- `safe_price_ceiling`：安全价上限；
-- `reasonable_buy_range`：本榜单真正使用的低风险正常执行区。
+若 `current_price < reasonable_buy_range.lower`，执行 `discount_sanity_check`：重新检查盈利链、产业领先变量、核心盈利、周期位置、重大事项和估值假设。
 
-正常路径固定迁移旧 `safe_price_range` 的核心计算逻辑：
-- `safe_price_ceiling = base_fair_value × (1 - MOS)`；
-- `reasonable_buy_range.upper = safe_price_ceiling`；
-- `reasonable_buy_range.lower = safe_price_ceiling × 0.95`。
+若复核仍有效且 `current_price >= low_risk_buy_range.lower`，不得因为价格更低而机械取消价值资格，标记 `deeper_discount`；若当前位于low-risk带，再标记 `low_risk=true`。
 
-5%只表示执行带宽，不是第二次MOS。旧字段 `safe_price_range` 正式废弃，新一轮不得继续输出或作为买点字段使用。
+只有 `current_price < low_risk_buy_range.lower` 才进入 `deep_discount_review`，完成复核与重新估值前不得进入正式价值榜或Near-miss。
 
-`reasonable_buy_range`必须由估值独立产生、有上下界，且不能参考技术结构。强周期公司必须先做盈利正常化，再进入同一构造；必要时触发Exception Path。
+## 7. 独立价格结构
+结构只负责 timing/拐点，不得修改 `reasonable_price_range / reasonable_buy_range / low_risk_buy_range`。
 
-每家公司同时输出 `valuation_position`：
-- `above_buy_range`：价格高于上沿；
-- `inside_buy_range`：价格位于区间内；
-- `deep_discount_review`：价格低于下沿，必须重新验证盈利链、产业领先变量、核心盈利、周期位置、重大事项和估值假设，完成复核前不得机械抄底。
-
-## 8. 独立价格结构
-对每家完整非review估值公司读取：
+对完整非review估值公司读取：
 `structure_type / structure_entry_range / structure_invalidation / key_level / relative_strength / volume_confirmation / chase_risk / timing_action / left_turn_confirmed / left_turn_basis`。
 
-价格结构不能修改 `reasonable_buy_range`，也不是左侧价值榜的硬门。
+## 8. 两个正式买点榜
+### 8.1 左侧价值买点榜
+`left_value_buyable_now = current_price <= reasonable_buy_range.upper AND valuation_review_valid AND NOT deep_discount_review`
 
-## 9. 两个正式买点榜
-### 9.1 左侧价值买点榜
-正常核心条件：
+- `inside_reasonable_buy_range`：正常价值机会；
+- `below_reasonable_buy_range` 且 `discount_sanity_check` 通过：以 `deeper_discount` 进入；
+- `inside_low_risk_buy_range`：在价值资格之上增加 `low_risk=true`；
+- 技术结构未确认不得否决价值资格，但必须展示结构风险。
 
-`left_value_buyable_now = valuation_position == inside_buy_range`
-
-即 `reasonable_buy_range.lower <= current_price <= reasonable_buy_range.upper`。
-
-只要基本面、估值仍有效且当前价格进入合理买入区，即可进入**左侧价值买点榜**。当前仍在下跌、transition甚至技术damaged，不得仅因技术结构未确认而把它从左侧价值榜淘汰；必须清楚展示结构风险和失效条件。
-
-若 `current_price < reasonable_buy_range.lower`，必须标记 `deep_discount_review`。这不是Near-miss，也不是自动买点；完成基本面与估值复核并重新估值后，再按新的 `valuation_position` 判断。
-
-### 9.2 左侧拐点买点榜
-核心条件：
-
+### 8.2 左侧拐点买点榜
 `left_turn_buyable_now = left_value_buyable_now AND left_turn_confirmed`
 
-因此必须满足：
+因此 `左侧拐点买点榜 ⊂ 左侧价值买点榜`。结构只负责把已经具备价值资格的公司进一步筛出开始转折的子集。
 
-`左侧拐点买点榜 ⊂ 左侧价值买点榜`
+## 9. Near-miss
+Near-miss仅收：
+`current_price > reasonable_buy_range.upper`
 
-左侧拐点要求价格仍在合理买入区内，并出现从左侧下跌/筑底向上转折的确认，例如：停止连续创新低、HL、关键支撑承接、重新站回关键位/均线、小级别突破配合量价确认等。
+默认Top10，仅展示，不持久化。`value_gap_pct` 必须以 `reasonable_buy_range.upper` 为唯一价值距离锚。禁止用 `low_risk_buy_range.upper` 或 `safe_price_ceiling` 排Near-miss。
 
-单纯既有右侧 `trend_continuation` 不等于左侧拐点；已经离开合理买入区的强势股也不能进入拐点榜。
+已经 `left_value_buyable_now=true` 或 `deep_discount_review` 的公司不得进入Near-miss。
 
-`damaged / overheated / unavailable` 不能判为 `left_turn_confirmed=true`，但其中的技术damaged不自动取消左侧价值榜资格。
-
-### 9.3 禁止单一 buyable_now 语义
-不再使用“价值 × 结构交集才是唯一买点”的旧逻辑，也不再发布单一 `buyable_now` 榜。
-
-正式买点只能来自：
-- `left_value_buyable_now`；
-- `left_turn_buyable_now`。
-
-## 10. 接近买点榜
-Near-miss只收**当前价格高于 `reasonable_buy_range.upper`**、但距离合理买入区已经较近的非review公司。
-
-默认Top10，仅用于展示，不形成跨期候选池。
-
-距离核心锚改为合理买入区：
-- 当前价高于买入区上沿：计算到上沿的 `value_gap_pct`；
-- 已进入合理买入区：必须进入左侧价值榜，不再作为Near-miss；
-- 当前价低于下沿：标记 `deep_discount_review`，不得进入Near-miss距离排名；
-- 技术结构不是Near-miss的硬距离门槛，可作为“下一触发点”辅助展示。
-
-## 11. COMPLETION GATE
+## 10. COMPLETION GATE
 正式发布前必须确认：
 - Data Gate通过；
-- Prompt全市场召回完整且无Top-N截断；
-- taxonomy映射与所需三级状态刷新完成；
-- 所有 admitted chains 完成Driver/利润传导解析；
-- Company Mapping Gate通过；
-- 所有 admitted chains 完整召回公司；
-- stock_code去重且保留全部链关系；
-- 所有唯一公司完成财务硬筛；
-- survivor完成Driver/盈利质量、去冗余、Precheck、横向比较；
-- valuation_set逐只完成估值或明确review；
-- 所有非review公司产生固定口径的 `reasonable_buy_range` 和 `valuation_position`；
-- `deep_discount_review` 公司已完成本轮异常折价复核或明确保持review状态；
-- 所有非review公司完成价格结构和 `left_turn_confirmed` 判断；
-- 所有非review公司完成左侧价值买点评估；
+- 一级行业完整扫描且所有improving方向完成三级下钻；
+- 所有准入三级正确应用industry_state；
+- 所有shards完整读取且计数相等；
+- 每只公司都有行业处理终态；
+- 所有mapped+eligible进入Gate1；
+- Gate1 survivors有Gate2终态；
+- Gate2 survivors全部完成Gate3宽分组、统一比较和横向择优；
+- Gate3每个真正可比组原则上仅1家pass，其余明确exclude或uncertain；
+- Gate3 pass全部进入Gate4并有终态；
+- 所有Gate4=pass完成正确估值路由，并分别产生 `reasonable_price_range / base_fair_value / reasonable_buy_range / safe_price_ceiling / low_risk_buy_range / valuation_position / low_risk_position`；
+- 必要的 `discount_sanity_check / deep_discount_review` 已处理；
+- 所有非review公司完成价格结构和左侧价值判断；
 - 左侧拐点榜逐只验证为左侧价值榜子集；
-- Near-miss只来自 `above_buy_range` 公司，不得包含 `inside_buy_range` 或 `deep_discount_review`。
+- Near-miss只来自 `above_reasonable_buy_range`，且距离锚是 `reasonable_buy_range.upper`。
 
-任一失败：`status=incomplete_research`，不发布本轮正式买点，也不得修改 `industry_state.json`。不存在回退发布上一轮榜单的路径。
+任一硬门失败：`status=incomplete_research`，不发布本轮正式买点，也不得用上一轮榜单回退。
 
-## 12. 持久化边界
+## 11. 持久化边界
 只允许：
 - `data/research/industry_state.json`：唯一跨轮基本面研究记忆；
 - `data/research/full_market_price_structure.json`：全市场机械价格结构。
 
-本轮公司集合、盈利链、去冗余结果、valuation_set、估值、reasonable_buy_range、两类买点、Near-miss和最终榜单全部为当轮临时结果。
+本轮公司集合、Gate结果、估值、`reasonable_buy_range`、`low_risk_buy_range`、两类买点、Near-miss和最终榜单均为当轮临时结果。
 
 明确禁止：`data/research/research_state.json`、独立候选池、机会池、周榜缓存、Near-miss池和单独估值缓存。
 
-## 13. 正式输出
+## 12. 正式输出
 固定输出：
-`【执行状态】 / 【全市场景气发现】 / 【三级行业盈利状态】 / 【产业链与公司轻筛】 / 【估值与合理买入区】 / 【价格结构与拐点】 / 【左侧价值买点榜】 / 【左侧拐点买点榜】 / 【接近买点榜】 / 【诊断与失效条件】`。
+`【执行状态】 / 【全市场景气发现】 / 【三级行业盈利状态】 / 【产业链与公司漏斗】 / 【Gate3同类比较】 / 【估值四层价格】 / 【价格结构与拐点】 / 【左侧价值买点榜】 / 【左侧拐点买点榜】 / 【接近买点榜】 / 【诊断与失效条件】`。
+
+每只正式估值公司至少展示：`current_price / reasonable_price_range / base_fair_value / reasonable_buy_range / low_risk_buy_range / valuation_position / low_risk_position / discount_sanity_check / left_value_buyable_now`。
