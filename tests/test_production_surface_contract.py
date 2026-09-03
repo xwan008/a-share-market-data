@@ -40,7 +40,7 @@ def test_market_data_workflow_publishes_locked_runtime_snapshot_in_same_run():
     assert "actions/upload-artifact@v4" in text
     assert "name: a-share-runtime-snapshot" in text
     assert "runtime_snapshot_manifest.json" in text
-    assert "git rev-parse', 'HEAD" in text
+    assert "['git', 'rev-parse', 'HEAD']" in text
 
 
 def test_research_directory_has_only_authoritative_runtime_files_and_readme():
