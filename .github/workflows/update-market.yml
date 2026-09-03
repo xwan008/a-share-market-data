@@ -143,6 +143,48 @@ jobs:
           else
             echo "No market-data changes to commit."
           fi
+      - name: Build locked-commit runtime manifest
+        if: steps.session.outputs.persist == 'true'
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import subprocess
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          sha = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
+          payload = {
+              'schema_version': 1,
+              'repo': 'xwan008/a-share-market-data',
+              'commit_sha': sha,
+              'generated_at': datetime.now(timezone.utc).isoformat(),
+              'snapshot_kind': 'chatgpt_runtime_locked_commit',
+          }
+          Path('runtime_snapshot_manifest.json').write_text(
+              json.dumps(payload, ensure_ascii=False, indent=2),
+              encoding='utf-8',
+          )
+          print(json.dumps(payload, ensure_ascii=False))
+          PY
+      - name: Upload locked-commit runtime snapshot
+        if: steps.session.outputs.persist == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: a-share-runtime-snapshot
+          path: |
+            runtime_snapshot_manifest.json
+            config/industry_scan_universe.json
+            data/health.json
+            data/research/industry_state.json
+            data/research/full_market_price_structure.json
+            data/shards/*.json
+            data/history_shards/*.json
+            skills/a-share-low-risk/company-research/SKILL.md
+            skills/a-share-low-risk/valuation/SKILL.md
+            skills/a-share-low-risk/price-structure/SKILL.md
+          if-no-files-found: error
+          retention-days: 3
       - name: Report skipped persistence
         if: steps.session.outputs.persist != 'true'
         run: echo "Market snapshot did not pass the completed-session quality gate; no repository data will be persisted."
@@ -150,3 +192,5 @@ jobs:
 # Completed daily sessions may persist in dual-source mode or verified single-source degraded mode.
 # Single-source fallback still requires >=99% usable quote coverage, <=1% invalid quotes,
 # and >=95% valuation/financial coverage with no fundamental-source errors.
+# Runtime snapshot publication is part of this same run because pushes created with GITHUB_TOKEN
+# do not recursively trigger a second push-based Actions workflow.
