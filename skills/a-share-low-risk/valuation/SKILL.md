@@ -1,7 +1,7 @@
 # 估值 Skill — 交易筛选估值
 
 ## 目的
-本任务不是给企业做投行级绝对估值，而是回答四件事：**核心盈利是否可持续、企业大致值多少钱、当前价格是否具备安全边际、真正适合低风险左侧参与的合理买入区在哪里。**
+本任务不是给企业做投行级绝对估值，而是回答五件事：**核心盈利是否可持续、企业大致值多少钱、什么价格已经具备合理风险收益比、什么价格具备更高安全边际、真正适合低风险左侧参与的执行位置在哪里。**
 
 核心原则：**默认简单，异常升级；估值决定 WHERE，不决定 WHEN。价格结构不得反向修改估值。**
 
@@ -9,7 +9,7 @@
 适用于扣非/核心盈利为正、主营口径可比、没有重大重组/一次性污染、PE仍有经济意义的绝大多数公司。
 
 固定顺序：
-`核心盈利 → Forward核心EPS → 当前/TTM PE + 动态PE → 同三级行业PE横比 → 核心盈利增速调整 → PB/ROE交叉验证 → 周期/口径检查 → 180日市场sanity → fair PE区间 → reasonable_price_range → base_fair_value → 一次MOS → safe_price_ceiling → reasonable_buy_range`
+`核心盈利 → Forward核心EPS → 当前/TTM PE + 动态PE → 同三级行业PE横比 → 核心盈利增速调整 → PB/ROE交叉验证 → 周期/口径检查 → 180日市场sanity → fair PE区间 → reasonable_price_range → base_fair_value → reasonable_buy_range → 一次MOS → safe_price_ceiling → low_risk_buy_range`
 
 ### 1.1 Forward核心EPS
 优先使用扣非/核心盈利。半年报只有在季节性较稳定时才可合理年化；否则结合季度边际、公司指引、订单/销量等构造Forward区间。股本发生重大变化时必须用当前/Forward稀释股本重算EPS，禁止跨重大股本变化直接缩放历史EPS。
@@ -41,46 +41,72 @@
 
 其作用只检查模型是否明显脱离现实，不能反向用市场价格“拟合”内在价值。若基本面发生结构性变化，历史价格只能参考。
 
-### 1.6 合理价值、安全价与合理买入区
-三者必须严格区分：
+## 1.6 四个价格概念必须严格分开
 
-1. `reasonable_price_range`：由Forward核心EPS × fair PE区间得到的**合理价值区间**，回答“大致值多少钱”；
-2. `safe_price_ceiling`：在 `base_fair_value` 上只应用一次MOS得到的**安全价格上限**，回答“最高到什么价格仍有足够安全边际”；
-3. `reasonable_buy_range`：本榜单真正使用的**低风险合理买入执行区间**，回答“在当前估值假设成立时，哪里是正常左侧执行带”。
+1. `reasonable_price_range`：由Forward核心EPS × fair PE区间得到的**合理价值区间**，回答“大致值多少钱”。
+2. `reasonable_buy_range`：在合理价值区内划出的**正常合理买入区**，回答“什么价格已经具有值得左侧参与的风险收益比”。它不是最保守的安全边际窄带。
+3. `safe_price_ceiling`：在 `base_fair_value` 上只应用一次MOS得到的**高安全边际价格上限**。
+4. `low_risk_buy_range`：围绕 `safe_price_ceiling` 构造的**低风险/高安全边际窄执行区**，回答“哪里属于更严格的低风险执行带”。
 
-`safe_price_ceiling` **不是** `reasonable_buy_range`，不得把“低于安全价上限”全部视为正常买点。
+`reasonable_buy_range` 与 `low_risk_buy_range` 不得混用。进入合理买入区即可获得左侧价值资格；进入低风险买入区只是进一步提高安全边际等级，而不是左侧价值榜的唯一门槛。
 
-#### 1.6.1 reasonable_buy_range 固定构造
-正式迁移旧 `safe_price_range` 的核心计算语义，并废弃旧字段名。正常路径固定为：
+### 1.6.1 reasonable_buy_range 固定构造
+正常路径固定为：
+
+`reasonable_buy_range.lower = reasonable_price_range.lower`
+
+`reasonable_buy_range.upper = base_fair_value`
+
+要求：
+- `base_fair_value` 正常路径必须位于 `reasonable_price_range` 内；
+- `reasonable_buy_range` 表示合理价值区的偏低半区，不应用MOS；
+- 不能参考技术结构；
+- 强周期公司必须先完成周期正常化，再形成 `reasonable_price_range / base_fair_value / reasonable_buy_range`；
+- Exception Path如需不同构造，必须记录 `exception_trigger / exception_method / buy_range_construction_basis`。
+
+这样做的目的，是把“值得买”与“极高安全边际才买”分开，避免把合理买入资格错误收缩为最保守的窄带。
+
+### 1.6.2 low_risk_buy_range 固定构造
 
 `safe_price_ceiling = base_fair_value × (1 - margin_of_safety_pct)`
 
-`reasonable_buy_range.upper = safe_price_ceiling`
+`low_risk_buy_range.upper = safe_price_ceiling`
 
-`reasonable_buy_range.lower = safe_price_ceiling × 0.95`
+`low_risk_buy_range.lower = safe_price_ceiling × 0.95`
 
-价格按A股最小报价单位统一四舍五入。这里的5%是**执行带宽**，不是第二次安全边际；MOS只在 `base_fair_value → safe_price_ceiling` 时应用一次，禁止把下沿再解释为第二次MOS。
-
-因此 `reasonable_buy_range` 必须：
-- 完全由估值层产生，不参考技术结构；
-- 是有上下界的区间，而不是单一最高价；
-- 上沿等于且不得高于 `safe_price_ceiling`；
-- 正常路径宽度固定为安全价上限向下5%的窄执行带，避免模型临场任意扩宽或缩窄；
-- 强周期公司必须先完成周期正常化/中周期盈利处理，再进入同一公式；
-- Exception Path如因估值方法本身不同需要偏离该固定构造，必须记录 `exception_trigger / exception_method / buy_range_construction_basis`；
-- 不得再次对已经应用MOS的结果重复打折。
-
-旧字段 `safe_price_range` 自本规则起废弃。历史结果只能作为迁移/审计证据，正式新输出不得继续生成或引用 `safe_price_range` 作为买点字段。
+价格按A股最小报价单位统一四舍五入。这里的5%是**低风险执行带宽**，不是第二次安全边际；MOS只在 `base_fair_value → safe_price_ceiling` 时应用一次。
 
 MOS参考：高置信10%–15%，中等15%–20%，低置信20%–25%。不得用“低EPS + 低PE + 再对合理价下沿打折”制造重复保守。
 
-#### 1.6.2 当前价格相对买入区的语义
-必须给出 `valuation_position`：
-- `above_buy_range`：`current_price > reasonable_buy_range.upper`，尚未进入价值买点，可按Near-miss规则计算到上沿的距离；
-- `inside_buy_range`：`reasonable_buy_range.lower <= current_price <= reasonable_buy_range.upper`，具备正常左侧价值买点资格；
-- `deep_discount_review`：`current_price < reasonable_buy_range.lower`，不是“更便宜所以自动更安全”，必须重新检查盈利链、产业领先变量、公司核心盈利、周期位置、重大事项和估值假设。
+旧 `safe_price_range` 字段继续废弃；其历史窄带语义迁移到 `low_risk_buy_range`，不得再迁移到 `reasonable_buy_range`。
 
-`deep_discount_review` 是价格相对估值异常的复核状态，不允许机械抄底，也不允许因为“低于下沿”直接得出基本面恶化。完成复核与重新估值前不得进入正式左侧价值买点榜或Near-miss距离排名；复核后按新的完整估值结果重新判定。
+### 1.6.3 当前价格位置语义
+必须同时输出 `valuation_position` 与 `low_risk_position`。
+
+`valuation_position` 只描述相对**合理买入区**：
+- `above_reasonable_buy_range`：`current_price > reasonable_buy_range.upper`，尚未进入正常合理买入资格，可进入Near-miss距离排名；
+- `inside_reasonable_buy_range`：`reasonable_buy_range.lower <= current_price <= reasonable_buy_range.upper`，具备正常左侧价值资格；
+- `below_reasonable_buy_range`：`current_price < reasonable_buy_range.lower`，价格更便宜，但不能仅因为跌破下沿就自动判定更安全，必须结合 `low_risk_position` 与折价复核处理。
+
+`low_risk_position` 描述相对**低风险窄带**：
+- `above_low_risk_buy_range`；
+- `inside_low_risk_buy_range`：进入高安全边际低风险执行带；
+- `below_low_risk_buy_range`。
+
+当 `current_price < reasonable_buy_range.lower` 时执行 `discount_sanity_check`：复核盈利链、产业领先变量、公司核心盈利、周期位置、重大事项和估值假设。只要复核仍有效且 `current_price >= low_risk_buy_range.lower`，不得仅因为“价格低于合理买入区下沿”取消左侧价值资格，应标记 `deeper_discount`；若同时位于 `low_risk_buy_range`，再标记 `low_risk`。
+
+只有 `current_price < low_risk_buy_range.lower` 才进入 `deep_discount_review`。该状态不是“越低越安全”，完成复核与重新估值前不得进入正式左侧价值榜或Near-miss。
+
+### 1.6.4 买点资格语义
+
+`left_value_buyable_now = current_price <= reasonable_buy_range.upper AND valuation_review_valid AND NOT deep_discount_review`
+
+其中：
+- `inside_reasonable_buy_range`：正常左侧价值机会；
+- `deeper_discount`：低于合理买入区下沿但折价复核通过，仍可作为左侧价值机会；
+- `inside_low_risk_buy_range`：在左侧价值资格之上增加 `low_risk=true` / 高安全边际标签；
+- `above_reasonable_buy_range`：不进入左侧价值榜，只能按Near-miss规则排序；
+- `deep_discount_review`：复核完成前不进入正式榜。
 
 ## 2. Exception Path
 只有Manifest明确的异常触发存在时才升级复杂模型，例如：
@@ -96,7 +122,7 @@ MOS参考：高置信10%–15%，中等15%–20%，低置信20%–25%。不得�
 可使用 PB-ROE、Residual Income、EV/EBITDA、NAV/DCF、FCF/DCF 或 case-specific。必须记录 `exception_trigger`，没有触发不得升级复杂模型。
 
 ## 3. 极端偏离审计
-若模型合理价、合理买入区与当前价出现严重偏离，先复核：
+若模型合理价、合理买入区、低风险买入区与当前价出现严重偏离，先复核：
 1. Forward核心EPS是否错误外推高增长；
 2. 股本/重组/一次性收益；
 3. 三级同行PE/PB；
@@ -108,18 +134,20 @@ MOS参考：高置信10%–15%，中等15%–20%，低置信20%–25%。不得�
 
 ## 4. 必须输出
 正常公司至少输出：
-`current_price / price_date / current_pe / dynamic_pe / pb / roe / core_profit_growth / peer_pe_median / peer_pb_median / fair_pe_low / fair_pe_mid / fair_pe_high / pe_basis / pb_cross_check / peer_valuation_check / cycle_normalization_check / market_180d_sanity_check / reasonable_price_range / base_fair_value / margin_of_safety_pct / safe_price_ceiling / reasonable_buy_range / valuation_position / falsifiers / valuation_path=normal_relative`。
+`current_price / price_date / current_pe / dynamic_pe / pb / roe / core_profit_growth / peer_pe_median / peer_pb_median / fair_pe_low / fair_pe_mid / fair_pe_high / pe_basis / pb_cross_check / peer_valuation_check / cycle_normalization_check / market_180d_sanity_check / reasonable_price_range / base_fair_value / reasonable_buy_range / margin_of_safety_pct / safe_price_ceiling / low_risk_buy_range / valuation_position / low_risk_position / discount_sanity_check / left_value_buyable_now / falsifiers / valuation_path=normal_relative`。
 
 异常公司额外输出：
-`valuation_path=exception / exception_trigger / exception_method / exception_evidence / buy_range_construction_basis / reasonable_buy_range`。
+`valuation_path=exception / exception_trigger / exception_method / exception_evidence / buy_range_construction_basis / reasonable_buy_range / low_risk_buy_range`。
 
 ## 5. Completion纪律
 - valuation_set逐只执行；
 - 正常公司必须完成PE主锚、PB/ROE交叉验证、周期/口径检查、三级同行比较和180日sanity；
 - 异常公司必须有明确异常触发；
+- `reasonable_buy_range` 与 `low_risk_buy_range` 必须分别产生并分别解释；
 - Safe Price Ceiling只应用一次MOS；
-- 每个非review公司必须产生可解释的 `reasonable_buy_range`；
-- 正常路径必须按固定5%执行带构造 `reasonable_buy_range`，不得临场猜区间；
-- 当前价格处于 `inside_buy_range` 才具备正常左侧价值买点资格；
-- 当前价格低于下沿必须标记 `deep_discount_review` 并完成基本面/估值复核后重新判定；
-- 价格结构只用于进一步判断是否进入“左侧拐点买点榜”，不得否决已经成立的左侧价值买点资格。
+- 正常路径 `reasonable_buy_range = [reasonable_price_range.lower, base_fair_value]`；
+- 正常路径 `low_risk_buy_range = [safe_price_ceiling×0.95, safe_price_ceiling]`；
+- 当前价格高于 `reasonable_buy_range.upper` 才属于Near-miss候选；
+- 当前价格低于 `reasonable_buy_range.lower` 不得自动失去价值资格，先执行 `discount_sanity_check`；
+- 当前价格低于 `low_risk_buy_range.lower` 才进入 `deep_discount_review`；
+- 价格结构只用于进一步判断是否进入“左侧拐点买点榜”，不得否决已经成立的左侧价值买点资格，也不得修改任何估值区间。
