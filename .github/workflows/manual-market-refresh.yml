@@ -1,0 +1,105 @@
+name: One-shot A-share market refresh
+
+# Temporary recovery workflow for a missed scheduled post-close refresh.
+# Remove after the 2026-09-03 closed session is persisted successfully.
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/manual-market-refresh.trigger'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: a-share-market-data-write
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Sync latest main
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest
+      - name: Run tests
+        run: python -m pytest -q
+      - name: Fetch market snapshot
+        run: python scripts/fetch_market.py
+      - name: Check completed-session persistence gate
+        id: session
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          latest = json.loads(Path('data/latest.json').read_text(encoding='utf-8'))
+          trade_date = str(latest.get('trade_date') or '')
+          status = str(latest.get('market_status') or '')
+          source_errors = ((latest.get('source_status') or {}).get('errors') or [])
+          persist = bool(trade_date and status == 'closed' and not source_errors)
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as fh:
+              fh.write(f"persist={'true' if persist else 'false'}\n")
+          print(json.dumps({
+              'trade_date': trade_date,
+              'market_status': status,
+              'source_errors': source_errors,
+              'persist': persist,
+          }, ensure_ascii=False))
+          PY
+      - name: Detect and repair corporate-action qfq drift
+        if: steps.session.outputs.persist == 'true'
+        run: python scripts/repair_corporate_actions.py
+      - name: Append closed session to bounded rolling history
+        if: steps.session.outputs.persist == 'true'
+        run: python scripts/history_store.py
+      - name: Build market history summaries
+        if: steps.session.outputs.persist == 'true'
+        run: python scripts/build_history.py
+      - name: Build compact ChatGPT bridge files
+        if: steps.session.outputs.persist == 'true'
+        run: python scripts/build_bridge.py
+      - name: Embed SW level3 industry into quote shards
+        if: steps.session.outputs.persist == 'true'
+        run: python scripts/enrich_shards_with_industry.py
+      - name: Build full-market low-risk price structure
+        if: steps.session.outputs.persist == 'true'
+        run: python scripts/build_full_market_price_structure.py
+      - name: Commit updated data
+        if: steps.session.outputs.persist == 'true'
+        shell: bash
+        run: |
+          if git status --porcelain -- data | grep -q .; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -A data
+            git commit -m "data: update A-share snapshot and rolling history"
+            for attempt in 1 2 3; do
+              git pull --rebase origin main
+              if git push origin HEAD:main; then exit 0; fi
+              sleep $((attempt * 2))
+            done
+            exit 1
+          else
+            echo "No market-data changes to commit."
+          fi
+      - name: Fail if persistence gate does not pass
+        if: steps.session.outputs.persist != 'true'
+        run: |
+          echo "One-shot refresh did not see a clean completed session; nothing persisted."
+          exit 1
