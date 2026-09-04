@@ -3,7 +3,7 @@
 ## 目标
 执行唯一正式主链：
 
-`DATA GATE → 全市场/全行业召回 → taxonomy映射 → 三级行业盈利状态 → 公司全集扫描 → Gate1 → Gate2 → Gate3同类择优 → Gate4 → 完整估值 → reasonable_buy_range + low_risk_buy_range → 独立价格结构 → 左侧价值买点榜 → 左侧拐点买点榜 → Near-miss → Completion Gate → 正式发布`
+`DATA GATE → 全市场/全行业召回 → taxonomy映射 → 三级行业盈利状态 → 公司全集扫描 → 绝对股价硬门 → Gate1 → Gate2 → Gate3同类择优 → Gate4 → 完整估值 → reasonable_buy_range + low_risk_buy_range → 独立价格结构 → 左侧价值买点榜 → 左侧拐点买点榜 → Near-miss → Completion Gate → 正式发布`
 
 核心原则：**发现阶段广而轻，验证阶段窄而深；公司层先便宜淘汰、后昂贵研究；合理价值、合理买入、低风险执行三层价值语义必须分开；价值决定 WHERE，结构只决定 TURN；任何硬门失败都 fail closed。**
 
@@ -47,7 +47,14 @@
 公司行业映射唯一运行时来源为shard自带 `industry_mapping_status / sw_level3_code / sw_level3_name`：
 - missing → `industry_unmapped`；
 - mapped但非准入三级 → `industry_not_eligible`；
-- 命中准入三级 → `mapped+eligible` 并进入Gate1。
+- 命中准入三级 → `mapped+eligible`，进入绝对股价硬门。
+
+### 绝对股价硬门（Gate1之前，强制）
+对全部 `mapped+eligible` 公司，在任何 Gate1 估值风险判断之前先检查当前股价：
+- `current_price > 100` → `exclude:price_above_100`，立即终止本轮公司研究，不得进入Gate1、后续估值、两个正式买点榜或Near-miss；
+- `current_price <= 100` → 通过绝对股价硬门，进入Gate1。
+
+100元为**含边界上限**：恰好100元允许进入，只有严格大于100元才剔除。该约束是本低风险榜的独立公司准入条件，不因PE/PB较低、相对同行便宜、合理价值更高或技术结构更强而放宽。
 
 禁止Top-N、只挑龙头或因公司数量大而跳过。
 
@@ -146,7 +153,7 @@ Near-miss仅收：
 - 所有准入三级正确应用industry_state；
 - 所有shards完整读取且计数相等；
 - 每只公司都有行业处理终态；
-- 所有mapped+eligible进入Gate1；
+- 所有 `mapped+eligible` 公司都完成绝对股价硬门；`current_price > 100` 必须终止为 `exclude:price_above_100`，只有 `current_price <= 100` 才能进入Gate1；
 - Gate1 survivors有Gate2终态；
 - Gate2 survivors全部完成Gate3宽分组、统一比较和横向择优；
 - Gate3每个真正可比组原则上仅1家pass，其余明确exclude或uncertain；
