@@ -5,10 +5,12 @@ name: Update A-share market data
 on:
   workflow_dispatch:
   schedule:
-    # Beijing/Shanghai 16:10 = UTC 08:10. China does not observe DST.
-    - cron: '10 8 * * 1-5'
-    # Beijing/Shanghai 16:30 = UTC 08:30. Second post-close retry window.
-    - cron: '30 8 * * 1-5'
+    # Primary post-close run in Beijing/Shanghai local time.
+    - cron: '10 16 * * 1-5'
+      timezone: 'Asia/Shanghai'
+    # Second post-close retry window.
+    - cron: '30 16 * * 1-5'
+      timezone: 'Asia/Shanghai'
 
 permissions:
   contents: write
