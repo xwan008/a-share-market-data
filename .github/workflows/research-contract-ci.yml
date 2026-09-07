@@ -62,6 +62,49 @@ jobs:
           python -m py_compile scripts/validate_industry_evidence.py
       - name: Validate 31-industry leading-anchor contract
         run: python scripts/fetch_industry_leading_anchors.py --self-test
+      - name: Prepare offline leading-anchor fixture
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          health = json.loads(Path('data/health.json').read_text(encoding='utf-8'))
+          universe = json.loads(Path('config/industry_scan_universe.json').read_text(encoding='utf-8'))
+          level1 = universe['levels']['level1']
+          payload = {
+              'contract_id': 'a-share-industry-leading-anchors',
+              'schema_version': 1,
+              'rollout_mode': 'shadow',
+              'generated_at': 'ci-offline-fixture',
+              'reference_trade_date': health['trade_date'],
+              'source_repo_commit_sha': '',
+              'collection': {
+                  'level1_expected': 31,
+                  'level1_accounted': 31,
+                  'complete': 0,
+                  'partial': 31,
+                  'total_attempts': 0,
+                  'failed_attempts': 0,
+              },
+              'level1': {
+                  row['code']: {
+                      'code': row['code'],
+                      'name': row['name'],
+                      'status': 'partial',
+                      'primary_anchor_id': None,
+                      'anchors': [],
+                      'attempts': [],
+                  }
+                  for row in level1
+              },
+              'semantics': {
+                  'ci_fixture': True,
+                  'important': 'No fresh leading anchor is fabricated in CI.',
+              },
+          }
+          Path('data/research/industry_leading_anchors.json').write_text(
+              json.dumps(payload, ensure_ascii=False, indent=2) + '\n', encoding='utf-8'
+          )
+          PY
       - name: Build and validate shadow industry evidence
         run: |
           python scripts/build_industry_evidence.py
@@ -74,8 +117,10 @@ jobs:
           assert evidence['contract_id'] == 'a-share-industry-evidence'
           assert evidence['schema_version'] == 3
           assert evidence['universe']['actual_level1_count'] == 31
+          assert evidence['leading_anchor_collection']['level1_accounted'] == 31
           assert gate['shape_valid'] is True
           assert gate['level1_accounted'] == 31
+          assert gate['leading_anchor_collection_accounted'] == 31
           PY
       - name: Build or validate production price-structure snapshot
         run: |
