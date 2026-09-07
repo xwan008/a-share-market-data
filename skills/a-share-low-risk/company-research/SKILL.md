@@ -21,26 +21,24 @@
 5. 本轮实时获取的公司财报、公告、交易所披露、业绩预告/快报、订单/产销/价格/成本、估值等公开证据。
 
 ## 0. 运行时读取协议（强制）
-正式执行必须按以下顺序读取，不能因为 GitHub 目录接口只返回文件元数据而误判为 shard 无法完整扫描：
+正式执行必须使用唯一读取路径：**锁 SHA → clone/下载 → 本地读**。GitHub Connector 不得作为正式 shard 正文扫描通道。
 
 1. 先读取 `data/research/industry_state.json`，结合本轮一级行业扫描与三级映射，形成**当前轮临时 admitted Level-3 集合**；该临时集合只保存三级代码/名称、trend、breadth、driver 等本轮必要字段，不保存公司候选。
-2. 在正式读取 shard 前先锁定当前生产仓库最新 `main` 的 commit SHA，记为 `repo_commit_sha`。本轮所有规则文件、运行时快照和 shard 正文必须能追溯到该 SHA；不得在同一轮中混用不同 commit 的 shard 数据。
-3. 再枚举 `data/shards/` 下的全部 `*.json` 文件，记录 `shard_file_count`。
-4. 对枚举出的每一个 shard，必须继续读取该文件**正文内容**；目录列表/contents API 返回的 name、path、sha、size 等元数据只用于枚举，不能代替正文扫描。
-5. 若执行环境支持本地仓库或工作区，优先在 `repo_commit_sha` 对应的本地副本中直接遍历 `data/shards/*.json`；若使用 GitHub 连接器，则先枚举文件，再按 `path` 使用文件读取接口逐个读取正文。两种方式在 Completion Gate 语义上等价。
-6. 若任一 shard 因响应大小限制、单行 JSON 截断、连接器输出预算、分页或其他传输限制而无法确认完整正文，**不得直接判定** `shard_scan_incomplete`。此时必须启动“锁定 SHA 的本地回退”：
-   - 优先将 `repo_commit_sha` 对应的完整仓库归档/工作区副本物化到当前本地运行环境；
-   - 若普通仓库 archive 通道在当前执行环境不可用，则查找 GitHub Actions 在同一 `repo_commit_sha` 上发布的 `a-share-runtime-snapshot` artifact，下载并解压到本地；
-   - artifact 内的 `runtime_snapshot_manifest.json.commit_sha` 必须严格等于 `repo_commit_sha`，否则不得使用；
-   - 本地回退成功后，直接逐文件 `json.loads` / 等价完整解析 `data/shards/*.json`，而不是继续依赖被截断的连接器文本输出。
-7. 本地回退时必须记录 `scan_source`：普通本地仓库/归档记为 `local_commit_archive`，GitHub Actions runtime snapshot 记为 `github_actions_runtime_snapshot`；同时记录 `repo_commit_sha`、`shard_file_count`、`actual_shard_content_read_count`、`company_universe_count`。
-8. 对每条股票记录直接使用 shard 自带的 `industry_mapping_status / sw_level3_code / sw_level3_name` 判断行业终态：
+2. 在正式读取 shard 前，锁定当前生产仓库最新 `main` 的 commit SHA，记为 `repo_commit_sha`。本轮所有规则文件、运行时数据和 shard 正文必须严格来自该 SHA；不得在同一轮中混用不同 commit。
+3. 锁定 SHA 后，必须先将 `repo_commit_sha` 对应的仓库副本 clone、checkout 或下载归档到当前本地运行环境。正式扫描不得先通过 GitHub Connector 逐个读取 shard 正文，也不得把 Connector 正文读取作为与本地读取等价的主路径。
+4. 若使用 clone，必须 checkout 到 `repo_commit_sha` 并验证 `HEAD == repo_commit_sha`；若使用归档，必须确认归档明确对应 `repo_commit_sha`。只有完成该校验后，才能进入 shard 扫描。
+5. 在已校验的本地副本中枚举 `data/shards/` 下全部 `*.json`，记录 `shard_file_count`；随后必须通过本地文件系统/Python 对每个 shard 执行完整 `json.load/json.loads` 或等价完整解析。
+6. 只有本地完整解析成功的 shard 才能计入 `actual_shard_content_read_count`。目录元数据、GitHub Connector 返回的正文、搜索片段、摘要、分页片段、截断文本都不得计入正式扫描完成数。
+7. GitHub Connector 只允许用于：锁定/确认 commit SHA、读取少量配置或规则文件、诊断、spot check。即使 Connector 能完整返回某个 shard，其结果也不能替代本地扫描，不能贡献 `actual_shard_content_read_count`，不能构造正式公司全集。
+8. 如果 `repo_commit_sha` 对应的仓库无法 clone/下载/checkout 到当前本地运行环境，或本地副本无法通过 SHA 校验，必须立即终止正式扫描并返回 `local_snapshot_unavailable`；**禁止退回 GitHub Connector 逐 shard 全市场扫描**。
+9. 如果本地副本已就绪，但任一 shard 无法完整解析、JSON 损坏、文件缺失或枚举数与成功解析数不一致，则返回 `shard_scan_incomplete`。不得用 Connector 分段读取来补齐正式扫描。
+10. `scan_source` 固定记录本地来源，例如 `local_git_checkout` 或 `local_commit_archive`；同时记录 `repo_commit_sha`、`shard_file_count`、`actual_shard_content_read_count`、`company_universe_count`。
+11. 对每条股票记录直接使用 shard 自带的 `industry_mapping_status / sw_level3_code / sw_level3_name` 判断行业终态：
    - 映射缺失 → `industry_unmapped`
    - 已映射但不在 admitted Level-3 集合 → `industry_not_eligible`
    - 已映射且命中 admitted Level-3 集合 → `mapped+eligible`，进入 Gate1
-9. `data/research/company_industry_index.json`、历史正式结果、旧候选、旧 Near-miss、搜索结果或聚合摘要均不得代替本步骤构造公司全集。
-10. **禁止错误阻断**：仅因为目录 API 不能一次性返回全部 shard 正文、返回被分页/截断、只显示元数据，或单个 shard 的连接器文本输出被截断，不得判定 `shard_scan_incomplete`。只有在实际尝试逐文件读取后仍存在无法确认完整正文的 shard，且“锁定 SHA 的本地回退”（普通本地副本/归档 + 同 SHA runtime snapshot artifact）也均无法完成扫描时，才可认为 shard 内容扫描不完整。
-11. Completion Gate 前必须核对：`repo_commit_sha`、`scan_source`、枚举文件数、实际成功完整读取文件数、处理股票记录数；`actual_shard_content_read_count` 必须等于 `shard_file_count`。
+12. `data/research/company_industry_index.json`、历史正式结果、旧候选、旧 Near-miss、搜索结果或聚合摘要均不得代替本步骤构造公司全集。
+13. Completion Gate 前必须核对：`repo_commit_sha`、`scan_source`、枚举文件数、实际成功完整读取文件数、处理股票记录数；`actual_shard_content_read_count` 必须等于 `shard_file_count`。
 
 ## 1. Company Mapping Gate
 公司全集与行业映射的唯一运行时来源是 shard 正文，不再读取 `company_industry_index.json` 构造公司池。
