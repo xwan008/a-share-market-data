@@ -30,7 +30,9 @@ def test_market_refresh_builds_commodity_health_before_locked_snapshot_dispatch(
     workflow = read(".github/workflows/update-market.yml")
     collector = workflow.index("python scripts/fetch_commodity_anchors.py")
     bridge = workflow.index("python scripts/build_bridge.py")
-    dispatch = workflow.index("gh workflow run runtime-snapshot.yml")
+    dispatch = workflow.index(
+        "bash scripts/dispatch_workflow_and_wait.sh runtime-snapshot.yml main"
+    )
     assert collector < bridge < dispatch
 
 
