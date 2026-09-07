@@ -1,11 +1,12 @@
 name: Build SW taxonomy and company industry index
 
+# Weekly root task. Successful index/shard changes hand off to the common event-driven
+# runtime snapshot -> evidence -> production bundle chain.
 on:
   workflow_dispatch:
   push:
     branches: [main]
     paths:
-      - '.github/workflows/build-company-industry-index.yml'
       - 'scripts/build_company_industry_index.py'
       - 'scripts/enrich_shards_with_industry.py'
       - 'requirements-research.txt'
@@ -15,6 +16,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: a-share-company-industry-index
@@ -85,6 +87,7 @@ jobs:
           PY
 
       - name: Commit taxonomy, company index, and enriched quote shards
+        id: commit
         shell: bash
         run: |
           if git status --porcelain -- config/industry_scan_universe.json data/research/company_industry_index.json data/shards | grep -q .; then
@@ -94,10 +97,20 @@ jobs:
             git commit -m "research: refresh SW taxonomy, company index, and shard industries"
             for attempt in 1 2 3; do
               git pull --rebase origin main
-              if git push; then exit 0; fi
+              if git push; then
+                echo "pushed=true" >> "$GITHUB_OUTPUT"
+                exit 0
+              fi
               sleep $((attempt * 2))
             done
             exit 1
-          else
-            echo "No SW taxonomy, company-index, or shard-industry changes."
           fi
+          echo "pushed=false" >> "$GITHUB_OUTPUT"
+          echo "No SW taxonomy, company-index, or shard-industry changes."
+
+      - name: Publish downstream production chain
+        if: steps.commit.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: bash scripts/dispatch_workflow_and_wait.sh runtime-snapshot.yml main
