@@ -41,14 +41,19 @@ jobs:
           health = json.loads(Path('data/health.json').read_text(encoding='utf-8'))
           evidence = json.loads(Path('data/research/industry_evidence.json').read_text(encoding='utf-8'))
           gate = json.loads(Path('data/research/evidence_gate.json').read_text(encoding='utf-8'))
+          anchors = json.loads(Path('data/research/industry_leading_anchors.json').read_text(encoding='utf-8'))
 
           if evidence.get('reference_trade_date') != health.get('trade_date'):
               raise SystemExit(
                   f"evidence trade date mismatch: {evidence.get('reference_trade_date')} != {health.get('trade_date')}"
               )
+          if anchors.get('reference_trade_date') != health.get('trade_date'):
+              raise SystemExit(
+                  f"leading-anchor trade date mismatch: {anchors.get('reference_trade_date')} != {health.get('trade_date')}"
+              )
 
           payload = {
-              'schema_version': 1,
+              'schema_version': 2,
               'repo': 'xwan008/a-share-market-data',
               'commit_sha': sha,
               'generated_at': datetime.now(timezone.utc).isoformat(),
@@ -57,6 +62,8 @@ jobs:
               'trade_date': health.get('trade_date'),
               'market_status': health.get('market_status'),
               'industry_evidence_reference_trade_date': evidence.get('reference_trade_date'),
+              'leading_anchor_complete': (anchors.get('collection') or {}).get('complete'),
+              'leading_anchor_partial': (anchors.get('collection') or {}).get('partial'),
               'evidence_gate_strict_pass': gate.get('strict_pass'),
               'decision_layer_ready': gate.get('decision_layer_ready'),
               'formal_consumer_rule': (
@@ -79,21 +86,26 @@ jobs:
           path: |
             production_bundle_manifest.json
             config/industry_evidence_contract.json
+            config/industry_leading_anchor_sources.json
             config/research_runtime_policy.json
             config/research_pipeline_manifest.json
             config/industry_scan_universe.json
             data/health.json
             data/commodity/futures_daily.json
             data/research/industry_state.json
+            data/research/industry_leading_anchors.json
             data/research/industry_evidence.json
             data/research/evidence_gate.json
             data/research/full_market_price_structure.json
             data/shards/*.json
             data/history_shards/*.json
+            data/industry_history/*.json
             skills/a-share-low-risk/orchestrator/SKILL.md
             skills/a-share-low-risk/company-research/SKILL.md
             skills/a-share-low-risk/valuation/SKILL.md
             skills/a-share-low-risk/price-structure/SKILL.md
+            skills/a-share-low-risk/evidence-pipeline/SKILL.md
+            scripts/fetch_industry_leading_anchors.py
             scripts/validate_research_completion.py
             scripts/validate_industry_evidence.py
           if-no-files-found: error
