@@ -14,6 +14,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: a-share-market-data-write
@@ -148,54 +149,36 @@ jobs:
           else
             echo "No market-data changes to commit."
           fi
-      - name: Build locked-commit runtime manifest
+      - name: Dispatch locked-commit runtime snapshot
         if: steps.session.outputs.persist == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          python - <<'PY'
-          import json
-          import subprocess
-          from datetime import datetime, timezone
-          from pathlib import Path
+          git fetch origin main
+          remote_sha="$(git rev-parse origin/main)"
+          echo "Dispatching runtime snapshot for main SHA: ${remote_sha}"
+          gh workflow run runtime-snapshot.yml --ref main
 
-          sha = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
-          health = json.loads(Path('data/health.json').read_text(encoding='utf-8'))
-          commodity = health.get('commodity_anchors') or {}
-          payload = {
-              'schema_version': 2,
-              'repo': 'xwan008/a-share-market-data',
-              'commit_sha': sha,
-              'generated_at': datetime.now(timezone.utc).isoformat(),
-              'snapshot_kind': 'chatgpt_runtime_locked_commit',
-              'trade_date': health.get('trade_date'),
-              'commodity_anchor_status': commodity.get('status'),
-              'commodity_reference_trade_date': commodity.get('reference_trade_date'),
-          }
-          Path('runtime_snapshot_manifest.json').write_text(
-              json.dumps(payload, ensure_ascii=False, indent=2),
-              encoding='utf-8',
-          )
-          print(json.dumps(payload, ensure_ascii=False))
-          PY
-      - name: Upload locked-commit runtime snapshot
-        if: steps.session.outputs.persist == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: a-share-runtime-snapshot
-          path: |
-            runtime_snapshot_manifest.json
-            config/industry_scan_universe.json
-            data/health.json
-            data/commodity/futures_daily.json
-            data/research/industry_state.json
-            data/research/full_market_price_structure.json
-            data/shards/*.json
-            data/history_shards/*.json
-            skills/a-share-low-risk/company-research/SKILL.md
-            skills/a-share-low-risk/valuation/SKILL.md
-            skills/a-share-low-risk/price-structure/SKILL.md
-          if-no-files-found: error
-          retention-days: 3
+          for attempt in $(seq 1 24); do
+            run_id="$(gh run list \
+              --workflow runtime-snapshot.yml \
+              --branch main \
+              --event workflow_dispatch \
+              --limit 20 \
+              --json databaseId,headSha,status,conclusion \
+              --jq ".[] | select(.headSha == \"${remote_sha}\") | .databaseId" \
+              | head -n 1)"
+            if [ -n "${run_id}" ]; then
+              echo "Runtime snapshot run ${run_id} created for ${remote_sha}."
+              gh run watch "${run_id}" --exit-status
+              exit 0
+            fi
+            sleep 5
+          done
+
+          echo "::error::No runtime snapshot workflow run appeared for ${remote_sha}."
+          exit 1
       - name: Report skipped persistence
         if: steps.session.outputs.persist != 'true'
         run: echo "Market snapshot did not pass the completed-session quality gate; no repository data will be persisted."
@@ -205,5 +188,5 @@ jobs:
 # and >=95% valuation/financial coverage with no fundamental-source errors.
 # Commodity-source failures are recorded as degraded and do not suppress equity persistence;
 # cycle valuation must then use its conservative anchorless fallback.
-# Runtime snapshot publication is part of this same run because pushes created with GITHUB_TOKEN
-# do not recursively trigger a second push-based Actions workflow.
+# Runtime snapshot publication is dispatched as a second workflow after the data push so the
+# snapshot workflow head_sha and manifest commit_sha both identify the committed main revision.
