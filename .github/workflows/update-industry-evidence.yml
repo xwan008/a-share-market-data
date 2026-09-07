@@ -1,0 +1,140 @@
+name: Update industry evidence
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'config/industry_evidence_contract.json'
+      - 'scripts/build_industry_evidence.py'
+      - 'scripts/validate_industry_evidence.py'
+      - '.github/workflows/update-industry-evidence.yml'
+  schedule:
+    # GitHub cron is UTC. 09:00/09:30 UTC = 17:00/17:30 Asia/Shanghai.
+    - cron: '0 9 * * 1-5'
+    - cron: '30 9 * * 1-5'
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: a-share-industry-evidence-write
+  cancel-in-progress: false
+
+jobs:
+  evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sync latest main
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Check closed-session source data
+        id: source
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          health = json.loads(Path('data/health.json').read_text(encoding='utf-8'))
+          state = json.loads(Path('data/research/industry_state.json').read_text(encoding='utf-8'))
+          current = {}
+          p = Path('data/research/industry_evidence.json')
+          if p.exists():
+              current = json.loads(p.read_text(encoding='utf-8'))
+
+          closed = bool(health.get('trade_date') and health.get('market_status') == 'closed')
+          same_inputs = bool(
+              current
+              and current.get('source_health_generated_at') == health.get('generated_at')
+              and current.get('source_industry_state_generated_at') == state.get('generated_at')
+          )
+          refresh = bool(closed and not same_inputs)
+
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as fh:
+              fh.write(f"closed={'true' if closed else 'false'}\n")
+              fh.write(f"refresh={'true' if refresh else 'false'}\n")
+          print(json.dumps({
+              'trade_date': health.get('trade_date'),
+              'market_status': health.get('market_status'),
+              'same_inputs': same_inputs,
+              'refresh': refresh,
+          }, ensure_ascii=False))
+          PY
+
+      - name: Build structured industry evidence
+        if: steps.source.outputs.refresh == 'true'
+        run: python scripts/build_industry_evidence.py
+
+      - name: Run Evidence Gate in shadow mode
+        if: steps.source.outputs.refresh == 'true'
+        run: python scripts/validate_industry_evidence.py --mode shadow
+
+      - name: Commit evidence diagnostics
+        id: commit
+        if: steps.source.outputs.refresh == 'true'
+        shell: bash
+        run: |
+          if git status --porcelain -- data/research/industry_evidence.json data/research/evidence_gate.json | grep -q .; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add data/research/industry_evidence.json data/research/evidence_gate.json
+            git commit -m "research: refresh structured industry evidence"
+            for attempt in 1 2 3; do
+              git pull --rebase origin main
+              if git push origin HEAD:main; then
+                echo "pushed=true" >> "$GITHUB_OUTPUT"
+                exit 0
+              fi
+              sleep $((attempt * 2))
+            done
+            exit 1
+          fi
+          echo "pushed=false" >> "$GITHUB_OUTPUT"
+
+      - name: Dispatch production bundle for committed evidence
+        if: steps.commit.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          git fetch origin main
+          remote_sha="$(git rev-parse origin/main)"
+          echo "Dispatching production bundle for main SHA: ${remote_sha}"
+          gh workflow run production-bundle.yml --ref main
+
+          for attempt in $(seq 1 24); do
+            run_id="$(gh run list \
+              --workflow production-bundle.yml \
+              --branch main \
+              --event workflow_dispatch \
+              --limit 20 \
+              --json databaseId,headSha,status,conclusion \
+              --jq ".[] | select(.headSha == \"${remote_sha}\") | .databaseId" \
+              | head -n 1)"
+            if [ -n "${run_id}" ]; then
+              echo "Production bundle run ${run_id} created for ${remote_sha}."
+              gh run watch "${run_id}" --exit-status
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "::error::No production-bundle workflow run appeared for ${remote_sha}."
+          exit 1
+
+      - name: Report no-op
+        if: steps.source.outputs.refresh != 'true'
+        run: echo "Industry evidence inputs are unchanged or market data is not closed; no evidence commit needed."

@@ -26,16 +26,19 @@ def test_cycle_valuation_has_machine_and_anchorless_routes() -> None:
     assert "静默淘汰" in orchestrator
 
 
-def test_market_refresh_builds_commodity_health_before_runtime_snapshot() -> None:
+def test_market_refresh_builds_commodity_health_before_locked_snapshot_dispatch() -> None:
     workflow = read(".github/workflows/update-market.yml")
     collector = workflow.index("python scripts/fetch_commodity_anchors.py")
     bridge = workflow.index("python scripts/build_bridge.py")
-    assert collector < bridge
-    assert "data/commodity/futures_daily.json" in workflow
+    dispatch = workflow.index("gh workflow run runtime-snapshot.yml")
+    assert collector < bridge < dispatch
 
 
 def test_runtime_snapshot_carries_raw_commodity_audit_data() -> None:
     workflow = read(".github/workflows/runtime-snapshot.yml")
+    assert "actions/upload-artifact@v4" in workflow
+    assert "name: a-share-runtime-snapshot" in workflow
+    assert "runtime_snapshot_manifest.json" in workflow
     assert "data/commodity/futures_daily.json" in workflow
     assert "commodity_anchor_status" in workflow
     assert "commodity_reference_trade_date" in workflow

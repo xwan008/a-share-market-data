@@ -1,0 +1,43 @@
+{
+  "contract_id": "a-share-industry-evidence",
+  "schema_version": 1,
+  "rollout_mode": "shadow",
+  "purpose": "Precompute fresh, structured industry prosperity evidence before the formal A-share low-risk ranking run.",
+  "universe_source": "config/industry_scan_universe.json",
+  "required_level1_count": 31,
+  "evidence_slots": {
+    "leading_anchor": {
+      "required": true,
+      "description": "The industry-specific first anchor or leading variable that can move profits before/with reported earnings."
+    },
+    "earnings_confirmation": {
+      "required": true,
+      "description": "Latest structured profitability confirmation, normally from same-repo financial cross-section / level3 profitability state."
+    },
+    "negative_evidence": {
+      "required": true,
+      "description": "Fresh falsifier / counter-evidence slot. An explicit checked_none record is valid; an absent slot is not."
+    }
+  },
+  "freshness_policy": {
+    "daily": {"max_age_calendar_days": 3},
+    "weekly": {"max_age_calendar_days": 10},
+    "monthly": {"max_age_calendar_days": 45},
+    "quarterly": {"max_age_calendar_days": 140}
+  },
+  "machine_adapters": {
+    "S24": {
+      "name": "有色金属",
+      "adapter": "commodity_anchors",
+      "symbols": ["CU0", "AU0", "AL0", "AO0"],
+      "frequency": "daily"
+    }
+  },
+  "status_semantics": {
+    "complete": "All required slots are present and fresh enough for the slot's own frequency.",
+    "partial": "At least one useful slot exists, but one or more required slots are missing/stale.",
+    "missing": "No usable current-cycle evidence is available."
+  },
+  "strict_gate_rule": "all 31 level1 industries must be complete before formal Decision Layer may rely exclusively on the evidence bundle",
+  "shadow_gate_rule": "always emit diagnostics and never block existing production while machine adapters are still being built"
+}

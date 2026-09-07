@@ -35,23 +35,35 @@ def test_market_data_workflow_cannot_persist_on_code_push():
     assert "status == 'closed'" in text
 
 
-def test_market_data_workflow_publishes_locked_runtime_snapshot_in_same_run():
-    text = (ROOT / ".github/workflows/update-market.yml").read_text(encoding="utf-8")
-    assert "actions/upload-artifact@v4" in text
-    assert "name: a-share-runtime-snapshot" in text
-    assert "runtime_snapshot_manifest.json" in text
-    assert "['git', 'rev-parse', 'HEAD']" in text
+def test_market_data_workflow_dispatches_locked_runtime_snapshot_after_data_push():
+    update = (ROOT / ".github/workflows/update-market.yml").read_text(encoding="utf-8")
+    snapshot = (ROOT / ".github/workflows/runtime-snapshot.yml").read_text(encoding="utf-8")
+    assert "gh workflow run runtime-snapshot.yml" in update
+    assert "remote_sha=\"$(git rev-parse origin/main)\"" in update
+    assert "actions/upload-artifact@v4" in snapshot
+    assert "name: a-share-runtime-snapshot" in snapshot
+    assert "runtime_snapshot_manifest.json" in snapshot
+    assert "['git', 'rev-parse', 'HEAD']" in snapshot
 
 
 def test_research_directory_has_only_authoritative_runtime_files_and_readme():
     research_dir = ROOT / "data/research"
     names = {p.name for p in research_dir.iterdir()}
-    assert names == {
+    allowed = {
         "README.md",
         "company_industry_index.json",
         "full_market_price_structure.json",
         "industry_state.json",
+        "industry_evidence.json",
+        "evidence_gate.json",
     }
+    assert names <= allowed
+    assert {
+        "README.md",
+        "company_industry_index.json",
+        "full_market_price_structure.json",
+        "industry_state.json",
+    } <= names
 
 
 def test_root_readme_declares_no_persisted_formal_run_state():
