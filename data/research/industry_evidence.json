@@ -1,0 +1,1128 @@
+{
+  "contract_id": "a-share-industry-evidence",
+  "schema_version": 1,
+  "rollout_mode": "shadow",
+  "generated_at": "2026-09-07T11:26:19.902373+00:00",
+  "reference_trade_date": "2026-09-07",
+  "source_repo_commit_sha": "96c8ef77a1019ac880728471911a6b6458519374",
+  "source_health_generated_at": "2026-09-07T17:28:50.095652+08:00",
+  "source_industry_state_generated_at": "2026-09-01T12:55:20.469674+08:00",
+  "universe": {
+    "taxonomy": "申万行业分类标准2021版",
+    "expected_level1_count": 31,
+    "actual_level1_count": 31
+  },
+  "coverage": {
+    "complete": 0,
+    "partial": 11,
+    "missing": 20
+  },
+  "level1": {
+    "S11": {
+      "code": "S11",
+      "name": "农林牧渔",
+      "evidence_status": "missing",
+      "required_slot_freshness": {
+        "leading_anchor": false,
+        "earnings_confirmation": false,
+        "negative_evidence": false
+      },
+      "slots": {
+        "leading_anchor": [],
+        "earnings_confirmation": [],
+        "negative_evidence": []
+      },
+      "level3_profitability_rows": 0
+    },
+    "S22": {
+      "code": "S22",
+      "name": "基础化工",
+      "evidence_status": "partial",
+      "required_slot_freshness": {
+        "leading_anchor": false,
+        "earnings_confirmation": true,
+        "negative_evidence": true
+      },
+      "slots": {
+        "leading_anchor": [],
+        "earnings_confirmation": [
+          {
+            "kind": "level3_profitability_breadth",
+            "source": "data/research/industry_state.json",
+            "reference_date": "2026-09-01",
+            "frequency": "quarterly",
+            "freshness": {
+              "status": "fresh",
+              "age_calendar_days": 6,
+              "max_age_calendar_days": 140
+            },
+            "metrics": {
+              "level3_count": 25,
+              "trend_counts": {
+                "stable": 8,
+                "deteriorating": 7,
+                "improving": 10
+              },
+              "breadth_counts": {
+                "narrow": 9,
+                "divergent": 8,
+                "broad": 8
+              },
+              "weighted_parent_profit_yoy": 0.40156569944059456,
+              "weighted_revenue_yoy": 0.10151041257800203
+            }
+          }
+        ],
+        "negative_evidence": [
+          {
+            "kind": "level3_profitability_falsifiers",
+            "source": "data/research/industry_state.json",
+            "reference_date": "2026-09-01",
+            "frequency": "quarterly",
+            "freshness": {
+              "status": "fresh",
+              "age_calendar_days": 6,
+              "max_age_calendar_days": 140
+            },
+            "metrics": {
+              "deteriorating_count": 7,
+              "uncertain_count": 0,
+              "examples": [
+                {
+                  "code": "S220203",
+                  "name": "无机盐",
+                  "trend": "deteriorating",
+                  "breadth": "divergent"
+                },
+                {
+                  "code": "S220305",
+                  "name": "涂料油墨",
+                  "trend": "deteriorating",
+                  "breadth": "narrow"
+                },
+                {
+                  "code": "S220315",
+                  "name": "食品及饲料添加剂",
+                  "trend": "deteriorating",
+                  "breadth": "narrow"
+                },
+                {
+                  "code": "S220316",
+                  "name": "有机硅",
+                  "trend": "deteriorating",
+                  "breadth": "divergent"
+                },
+                {
+                  "code": "S220406",
+                  "name": "锦纶",
+                  "trend": "deteriorating",
+                  "breadth": "divergent"
+                },
+                {
+                  "code": "S220801",
+                  "name": "氮肥",
+                  "trend": "deteriorating",
+                  "breadth": "divergent"
+                },
+                {
+                  "code": "S220803",
+                  "name": "农药",
+                  "trend": "deteriorating",
+                  "breadth": "divergent"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "level3_profitability_rows": 25
+    },
+    "S23": {
+      "code": "S23",
+      "name": "钢铁",
+      "evidence_status": "missing",
+      "required_slot_freshness": {
+        "leading_anchor": false,
+        "earnings_confirmation": false,
+        "negative_evidence": false
+      },
+      "slots": {
+        "leading_anchor": [],
+        "earnings_confirmation": [],
+        "negative_evidence": []
+      },
+      "level3_profitability_rows": 0
+    },
+    "S24": {
+      "code": "S24",
+      "name": "有色金属",
+      "evidence_status": "partial",
+      "required_slot_freshness": {
+        "leading_anchor": true,
+        "earnings_confirmation": true,
+        "negative_evidence": false
+      },
+      "slots": {
+        "leading_anchor": [
+          {
+            "kind": "commodity_anchor_set",
+            "source": "data/health.json#commodity_anchors",
+            "reference_date": "2026-09-04",
+            "frequency": "daily",
+            "freshness": {
+              "status": "fresh",
+              "age_calendar_days": 3,
+              "max_age_calendar_days": 3
+            },
+            "source_status": "ok",
+            "anchors": [
+              {
+                "symbol": "CU0",
+                "name": "沪铜连续",
+                "role": "revenue_price",
+                "last_date": "2026-09-04",
+                "current": 108780.0,
+                "ma20": 108186.0,
+                "ma60": 105641.333333,
+                "current_to_neutral": 1.360515,
+                "trend_20_vs_60_pct": 2.4088
+              },
+              {
+                "symbol": "AU0",
+                "name": "沪金连续",
+                "role": "revenue_price",
+                "last_date": "2026-09-04",
+                "current": 965.96,
+                "ma20": 968.195,
+                "ma60": 921.604,
+                "current_to_neutral": 1.218723,
+                "trend_20_vs_60_pct": 5.0554
+              },
+              {
+                "symbol": "AL0",
+                "name": "沪铝连续",
+                "role": "revenue_price",
+                "last_date": "2026-09-04",
+                "current": 24290.0,
+                "ma20": 23980.5,
+                "ma60": 23549.583333,
+                "current_to_neutral": 1.165547,
+                "trend_20_vs_60_pct": 1.8298
+              },
+              {
+                "symbol": "AO0",
+                "name": "氧化铝连续",
+                "role": "input_cost",
+                "last_date": "2026-09-04",
+                "current": 2795.0,
+                "ma20": 2691.0,
+                "ma60": 2728.45,
+                "current_to_neutral": 0.960151,
+                "trend_20_vs_60_pct": -1.3726
+              }
+            ]
+          }
+        ],
+        "earnings_confirmation": [
+          {
+            "kind": "level3_profitability_breadth",
+            "source": "data/research/industry_state.json",
+            "reference_date": "2026-09-01",
+            "frequency": "quarterly",
+            "freshness": {
+              "status": "fresh",
+              "age_calendar_days": 6,
+              "max_age_calendar_days": 140
+            },
+            "metrics": {
+              "level3_count": 14,
+              "trend_counts": {
+                "improving": 14
+              },
+              "breadth_counts": {
+                "narrow": 2,
+                "broad": 12
+              },
+              "weighted_parent_profit_yoy": 0.788648383351449,
+              "weighted_revenue_yoy": 0.34926008361721145
+            }
+          }
+        ],
+        "negative_evidence": []
+      },
+      "level3_profitability_rows": 14
+    },
+    "S27": {
+      "code": "S27",
+      "name": "电子",
+      "evidence_status": "partial",
+      "required_slot_freshness": {
+        "leading_anchor": false,
+        "earnings_confirmation": true,
+        "negative_evidence": true
+      },
+      "slots": {
+        "leading_anchor": [],
+        "earnings_confirmation": [
+          {
+            "kind": "level3_profitability_breadth",
+            "source": "data/research/industry_state.json",
+            "reference_date": "2026-09-01",
+            "frequency": "quarterly",
+            "freshness": {
+              "status": "fresh",
+              "age_calendar_days": 6,
+              "max_age_calendar_days": 140
+            },
+            "metrics": {
+              "level3_count": 16,
+              "trend_counts": {
+                "deteriorating": 6,
+                "improving": 6,
+                "unconfirmed": 1,
+                "stable": 3
+              },
+              "breadth_counts": {
+                "divergent": 8,
+                "broad": 4,
+                "narrow": 4
+              },
+              "weighted_parent_profit_yoy": 0.49036795885264156,
+              "weighted_revenue_yoy": 0.27290230070965976
+            }
+          }
+        ],
+        "negative_evidence": [
+          {
+            "kind": "level3_profitability_falsifiers",
+            "source": "data/research/industry_state.json",
+            "reference_date": "2026-09-01",
+            "frequency": "quarterly",
+            "freshness": {
+              "status": "fresh",
+              "age_calendar_days": 6,
+              "max_age_calendar_days": 140
+            },
+            "metrics": {
+              "deteriorating_count": 6,
+              "uncertain_count": 0,
+              "examples": [
+                {
+                  "code": "S270102",
+                  "name": "分立器件",
+                  "trend": "deteriorating",
+                  "breadth": "divergent"
+                },
+                {
+                  "code": "S270105",
+                  "name": "模拟芯片设计",
+                  "trend": "deteriorating",
+                  "breadth": "divergent"
+                },
+                {
+                  "code": "S270302",
+                  "name": "LED",
+                  "trend": "deteriorating",
+                  "breadth": "divergent"
+                },
+                {
+                  "code": "S270303",
+                  "name": "光学元件",
+                  "trend": "deteriorating",
+                  "breadth": "divergent"
+                },
+                {
+                  "code": "S270503",
+                  "name": "品牌消费电子",
+                  "trend": "deteriorating",
+                  "breadth": "divergent"
+                },
+                {
+                  "code": "S270601",
+                  "name": "电子化学品Ⅲ",
+                  "trend": "deteriorating",
+                  "breadth": "narrow"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "level3_profitability_rows": 16
+    },
+    "S28": {
+      "code": "S28",
+      "name": "汽车",
+      "evidence_status": "missing",
+      "required_slot_freshness": {
+        "leading_anchor": false,
+        "earnings_confirmation": false,
+        "negative_evidence": false
+      },
+      "slots": {
+        "leading_anchor": [],
+        "earnings_confirmation": [],
+        "negative_evidence": []
+      },
+      "level3_profitability_rows": 0
+    },
+    "S33": {
+      "code": "S33",
+      "name": "家用电器",
+      "evidence_status": "missing",
+      "required_slot_freshness": {
+        "leading_anchor": false,
+        "earnings_confirmation": false,
+        "negative_evidence": false
+      },
+      "slots": {
+        "leading_anchor": [],
+        "earnings_confirmation": [],
+        "negative_evidence": []
+      },
+      "level3_profitability_rows": 0
+    },
+    "S34": {
+      "code": "S34",
+      "name": "食品饮料",
+      "evidence_status": "missing",
+      "required_slot_freshness": {
+        "leading_anchor": false,
+        "earnings_confirmation": false,
+        "negative_evidence": false
+      },
+      "slots": {
+        "leading_anchor": [],
+        "earnings_confirmation": [],
+        "negative_evidence": []
+      },
+      "level3_profitability_rows": 0
+    },
+    "S35": {
+      "code": "S35",
+      "name": "纺织服饰",
+      "evidence_status": "missing",
+      "required_slot_freshness": {
+        "leading_anchor": false,
+        "earnings_confirmation": false,
+        "negative_evidence": false
+      },
+      "slots": {
+        "leading_anchor": [],
+        "earnings_confirmation": [],
+        "negative_evidence": []
+      },
+      "level3_profitability_rows": 0
+    },
+    "S36": {
+      "code": "S36",
+      "name": "轻工制造",
+      "evidence_status": "partial",
+      "required_slot_freshness": {
+        "leading_anchor": false,
+        "earnings_confirmation": true,
+        "negative_evidence": false
+      },
+      "slots": {
+        "leading_anchor": [],
+        "earnings_confirmation": [
+          {
+            "kind": "level3_profitability_breadth",
+            "source": "data/research/industry_state.json",
+            "reference_date": "2026-09-01",
+            "frequency": "quarterly",
+            "freshness": {
+              "status": "fresh",
+              "age_calendar_days": 6,
+              "max_age_calendar_days": 140
+            },
+            "metrics": {
+              "level3_count": 2,
+              "trend_counts": {
+                "stable": 2
+              },
+              "breadth_counts": {
+                "narrow": 2
+              },
+              "weighted_parent_profit_yoy": 0.6751976538433947,
+              "weighted_revenue_yoy": 0.0854667920539696
+            }
+          }
+        ],
+        "negative_evidence": []
+      },
+      "level3_profitability_rows": 2
+    },
+    "S37": {
+      "code": "S37",
+      "name": "医药生物",
+      "evidence_status": "missing",
+      "required_slot_freshness": {
+        "leading_anchor": false,
+        "earnings_confirmation": false,
+        "negative_evidence": false
+      },
+      "slots": {
+        "leading_anchor": [],
+        "earnings_confirmation": [],
+        "negative_evidence": []
+      },
+      "level3_profitability_rows": 0
+    },
+    "S41": {
+      "code": "S41",
+      "name": "公用事业",
+      "evidence_status": "missing",
+      "required_slot_freshness": {
+        "leading_anchor": false,
+        "earnings_confirmation": false,
+        "negative_evidence": false
+      },
+      "slots": {
+        "leading_anchor": [],
+        "earnings_confirmation": [],
+        "negative_evidence": []
+      },
+      "level3_profitability_rows": 0
+    },
+    "S42": {
+      "code": "S42",
+      "name": "交通运输",
+      "evidence_status": "missing",
+      "required_slot_freshness": {
+        "leading_anchor": false,
+        "earnings_confirmation": false,
+        "negative_evidence": false
+      },
+      "slots": {
+        "leading_anchor": [],
+        "earnings_confirmation": [],
+        "negative_evidence": []
+      },
+      "level3_profitability_rows": 0
+    },
+    "S43": {
+      "code": "S43",
+      "name": "房地产",
+      "evidence_status": "missing",
+      "required_slot_freshness": {
+        "leading_anchor": false,
+        "earnings_confirmation": false,
+        "negative_evidence": false
+      },
+      "slots": {
+        "leading_anchor": [],
+        "earnings_confirmation": [],
+        "negative_evidence": []
+      },
+      "level3_profitability_rows": 0
+    },
+    "S45": {
+      "code": "S45",
+      "name": "商贸零售",
+      "evidence_status": "partial",
+      "required_slot_freshness": {
+        "leading_anchor": false,
+        "earnings_confirmation": true,
+        "negative_evidence": true
+      },
+      "slots": {
+        "leading_anchor": [],
+        "earnings_confirmation": [
+          {
+            "kind": "level3_profitability_breadth",
+            "source": "data/research/industry_state.json",
+            "reference_date": "2026-09-01",
+            "frequency": "quarterly",
+            "freshness": {
+              "status": "fresh",
+              "age_calendar_days": 6,
+              "max_age_calendar_days": 140
+            },
+            "metrics": {
+              "level3_count": 10,
+              "trend_counts": {
+                "deteriorating": 5,
+                "stable": 2,
+                "improving": 3
+              },
+              "breadth_counts": {
+                "divergent": 5,
+                "narrow": 2,
+                "broad": 3
+              },
+              "weighted_parent_profit_yoy": 0.6754648160840245,
+              "weighted_revenue_yoy": -0.03854600631553196
+            }
+          }
+        ],
+        "negative_evidence": [
+          {
+            "kind": "level3_profitability_falsifiers",
+            "source": "data/research/industry_state.json",
+            "reference_date": "2026-09-01",
+            "frequency": "quarterly",
+            "freshness": {
+              "status": "fresh",
+              "age_calendar_days": 6,
+              "max_age_calendar_days": 140
+            },
+            "metrics": {
+              "deteriorating_count": 5,
+              "uncertain_count": 0,
+              "examples": [
+                {
+                  "code": "S450201",
+                  "name": "贸易Ⅲ",
+                  "trend": "deteriorating",
+                  "breadth": "divergent"
+                },
+                {
+                  "code": "S450301",
+                  "name": "百货",
+                  "trend": "deteriorating",
+                  "breadth": "divergent"
+                },
+                {
+                  "code": "S450304",
+                  "name": "商业物业经营",
+                  "trend": "deteriorating",
+                  "breadth": "divergent"
+                },
+                {
+                  "code": "S450401",
+                  "name": "专业连锁Ⅲ",
+                  "trend": "deteriorating",
+                  "breadth": "divergent"
+                },
+                {
+                  "code": "S450601",
+                  "name": "综合电商",
+                  "trend": "deteriorating",
+                  "breadth": "divergent"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "level3_profitability_rows": 10
+    },
+    "S46": {
+      "code": "S46",
+      "name": "社会服务",
+      "evidence_status": "missing",
+      "required_slot_freshness": {
+        "leading_anchor": false,
+        "earnings_confirmation": false,
+        "negative_evidence": false
+      },
+      "slots": {
+        "leading_anchor": [],
+        "earnings_confirmation": [],
+        "negative_evidence": []
+      },
+      "level3_profitability_rows": 0
+    },
+    "S48": {
+      "code": "S48",
+      "name": "银行",
+      "evidence_status": "missing",
+      "required_slot_freshness": {
+        "leading_anchor": false,
+        "earnings_confirmation": false,
+        "negative_evidence": false
+      },
+      "slots": {
+        "leading_anchor": [],
+        "earnings_confirmation": [],
+        "negative_evidence": []
+      },
+      "level3_profitability_rows": 0
+    },
+    "S49": {
+      "code": "S49",
+      "name": "非银金融",
+      "evidence_status": "partial",
+      "required_slot_freshness": {
+        "leading_anchor": false,
+        "earnings_confirmation": true,
+        "negative_evidence": false
+      },
+      "slots": {
+        "leading_anchor": [],
+        "earnings_confirmation": [
+          {
+            "kind": "level3_profitability_breadth",
+            "source": "data/research/industry_state.json",
+            "reference_date": "2026-09-01",
+            "frequency": "quarterly",
+            "freshness": {
+              "status": "fresh",
+              "age_calendar_days": 6,
+              "max_age_calendar_days": 140
+            },
+            "metrics": {
+              "level3_count": 9,
+              "trend_counts": {
+                "improving": 7,
+                "stable": 1,
+                "unconfirmed": 1
+              },
+              "breadth_counts": {
+                "broad": 7,
+                "narrow": 1,
+                "divergent": 1
+              },
+              "weighted_parent_profit_yoy": 0.7020948258660147,
+              "weighted_revenue_yoy": 0.3706049481634799
+            }
+          }
+        ],
+        "negative_evidence": []
+      },
+      "level3_profitability_rows": 9
+    },
+    "S51": {
+      "code": "S51",
+      "name": "综合",
+      "evidence_status": "missing",
+      "required_slot_freshness": {
+        "leading_anchor": false,
+        "earnings_confirmation": false,
+        "negative_evidence": false
+      },
+      "slots": {
+        "leading_anchor": [],
+        "earnings_confirmation": [],
+        "negative_evidence": []
+      },
+      "level3_profitability_rows": 0
+    },
+    "S61": {
+      "code": "S61",
+      "name": "建筑材料",
+      "evidence_status": "missing",
+      "required_slot_freshness": {
+        "leading_anchor": false,
+        "earnings_confirmation": false,
+        "negative_evidence": false
+      },
+      "slots": {
+        "leading_anchor": [],
+        "earnings_confirmation": [],
+        "negative_evidence": []
+      },
+      "level3_profitability_rows": 0
+    },
+    "S62": {
+      "code": "S62",
+      "name": "建筑装饰",
+      "evidence_status": "missing",
+      "required_slot_freshness": {
+        "leading_anchor": false,
+        "earnings_confirmation": false,
+        "negative_evidence": false
+      },
+      "slots": {
+        "leading_anchor": [],
+        "earnings_confirmation": [],
+        "negative_evidence": []
+      },
+      "level3_profitability_rows": 0
+    },
+    "S63": {
+      "code": "S63",
+      "name": "电力设备",
+      "evidence_status": "missing",
+      "required_slot_freshness": {
+        "leading_anchor": false,
+        "earnings_confirmation": false,
+        "negative_evidence": false
+      },
+      "slots": {
+        "leading_anchor": [],
+        "earnings_confirmation": [],
+        "negative_evidence": []
+      },
+      "level3_profitability_rows": 0
+    },
+    "S64": {
+      "code": "S64",
+      "name": "机械设备",
+      "evidence_status": "missing",
+      "required_slot_freshness": {
+        "leading_anchor": false,
+        "earnings_confirmation": false,
+        "negative_evidence": false
+      },
+      "slots": {
+        "leading_anchor": [],
+        "earnings_confirmation": [],
+        "negative_evidence": []
+      },
+      "level3_profitability_rows": 0
+    },
+    "S65": {
+      "code": "S65",
+      "name": "国防军工",
+      "evidence_status": "partial",
+      "required_slot_freshness": {
+        "leading_anchor": false,
+        "earnings_confirmation": true,
+        "negative_evidence": false
+      },
+      "slots": {
+        "leading_anchor": [],
+        "earnings_confirmation": [
+          {
+            "kind": "level3_profitability_breadth",
+            "source": "data/research/industry_state.json",
+            "reference_date": "2026-09-01",
+            "frequency": "quarterly",
+            "freshness": {
+              "status": "fresh",
+              "age_calendar_days": 6,
+              "max_age_calendar_days": 140
+            },
+            "metrics": {
+              "level3_count": 1,
+              "trend_counts": {
+                "improving": 1
+              },
+              "breadth_counts": {
+                "broad": 1
+              },
+              "weighted_parent_profit_yoy": 1.8308488219456454,
+              "weighted_revenue_yoy": 0.3993174350355484
+            }
+          }
+        ],
+        "negative_evidence": []
+      },
+      "level3_profitability_rows": 1
+    },
+    "S71": {
+      "code": "S71",
+      "name": "计算机",
+      "evidence_status": "partial",
+      "required_slot_freshness": {
+        "leading_anchor": false,
+        "earnings_confirmation": true,
+        "negative_evidence": true
+      },
+      "slots": {
+        "leading_anchor": [],
+        "earnings_confirmation": [
+          {
+            "kind": "level3_profitability_breadth",
+            "source": "data/research/industry_state.json",
+            "reference_date": "2026-09-01",
+            "frequency": "quarterly",
+            "freshness": {
+              "status": "fresh",
+              "age_calendar_days": 6,
+              "max_age_calendar_days": 140
+            },
+            "metrics": {
+              "level3_count": 2,
+              "trend_counts": {
+                "improving": 1,
+                "deteriorating": 1
+              },
+              "breadth_counts": {
+                "narrow": 1,
+                "divergent": 1
+              },
+              "weighted_parent_profit_yoy": 1.0677516504293594,
+              "weighted_revenue_yoy": 0.040281877680687334
+            }
+          }
+        ],
+        "negative_evidence": [
+          {
+            "kind": "level3_profitability_falsifiers",
+            "source": "data/research/industry_state.json",
+            "reference_date": "2026-09-01",
+            "frequency": "quarterly",
+            "freshness": {
+              "status": "fresh",
+              "age_calendar_days": 6,
+              "max_age_calendar_days": 140
+            },
+            "metrics": {
+              "deteriorating_count": 1,
+              "uncertain_count": 0,
+              "examples": [
+                {
+                  "code": "S710103",
+                  "name": "其他计算机设备",
+                  "trend": "deteriorating",
+                  "breadth": "divergent"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "level3_profitability_rows": 2
+    },
+    "S72": {
+      "code": "S72",
+      "name": "传媒",
+      "evidence_status": "missing",
+      "required_slot_freshness": {
+        "leading_anchor": false,
+        "earnings_confirmation": false,
+        "negative_evidence": false
+      },
+      "slots": {
+        "leading_anchor": [],
+        "earnings_confirmation": [],
+        "negative_evidence": []
+      },
+      "level3_profitability_rows": 0
+    },
+    "S73": {
+      "code": "S73",
+      "name": "通信",
+      "evidence_status": "partial",
+      "required_slot_freshness": {
+        "leading_anchor": false,
+        "earnings_confirmation": true,
+        "negative_evidence": true
+      },
+      "slots": {
+        "leading_anchor": [],
+        "earnings_confirmation": [
+          {
+            "kind": "level3_profitability_breadth",
+            "source": "data/research/industry_state.json",
+            "reference_date": "2026-09-01",
+            "frequency": "quarterly",
+            "freshness": {
+              "status": "fresh",
+              "age_calendar_days": 6,
+              "max_age_calendar_days": 140
+            },
+            "metrics": {
+              "level3_count": 4,
+              "trend_counts": {
+                "deteriorating": 1,
+                "improving": 3
+              },
+              "breadth_counts": {
+                "divergent": 1,
+                "broad": 2,
+                "narrow": 1
+              },
+              "weighted_parent_profit_yoy": 0.7258355895145632,
+              "weighted_revenue_yoy": 0.2074178103091633
+            }
+          }
+        ],
+        "negative_evidence": [
+          {
+            "kind": "level3_profitability_falsifiers",
+            "source": "data/research/industry_state.json",
+            "reference_date": "2026-09-01",
+            "frequency": "quarterly",
+            "freshness": {
+              "status": "fresh",
+              "age_calendar_days": 6,
+              "max_age_calendar_days": 140
+            },
+            "metrics": {
+              "deteriorating_count": 1,
+              "uncertain_count": 0,
+              "examples": [
+                {
+                  "code": "S730204",
+                  "name": "通信网络设备及器件",
+                  "trend": "deteriorating",
+                  "breadth": "divergent"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "level3_profitability_rows": 4
+    },
+    "S74": {
+      "code": "S74",
+      "name": "煤炭",
+      "evidence_status": "partial",
+      "required_slot_freshness": {
+        "leading_anchor": false,
+        "earnings_confirmation": true,
+        "negative_evidence": true
+      },
+      "slots": {
+        "leading_anchor": [],
+        "earnings_confirmation": [
+          {
+            "kind": "level3_profitability_breadth",
+            "source": "data/research/industry_state.json",
+            "reference_date": "2026-09-01",
+            "frequency": "quarterly",
+            "freshness": {
+              "status": "fresh",
+              "age_calendar_days": 6,
+              "max_age_calendar_days": 140
+            },
+            "metrics": {
+              "level3_count": 3,
+              "trend_counts": {
+                "improving": 1,
+                "stable": 1,
+                "deteriorating": 1
+              },
+              "breadth_counts": {
+                "broad": 2,
+                "divergent": 1
+              },
+              "weighted_parent_profit_yoy": 0.10655337884863167,
+              "weighted_revenue_yoy": 0.05120646163435173
+            }
+          }
+        ],
+        "negative_evidence": [
+          {
+            "kind": "level3_profitability_falsifiers",
+            "source": "data/research/industry_state.json",
+            "reference_date": "2026-09-01",
+            "frequency": "quarterly",
+            "freshness": {
+              "status": "fresh",
+              "age_calendar_days": 6,
+              "max_age_calendar_days": 140
+            },
+            "metrics": {
+              "deteriorating_count": 1,
+              "uncertain_count": 0,
+              "examples": [
+                {
+                  "code": "S740201",
+                  "name": "焦炭Ⅲ",
+                  "trend": "deteriorating",
+                  "breadth": "divergent"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "level3_profitability_rows": 3
+    },
+    "S75": {
+      "code": "S75",
+      "name": "石油石化",
+      "evidence_status": "partial",
+      "required_slot_freshness": {
+        "leading_anchor": false,
+        "earnings_confirmation": true,
+        "negative_evidence": true
+      },
+      "slots": {
+        "leading_anchor": [],
+        "earnings_confirmation": [
+          {
+            "kind": "level3_profitability_breadth",
+            "source": "data/research/industry_state.json",
+            "reference_date": "2026-09-01",
+            "frequency": "quarterly",
+            "freshness": {
+              "status": "fresh",
+              "age_calendar_days": 6,
+              "max_age_calendar_days": 140
+            },
+            "metrics": {
+              "level3_count": 6,
+              "trend_counts": {
+                "improving": 4,
+                "deteriorating": 2
+              },
+              "breadth_counts": {
+                "narrow": 2,
+                "divergent": 2,
+                "broad": 2
+              },
+              "weighted_parent_profit_yoy": 1.3184318022469306,
+              "weighted_revenue_yoy": 0.05510038074868057
+            }
+          }
+        ],
+        "negative_evidence": [
+          {
+            "kind": "level3_profitability_falsifiers",
+            "source": "data/research/industry_state.json",
+            "reference_date": "2026-09-01",
+            "frequency": "quarterly",
+            "freshness": {
+              "status": "fresh",
+              "age_calendar_days": 6,
+              "max_age_calendar_days": 140
+            },
+            "metrics": {
+              "deteriorating_count": 2,
+              "uncertain_count": 0,
+              "examples": [
+                {
+                  "code": "S750201",
+                  "name": "油田服务",
+                  "trend": "deteriorating",
+                  "breadth": "divergent"
+                },
+                {
+                  "code": "S750202",
+                  "name": "油气及炼化工程",
+                  "trend": "deteriorating",
+                  "breadth": "divergent"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "level3_profitability_rows": 6
+    },
+    "S76": {
+      "code": "S76",
+      "name": "环保",
+      "evidence_status": "missing",
+      "required_slot_freshness": {
+        "leading_anchor": false,
+        "earnings_confirmation": false,
+        "negative_evidence": false
+      },
+      "slots": {
+        "leading_anchor": [],
+        "earnings_confirmation": [],
+        "negative_evidence": []
+      },
+      "level3_profitability_rows": 0
+    },
+    "S77": {
+      "code": "S77",
+      "name": "美容护理",
+      "evidence_status": "missing",
+      "required_slot_freshness": {
+        "leading_anchor": false,
+        "earnings_confirmation": false,
+        "negative_evidence": false
+      },
+      "slots": {
+        "leading_anchor": [],
+        "earnings_confirmation": [],
+        "negative_evidence": []
+      },
+      "level3_profitability_rows": 0
+    }
+  },
+  "semantics": {
+    "decision_owner": "ChatGPT Decision Layer",
+    "collection_owner": "GitHub Actions Evidence Layer",
+    "important": "This file precomputes evidence inputs. It does not mechanically label an industry improving/neutral/deteriorating."
+  }
+}
