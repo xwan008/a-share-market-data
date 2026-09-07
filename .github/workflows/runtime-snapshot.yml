@@ -1,13 +1,13 @@
 name: Publish ChatGPT runtime snapshot
 
+# Event-driven bridge: upstream production workflows dispatch this explicitly after
+# they commit a new authoritative main revision. It no longer runs on every push.
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 permissions:
   contents: read
+  actions: write
 
 concurrency:
   group: a-share-runtime-snapshot
@@ -16,7 +16,7 @@ concurrency:
 jobs:
   snapshot:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
@@ -73,3 +73,9 @@ jobs:
             scripts/validate_research_completion.py
           if-no-files-found: error
           retention-days: 3
+
+      - name: Dispatch downstream industry evidence refresh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: bash scripts/dispatch_workflow_and_wait.sh update-industry-evidence.yml main
