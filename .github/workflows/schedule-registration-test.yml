@@ -5,9 +5,13 @@ name: Schedule registration probe
 on:
   workflow_dispatch:
   schedule:
-    # Run on off-peak minutes so a result should appear within at most ~15 minutes.
+    # Existing timezone-aware probe (Asia/Shanghai).
     - cron: '7,22,37,52 * * * *'
       timezone: 'Asia/Shanghai'
+    # A/B control: traditional UTC cron with no timezone field.
+    # At the time of this test, the next expected UTC trigger is 10:03 UTC
+    # (18:03 Asia/Shanghai), followed by the timezone-aware trigger at 18:07.
+    - cron: '3,18,33,48 * * * *'
 
 permissions:
   contents: read
@@ -25,6 +29,7 @@ jobs:
         shell: bash
         run: |
           echo "event=${{ github.event_name }}"
+          echo "schedule=${{ github.event.schedule }}"
           echo "workflow=${{ github.workflow }}"
           echo "run_id=${{ github.run_id }}"
           echo "sha=${{ github.sha }}"
