@@ -46,6 +46,14 @@ def test_market_data_workflow_dispatches_locked_runtime_snapshot_after_data_push
     assert "['git', 'rev-parse', 'HEAD']" in snapshot
 
 
+def test_industry_evidence_refresh_is_schema_aware():
+    workflow = (ROOT / ".github/workflows/update-industry-evidence.yml").read_text(encoding="utf-8")
+    builder = (ROOT / "scripts/build_industry_evidence.py").read_text(encoding="utf-8")
+    assert "EXPECTED_EVIDENCE_SCHEMA_VERSION = 2" in workflow
+    assert "current.get('schema_version') == EXPECTED_EVIDENCE_SCHEMA_VERSION" in workflow
+    assert '"schema_version": 2' in builder
+
+
 def test_research_directory_has_only_authoritative_runtime_files_and_readme():
     research_dir = ROOT / "data/research"
     names = {p.name for p in research_dir.iterdir()}

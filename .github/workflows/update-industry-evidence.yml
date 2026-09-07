@@ -49,6 +49,7 @@ jobs:
           import os
           from pathlib import Path
 
+          EXPECTED_EVIDENCE_SCHEMA_VERSION = 2
           health = json.loads(Path('data/health.json').read_text(encoding='utf-8'))
           state = json.loads(Path('data/research/industry_state.json').read_text(encoding='utf-8'))
           current = {}
@@ -59,6 +60,7 @@ jobs:
           closed = bool(health.get('trade_date') and health.get('market_status') == 'closed')
           same_inputs = bool(
               current
+              and current.get('schema_version') == EXPECTED_EVIDENCE_SCHEMA_VERSION
               and current.get('source_health_generated_at') == health.get('generated_at')
               and current.get('source_industry_state_generated_at') == state.get('generated_at')
           )
@@ -70,6 +72,8 @@ jobs:
           print(json.dumps({
               'trade_date': health.get('trade_date'),
               'market_status': health.get('market_status'),
+              'current_schema_version': current.get('schema_version'),
+              'expected_schema_version': EXPECTED_EVIDENCE_SCHEMA_VERSION,
               'same_inputs': same_inputs,
               'refresh': refresh,
           }, ensure_ascii=False))
@@ -137,4 +141,4 @@ jobs:
 
       - name: Report no-op
         if: steps.source.outputs.refresh != 'true'
-        run: echo "Industry evidence inputs are unchanged or market data is not closed; no evidence commit needed."
+        run: echo "Industry evidence inputs and schema are unchanged or market data is not closed; no evidence commit needed."
