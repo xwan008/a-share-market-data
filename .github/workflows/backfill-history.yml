@@ -5,9 +5,6 @@ on:
   schedule:
     - cron: '20 10 * * 6'
       timezone: 'Asia/Shanghai'
-    # Temporary registration probe on an already-established scheduled workflow identity.
-    # 11:15 UTC = 19:15 Asia/Shanghai on 2026-09-07.
-    - cron: '15 11 * * *'
 
 permissions:
   contents: write
@@ -20,23 +17,7 @@ env:
   HISTORY_PARTITION_COUNT: 16
 
 jobs:
-  registration_probe:
-    if: ${{ github.event_name == 'schedule' && github.event.schedule == '15 11 * * *' }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - name: Report scheduler registration probe
-        shell: bash
-        run: |
-          echo "event=${{ github.event_name }}"
-          echo "schedule=${{ github.event.schedule }}"
-          echo "workflow=${{ github.workflow }}"
-          echo "run_id=${{ github.run_id }}"
-          echo "sha=${{ github.sha }}"
-          echo "utc_now=$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
-
   test:
-    if: ${{ github.event_name != 'schedule' || github.event.schedule != '15 11 * * *' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
