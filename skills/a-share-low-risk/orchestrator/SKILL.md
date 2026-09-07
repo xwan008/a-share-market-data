@@ -37,9 +37,16 @@
 - 或 `trend=stable AND breadth=divergent`。
 
 ## 3. Shard全集与公司准入
-锁定本轮 `repo_commit_sha`。规则文件、运行时快照和shard正文不得混用不同SHA。
+正式 shard 扫描只允许唯一读取路径：**锁 SHA → clone/下载 → 本地读**。
 
-枚举并完整读取该SHA下全部 `data/shards/*.json`。目录元数据不能替代正文。如果连接器正文被截断，必须回退到同SHA完整本地归档或同SHA GitHub Actions `a-share-runtime-snapshot`，并验证manifest SHA一致后逐文件完整JSON解析。
+1. 锁定本轮生产仓库最新 `main` commit SHA 为 `repo_commit_sha`；规则文件、运行时数据和 shard 正文不得混用不同 SHA。
+2. 锁定后必须先把 `repo_commit_sha` 对应的仓库 clone、checkout 或下载归档到当前本地运行环境。GitHub Connector 不得作为正式 shard 正文扫描通道，也不得与本地读取并列为等价路径。
+3. 若使用 clone，必须验证 `HEAD == repo_commit_sha`；若使用归档，必须确认归档明确对应 `repo_commit_sha`。SHA 校验通过后才能开始扫描。
+4. 在本地副本中枚举全部 `data/shards/*.json`，记录 `shard_file_count`，并通过本地文件系统/Python 对每个 shard 执行完整 JSON 解析。
+5. 只有本地完整解析成功的 shard 才计入 `actual_shard_content_read_count`。目录元数据、Connector 正文、搜索片段、分页/分段内容和截断文本都不能计入正式完成数。
+6. GitHub Connector 只允许用于锁定/确认 SHA、读取少量规则或配置、诊断与 spot check；即使单个 shard 能被 Connector 完整返回，也不能代替本地扫描，也不能贡献正式计数。
+7. 若 `repo_commit_sha` 无法 clone/下载/checkout 到本地，或本地 SHA 校验失败，立即返回 `local_snapshot_unavailable`；禁止退回 Connector 逐 shard 扫描。
+8. 若本地副本已就绪，但存在 shard 缺失、JSON 损坏、解析失败或 `actual_shard_content_read_count != shard_file_count`，返回 `shard_scan_incomplete`；禁止用 Connector 分段读取补齐正式扫描。
 
 记录：`repo_commit_sha / scan_source / shard_file_count / actual_shard_content_read_count / company_universe_count`。Completion Gate前必须满足：
 `actual_shard_content_read_count == shard_file_count`。
