@@ -1,5 +1,7 @@
 name: Update industry evidence
 
+# Event-driven stage: normally dispatched by runtime-snapshot after an authoritative
+# repository snapshot is published. Push remains only for evidence-pipeline code changes.
 on:
   workflow_dispatch:
   push:
@@ -9,10 +11,6 @@ on:
       - 'scripts/build_industry_evidence.py'
       - 'scripts/validate_industry_evidence.py'
       - '.github/workflows/update-industry-evidence.yml'
-  schedule:
-    # GitHub cron is UTC. 09:00/09:30 UTC = 17:00/17:30 Asia/Shanghai.
-    - cron: '0 9 * * 1-5'
-    - cron: '30 9 * * 1-5'
 
 permissions:
   contents: write
@@ -25,7 +23,7 @@ concurrency:
 jobs:
   evidence:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
@@ -114,30 +112,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
-        run: |
-          git fetch origin main
-          remote_sha="$(git rev-parse origin/main)"
-          echo "Dispatching production bundle for main SHA: ${remote_sha}"
-          gh workflow run production-bundle.yml --ref main
-
-          for attempt in $(seq 1 24); do
-            run_id="$(gh run list \
-              --workflow production-bundle.yml \
-              --branch main \
-              --event workflow_dispatch \
-              --limit 20 \
-              --json databaseId,headSha,status,conclusion \
-              --jq ".[] | select(.headSha == \"${remote_sha}\") | .databaseId" \
-              | head -n 1)"
-            if [ -n "${run_id}" ]; then
-              echo "Production bundle run ${run_id} created for ${remote_sha}."
-              gh run watch "${run_id}" --exit-status
-              exit 0
-            fi
-            sleep 5
-          done
-          echo "::error::No production-bundle workflow run appeared for ${remote_sha}."
-          exit 1
+        run: bash scripts/dispatch_workflow_and_wait.sh production-bundle.yml main
 
       - name: Report no-op
         if: steps.source.outputs.refresh != 'true'
