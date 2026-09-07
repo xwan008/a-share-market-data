@@ -1,0 +1,101 @@
+name: Publish A-share production bundle
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Backup publication window. 09:40 UTC = 17:40 Asia/Shanghai.
+    - cron: '40 9 * * 1-5'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: a-share-production-bundle
+  cancel-in-progress: true
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify Evidence Gate shape
+        run: python scripts/validate_industry_evidence.py --mode shadow
+
+      - name: Build locked-commit production manifest
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import subprocess
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          sha = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
+          health = json.loads(Path('data/health.json').read_text(encoding='utf-8'))
+          evidence = json.loads(Path('data/research/industry_evidence.json').read_text(encoding='utf-8'))
+          gate = json.loads(Path('data/research/evidence_gate.json').read_text(encoding='utf-8'))
+
+          if evidence.get('reference_trade_date') != health.get('trade_date'):
+              raise SystemExit(
+                  f"evidence trade date mismatch: {evidence.get('reference_trade_date')} != {health.get('trade_date')}"
+              )
+
+          payload = {
+              'schema_version': 1,
+              'repo': 'xwan008/a-share-market-data',
+              'commit_sha': sha,
+              'generated_at': datetime.now(timezone.utc).isoformat(),
+              'bundle_kind': 'a_share_production_bundle',
+              'rollout_mode': 'shadow',
+              'trade_date': health.get('trade_date'),
+              'market_status': health.get('market_status'),
+              'industry_evidence_reference_trade_date': evidence.get('reference_trade_date'),
+              'evidence_gate_strict_pass': gate.get('strict_pass'),
+              'decision_layer_ready': gate.get('decision_layer_ready'),
+              'formal_consumer_rule': (
+                  'During shadow rollout, this artifact is diagnostic only. '
+                  'Formal ChatGPT production continues to use the existing runtime snapshot until strict_pass=true '
+                  'and the orchestrator is explicitly migrated.'
+              ),
+          }
+          Path('production_bundle_manifest.json').write_text(
+              json.dumps(payload, ensure_ascii=False, indent=2) + '\n',
+              encoding='utf-8',
+          )
+          print(json.dumps(payload, ensure_ascii=False))
+          PY
+
+      - name: Upload locked-commit production bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: a-share-production-bundle
+          path: |
+            production_bundle_manifest.json
+            config/industry_evidence_contract.json
+            config/research_runtime_policy.json
+            config/research_pipeline_manifest.json
+            config/industry_scan_universe.json
+            data/health.json
+            data/commodity/futures_daily.json
+            data/research/industry_state.json
+            data/research/industry_evidence.json
+            data/research/evidence_gate.json
+            data/research/full_market_price_structure.json
+            data/shards/*.json
+            data/history_shards/*.json
+            skills/a-share-low-risk/orchestrator/SKILL.md
+            skills/a-share-low-risk/company-research/SKILL.md
+            skills/a-share-low-risk/valuation/SKILL.md
+            skills/a-share-low-risk/price-structure/SKILL.md
+            scripts/validate_research_completion.py
+            scripts/validate_industry_evidence.py
+          if-no-files-found: error
+          retention-days: 3
