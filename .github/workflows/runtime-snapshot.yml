@@ -57,6 +57,8 @@ jobs:
           name: a-share-runtime-snapshot
           path: |
             runtime_snapshot_manifest.json
+            config/research_runtime_policy.json
+            config/research_pipeline_manifest.json
             config/industry_scan_universe.json
             data/health.json
             data/commodity/futures_daily.json
@@ -64,8 +66,10 @@ jobs:
             data/research/full_market_price_structure.json
             data/shards/*.json
             data/history_shards/*.json
+            skills/a-share-low-risk/orchestrator/SKILL.md
             skills/a-share-low-risk/company-research/SKILL.md
             skills/a-share-low-risk/valuation/SKILL.md
             skills/a-share-low-risk/price-structure/SKILL.md
+            scripts/validate_research_completion.py
           if-no-files-found: error
           retention-days: 3

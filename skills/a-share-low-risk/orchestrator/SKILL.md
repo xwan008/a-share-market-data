@@ -178,6 +178,34 @@ Near-miss仅收：
 - 左侧拐点榜逐只验证为左侧价值榜子集；
 - Near-miss只来自 `above_reasonable_buy_range`，且距离锚是 `reasonable_buy_range.upper`。
 
+### 10.1 Completion Ledger 守恒校验（强制）
+在宣布 Completion Gate 通过之前，必须为**当前轮**生成临时 `completion_ledger.json`（只存在于当前本地运行环境，不得提交、持久化或成为下一轮输入），并执行：
+
+`python scripts/validate_research_completion.py completion_ledger.json`
+
+只有校验器返回 `completion_gate_passed` 才允许正式发布。任何字段缺失、阶段计数不守恒、下一 Gate 少处理一家公司、榜单集合关系不合法，都必须视为 `incomplete_research`。
+
+为避免用近似流程冒充正式研究，额外强制：
+- Gate2/Gate4不得以机械字段筛选代替公开证据核验；财务字段只能用于召回、预筛或支撑，不能替代主营暴露、核心盈利质量、经营变量和反向证据判断。
+- Gate3不得直接以 `sw_level3_code` 作为真正可比组；只有确认核心盈利驱动与商业模式高度可比后，才能形成同一真正可比组。
+- Gate3通过的每一家公司都必须获得Gate4终态；只研究部分winner、抽样研究或因时间/上下文限制提前停止，均不得算Completion Gate完成。
+- 正式估值不得用 `H1 EPS×2`、预设统一PE带、自由haircut或其他未被估值Skill允许的捷径代替完整估值。
+- 运行时间、上下文长度、工具调用量不是合法终态；未完成只能fail closed，禁止通过缩小样本、代理分组或回退旧结果来“完成”榜单。
+
+Ledger至少必须证明以下守恒关系：
+`shard_file_count == actual_shard_content_read_count`
+`level1_total_count == level1_terminal_count`
+`improving_level1_count == improving_level1_drilled_count`
+`admitted_level3_count == admitted_level3_industry_state_applied_count`
+`company_universe_count == company_industry_terminal_count`
+`mapped_eligible_count == absolute_price_gate_terminal_count`
+`price_gate_pass_count == gate1_terminal_count`
+`gate1_pass_count == gate2_terminal_count`
+`gate2_pass_count == gate3_terminal_count`
+`gate3_pass_count == gate4_terminal_count`
+`gate4_pass_count == valuation_terminal_count`
+`formal_valuation_count == price_structure_terminal_count == buy_point_terminal_count`
+
 任一硬门失败：`status=incomplete_research`，不发布本轮正式买点，也不得用上一轮榜单回退。
 
 ## 11. 持久化边界
