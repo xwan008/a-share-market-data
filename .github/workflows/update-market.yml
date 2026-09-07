@@ -1,16 +1,9 @@
 name: Update A-share market data
 
 # Consolidated post-close pipeline: quote/history/commodity/bridge/price-structure refresh together.
-# Code pushes that change the market-input pipeline run one refresh; ordinary code pushes are CI-only.
+# Persistence is allowed only on scheduled or explicit manual runs, never on code pushes.
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - 'scripts/fetch_commodity_anchors.py'
-      - 'scripts/build_bridge.py'
-      - 'requirements.txt'
-      - '.github/workflows/update-market.yml'
   schedule:
     # Primary post-close run in Beijing/Shanghai local time.
     - cron: '10 16 * * 1-5'
