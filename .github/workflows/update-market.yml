@@ -1,9 +1,16 @@
 name: Update A-share market data
 
-# Consolidated post-close pipeline: quote/history/bridge/price-structure refresh together.
-# Code pushes are validated by CI and never write market data.
+# Consolidated post-close pipeline: quote/history/commodity/bridge/price-structure refresh together.
+# Code pushes that change the market-input pipeline run one refresh; ordinary code pushes are CI-only.
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/fetch_commodity_anchors.py'
+      - 'scripts/build_bridge.py'
+      - 'requirements.txt'
+      - '.github/workflows/update-market.yml'
   schedule:
     # Primary post-close run in Beijing/Shanghai local time.
     - cron: '10 16 * * 1-5'
@@ -118,6 +125,9 @@ jobs:
       - name: Build market history summaries
         if: steps.session.outputs.persist == 'true'
         run: python scripts/build_history.py
+      - name: Fetch commodity futures anchors
+        if: steps.session.outputs.persist == 'true'
+        run: python scripts/fetch_commodity_anchors.py
       - name: Build compact ChatGPT bridge files
         if: steps.session.outputs.persist == 'true'
         run: python scripts/build_bridge.py
@@ -156,12 +166,17 @@ jobs:
           from pathlib import Path
 
           sha = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
+          health = json.loads(Path('data/health.json').read_text(encoding='utf-8'))
+          commodity = health.get('commodity_anchors') or {}
           payload = {
-              'schema_version': 1,
+              'schema_version': 2,
               'repo': 'xwan008/a-share-market-data',
               'commit_sha': sha,
               'generated_at': datetime.now(timezone.utc).isoformat(),
               'snapshot_kind': 'chatgpt_runtime_locked_commit',
+              'trade_date': health.get('trade_date'),
+              'commodity_anchor_status': commodity.get('status'),
+              'commodity_reference_trade_date': commodity.get('reference_trade_date'),
           }
           Path('runtime_snapshot_manifest.json').write_text(
               json.dumps(payload, ensure_ascii=False, indent=2),
@@ -178,6 +193,7 @@ jobs:
             runtime_snapshot_manifest.json
             config/industry_scan_universe.json
             data/health.json
+            data/commodity/futures_daily.json
             data/research/industry_state.json
             data/research/full_market_price_structure.json
             data/shards/*.json
@@ -194,5 +210,7 @@ jobs:
 # Completed daily sessions may persist in dual-source mode or verified single-source degraded mode.
 # Single-source fallback still requires >=99% usable quote coverage, <=1% invalid quotes,
 # and >=95% valuation/financial coverage with no fundamental-source errors.
+# Commodity-source failures are recorded as degraded and do not suppress equity persistence;
+# cycle valuation must then use its conservative anchorless fallback.
 # Runtime snapshot publication is part of this same run because pushes created with GITHUB_TOKEN
 # do not recursively trigger a second push-based Actions workflow.
