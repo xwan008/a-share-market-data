@@ -1,5 +1,7 @@
 name: Backfill A-share rolling history
 
+# Weekly root task. A successful history commit hands off to the same event-driven
+# runtime snapshot -> evidence -> production bundle chain used by daily market updates.
 on:
   workflow_dispatch:
   schedule:
@@ -8,6 +10,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: a-share-market-data-write
@@ -82,7 +85,7 @@ jobs:
   aggregate:
     needs: [test, backfill]
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
         with:
@@ -104,6 +107,7 @@ jobs:
       - name: Remove transient partition status files
         run: rm -rf data/backfill_parts
       - name: Commit bounded history
+        id: commit
         shell: bash
         run: |
           if git status --porcelain -- data | grep -q .; then
@@ -113,10 +117,19 @@ jobs:
             git commit -m "data: refresh sharded bounded 180-session qfq history"
             for attempt in 1 2 3; do
               git pull --rebase origin main
-              if git push origin HEAD:main; then exit 0; fi
+              if git push origin HEAD:main; then
+                echo "pushed=true" >> "$GITHUB_OUTPUT"
+                exit 0
+              fi
               sleep $((attempt * 2))
             done
             exit 1
-          else
-            echo "No sharded backfill changes to commit."
           fi
+          echo "pushed=false" >> "$GITHUB_OUTPUT"
+          echo "No sharded backfill changes to commit."
+      - name: Publish downstream production chain
+        if: steps.commit.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: bash scripts/dispatch_workflow_and_wait.sh runtime-snapshot.yml main
