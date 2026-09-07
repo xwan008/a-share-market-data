@@ -1,6 +1,7 @@
 name: Update A-share market data
 
-# Consolidated post-close pipeline: quote/history/commodity/bridge/price-structure refresh together.
+# Root post-close pipeline. Time only starts this root workflow; successful data commits
+# hand off to runtime snapshot -> industry evidence -> production bundle.
 # Persistence is allowed only on scheduled or explicit manual runs, never on code pushes.
 on:
   workflow_dispatch:
@@ -23,7 +24,7 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
@@ -132,6 +133,7 @@ jobs:
         if: steps.session.outputs.persist == 'true'
         run: python scripts/build_full_market_price_structure.py
       - name: Commit updated data
+        id: commit
         if: steps.session.outputs.persist == 'true'
         shell: bash
         run: |
@@ -142,43 +144,25 @@ jobs:
             git commit -m "data: update A-share snapshot and rolling history"
             for attempt in 1 2 3; do
               git pull --rebase origin main
-              if git push origin HEAD:main; then exit 0; fi
+              if git push origin HEAD:main; then
+                echo "pushed=true" >> "$GITHUB_OUTPUT"
+                exit 0
+              fi
               sleep $((attempt * 2))
             done
             exit 1
-          else
-            echo "No market-data changes to commit."
           fi
-      - name: Dispatch locked-commit runtime snapshot
-        if: steps.session.outputs.persist == 'true'
+          echo "pushed=false" >> "$GITHUB_OUTPUT"
+          echo "No market-data changes to commit."
+      - name: Publish downstream production chain
+        if: steps.commit.outputs.pushed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
-        run: |
-          git fetch origin main
-          remote_sha="$(git rev-parse origin/main)"
-          echo "Dispatching runtime snapshot for main SHA: ${remote_sha}"
-          gh workflow run runtime-snapshot.yml --ref main
-
-          for attempt in $(seq 1 24); do
-            run_id="$(gh run list \
-              --workflow runtime-snapshot.yml \
-              --branch main \
-              --event workflow_dispatch \
-              --limit 20 \
-              --json databaseId,headSha,status,conclusion \
-              --jq ".[] | select(.headSha == \"${remote_sha}\") | .databaseId" \
-              | head -n 1)"
-            if [ -n "${run_id}" ]; then
-              echo "Runtime snapshot run ${run_id} created for ${remote_sha}."
-              gh run watch "${run_id}" --exit-status
-              exit 0
-            fi
-            sleep 5
-          done
-
-          echo "::error::No runtime snapshot workflow run appeared for ${remote_sha}."
-          exit 1
+        run: bash scripts/dispatch_workflow_and_wait.sh runtime-snapshot.yml main
+      - name: Report unchanged completed session
+        if: steps.session.outputs.persist == 'true' && steps.commit.outputs.pushed != 'true'
+        run: echo "Completed-session data is already current; downstream publication is unchanged."
       - name: Report skipped persistence
         if: steps.session.outputs.persist != 'true'
         run: echo "Market snapshot did not pass the completed-session quality gate; no repository data will be persisted."
@@ -188,5 +172,4 @@ jobs:
 # and >=95% valuation/financial coverage with no fundamental-source errors.
 # Commodity-source failures are recorded as degraded and do not suppress equity persistence;
 # cycle valuation must then use its conservative anchorless fallback.
-# Runtime snapshot publication is dispatched as a second workflow after the data push so the
-# snapshot workflow head_sha and manifest commit_sha both identify the committed main revision.
+# A successful data push is the only event that starts downstream publication.
