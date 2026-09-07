@@ -1,10 +1,9 @@
 name: Publish A-share production bundle
 
+# Terminal event-driven stage. Normally dispatched by update-industry-evidence after
+# a new evidence commit; manual dispatch remains available for recovery/diagnostics.
 on:
   workflow_dispatch:
-  schedule:
-    # Backup publication window. 09:40 UTC = 17:40 Asia/Shanghai.
-    - cron: '40 9 * * 1-5'
 
 permissions:
   contents: read
