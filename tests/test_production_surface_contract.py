@@ -38,12 +38,37 @@ def test_market_data_workflow_cannot_persist_on_code_push():
 def test_market_data_workflow_dispatches_locked_runtime_snapshot_after_data_push():
     update = (ROOT / ".github/workflows/update-market.yml").read_text(encoding="utf-8")
     snapshot = (ROOT / ".github/workflows/runtime-snapshot.yml").read_text(encoding="utf-8")
-    assert "gh workflow run runtime-snapshot.yml" in update
-    assert "remote_sha=\"$(git rev-parse origin/main)\"" in update
+    helper = (ROOT / "scripts/dispatch_workflow_and_wait.sh").read_text(encoding="utf-8")
+
+    assert "bash scripts/dispatch_workflow_and_wait.sh runtime-snapshot.yml main" in update
+    assert "if: steps.commit.outputs.pushed == 'true'" in update
+    assert "gh workflow run" in helper
+    assert "headSha" in helper
+    assert "createdAt" in helper
     assert "actions/upload-artifact@v4" in snapshot
     assert "name: a-share-runtime-snapshot" in snapshot
     assert "runtime_snapshot_manifest.json" in snapshot
     assert "['git', 'rev-parse', 'HEAD']" in snapshot
+
+
+def test_downstream_publication_is_event_driven_and_cron_is_root_only():
+    market = (ROOT / ".github/workflows/update-market.yml").read_text(encoding="utf-8")
+    backfill = (ROOT / ".github/workflows/backfill-history.yml").read_text(encoding="utf-8")
+    industry = (ROOT / ".github/workflows/build-company-industry-index.yml").read_text(encoding="utf-8")
+    snapshot = (ROOT / ".github/workflows/runtime-snapshot.yml").read_text(encoding="utf-8")
+    evidence = (ROOT / ".github/workflows/update-industry-evidence.yml").read_text(encoding="utf-8")
+    bundle = (ROOT / ".github/workflows/production-bundle.yml").read_text(encoding="utf-8")
+
+    assert sum(text.count("- cron:") for text in (market, backfill, industry)) == 4
+    for text in (snapshot, evidence, bundle):
+        trigger_block = text.split("permissions:", 1)[0]
+        assert "schedule:" not in trigger_block
+
+    snapshot_trigger = snapshot.split("permissions:", 1)[0]
+    assert "workflow_dispatch:" in snapshot_trigger
+    assert "push:" not in snapshot_trigger
+    assert "bash scripts/dispatch_workflow_and_wait.sh update-industry-evidence.yml main" in snapshot
+    assert "bash scripts/dispatch_workflow_and_wait.sh production-bundle.yml main" in evidence
 
 
 def test_industry_evidence_refresh_is_schema_aware():
