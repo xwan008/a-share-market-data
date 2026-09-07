@@ -7,7 +7,7 @@
 
 核心原则：**发现阶段广而轻，验证阶段窄而深；公司层先便宜淘汰、后昂贵研究；合理价值、合理买入、低风险执行三层价值语义必须分开；价值决定 WHERE，结构只决定 TURN；任何硬门失败都 fail closed。**
 
-本 Skill 服从 `config/research_runtime_policy.json`、`config/research_pipeline_manifest.json` 与 `valuation/SKILL.md`、`price-structure/SKILL.md`。若旧契约仍把 `reasonable_buy_range` 定义成 MOS 后5%窄带，以新版估值 Skill 的“双买入区”语义为准，旧窄带语义迁移到 `low_risk_buy_range`。
+本 Skill 服从 `config/research_runtime_policy.json`、`config/research_pipeline_manifest.json` 与 `valuation/SKILL.md`、`price-structure/SKILL.md`。若旧契约仍把 `reasonable_buy_range` 定义成 MOS 后5%窄带，以新版估值 Skill 的“双买入区”语义为准，旧窄带语义迁移到 `low_risk_buy_range`。强周期估值若与旧的 `missing_cycle_anchor` 规则冲突，以新版估值 Skill 的“机器商品锚 + 保守无锚fallback”双路径为准。
 
 ### 当前轮隔离原则（强制）
 除 `data/research/industry_state.json` 的三级行业盈利基线外，上一轮公司、盈利链、估值、价格结构判断、买点、Near-miss、榜单结果都不是下一轮输入。
@@ -22,6 +22,8 @@
 - 行情/财务/估值覆盖没有实质退化；
 - 历史数据覆盖该交易日；
 - `full_market_price_structure.json` 的参考交易日与之相同。
+
+同时读取 `health.commodity_anchors`。若该块存在且 `status=ok/degraded`，其 `reference_trade_date` 必须与 `health.trade_date` 相同；其中有效 symbol 可作为强周期机器锚。商品源 `degraded/unavailable` **不使整个A股 Data Gate失败**，但必须在强周期估值时进入 `conservative_anchorless_cycle`；不得静默忽略，也不得用过期锚冒充当期数据。
 
 历史窗口：65日仅为轻量摘要；120日为正式价格结构最低门槛；180日为底层滚动历史和正式结构/估值sanity目标窗口。权威底层历史来源始终是 `data/history_shards/*.json`。
 
@@ -112,7 +114,11 @@ Gate3终态：
 
 `reasonable_buy_range` 不使用MOS；5%仅是 `low_risk_buy_range` 的执行带宽；MOS只应用一次。旧 `safe_price_range` 字段继续废弃，其窄带语义迁移到 `low_risk_buy_range`。
 
-强周期公司必须先获取并评估最直接商品价格/价差、供需、库存和周期位置，形成 `normalized_core_eps`，区分结构性盈利和周期性盈利。高景气利润不得机械外推；周期景气不得通过EPS和PE重复计价。缺少周期第一锚 → `valuation_incomplete:missing_cycle_anchor`。
+强周期公司统一按 `valuation/SKILL.md` 的双路径处理：
+- 有可靠机器锚：读取同一锁定快照 `health.commodity_anchors`，结合供需/库存/周期位置形成 `normalized_core_eps`；
+- 无可靠机器锚或商品源 degraded：进入 `conservative_anchorless_cycle`，使用保守Forward盈利、下一年度下行约束、结构折价和6–18个月周期regime形成 `normalized_core_eps`。
+
+高景气利润不得机械外推；周期景气不得通过EPS和PE重复计价。**缺少单一期货锚本身不得淘汰公司。只有机器锚与无锚fallback所需的Forward盈利/周期证据都不足，才允许 `valuation_incomplete:missing_cycle_inputs`。**
 
 ## 6. 当前价格位置与折价复核
 每家公司同时输出：
@@ -166,6 +172,7 @@ Near-miss仅收：
 - Gate3每个真正可比组原则上仅1家pass，其余明确exclude或uncertain；
 - Gate3 pass全部进入Gate4并有终态；
 - 所有Gate4=pass完成正确估值路由，并分别产生 `reasonable_price_range / base_fair_value / reasonable_buy_range / safe_price_ceiling / low_risk_buy_range / valuation_position / low_risk_position`；
+- 所有 `strong_cycle_or_commodity` 明确记录 `machine_commodity_anchor` 或 `conservative_anchorless_cycle`，不得以 `missing_cycle_anchor` 静默淘汰；
 - 必要的 `discount_sanity_check / deep_discount_review` 已处理；
 - 所有非review公司完成价格结构和左侧价值判断；
 - 左侧拐点榜逐只验证为左侧价值榜子集；
