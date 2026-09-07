@@ -37,18 +37,18 @@
 - 或 `trend=stable AND breadth=divergent`。
 
 ## 3. Shard全集与公司准入
-正式 shard 扫描只允许唯一读取路径：**锁 SHA → clone/下载 → 本地读**。
+正式 shard 扫描的唯一数据语义是：**锁 SHA → 获得该 SHA 的完整本地快照 → 校验 SHA → 本地逐文件解析**。允许多种“传输方式”把同一锁定 SHA 的完整快照送入本地，但正式扫描本身永远只能发生在本地文件系统。
 
 1. 锁定本轮生产仓库最新 `main` commit SHA 为 `repo_commit_sha`；规则文件、运行时数据和 shard 正文不得混用不同 SHA。
-2. 锁定后必须先把 `repo_commit_sha` 对应的仓库 clone、checkout 或下载归档到当前本地运行环境。GitHub Connector 不得作为正式 shard 正文扫描通道，也不得与本地读取并列为等价路径。
-3. 若使用 clone，必须验证 `HEAD == repo_commit_sha`；若使用归档，必须确认归档明确对应 `repo_commit_sha`。SHA 校验通过后才能开始扫描。
-4. 在本地副本中枚举全部 `data/shards/*.json`，记录 `shard_file_count`，并通过本地文件系统/Python 对每个 shard 执行完整 JSON 解析。
-5. 只有本地完整解析成功的 shard 才计入 `actual_shard_content_read_count`。目录元数据、Connector 正文、搜索片段、分页/分段内容和截断文本都不能计入正式完成数。
-6. GitHub Connector 只允许用于锁定/确认 SHA、读取少量规则或配置、诊断与 spot check；即使单个 shard 能被 Connector 完整返回，也不能代替本地扫描，也不能贡献正式计数。
-7. 若 `repo_commit_sha` 无法 clone/下载/checkout 到本地，或本地 SHA 校验失败，立即返回 `local_snapshot_unavailable`；禁止退回 Connector 逐 shard 扫描。
-8. 若本地副本已就绪，但存在 shard 缺失、JSON 损坏、解析失败或 `actual_shard_content_read_count != shard_file_count`，返回 `shard_scan_incomplete`；禁止用 Connector 分段读取补齐正式扫描。
+2. 优先路径：将 `repo_commit_sha` 对应仓库 clone/checkout，或下载该 commit 的完整归档到当前本地运行环境。若使用 clone，必须验证 `HEAD == repo_commit_sha`；若使用归档，必须确认归档明确对应 `repo_commit_sha`。
+3. 兼容受限运行环境的正式回退路径：若当前容器无法直接访问 GitHub、clone/归档下载失败，允许通过 GitHub Connector 仅定位并下载 GitHub Actions `a-share-runtime-snapshot` artifact 到本地。必须选择 `head_sha == repo_commit_sha`、workflow 已成功完成的 artifact；解压后必须读取 `runtime_snapshot_manifest.json` 并验证 `repo == xwan008/a-share-market-data` 且 `commit_sha == repo_commit_sha`。manifest 不匹配、缺失或 artifact 不完整一律不得继续。
+4. GitHub Connector 在回退路径中只承担“锁定 SHA / 查询 workflow 与 artifact 元数据 / 下载完整 ZIP 文件”的传输职责；严禁用 Connector 逐 shard 读取正文、搜索片段、分页内容或拼接内容构造正式公司全集。
+5. SHA/manifest 校验通过后，在本地快照中枚举全部 `data/shards/*.json`，记录 `shard_file_count`，并仅通过本地文件系统/Python 对每个 shard 执行完整 JSON 解析。
+6. 只有本地完整解析成功的 shard 才能计入 `actual_shard_content_read_count`。目录元数据、Connector shard 正文、搜索片段、分页/分段内容和截断文本均不得计入正式完成数。
+7. 若直接本地仓库/归档不可用，且不存在与 `repo_commit_sha` 完全匹配的成功 `a-share-runtime-snapshot`，或 artifact 无法下载/解压/通过 manifest 校验，则返回 `local_snapshot_unavailable`；禁止退回 Connector 逐 shard 全市场扫描。
+8. 若本地快照已就绪，但任一 shard 缺失、JSON损坏、解析失败，或 `actual_shard_content_read_count != shard_file_count`，返回 `shard_scan_incomplete`；禁止用 Connector 分段读取补齐正式扫描。
 
-记录：`repo_commit_sha / scan_source / shard_file_count / actual_shard_content_read_count / company_universe_count`。Completion Gate前必须满足：
+记录：`repo_commit_sha / scan_source / shard_file_count / actual_shard_content_read_count / company_universe_count`。其中 `scan_source` 仅允许 `local_git_checkout / local_commit_archive / github_actions_runtime_snapshot`。Completion Gate前必须满足：
 `actual_shard_content_read_count == shard_file_count`。
 
 公司行业映射唯一运行时来源为shard自带 `industry_mapping_status / sw_level3_code / sw_level3_name`：
