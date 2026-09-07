@@ -1,0 +1,68 @@
+name: Commodity anchor smoke test
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/fetch_commodity_anchors.py'
+      - 'requirements.txt'
+      - '.github/workflows/commodity-anchor-smoke.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: commodity-anchor-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Fetch commodity anchors without persisting repository data
+        run: python scripts/fetch_commodity_anchors.py
+      - name: Validate same-session commodity payload
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          latest = json.loads(Path('data/latest.json').read_text(encoding='utf-8'))
+          commodity = json.loads(Path('data/commodity/futures_daily.json').read_text(encoding='utf-8'))
+          expected = str(latest.get('trade_date') or '')[:10]
+          actual = str(commodity.get('reference_trade_date') or '')[:10]
+          anchors = commodity.get('anchors') or {}
+          if actual != expected:
+              raise SystemExit(f'reference date mismatch: expected={expected} actual={actual}')
+          if not anchors:
+              raise SystemExit(f'no machine commodity anchors available: {commodity.get("errors")}')
+          for symbol, item in anchors.items():
+              if int(item.get('age_days', 999)) > int(commodity.get('max_anchor_age_days', 7)):
+                  raise SystemExit(f'stale anchor: {symbol} {item.get("last_date")}')
+              if int(item.get('neutral_window_sessions', 0)) < int(commodity.get('minimum_neutral_sessions', 252)):
+                  raise SystemExit(f'insufficient neutral history: {symbol}')
+          print(json.dumps({
+              'status': commodity.get('status'),
+              'reference_trade_date': actual,
+              'anchors': sorted(anchors),
+              'errors': commodity.get('errors') or {},
+          }, ensure_ascii=False))
+          PY
+      - name: Upload diagnostic commodity payload
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: commodity-anchor-smoke
+          path: data/commodity/futures_daily.json
+          if-no-files-found: error
+          retention-days: 1
