@@ -40,7 +40,9 @@
 强周期/资源公司不得因为缺少单一期货代码而从正式研究中静默消失。先识别 `cycle_valuation_mode`：
 
 #### A. `machine_commodity_anchor`
-当主营存在可靠、经济含义直接的机器商品锚时，**正式运行只读取当前锁定快照 `data/health.json -> commodity_anchors`，不得在估值阶段临时联网抓期货**。原始审计日线保存在 `data/commodity/futures_daily.json`，但正式运行以 health 中的同 SHA 摘要为准。
+当主营存在可靠、经济含义直接的机器商品锚时，**正式运行优先读取当前锁定快照 `data/health.json -> commodity_anchors`，不得在估值阶段临时联网抓期货**。原始/审计商品数据保存在同一锁定 SHA 的 `data/commodity/futures_daily.json`。
+
+迁移兼容规则：若当前锁定快照中的 `health.json` 尚未生成 `commodity_anchors` 块，但同一 SHA 已存在 `data/commodity/futures_daily.json`，允许仅作为迁移回退读取该文件。必须同时满足：`reference_trade_date == health.trade_date`、`status in {ok,degraded}`、对应 symbol 存在、`age_days <= max_anchor_age_days`、`neutral_window_sessions >= minimum_neutral_sessions`。若 health 已有商品块，则以 health 为正式摘要，不得用 raw 文件绕过 health 中的 stale/invalid 判定。必须记录 `commodity_anchor_input_source=health_summary` 或 `same_sha_raw_migration_fallback`。
 
 当前标准机器锚：
 - 铜资源/铜价暴露：`CU0` 沪铜连续；
