@@ -57,22 +57,37 @@ def validate(mode: str):
                 "stale_or_unknown_slots": stale_or_unknown_slots,
             })
 
+    shard_scan = evidence.get("shard_financial_breadth_scan") or {}
+    shard_scan_required = int(evidence.get("schema_version") or 0) >= 2
+    shard_scan_complete = (
+        bool(shard_scan)
+        and int(shard_scan.get("shard_file_count") or 0) > 0
+        and int(shard_scan.get("actual_shard_content_read_count") or 0)
+        == int(shard_scan.get("shard_file_count") or 0)
+        and int(shard_scan.get("stock_records_read") or 0) > 0
+    )
+    if not shard_scan_required:
+        shard_scan_complete = True
+
     shape_valid = (
         evidence.get("contract_id") == "a-share-industry-evidence"
         and len(level1) == expected
         and (evidence.get("universe") or {}).get("actual_level1_count") == expected
+        and shard_scan_complete
     )
     strict_pass = bool(shape_valid and complete == expected and not deficiencies)
 
     gate = {
         "contract_id": "a-share-industry-evidence-gate",
-        "schema_version": 1,
+        "schema_version": 2,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "mode": mode,
         "reference_trade_date": evidence.get("reference_trade_date"),
         "shape_valid": shape_valid,
         "level1_expected": expected,
         "level1_accounted": len(level1),
+        "shard_financial_breadth_scan_complete": shard_scan_complete,
+        "shard_financial_breadth_scan": shard_scan,
         "complete": complete,
         "partial": partial,
         "missing": missing,
@@ -82,7 +97,7 @@ def validate(mode: str):
         "deficiencies": deficiencies,
         "semantics": (
             "In shadow mode this gate is diagnostic and must not replace the current formal production gate. "
-            "Switch to strict only after machine evidence coverage is intentionally completed."
+            "Switch to strict only after machine leading-anchor coverage is intentionally completed."
         ),
     }
 
@@ -91,6 +106,7 @@ def validate(mode: str):
     print(json.dumps({
         "mode": mode,
         "shape_valid": shape_valid,
+        "shard_scan_complete": shard_scan_complete,
         "complete": complete,
         "partial": partial,
         "missing": missing,
