@@ -32,12 +32,17 @@ jobs:
           from pathlib import Path
 
           sha = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
+          health = json.loads(Path('data/health.json').read_text(encoding='utf-8'))
+          commodity = health.get('commodity_anchors') or {}
           payload = {
-              'schema_version': 1,
+              'schema_version': 2,
               'repo': 'xwan008/a-share-market-data',
               'commit_sha': sha,
               'generated_at': datetime.now(timezone.utc).isoformat(),
               'snapshot_kind': 'chatgpt_runtime_locked_commit',
+              'trade_date': health.get('trade_date'),
+              'commodity_anchor_status': commodity.get('status'),
+              'commodity_reference_trade_date': commodity.get('reference_trade_date'),
           }
           Path('runtime_snapshot_manifest.json').write_text(
               json.dumps(payload, ensure_ascii=False, indent=2),
@@ -54,6 +59,7 @@ jobs:
             runtime_snapshot_manifest.json
             config/industry_scan_universe.json
             data/health.json
+            data/commodity/futures_daily.json
             data/research/industry_state.json
             data/research/full_market_price_structure.json
             data/shards/*.json
