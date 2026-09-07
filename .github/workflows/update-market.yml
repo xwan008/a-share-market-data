@@ -11,6 +11,9 @@ on:
     # Second post-close retry window.
     - cron: '30 16 * * 1-5'
       timezone: 'Asia/Shanghai'
+    # Temporary scheduler-registration probe after Disable -> Enable.
+    # 11:30/11:35 UTC = 19:30/19:35 Asia/Shanghai on 2026-09-07.
+    - cron: '30,35 11 * * *'
 
 permissions:
   contents: write
@@ -21,7 +24,23 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  scheduler_probe:
+    if: ${{ github.event_name == 'schedule' && github.event.schedule == '30,35 11 * * *' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Report update-market scheduler probe
+        shell: bash
+        run: |
+          echo "event=${{ github.event_name }}"
+          echo "schedule=${{ github.event.schedule }}"
+          echo "workflow=${{ github.workflow }}"
+          echo "run_id=${{ github.run_id }}"
+          echo "sha=${{ github.sha }}"
+          echo "utc_now=$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+
   update:
+    if: ${{ github.event_name != 'schedule' || github.event.schedule != '30,35 11 * * *' }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
