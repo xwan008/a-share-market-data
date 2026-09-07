@@ -1,5 +1,7 @@
 name: Update industry evidence
 
+# Event-driven stage: normally dispatched by runtime-snapshot after an authoritative
+# repository snapshot is published. Push remains only for evidence-pipeline code changes.
 on:
   workflow_dispatch:
   push:
@@ -11,10 +13,6 @@ on:
       - 'scripts/build_industry_evidence.py'
       - 'scripts/validate_industry_evidence.py'
       - '.github/workflows/update-industry-evidence.yml'
-  schedule:
-    # GitHub cron is UTC. 09:00/09:30 UTC = 17:00/17:30 Asia/Shanghai.
-    - cron: '0 9 * * 1-5'
-    - cron: '30 9 * * 1-5'
 
 permissions:
   contents: write
@@ -27,7 +25,7 @@ concurrency:
 jobs:
   evidence:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
@@ -58,7 +56,11 @@ jobs:
           closed = bool(health.get('trade_date') and health.get('market_status') == 'closed')
           with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as fh:
               fh.write(f"closed={'true' if closed else 'false'}\n")
-          print(json.dumps({'trade_date': health.get('trade_date'), 'market_status': health.get('market_status'), 'closed': closed}, ensure_ascii=False))
+          print(json.dumps({
+              'trade_date': health.get('trade_date'),
+              'market_status': health.get('market_status'),
+              'closed': closed,
+          }, ensure_ascii=False))
           PY
 
       - name: Collect industry leading anchors
@@ -66,14 +68,15 @@ jobs:
         run: python scripts/fetch_industry_leading_anchors.py
 
       - name: Decide evidence rebuild
-        if: steps.source.outputs.closed == 'true'
         id: rebuild
+        if: steps.source.outputs.closed == 'true'
         shell: bash
         run: |
           python - <<'PY'
           import json
           import os
           from pathlib import Path
+
           EXPECTED_EVIDENCE_SCHEMA_VERSION = 3
           health = json.loads(Path('data/health.json').read_text(encoding='utf-8'))
           state = json.loads(Path('data/research/industry_state.json').read_text(encoding='utf-8'))
@@ -82,6 +85,7 @@ jobs:
           p = Path('data/research/industry_evidence.json')
           if p.exists():
               current = json.loads(p.read_text(encoding='utf-8'))
+
           same_inputs = bool(
               current
               and current.get('schema_version') == EXPECTED_EVIDENCE_SCHEMA_VERSION
@@ -89,18 +93,26 @@ jobs:
               and current.get('source_industry_state_generated_at') == state.get('generated_at')
               and current.get('source_leading_anchor_generated_at') == anchors.get('generated_at')
           )
-          rebuild = not same_inputs
+          refresh = not same_inputs
+
           with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as fh:
-              fh.write(f"rebuild={'true' if rebuild else 'false'}\n")
-          print(json.dumps({'current_schema_version': current.get('schema_version'), 'expected_schema_version': EXPECTED_EVIDENCE_SCHEMA_VERSION, 'anchor_complete': (anchors.get('collection') or {}).get('complete'), 'same_inputs': same_inputs, 'rebuild': rebuild}, ensure_ascii=False))
+              fh.write(f"refresh={'true' if refresh else 'false'}\n")
+          print(json.dumps({
+              'current_schema_version': current.get('schema_version'),
+              'expected_schema_version': EXPECTED_EVIDENCE_SCHEMA_VERSION,
+              'leading_anchor_complete': (anchors.get('collection') or {}).get('complete'),
+              'leading_anchor_partial': (anchors.get('collection') or {}).get('partial'),
+              'same_inputs': same_inputs,
+              'refresh': refresh,
+          }, ensure_ascii=False))
           PY
 
       - name: Build structured industry evidence
-        if: steps.source.outputs.closed == 'true' && steps.rebuild.outputs.rebuild == 'true'
+        if: steps.source.outputs.closed == 'true' && steps.rebuild.outputs.refresh == 'true'
         run: python scripts/build_industry_evidence.py
 
       - name: Run Evidence Gate in shadow mode
-        if: steps.source.outputs.closed == 'true' && steps.rebuild.outputs.rebuild == 'true'
+        if: steps.source.outputs.closed == 'true' && steps.rebuild.outputs.refresh == 'true'
         run: python scripts/validate_industry_evidence.py --mode shadow
 
       - name: Commit evidence diagnostics
@@ -130,22 +142,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
-        run: |
-          git fetch origin main
-          remote_sha="$(git rev-parse origin/main)"
-          echo "Dispatching production bundle for main SHA: ${remote_sha}"
-          gh workflow run production-bundle.yml --ref main
-          for attempt in $(seq 1 24); do
-            run_id="$(gh run list --workflow production-bundle.yml --branch main --event workflow_dispatch --limit 20 --json databaseId,headSha,status,conclusion --jq ".[] | select(.headSha == \"${remote_sha}\") | .databaseId" | head -n 1)"
-            if [ -n "${run_id}" ]; then
-              gh run watch "${run_id}" --exit-status
-              exit 0
-            fi
-            sleep 5
-          done
-          echo "::error::No production-bundle workflow run appeared for ${remote_sha}."
-          exit 1
+        run: bash scripts/dispatch_workflow_and_wait.sh production-bundle.yml main
 
-      - name: Report no-op or market-not-closed
+      - name: Report no-op
         if: steps.commit.outputs.pushed != 'true'
-        run: echo "No evidence commit required, or closed-session data is not ready."
+        run: echo "Industry evidence/leading anchors are unchanged or market data is not closed; no evidence commit needed."
