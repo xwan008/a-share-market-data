@@ -22,6 +22,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 SHARDS = DATA / "shards"
 HISTORY_SHARDS = DATA / "history_shards"
+COMMODITY = DATA / "commodity" / "futures_daily.json"
 SHARD_KEY_LENGTH = 5
 SAMPLES = ("002475", "601138", "601899")
 
@@ -167,6 +168,41 @@ def build_history_storage_coverage() -> dict:
     }
 
 
+def build_commodity_anchor_health() -> dict:
+    """Expose compact, reproducible commodity anchors through authoritative health.json.
+
+    Raw futures history remains in data/commodity/futures_daily.json for audit. Formal
+    research reads this compact health block so commodity inputs stay inside the existing
+    authoritative market-health contract.
+    """
+    payload = read_json(COMMODITY, {})
+    anchors = {}
+    for symbol, item in (payload.get("anchors") or {}).items():
+        anchors[symbol] = {
+            key: value
+            for key, value in item.items()
+            if key != "history"
+        }
+    return {
+        "schema_version": payload.get("schema_version"),
+        "generated_at": payload.get("generated_at"),
+        "reference_trade_date": payload.get("reference_trade_date"),
+        "source": payload.get("source"),
+        "status": payload.get("status", "unavailable"),
+        "max_anchor_age_days": payload.get("max_anchor_age_days"),
+        "neutral_window_sessions": payload.get("neutral_window_sessions"),
+        "minimum_neutral_sessions": payload.get("minimum_neutral_sessions"),
+        "required_symbols": payload.get("required_symbols") or [],
+        "anchors": anchors,
+        "errors": payload.get("errors") or {},
+        "runtime_semantics": (
+            "Machine-readable cycle anchors. Missing/degraded anchors are cycle-specific; "
+            "they do not invalidate non-cycle market data and must route eligible cycle "
+            "companies to the conservative anchorless valuation fallback."
+        ),
+    }
+
+
 def main() -> int:
     latest = read_json(DATA / "latest.json", {})
     trends = read_json(DATA / "trend_summary.json", {"stocks": {}})
@@ -220,6 +256,7 @@ def main() -> int:
         "fundamental_stats": latest.get("fundamental_stats"),
         "shard_count": len(groups),
         "market_breadth": build_market_breadth(latest_stocks, trend_stocks),
+        "commodity_anchors": build_commodity_anchor_health(),
         "history": {
             "storage": trends.get("history_storage"),
             "history_shard_key_length": trends.get("history_shard_key_length"),
@@ -268,6 +305,7 @@ def main() -> int:
         f">={PRICE_STRUCTURE_TARGET_POINTS}d: "
         f"{storage_coverage.get('points_ge_price_structure_target', 0)}, "
         f"fundamentals: {(latest.get('fundamental_stats') or {}).get('financial_usable', 0)}, "
+        f"commodity anchors: {build_commodity_anchor_health().get('status')}, "
         f"repairs: {repair.get('repaired', 0)}"
     )
     return 0
