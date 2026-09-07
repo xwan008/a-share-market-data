@@ -33,9 +33,10 @@ def fnum(value: Any) -> float | None:
     if isinstance(value, (int, float)):
         result = float(value)
         return result if math.isfinite(result) else None
-    text = str(value).strip().replace(",", "").replace("，", "").replace("%", "")
+    text = str(value).strip().replace(",", "").replace("，", "")
     if not text or text.lower() in {"nan", "none", "null", "--", "-", "—"}:
         return None
+    text = text.replace("%", "")
     try:
         result = float(text)
     except (TypeError, ValueError):
@@ -50,13 +51,20 @@ def parse_period(value: Any) -> date | None:
         return value.date()
     if isinstance(value, date):
         return value
+    if isinstance(value, float) and math.isfinite(value):
+        year = int(value)
+        month = int(round((value - year) * 10))
+        if 1900 <= year <= 2200 and 1 <= month <= 12:
+            return date(year, month, 1)
     text = str(value).strip()
     if not text:
         return None
-    match = re.search(r"(20\d{2}|19\d{2})[-/年.](\d{1,2})(?:[-/月.](\d{1,2}))?", text)
-    if match:
+    m = re.search(r"(20\d{2}|19\d{2})[-/年.](\d{1,2})(?:[-/月.](\d{1,2}))?", text)
+    if m:
+        year, month = int(m.group(1)), int(m.group(2))
+        day = int(m.group(3) or 1)
         try:
-            return date(int(match.group(1)), int(match.group(2)), int(match.group(3) or 1))
+            return date(year, month, day)
         except ValueError:
             return None
     digits = re.sub(r"\D", "", text)
@@ -81,12 +89,36 @@ def freshness(ref_day: date | None, target_day: date, frequency: str, config: di
     return {"status": "fresh" if 0 <= age <= max_age else "stale", "age_calendar_days": age, "max_age_calendar_days": max_age}
 
 
-def pick_date_column(frame, candidates: list[str]):
+def metric_value(value: Any) -> Any:
+    numeric = fnum(value)
+    if numeric is not None:
+        return round(numeric, 6)
+    text = str(value).strip() if value is not None else ""
+    return text if text and text.lower() != "nan" else None
+
+
+def apply_row_filter(frame, row_filter: dict | None):
+    if frame is None or frame.empty or not row_filter:
+        return frame
+    out = frame
+    for column, allowed in row_filter.items():
+        if column not in out.columns:
+            continue
+        allowed_values = [str(item) for item in (allowed or [])]
+        if not allowed_values:
+            continue
+        mask = out[column].astype(str).apply(lambda value: any(token in value for token in allowed_values))
+        out = out.loc[mask]
+    return out
+
+
+def pick_date_column(frame, candidates: list[str]) -> str:
     for candidate in candidates:
         if candidate in frame.columns:
             return candidate
     for column in frame.columns:
-        if any(token in str(column) for token in ("日期", "时间", "月份", "date", "Date")):
+        name = str(column)
+        if any(token in name for token in ("日期", "时间", "月份", "date", "Date")):
             return column
     raise RuntimeError(f"date_column_missing:{list(frame.columns)}")
 
@@ -96,46 +128,54 @@ def collect_akshare_table(ak, candidate: dict, target_day: date, config: dict) -
     frame = getattr(ak, function_name)(**(candidate.get("kwargs") or {}))
     if frame is None or frame.empty:
         raise RuntimeError("empty_dataframe")
-    row_filter = candidate.get("row_filter") or {}
-    for column, allowed in row_filter.items():
-        if column in frame.columns:
-            tokens = [str(item) for item in allowed]
-            frame = frame.loc[frame[column].astype(str).apply(lambda value: any(token in value for token in tokens))]
-    if frame.empty:
+    frame = apply_row_filter(frame, candidate.get("row_filter"))
+    if frame is None or frame.empty:
         raise RuntimeError("row_filter_empty")
     date_col = pick_date_column(frame, candidate.get("date_columns") or [])
-    metric_cols = [column for column in (candidate.get("metric_columns") or []) if column in frame.columns]
+    metric_cols = [col for col in (candidate.get("metric_columns") or []) if col in frame.columns]
     if not metric_cols:
         raise RuntimeError(f"metric_columns_missing:{list(frame.columns)}")
-    dated = []
+    dated_rows = []
     for _, row in frame.iterrows():
         row_day = parse_period(row.get(date_col))
         if row_day and row_day <= target_day:
-            dated.append((row_day, row))
-    if not dated:
+            dated_rows.append((row_day, row))
+    if not dated_rows:
         raise RuntimeError("no_parseable_rows")
-    latest_day = max(day for day, _ in dated)
+    latest_day = max(day for day, _ in dated_rows)
+    selected = [row for day, row in dated_rows if day == latest_day]
     metrics = {}
-    scope_columns = [column for column in row_filter if column in frame.columns]
-    for day, row in dated:
-        if day != latest_day:
-            continue
-        prefix = "|".join(f"{column}={row.get(column)}" for column in scope_columns)
+    scope_columns = list((candidate.get("row_filter") or {}).keys())
+    for row in selected:
+        scope_parts = [f"{column}={row.get(column)}" for column in scope_columns if column in frame.columns]
+        prefix = "|".join(scope_parts)
         for column in metric_cols:
-            raw = row.get(column)
-            value = fnum(raw)
+            value = metric_value(row.get(column))
             if value is None:
-                text = str(raw).strip() if raw is not None else ""
-                if not text or text.lower() == "nan":
-                    continue
-                output = text
-            else:
-                output = round(value, 6)
-            metrics[f"{prefix}::{column}" if prefix else str(column)] = output
+                continue
+            key = f"{prefix}::{column}" if prefix else str(column)
+            metrics[key] = value
     if not metrics:
         raise RuntimeError("latest_row_has_no_metrics")
     frequency = candidate.get("frequency", "monthly")
     return {"anchor_id": candidate["id"], "source_type": "akshare_table", "source": f"akshare.{function_name}", "proxy_strength": candidate.get("proxy_strength", "primary"), "reference_date": latest_day.isoformat(), "frequency": frequency, "freshness": freshness(latest_day, target_day, frequency, config), "metrics": metrics}
+
+
+def normalize_futures_rows(frame) -> list[tuple[date, float]]:
+    if frame is None or frame.empty:
+        return []
+    date_col = next((c for c in frame.columns if str(c).lower() == "date"), None)
+    close_col = next((c for c in frame.columns if str(c).lower() == "close"), None)
+    if date_col is None or close_col is None:
+        raise RuntimeError(f"futures_columns_missing:{list(frame.columns)}")
+    rows = []
+    for _, row in frame.iterrows():
+        row_day = parse_period(row.get(date_col))
+        close = fnum(row.get(close_col))
+        if row_day and close is not None and close > 0:
+            rows.append((row_day, close))
+    rows.sort(key=lambda item: item[0])
+    return rows
 
 
 def collect_futures_basket(ak, candidate: dict, target_day: date, config: dict) -> dict:
@@ -144,26 +184,16 @@ def collect_futures_basket(ak, candidate: dict, target_day: date, config: dict) 
     summaries, errors, reference_days = {}, {}, []
     for symbol in candidate.get("symbols") or []:
         try:
-            frame = ak.futures_zh_daily_sina(symbol=symbol)
-            date_col = next((column for column in frame.columns if str(column).lower() == "date"), None)
-            close_col = next((column for column in frame.columns if str(column).lower() == "close"), None)
-            if date_col is None or close_col is None:
-                raise RuntimeError(f"columns_missing:{list(frame.columns)}")
-            rows = []
-            for _, row in frame.iterrows():
-                row_day, close = parse_period(row.get(date_col)), fnum(row.get(close_col))
-                if row_day and row_day <= target_day and close is not None and close > 0:
-                    rows.append((row_day, close))
-            rows.sort(key=lambda item: item[0])
+            rows = [item for item in normalize_futures_rows(ak.futures_zh_daily_sina(symbol=symbol)) if item[0] <= target_day]
             if len(rows) < 20:
                 raise RuntimeError(f"insufficient_history:{len(rows)}")
             last_day = rows[-1][0]
             if (target_day - last_day).days > max_age:
                 raise RuntimeError(f"stale:{last_day.isoformat()}")
             closes = [item[1] for item in rows]
-            current = closes[-1]
             ma20 = sum(closes[-20:]) / 20
             ma60 = sum(closes[-60:]) / 60 if len(closes) >= 60 else None
+            current = closes[-1]
             summaries[symbol] = {"last_date": last_day.isoformat(), "current": round(current, 6), "ma20": round(ma20, 6), "ma60": round(ma60, 6) if ma60 else None, "change_20_sessions_pct": round((current / closes[-20] - 1) * 100, 4), "trend_20_vs_60_pct": round((ma20 / ma60 - 1) * 100, 4) if ma60 else None}
             reference_days.append(last_day)
         except Exception as exc:
@@ -181,8 +211,10 @@ def collect_health_commodity(candidate: dict, target_day: date, config: dict, he
     selected, reference_days = {}, []
     for symbol in candidate.get("symbols") or []:
         row = rows.get(symbol)
-        row_day = parse_period((row or {}).get("last_date"))
-        if not row or not row_day:
+        if not row:
+            continue
+        row_day = parse_period(row.get("last_date"))
+        if not row_day:
             continue
         selected[symbol] = {key: row.get(key) for key in ("name", "role", "last_date", "current", "ma20", "ma60", "current_to_neutral", "trend_20_vs_60_pct")}
         reference_days.append(row_day)
@@ -198,7 +230,7 @@ def collect_cpca_monthly(ak, candidate: dict, target_day: date, config: dict) ->
     frame = getattr(ak, candidate["function"])(**(candidate.get("kwargs") or {}))
     if frame is None or frame.empty:
         raise RuntimeError("empty_dataframe")
-    month_col = next((column for column in frame.columns if "月份" in str(column)), None)
+    month_col = next((c for c in frame.columns if "月份" in str(c)), None)
     if month_col is None:
         raise RuntimeError(f"month_column_missing:{list(frame.columns)}")
     year_columns = []
@@ -244,6 +276,11 @@ def collect_movie_monthly(ak, candidate: dict, target_day: date, config: dict) -
     if not values:
         raise RuntimeError("movie_boxoffice_no_numeric_values")
     metrics = {"boxoffice_total_100m_cny": round(sum(values), 6), "movie_count": len(values)}
+    if "平均票价" in frame.columns:
+        ticket = [fnum(value) for value in frame["平均票价"].tolist()]
+        ticket = [value for value in ticket if value is not None]
+        if ticket:
+            metrics["mean_ticket_price"] = round(sum(ticket) / len(ticket), 6)
     frequency = candidate.get("frequency", "monthly")
     return {"anchor_id": candidate["id"], "source_type": "movie_monthly", "source": f"akshare.{candidate['function']}", "proxy_strength": candidate.get("proxy_strength", "primary"), "reference_date": completed_month_end.isoformat(), "frequency": frequency, "freshness": freshness(completed_month_end, target_day, frequency, config), "metrics": metrics}
 
@@ -264,7 +301,8 @@ def collect_nbs_path(ak, candidate: dict, target_day: date, config: dict) -> dic
                     continue
                 best = None
                 for column in frame.columns:
-                    point_day, value = parse_period(column), fnum(row.get(column))
+                    point_day = parse_period(column)
+                    value = fnum(row.get(column))
                     if point_day and point_day <= target_day and value is not None and (best is None or point_day > best[0]):
                         best = (point_day, value, str(column))
                 if best:
@@ -272,7 +310,7 @@ def collect_nbs_path(ak, candidate: dict, target_day: date, config: dict) -> dic
                     matched[label] = {"value": round(value, 6), "period": column, "reference_date": point_day.isoformat()}
                     reference_days.append(point_day)
             if len(matched) < min_matches:
-                raise RuntimeError(f"keyword_matches_below_min:{len(matched)}/{min_matches}")
+                raise RuntimeError(f"keyword_matches_below_min:{len(matched)}/{min_matches}:index={list(map(str, frame.index))[:20]}")
             latest_day = max(reference_days)
             return {"anchor_id": candidate["id"], "source_type": "nbs_path", "source": "akshare.macro_china_nbs_nation", "source_path": path, "proxy_strength": candidate.get("proxy_strength", "primary"), "reference_date": latest_day.isoformat(), "frequency": frequency, "freshness": freshness(latest_day, target_day, frequency, config), "metrics": matched}
         except Exception as exc:
@@ -301,7 +339,9 @@ def semantic_payload(payload: dict) -> dict:
 
 def main() -> int:
     import akshare as ak
-    config, health = read_json(CONFIG_PATH), read_json(HEALTH_PATH)
+
+    config = read_json(CONFIG_PATH)
+    health = read_json(HEALTH_PATH)
     trade_date = str(health.get("trade_date") or "")[:10]
     target_day = parse_period(trade_date)
     if not target_day:
@@ -313,7 +353,8 @@ def main() -> int:
     if len(industries) != expected:
         raise RuntimeError(f"industry_source_matrix_incomplete:{len(industries)}/{expected}")
 
-    level1, complete, partial, total_attempts, failed_attempts = {}, 0, 0, 0, 0
+    level1 = {}
+    complete = partial = total_attempts = failed_attempts = 0
     for code, industry in industries.items():
         anchors, attempts = [], []
         for candidate in industry.get("candidates") or []:
@@ -335,6 +376,7 @@ def main() -> int:
         level1[code] = {"code": code, "name": industry.get("name"), "status": status, "primary_anchor_id": primary.get("anchor_id") if primary else None, "anchors": anchors, "attempts": attempts}
 
     payload = {"contract_id": "a-share-industry-leading-anchors", "schema_version": 1, "rollout_mode": config.get("rollout_mode", "shadow"), "generated_at": datetime.now(timezone.utc).isoformat(), "reference_trade_date": trade_date, "source_repo_commit_sha": current_git_sha(), "collection": {"level1_expected": expected, "level1_accounted": len(level1), "complete": complete, "partial": partial, "total_attempts": total_attempts, "failed_attempts": failed_attempts}, "level1": level1, "semantics": {"primary_anchor_rule": "first fresh non-secondary candidate, otherwise first fresh secondary candidate", "no_market_price_proxy": True, "financial_breadth_not_used_as_leading_anchor": True}}
+
     if OUTPUT_PATH.exists() and semantic_payload(read_json(OUTPUT_PATH)) == semantic_payload(payload):
         print(json.dumps({"changed": False, "reference_trade_date": trade_date, "complete": complete, "partial": partial, "failed_attempts": failed_attempts}, ensure_ascii=False))
         return 0
@@ -348,6 +390,7 @@ def self_test() -> int:
     assert parse_period("2026-09-07") == date(2026, 9, 7)
     assert parse_period("2026年08月份") == date(2026, 8, 1)
     assert parse_period("202608") == date(2026, 8, 1)
+    assert parse_period("2026.7") == date(2026, 7, 1)
     assert fnum("12.3%") == 12.3
     assert fnum("--") is None
     config = read_json(CONFIG_PATH)
