@@ -19,8 +19,11 @@ def test_cycle_valuation_has_machine_and_anchorless_routes() -> None:
         assert "conservative_anchorless_cycle" in text
         assert "valuation_incomplete:missing_cycle_inputs" in text
 
-    assert "missing_cycle_anchor 本身不再是强周期公司退出估值集的充分条件" in valuation
-    assert "不得以 `missing_cycle_anchor` 静默淘汰" in orchestrator
+    # Missing a single machine futures anchor must not be a terminal exclusion anymore.
+    assert "missing_cycle_anchor" in valuation
+    assert "不再是强周期公司退出估值集的充分条件" in valuation
+    assert "missing_cycle_anchor" in orchestrator
+    assert "静默淘汰" in orchestrator
 
 
 def test_market_refresh_builds_commodity_health_before_runtime_snapshot() -> None:
