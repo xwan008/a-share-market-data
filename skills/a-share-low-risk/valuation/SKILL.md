@@ -36,6 +36,52 @@
 
 对强周期公司，禁止把景气高点的TTM盈利或极高同比增速机械外推到长期合理价。应优先使用正常化/中周期核心盈利、可验证的Forward产销量与成本假设；若周期扭曲严重，则触发 `extreme_cycle_distortion` 进入Exception Path。
 
+### 1.4.1 强周期双路径估值（强制）
+强周期/资源公司不得因为缺少单一期货代码而从正式研究中静默消失。先识别 `cycle_valuation_mode`：
+
+#### A. `machine_commodity_anchor`
+当主营存在可靠、经济含义直接的机器商品锚时，**正式运行只读取当前锁定快照 `data/health.json -> commodity_anchors`，不得在估值阶段临时联网抓期货**。原始审计日线保存在 `data/commodity/futures_daily.json`，但正式运行以 health 中的同 SHA 摘要为准。
+
+当前标准机器锚：
+- 铜资源/铜价暴露：`CU0` 沪铜连续；
+- 黄金暴露：`AU0` 沪金连续；
+- 电解铝售价：`AL0` 沪铝连续；
+- 电解铝主要成本交叉验证：`AO0` 氧化铝连续。
+
+紫金矿业等多商品公司必须按真实盈利暴露组合多个锚，不能只挑走势最强的商品。没有可靠直接映射的化工品/价差，不得为了完成估值硬套一个相关性弱的期货品种。
+
+机器锚有效条件：
+- `commodity_anchors.reference_trade_date` 与本轮股票 `health.trade_date` 相同；
+- 对应 symbol 存在且 `age_days <= max_anchor_age_days`；
+- `neutral_window_sessions >= minimum_neutral_sessions`；
+- 当前价、MA20、MA60、中性价格中位数及 `current_to_neutral` 可读。
+
+正常化原则：
+- 使用约2年中性窗口比较当前商品/成本条件与中枢；
+- 商品价格高于中枢形成的 windfall 只能**下调**正常化EPS，不能把短期高景气直接资本化；
+- 输入成本高于中枢按相反方向处理；
+- 当前商品偏弱不得机械抬高正常化EPS；
+- 短期商品走强可以提高盈利持续性置信度，但不能直接抬高低风险买入区。
+
+必须记录：`commodity_anchors_used / commodity_anchor_date / current_to_neutral / normalization_factor / normalized_core_eps`。
+
+#### B. `conservative_anchorless_cycle`
+若行业没有可靠机器锚，或当日机器锚源 `degraded/unavailable`，**不得仅因此返回 `valuation_incomplete`**。改走保守无锚周期路径：
+
+`可验证Forward核心EPS → 下一年度只做下行约束 → 周期结构折价 → 供需/库存/产能6–18个月regime复核 → 180日市场sanity → fair multiple → 四层价格体系`
+
+规则：
+- 优先当前年度一致预期/公司可验证Forward核心EPS；
+- 下一年度预期若更低，必须降低盈利锚；若更高，不得仅凭乐观预测抬高低风险盈利锚；
+- 根据周期性强弱施加明确、一次性的结构折价/normalization haircut，并说明依据；
+- 必须用供给、需求、库存、产能/开工率、价格/价差等公开证据确认周期 regime；
+- 氟化工、聚氨酯、煤化工、氨纶等没有稳定单一期货代表真实利润价差的方向，优先走此路径，不得伪造机器锚。
+
+只有当**机器锚不可用且无锚路径所需的Forward盈利与周期regime证据也不足**时，才允许：
+`valuation_incomplete:missing_cycle_inputs`。
+
+因此，`missing_cycle_anchor` 本身不再是强周期公司退出估值集的充分条件。
+
 ### 1.5 180日市场 sanity check
 必须读取最近180个交易日：价格 low/median/high、当前价格 percentile；历史估值分位可得时一并使用。
 
@@ -136,12 +182,17 @@ MOS参考：高置信10%–15%，中等15%–20%，低置信20%–25%。不得�
 正常公司至少输出：
 `current_price / price_date / current_pe / dynamic_pe / pb / roe / core_profit_growth / peer_pe_median / peer_pb_median / fair_pe_low / fair_pe_mid / fair_pe_high / pe_basis / pb_cross_check / peer_valuation_check / cycle_normalization_check / market_180d_sanity_check / reasonable_price_range / base_fair_value / reasonable_buy_range / margin_of_safety_pct / safe_price_ceiling / low_risk_buy_range / valuation_position / low_risk_position / discount_sanity_check / left_value_buyable_now / falsifiers / valuation_path=normal_relative`。
 
+强周期公司额外输出：
+`cycle_valuation_mode / commodity_anchor_status / commodity_anchors_used / commodity_anchor_date / normalization_factor / normalized_core_eps / cycle_regime_basis / anchorless_fallback_basis`。
+
 异常公司额外输出：
 `valuation_path=exception / exception_trigger / exception_method / exception_evidence / buy_range_construction_basis / reasonable_buy_range / low_risk_buy_range`。
 
 ## 5. Completion纪律
 - valuation_set逐只执行；
 - 正常公司必须完成PE主锚、PB/ROE交叉验证、周期/口径检查、三级同行比较和180日sanity；
+- 强周期公司必须明确 `machine_commodity_anchor` 或 `conservative_anchorless_cycle`，不得因没有单一期货代码静默退出；
+- 只有机器锚与无锚fallback输入均不足时才允许 `valuation_incomplete:missing_cycle_inputs`；
 - 异常公司必须有明确异常触发；
 - `reasonable_buy_range` 与 `low_risk_buy_range` 必须分别产生并分别解释；
 - Safe Price Ceiling只应用一次MOS；
