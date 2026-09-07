@@ -2,6 +2,13 @@ name: Update industry evidence
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'config/industry_evidence_contract.json'
+      - 'scripts/build_industry_evidence.py'
+      - 'scripts/validate_industry_evidence.py'
+      - '.github/workflows/update-industry-evidence.yml'
   schedule:
     # GitHub cron is UTC. 09:00/09:30 UTC = 17:00/17:30 Asia/Shanghai.
     - cron: '0 9 * * 1-5'
