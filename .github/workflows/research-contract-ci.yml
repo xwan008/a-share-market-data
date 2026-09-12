@@ -6,9 +6,11 @@ on:
       - 'config/research_runtime_policy.json'
       - 'config/research_pipeline_manifest.json'
       - 'config/industry_evidence_contract.json'
+      - 'config/industry_leading_anchor_sources.json'
       - 'skills/a-share-low-risk/**'
       - 'scripts/build_full_market_price_structure.py'
       - 'scripts/validate_research_completion.py'
+      - 'scripts/fetch_industry_leading_anchors.py'
       - 'scripts/build_industry_evidence.py'
       - 'scripts/validate_industry_evidence.py'
       - '.github/workflows/update-industry-evidence.yml'
@@ -21,9 +23,11 @@ on:
       - 'config/research_runtime_policy.json'
       - 'config/research_pipeline_manifest.json'
       - 'config/industry_evidence_contract.json'
+      - 'config/industry_leading_anchor_sources.json'
       - 'skills/a-share-low-risk/**'
       - 'scripts/build_full_market_price_structure.py'
       - 'scripts/validate_research_completion.py'
+      - 'scripts/fetch_industry_leading_anchors.py'
       - 'scripts/build_industry_evidence.py'
       - 'scripts/validate_industry_evidence.py'
       - '.github/workflows/update-industry-evidence.yml'
@@ -51,10 +55,56 @@ jobs:
           pip install pytest
       - name: Run repository tests
         run: python -m pytest -q
-      - name: Compile new evidence pipeline scripts
+      - name: Compile evidence pipeline scripts
         run: |
+          python -m py_compile scripts/fetch_industry_leading_anchors.py
           python -m py_compile scripts/build_industry_evidence.py
           python -m py_compile scripts/validate_industry_evidence.py
+      - name: Validate 31-industry leading-anchor contract
+        run: python scripts/fetch_industry_leading_anchors.py --self-test
+      - name: Prepare offline leading-anchor fixture
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          health = json.loads(Path('data/health.json').read_text(encoding='utf-8'))
+          universe = json.loads(Path('config/industry_scan_universe.json').read_text(encoding='utf-8'))
+          level1 = universe['levels']['level1']
+          payload = {
+              'contract_id': 'a-share-industry-leading-anchors',
+              'schema_version': 1,
+              'rollout_mode': 'shadow',
+              'generated_at': 'ci-offline-fixture',
+              'reference_trade_date': health['trade_date'],
+              'source_repo_commit_sha': '',
+              'collection': {
+                  'level1_expected': 31,
+                  'level1_accounted': 31,
+                  'complete': 0,
+                  'partial': 31,
+                  'total_attempts': 0,
+                  'failed_attempts': 0,
+              },
+              'level1': {
+                  row['code']: {
+                      'code': row['code'],
+                      'name': row['name'],
+                      'status': 'partial',
+                      'primary_anchor_id': None,
+                      'anchors': [],
+                      'attempts': [],
+                  }
+                  for row in level1
+              },
+              'semantics': {
+                  'ci_fixture': True,
+                  'important': 'No fresh leading anchor is fabricated in CI.',
+              },
+          }
+          Path('data/research/industry_leading_anchors.json').write_text(
+              json.dumps(payload, ensure_ascii=False, indent=2) + '\n', encoding='utf-8'
+          )
+          PY
       - name: Build and validate shadow industry evidence
         run: |
           python scripts/build_industry_evidence.py
@@ -62,13 +112,15 @@ jobs:
           python - <<'PY'
           import json
           from pathlib import Path
-
           evidence = json.loads(Path('data/research/industry_evidence.json').read_text(encoding='utf-8'))
           gate = json.loads(Path('data/research/evidence_gate.json').read_text(encoding='utf-8'))
           assert evidence['contract_id'] == 'a-share-industry-evidence'
+          assert evidence['schema_version'] == 3
           assert evidence['universe']['actual_level1_count'] == 31
+          assert evidence['leading_anchor_collection']['level1_accounted'] == 31
           assert gate['shape_valid'] is True
           assert gate['level1_accounted'] == 31
+          assert gate['leading_anchor_collection_accounted'] == 31
           PY
       - name: Build or validate production price-structure snapshot
         run: |
@@ -76,27 +128,16 @@ jobs:
           import json
           import subprocess
           from pathlib import Path
-
           health = json.loads(Path('data/health.json').read_text(encoding='utf-8'))
           latest = json.loads(Path('data/latest.json').read_text(encoding='utf-8'))
           structure_path = Path('data/research/full_market_price_structure.json')
-
           health_date = str(health.get('trade_date') or '')
           latest_date = str(latest.get('trade_date') or '')
-          closed_complete = (
-              health.get('market_status') == 'closed'
-              and health_date
-              and health_date == latest_date
-          )
-
+          closed_complete = health.get('market_status') == 'closed' and health_date and health_date == latest_date
           if closed_complete:
               subprocess.run(['python', 'scripts/build_full_market_price_structure.py'], check=True)
           else:
-              print(
-                  'Skipping structure rebuild because repository market data is not a '
-                  'closed-session-complete snapshot; validating the last committed structure instead.'
-              )
-
+              print('Skipping structure rebuild because repository market data is not a closed-session-complete snapshot; validating the last committed structure instead.')
           p = json.loads(structure_path.read_text(encoding='utf-8'))
           assert p['contract_id'] == 'a-share-low-risk-price-structure'
           assert 'schema_version' not in p

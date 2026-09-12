@@ -8,6 +8,8 @@ on:
     branches: [main]
     paths:
       - 'config/industry_evidence_contract.json'
+      - 'config/industry_leading_anchor_sources.json'
+      - 'scripts/fetch_industry_leading_anchors.py'
       - 'scripts/build_industry_evidence.py'
       - 'scripts/validate_industry_evidence.py'
       - '.github/workflows/update-industry-evidence.yml'
@@ -37,6 +39,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
       - name: Check closed-session source data
         id: source
@@ -46,54 +52,78 @@ jobs:
           import json
           import os
           from pathlib import Path
+          health = json.loads(Path('data/health.json').read_text(encoding='utf-8'))
+          closed = bool(health.get('trade_date') and health.get('market_status') == 'closed')
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as fh:
+              fh.write(f"closed={'true' if closed else 'false'}\n")
+          print(json.dumps({
+              'trade_date': health.get('trade_date'),
+              'market_status': health.get('market_status'),
+              'closed': closed,
+          }, ensure_ascii=False))
+          PY
 
-          EXPECTED_EVIDENCE_SCHEMA_VERSION = 2
+      - name: Collect industry leading anchors
+        if: steps.source.outputs.closed == 'true'
+        run: python scripts/fetch_industry_leading_anchors.py
+
+      - name: Decide evidence rebuild
+        id: rebuild
+        if: steps.source.outputs.closed == 'true'
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          EXPECTED_EVIDENCE_SCHEMA_VERSION = 3
           health = json.loads(Path('data/health.json').read_text(encoding='utf-8'))
           state = json.loads(Path('data/research/industry_state.json').read_text(encoding='utf-8'))
+          anchors = json.loads(Path('data/research/industry_leading_anchors.json').read_text(encoding='utf-8'))
           current = {}
           p = Path('data/research/industry_evidence.json')
           if p.exists():
               current = json.loads(p.read_text(encoding='utf-8'))
 
-          closed = bool(health.get('trade_date') and health.get('market_status') == 'closed')
           same_inputs = bool(
               current
               and current.get('schema_version') == EXPECTED_EVIDENCE_SCHEMA_VERSION
               and current.get('source_health_generated_at') == health.get('generated_at')
               and current.get('source_industry_state_generated_at') == state.get('generated_at')
+              and current.get('source_leading_anchor_generated_at') == anchors.get('generated_at')
           )
-          refresh = bool(closed and not same_inputs)
+          refresh = not same_inputs
 
           with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as fh:
-              fh.write(f"closed={'true' if closed else 'false'}\n")
               fh.write(f"refresh={'true' if refresh else 'false'}\n")
           print(json.dumps({
-              'trade_date': health.get('trade_date'),
-              'market_status': health.get('market_status'),
               'current_schema_version': current.get('schema_version'),
               'expected_schema_version': EXPECTED_EVIDENCE_SCHEMA_VERSION,
+              'leading_anchor_complete': (anchors.get('collection') or {}).get('complete'),
+              'leading_anchor_partial': (anchors.get('collection') or {}).get('partial'),
               'same_inputs': same_inputs,
               'refresh': refresh,
           }, ensure_ascii=False))
           PY
 
       - name: Build structured industry evidence
-        if: steps.source.outputs.refresh == 'true'
+        if: steps.source.outputs.closed == 'true' && steps.rebuild.outputs.refresh == 'true'
         run: python scripts/build_industry_evidence.py
 
       - name: Run Evidence Gate in shadow mode
-        if: steps.source.outputs.refresh == 'true'
+        if: steps.source.outputs.closed == 'true' && steps.rebuild.outputs.refresh == 'true'
         run: python scripts/validate_industry_evidence.py --mode shadow
 
       - name: Commit evidence diagnostics
         id: commit
-        if: steps.source.outputs.refresh == 'true'
+        if: steps.source.outputs.closed == 'true'
         shell: bash
         run: |
-          if git status --porcelain -- data/research/industry_evidence.json data/research/evidence_gate.json | grep -q .; then
+          if git status --porcelain -- data/research/industry_leading_anchors.json data/research/industry_evidence.json data/research/evidence_gate.json | grep -q .; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add data/research/industry_evidence.json data/research/evidence_gate.json
+            git add data/research/industry_leading_anchors.json data/research/industry_evidence.json data/research/evidence_gate.json
             git commit -m "research: refresh structured industry evidence"
             for attempt in 1 2 3; do
               git pull --rebase origin main
@@ -115,5 +145,5 @@ jobs:
         run: bash scripts/dispatch_workflow_and_wait.sh production-bundle.yml main
 
       - name: Report no-op
-        if: steps.source.outputs.refresh != 'true'
-        run: echo "Industry evidence inputs and schema are unchanged or market data is not closed; no evidence commit needed."
+        if: steps.commit.outputs.pushed != 'true'
+        run: echo "Industry evidence/leading anchors are unchanged or market data is not closed; no evidence commit needed."

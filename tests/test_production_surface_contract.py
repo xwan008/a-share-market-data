@@ -71,12 +71,38 @@ def test_downstream_publication_is_event_driven_and_cron_is_root_only():
     assert "bash scripts/dispatch_workflow_and_wait.sh production-bundle.yml main" in evidence
 
 
-def test_industry_evidence_refresh_is_schema_aware():
+def test_industry_evidence_refresh_is_schema_and_anchor_aware():
     workflow = (ROOT / ".github/workflows/update-industry-evidence.yml").read_text(encoding="utf-8")
     builder = (ROOT / "scripts/build_industry_evidence.py").read_text(encoding="utf-8")
-    assert "EXPECTED_EVIDENCE_SCHEMA_VERSION = 2" in workflow
+    assert "EXPECTED_EVIDENCE_SCHEMA_VERSION = 3" in workflow
     assert "current.get('schema_version') == EXPECTED_EVIDENCE_SCHEMA_VERSION" in workflow
-    assert '"schema_version": 2' in builder
+    assert "source_leading_anchor_generated_at" in workflow
+    assert "python scripts/fetch_industry_leading_anchors.py" in workflow
+    assert '"schema_version": 3' in builder
+    assert "industry_leading_anchors.json" in builder
+
+
+def test_leading_anchor_matrix_accounts_for_all_level1_and_forbids_market_price_proxy():
+    import json
+
+    matrix = json.loads((ROOT / "config/industry_leading_anchor_sources.json").read_text(encoding="utf-8"))
+    universe = json.loads((ROOT / "config/industry_scan_universe.json").read_text(encoding="utf-8"))
+    level1_codes = {row["code"] for row in universe["levels"]["level1"]}
+    assert matrix["required_level1_count"] == 31
+    assert set(matrix["industries"]) == level1_codes
+    assert matrix["rules"]["stock_or_industry_index_price_forbidden"] is True
+    forbidden = {"stock_price", "industry_index_price", "industry_kline", "stock_kline"}
+    for code, row in matrix["industries"].items():
+        assert row["candidates"], code
+        assert not ({candidate.get("type") for candidate in row["candidates"]} & forbidden), code
+
+
+def test_production_bundle_carries_leading_anchor_contract_and_payload():
+    bundle = (ROOT / ".github/workflows/production-bundle.yml").read_text(encoding="utf-8")
+    assert "config/industry_leading_anchor_sources.json" in bundle
+    assert "data/research/industry_leading_anchors.json" in bundle
+    assert "scripts/fetch_industry_leading_anchors.py" in bundle
+    assert "leading_anchor_complete" in bundle
 
 
 def test_research_directory_has_only_authoritative_runtime_files_and_readme():
@@ -87,6 +113,7 @@ def test_research_directory_has_only_authoritative_runtime_files_and_readme():
         "company_industry_index.json",
         "full_market_price_structure.json",
         "industry_state.json",
+        "industry_leading_anchors.json",
         "industry_evidence.json",
         "evidence_gate.json",
     }
